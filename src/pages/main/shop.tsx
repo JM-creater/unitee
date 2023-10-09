@@ -2,6 +2,7 @@ import './shop.css'
 import { Link, useParams } from "react-router-dom"
 import shopPic1Carousel from "../../assets/images/carouselPic2.png"
 import shopPic2Carousel from  "../../assets/images/carouselPic1.png"
+import starIcon from "../../assets/images/icons/starRating.png"
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect, useState } from 'react'
 import axios from 'axios'
@@ -57,7 +58,7 @@ function Shop() {
                             <img src={ `https://localhost:7017/${shops.image}` } className="supplierCard-img"/>
                             <div className='col-md-5 shop-card-details'>
                                 <h5 className="supplier-card-title">{shops.shopName}</h5>
-                                <h5 className='shop-rating-card'>No Rating Yet</h5>
+                                <h5 className='shop-rating-card'><img className="ratingIcon" src={ starIcon }/>No Rating Yet</h5>
                                 <h5 className='shop-rating-card'>{shops.address}</h5>
                             </div>
                         </div>

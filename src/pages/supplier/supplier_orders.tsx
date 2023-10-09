@@ -14,11 +14,12 @@ function Orders () {
     };
 
     const Status ={
-      Created: 'Created',
+      OrderPlaced: 'OrderPlaced',
       Pending: 'Pending',
-      OrderPlaced: 'Order Placed',
-      ForPickUp: 'For Pick Up',
-      Completed: 'Completed'
+      Approved: 'Approved',
+      ForPickUp: 'ForPickUp',
+      Completed: 'Completed',
+      Canceled: 'Canceled'
     };
 
     const [orders, setOrders] = useState([]);
@@ -47,14 +48,18 @@ function Orders () {
 
 
 
+
     return <div className="orders-main-container">
         <div className="row">
           <div className="col-3">
             <nav id="orders-navbar" 
             className="orders-nav-container">
               <nav className="orders-nav nav nav-pills flex-column">
+                <a className="orders-nav-link" href="#orderplaced-orders">ORDER PLACED</a>
                 <a className="orders-nav-link" href="#pending-orders">PENDING</a>
                 <a className="orders-nav-link" href="#approved-orders">APPROVED</a>
+                <a className="orders-nav-link" href="#forpickup-orders">FOR PICK UP</a>
+                <a className="orders-nav-link" href="#completed-orders">COMPLETED</a>
                 <a className="orders-nav-link" href="#canceled-orders">CANCELED</a>
                 <Link to={`/supplier_items/${id}`}>
                   <span className="orders-nav-link">Back</span>
@@ -63,185 +68,352 @@ function Orders () {
             </nav>
           </div>
 
-  <div className="orders-admin-container col-9">
-    <div data-bs-spy="scroll" data-bs-target="#orders-navbar" data-bs-smooth-scroll="true" className="odersScrollspy" tabIndex={0}>
-      <div id="pending-orders">
-        <h4 className="order-status-text">Pending Orders</h4>
-          <div className='col-md-10 pending-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-          <table className="table table-hover table-striped align-middle caption-bot table-xl">
-          <caption>end of list of pending orders</caption>
-          <thead className='table-dark align-middle'>
-            <tr className='thead-row'>
-              <th scope="col">Date</th>
-              <th scope="col">Order ID</th>
-              <th scope="col">Number of Items</th>
-              <th scope="col">Total Amount</th>
-              <th scope="col">Status</th>
-            </tr>
-          </thead>
-          {orders.map((orderItem, index) => (
-          <tbody key={index}  className="table-group-divider">
-            <tr onClick={() => setSelectedOrders(orderItem)}>
-              <th scope="row" data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{orderItem.dateCreated}</th>
-              <td data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{orderItem.id}</td>
-              <td data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{orderItem.cart.items.length}</td>
-              <td data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{orderItem.total}</td>
-              <td data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
-            </tr>
-          </tbody>
-          ))}
-          </table>
-        </div>
-      </div>
-      
-      <div id="approved-orders">
-        <h4 className="order-status-text">Approved Orders</h4>
-        <div className='col-md-10 approved-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-          <table className="table table-hover table-striped align-middle caption-bot table-xl">
-          <caption>end of list of approved orders</caption>
-          <thead className='table-dark align-middle'>
-              <tr className='thead-row'>
-              <th scope="col">Date</th>
-              <th scope="col">Order ID</th>
-              <th scope="col">Number of Items</th>
-              <th scope="col">Total Amount</th>
-              <th scope="col">Status</th>
-              </tr>
-          </thead>
-          <tbody className="table-group-divider">
-            {/* <tr>
-              <th scope="row" data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">08/28/2023</th>
-              <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">2583792</td>
-              <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">5</td>
-              <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">PHP 1000</td>
-              <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">Approved</td>
-            </tr> */}
-          </tbody>
-          </table>
-        </div>
-      </div>
-      <div id="canceled-orders">
-        <h4 className="order-status-text">Canceled Orders</h4>
-        <div className='col-md-10 admin-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-          <table className="table table-hover table-striped align-middle caption-bot table-xl">
-          <caption>end of list of cancelled orders</caption>
-          <thead className='table-dark align-middle'>
-              <tr className='thead-row'>
-              <th scope="col">Date</th>
-              <th scope="col">Order ID</th>
-              <th scope="col">Number of Items</th>
-              <th scope="col">Total Amount</th>
-              <th scope="col">Status</th>
-              </tr>
-          </thead>
-          <tbody className="table-group-divider">
-            {/* <tr>
-              <th scope="row" data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">08/28/2023</th>
-              <td data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">2583792</td>
-              <td data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">5</td>
-              <td data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">PHP 1000</td>
-              <td data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">Canceled</td>
-            </tr> */}
-          </tbody>
-          </table>
-        </div>
-      </div>
+          <div className="orders-admin-container col-9">
+            <div data-bs-spy="scroll" data-bs-target="#orders-navbar" data-bs-smooth-scroll="true" className="odersScrollspy" tabIndex={0}>
 
-    </div>
-  
-  </div>
-</div>
-
-<div className="pending-order-modal modal fade" id="pendingOrdersModal" tabIndex={-1} aria-labelledby="pendingOrderModalLabel" aria-hidden="true">
-  <div className="modal-dialog modal-dialog-centered modal-xl">
-    <div className="orders-modal-content modal-content" style={{ backgroundColor:'#fff' }}>
-    <div className="modal-header">
-    <h3 className='modal-order-title'>Order Details</h3>
-        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      {selectedOrders && (
-        <div className='col-md-12 row' style={{ display:'flex', justifyContent:'space-between', padding:'15px' }}>
-        <div className="modal-body">
-          <div style={{ display:'flex', flexFlow:'row', gap:'50px' }}>
-              <div className='col-md-3 product-details-container' >
-              <div className='customer-details-content'>
-              <h3 className='order-details-titles'>Customer Details</h3>
-              <span className="customer-details-text">First Name: <p className="customer-details-input">{selectedOrders.user.firstName}</p></span>
-              <span className="customer-details-text">Last Name: <p className="customer-details-input">{selectedOrders.user.lastName}</p></span>
-              <span className="customer-details-text">ID Number: <p className="customer-details-input">{selectedOrders.user.id}</p></span>
-              <span className="customer-details-text">Phone Number: <p className="customer-details-input">{selectedOrders.user.phoneNumber}</p></span>
+            <div id="orderplaced-orders">
+                <h4 className="order-status-text">Order Placed</h4>
+                <div className='col-md-10 approved-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+                  <table className="table table-hover table-striped align-middle caption-bot table-xl">
+                  <caption>end of list of placed orders</caption>
+                  <thead className='table-dark align-middle'>
+                      <tr className='thead-row'>
+                      <th scope="col">Date</th>
+                      <th scope="col">Order No.</th>
+                      <th scope="col">Number of Items</th>
+                      <th scope="col">Total Amount</th>
+                      <th scope="col">Status</th>
+                      </tr>
+                  </thead>
+                  {orders.map((orderItem, index) => (
+                  <tbody key={index}  className="table-group-divider">
+                    <tr onClick={() => setSelectedOrders(orderItem)}>
+                      <th scope="row" data-bs-toggle="modal" data-bs-target="#orderPlacedModal">{orderItem.dateCreated}</th>
+                      <td data-bs-toggle="modal" data-bs-target="#orderPlacedModal">{orderItem.orderNumber}</td>
+                      <td data-bs-toggle="modal" data-bs-target="#orderPlacedModal">{orderItem.cart.items.length}</td>
+                      <td data-bs-toggle="modal" data-bs-target="#orderPlacedModal">{orderItem.total}</td>
+                      <td data-bs-toggle="modal" data-bs-target="#orderPlacedModal">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                    </tr>
+                  </tbody>
+                  ))}
+                  </table>
+                </div>
               </div>
-              <div className='order-details-content'>
-              <h3 className='order-details-titles'>Order Details</h3>
-              <span className="order-details-text">Order Date: <p className="order-details-input">{selectedOrders.dateCreated}</p></span>
-              <span className="order-details-text">Order ID: <p className="order-details-input">{selectedOrders.id}</p></span>
-              <span className="order-details-text">Number of Items: <p className="order-details-input">{selectedOrders.cart.items.length}</p></span>
-              <span className="order-details-text">Payment option: <p className="order-details-input">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</p></span>
+
+              <div id="pending-orders">
+                <h4 className="order-status-text">Pending Orders</h4>
+                  <div className='col-md-10 pending-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+                  <table className="table table-hover table-striped align-middle caption-bot table-xl">
+                  <caption>end of list of pending orders</caption>
+                  <thead className='table-dark align-middle'>
+                    <tr className='thead-row'>
+                      <th scope="col">Date</th>
+                      <th scope="col">Order No.</th>
+                      <th scope="col">Number of Items</th>
+                      <th scope="col">Total Amount</th>
+                      <th scope="col">Status</th>
+                    </tr>
+                  </thead>
+                  {orders.map((orderItem, index) => (
+                  <tbody key={index}  className="table-group-divider">
+                    <tr onClick={() => setSelectedOrders(orderItem)}>
+                      <th scope="row" data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{orderItem.dateCreated}</th>
+                      <td data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{orderItem.orderNumber}</td>
+                      <td data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{orderItem.cart.items.length}</td>
+                      <td data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{orderItem.total}</td>
+                      <td data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                    </tr>
+                  </tbody>
+                  ))}
+                  </table>
+                </div>
               </div>
               
-              <div className='payment-details-content'>
-              <h3 className='order-details-titles'>Payment Details</h3>
-              <h4>Total Amount: <p className="order-details-input">{selectedOrders.total}</p></h4>
-              <span className="order-details-text">Proof of payment:</span>
-                <a 
-                    href={`https://localhost:7017/${selectedOrders.proofOfPayment}`}
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    style={{ fontSize:'15px', display: 'block' }}
-                >
-                    {selectedOrders.proofOfPayment.split('\\').pop()}
-                </a>
-              </div>
+              <div id="approved-orders">
+                <h4 className="order-status-text">Approved Orders</h4>
+                <div className='col-md-10 approved-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+                  <table className="table table-hover table-striped align-middle caption-bot table-xl">
+                  <caption>end of list of approved orders</caption>
+                  <thead className='table-dark align-middle'>
+                      <tr className='thead-row'>
+                      <th scope="col">Date</th>
+                      <th scope="col">Order No.</th>
+                      <th scope="col">Number of Items</th>
+                      <th scope="col">Total Amount</th>
+                      <th scope="col">Status</th>
+                      </tr>
+                  </thead>
+                  <tbody className="table-group-divider">
+                    <tr>
+                      <th scope="row" data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">08/28/2023</th>
+                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">2583792</td>
+                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">5</td>
+                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">PHP 1000</td>
+                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">Approved</td>
+                    </tr>
+                  </tbody>
+                  </table>
+                </div>
               </div>
 
-              <div className='item-details-container'>
-                <h3>Item Details:</h3>
-                <div className='order-table-wrapper table-responsive-sm'>
-                    <table className="col-md-12 table table-hover align-middle caption-bot table-xl">
-                      <caption>end of list</caption>
-                      <thead className='table-dark align-middle'>
-                          <tr className='thead-row'>
-                            <th className="order-table-header" scope="col">Product</th>
-                            <th className="order-table-header" scope="col">Size</th>
-                            <th className="order-table-header" scope="col">Quantity</th>
-                            <th className="order-table-header" scope="col">Price</th>
-                          </tr>
-                      </thead>
-                      <tbody className="table-group-divider">
-                          {selectedOrders.cart.items.map(item => (
-                            <tr key={item.id}>
-                                <th scope="row">
-                                  <img 
-                                      className="prod-image-cart" 
-                                      src={`https://localhost:7017/${item.product.image}`} 
-                                      alt={item.product.productName}
-                                  />
-                                  {item.product.productName}
-                                </th>
-                                <td>{item.sizeQuantity.size}</td>
-                                <td>{item.quantity}</td>
-                                <td>PHP {item.product.price}</td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
+              <div id="forpickup-orders">
+                <h4 className="order-status-text">For Pick Up</h4>
+                <div className='col-md-10 approved-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+                  <table className="table table-hover table-striped align-middle caption-bot table-xl">
+                  <caption>end of list of pick up orders</caption>
+                  <thead className='table-dark align-middle'>
+                      <tr className='thead-row'>
+                      <th scope="col">Date</th>
+                      <th scope="col">Order No.</th>
+                      <th scope="col">Number of Items</th>
+                      <th scope="col">Total Amount</th>
+                      <th scope="col">Status</th>
+                      </tr>
+                  </thead>
+                  <tbody className="table-group-divider">
+                    <tr>
+                      <th scope="row" data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">08/28/2023</th>
+                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">2583792</td>
+                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">5</td>
+                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">PHP 1000</td>
+                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">Approved</td>
+                    </tr>
+                  </tbody>
+                  </table>
                 </div>
+              </div>
+
+              <div id="completed-orders">
+                <h4 className="order-status-text">Completed</h4>
+                <div className='col-md-10 approved-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+                  <table className="table table-hover table-striped align-middle caption-bot table-xl">
+                  <caption>end of list of completed orders</caption>
+                  <thead className='table-dark align-middle'>
+                      <tr className='thead-row'>
+                      <th scope="col">Date</th>
+                      <th scope="col">Order No.</th>
+                      <th scope="col">Number of Items</th>
+                      <th scope="col">Total Amount</th>
+                      <th scope="col">Status</th>
+                      </tr>
+                  </thead>
+                  <tbody className="table-group-divider">
+                    <tr>
+                      <th scope="row" data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">08/28/2023</th>
+                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">2583792</td>
+                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">5</td>
+                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">PHP 1000</td>
+                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">Approved</td>
+                    </tr>
+                  </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div id="canceled-orders">
+                <h4 className="order-status-text">Canceled Orders</h4>
+                <div className='col-md-10 admin-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+                  <table className="table table-hover table-striped align-middle caption-bot table-xl">
+                  <caption>end of list of canceled orders</caption>
+                  <thead className='table-dark align-middle'>
+                      <tr className='thead-row'>
+                      <th scope="col">Date</th>
+                      <th scope="col">Order No.</th>
+                      <th scope="col">Number of Items</th>
+                      <th scope="col">Total Amount</th>
+                      <th scope="col">Status</th>
+                      </tr>
+                  </thead>
+                  <tbody className="table-group-divider">
+                    <tr>
+                      <th scope="row" data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">08/28/2023</th>
+                      <td data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">2583792</td>
+                      <td data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">5</td>
+                      <td data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">PHP 1000</td>
+                      <td data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">Canceled</td>
+                    </tr>
+                  </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+      </div>
+
+      <div className="pending-order-modal modal fade" id="orderPlacedModal" tabIndex={-1} aria-labelledby="orderPlacedModalModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered modal-xl">
+          <div className="orders-modal-content modal-content" style={{ backgroundColor:'#fff' }}>
+          <div className="modal-header">
+          <h3 className='modal-order-title'>Order Details</h3>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            {selectedOrders && (
+              <div className='col-md-12 row' style={{ display:'flex', justifyContent:'space-between', padding:'15px' }}>
+              <div className="modal-body">
+                <div style={{ display:'flex', flexFlow:'row', gap:'50px' }}>
+                    <div className='col-md-3 product-details-container' >
+                    <div className='customer-details-content'>
+                    <h3 className='order-details-titles'>Customer Details</h3>
+                    <span className="customer-details-text">First Name: <p className="customer-details-input">{selectedOrders.user.firstName}</p></span>
+                    <span className="customer-details-text">Last Name: <p className="customer-details-input">{selectedOrders.user.lastName}</p></span>
+                    <span className="customer-details-text">ID Number: <p className="customer-details-input">{selectedOrders.user.id}</p></span>
+                    <span className="customer-details-text">Phone Number: <p className="customer-details-input">{selectedOrders.user.phoneNumber}</p></span>
+                    </div>
+                    <div className='order-details-content'>
+                    <h3 className='order-details-titles'>Order Details</h3>
+                    <span className="order-details-text">Order Date: <p className="order-details-input">{selectedOrders.dateCreated}</p></span>
+                    <span className="order-details-text">Order No: <p className="order-details-input">{selectedOrders.orderNumber}</p></span>
+                    <span className="order-details-text">Number of Items: <p className="order-details-input">{selectedOrders.cart.items.length}</p></span>
+                    <span className="order-details-text">Payment option: <p className="order-details-input">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</p></span>
+                    </div>
+                    
+                    <div className='payment-details-content'>
+                    <h3 className='order-details-titles'>Payment Details</h3>
+                    <h4>Total Amount: <p className="order-details-input">{selectedOrders.total}</p></h4>
+                    <span className="order-details-text">Proof of payment:</span>
+                      <a 
+                          href={`https://localhost:7017/${selectedOrders.proofOfPayment}`}
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          style={{ fontSize:'15px', display: 'block' }}
+                      >
+                          {selectedOrders.proofOfPayment.split('\\').pop()}
+                      </a>
+                    </div>
+                    </div>
+
+                    <div className='item-details-container'>
+                      <h3>Item Details:</h3>
+                      <div className='order-table-wrapper table-responsive-sm'>
+                          <table className="col-md-12 table table-hover align-middle caption-bot table-xl">
+                            <caption>end of list</caption>
+                            <thead className='table-dark align-middle'>
+                                <tr className='thead-row'>
+                                  <th className="order-table-header" scope="col">Product</th>
+                                  <th className="order-table-header" scope="col">Size</th>
+                                  <th className="order-table-header" scope="col">Quantity</th>
+                                  <th className="order-table-header" scope="col">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody className="table-group-divider">
+                                {selectedOrders.cart.items.map(item => (
+                                  <tr key={item.id}>
+                                      <th scope="row">
+                                        <img 
+                                            className="prod-image-cart" 
+                                            src={`https://localhost:7017/${item.product.image}`} 
+                                            alt={item.product.productName}
+                                        />
+                                        {item.product.productName}
+                                      </th>
+                                      <td>{item.sizeQuantity.size}</td>
+                                      <td>{item.quantity}</td>
+                                      <td>PHP {item.product.price}</td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                      </div>
+                  </div>
+                </div>
+              </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="pending-order-modal modal fade" id="pendingOrdersModal" tabIndex={-1} aria-labelledby="pendingOrderModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered modal-xl">
+          <div className="orders-modal-content modal-content" style={{ backgroundColor:'#fff' }}>
+          <div className="modal-header">
+          <h3 className='modal-order-title'>Order Details</h3>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            {selectedOrders && (
+              <div className='col-md-12 row' style={{ display:'flex', justifyContent:'space-between', padding:'15px' }}>
+              <div className="modal-body">
+                <div style={{ display:'flex', flexFlow:'row', gap:'50px' }}>
+                    <div className='col-md-3 product-details-container' >
+                    <div className='customer-details-content'>
+                    <h3 className='order-details-titles'>Customer Details</h3>
+                    <span className="customer-details-text">First Name: <p className="customer-details-input">{selectedOrders.user.firstName}</p></span>
+                    <span className="customer-details-text">Last Name: <p className="customer-details-input">{selectedOrders.user.lastName}</p></span>
+                    <span className="customer-details-text">ID Number: <p className="customer-details-input">{selectedOrders.user.id}</p></span>
+                    <span className="customer-details-text">Phone Number: <p className="customer-details-input">{selectedOrders.user.phoneNumber}</p></span>
+                    </div>
+                    <div className='order-details-content'>
+                    <h3 className='order-details-titles'>Order Details</h3>
+                    <span className="order-details-text">Order Date: <p className="order-details-input">{selectedOrders.dateCreated}</p></span>
+                    <span className="order-details-text">Order No: <p className="order-details-input">{selectedOrders.orderNumber}</p></span>
+                    <span className="order-details-text">Number of Items: <p className="order-details-input">{selectedOrders.cart.items.length}</p></span>
+                    <span className="order-details-text">Payment option: <p className="order-details-input">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</p></span>
+                    </div>
+                    
+                    <div className='payment-details-content'>
+                    <h3 className='order-details-titles'>Payment Details</h3>
+                    <h4>Total Amount: <p className="order-details-input">{selectedOrders.total}</p></h4>
+                    <span className="order-details-text">Proof of payment:</span>
+                      <a 
+                          href={`https://localhost:7017/${selectedOrders.proofOfPayment}`}
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          style={{ fontSize:'15px', display: 'block' }}
+                      >
+                          {selectedOrders.proofOfPayment.split('\\').pop()}
+                      </a>
+                    </div>
+                    </div>
+
+                    <div className='item-details-container'>
+                      <h3>Item Details:</h3>
+                      <div className='order-table-wrapper table-responsive-sm'>
+                          <table className="col-md-12 table table-hover align-middle caption-bot table-xl">
+                            <caption>end of list</caption>
+                            <thead className='table-dark align-middle'>
+                                <tr className='thead-row'>
+                                  <th className="order-table-header" scope="col">Product</th>
+                                  <th className="order-table-header" scope="col">Size</th>
+                                  <th className="order-table-header" scope="col">Quantity</th>
+                                  <th className="order-table-header" scope="col">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody className="table-group-divider">
+                                {selectedOrders.cart.items.map(item => (
+                                  <tr key={item.id}>
+                                      <th scope="row">
+                                        <img 
+                                            className="prod-image-cart" 
+                                            src={`https://localhost:7017/${item.product.image}`} 
+                                            alt={item.product.productName}
+                                        />
+                                        {item.product.productName}
+                                      </th>
+                                      <td>{item.sizeQuantity.size}</td>
+                                      <td>{item.quantity}</td>
+                                      <td>PHP {item.product.price}</td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                      </div>
+                  </div>
+                </div>
+              </div>
+              </div>
+            )}
+
+            <div className="modal-footer">
+            <button className="proceed-Btn"data-bs-toggle="modal" data-bs-target="#cartModal">
+                  Approve Order
+                  </button>
+            <button className="Btn" data-bs-toggle="modal" data-bs-target="#cancelOrderConfirmModal">
+                  Deny Order</button>
             </div>
           </div>
         </div>
-        </div>
-      )}
-
-      <div className="modal-footer">
-      <button className="proceed-Btn"data-bs-toggle="modal" data-bs-target="#cartModal">
-            Approve Order
-            </button>
-      <button className="Btn" data-bs-toggle="modal" data-bs-target="#cancelOrderConfirmModal">
-            Deny Order</button>
       </div>
-    </div>
-  </div>
-</div>
 
 
 <div className="approved-order-modal modal fade" id="approvedOrdersModal" tabIndex={-1} aria-labelledby="approvedOrderModalLabel" aria-hidden="true">
@@ -282,81 +454,26 @@ function Orders () {
             <div className='item-details-container'>
             <h3>Item Details:</h3>
             <div className='order-table-wrapper table-responsive-sm'>
-        <table className="col-md-12 table table-hover align-middle caption-bot table-xl">
-        <caption>end of list</caption>
-        <thead className='table-dark align-middle'>
-            <tr className='thead-row'>
-            <th className="order-table-header" scope="col">Product</th>
-            <th className="order-table-header" scope="col">Size</th>
-            <th className="order-table-header" scope="col">Quantity</th>
-            <th className="order-table-header" scope="col">Price</th>
-            </tr>
-        </thead>
-        <tbody className="table-group-divider">
-        <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-        </tbody>
-        </table>
-
-        </div>
+              <table className="col-md-12 table table-hover align-middle caption-bot table-xl">
+              <caption>end of list</caption>
+              <thead className='table-dark align-middle'>
+                  <tr className='thead-row'>
+                  <th className="order-table-header" scope="col">Product</th>
+                  <th className="order-table-header" scope="col">Size</th>
+                  <th className="order-table-header" scope="col">Quantity</th>
+                  <th className="order-table-header" scope="col">Price</th>
+                  </tr>
+              </thead>
+                <tbody className="table-group-divider">
+                    <tr>
+                      <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
+                      <td>XL</td>
+                      <td>3</td>
+                      <td>PHP 123</td>
+                    </tr>
+                </tbody>
+              </table>
+            </div>
             </div>
         </div>
       </div>
@@ -405,51 +522,26 @@ function Orders () {
             <div className='item-details-container'>
             <h3>Item Details:</h3>
             <div className='order-table-wrapper table-responsive-sm'>
-        <table className="col-md-12 table table-hover align-middle caption-bot table-xl">
-        <caption>end of list</caption>
-        <thead className='table-dark align-middle'>
-            <tr className='thead-row'>
-            <th className="order-table-header" scope="col">Product</th>
-            <th className="order-table-header" scope="col">Size</th>
-            <th className="order-table-header" scope="col">Quantity</th>
-            <th className="order-table-header" scope="col">Price</th>
-            </tr>
-        </thead>
-        <tbody className="table-group-divider">
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            
-        </tbody>
-        </table>
-        </div>
+              <table className="col-md-12 table table-hover align-middle caption-bot table-xl">
+                <caption>end of list</caption>
+                <thead className='table-dark align-middle'>
+                    <tr className='thead-row'>
+                    <th className="order-table-header" scope="col">Product</th>
+                    <th className="order-table-header" scope="col">Size</th>
+                    <th className="order-table-header" scope="col">Quantity</th>
+                    <th className="order-table-header" scope="col">Price</th>
+                    </tr>
+                </thead>
+                <tbody className="table-group-divider">
+                    <tr>
+                      <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
+                      <td>XL</td>
+                      <td>3</td>
+                      <td>PHP 123</td>
+                    </tr>
+                </tbody>
+              </table>
+              </div>
             </div>
         </div>
       </div>
