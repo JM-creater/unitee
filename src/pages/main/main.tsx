@@ -11,6 +11,7 @@ import notification from "../../assets/images/icons/notifIcon.png"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
+import cartEventEmitter from "../../helpers/EventEmitter"
 
 function Main() {
 
@@ -19,9 +20,9 @@ function Main() {
     }
 
     const [customer, setCustomer] = useState<Customer | null>(null); 
-    const [cart, setCart] = useState([]);
+    const [, setCart] = useState([]);
     const { userId } = useParams();
-    const totalItems = cart.reduce((acc, cartItems) => acc + cartItems.items.length, 0)
+    const [totalItems, setTotalItems] = useState<number | null>(null);
 
     useEffect(() => {
         axios.get(`https://localhost:7017/Users/${userId}`)
@@ -34,14 +35,25 @@ function Main() {
     }, [userId]);
 
     useEffect(() => {
+        const updateCartCount = () => {
         axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
-        .then(res => {
-            setCart(res.data);
-        })
-        .catch(error => {
-            console.error(error);
-        });
+            .then(res => {
+                setCart(res.data);
+                setTotalItems(res.data.reduce((acc, cartItems) => acc + cartItems.items.length, 0));
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+        cartEventEmitter.on("itemAddedToCart", updateCartCount);
+    
+        updateCartCount();
+    
+        return () => {
+            cartEventEmitter.off("itemAddedToCart", updateCartCount);
+        };
     }, [userId]);
+    
 
     return <div className="main">
             <header className="header" style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
@@ -54,8 +66,10 @@ function Main() {
                         <img className="nav-icon" src={ homeIcon }/>
                     </Link>
                     <Link className="customer-nav-link" to='cart'>
-                        <img className="nav-icon" src={ carts }/>
-                        {totalItems > 0 && <span className="cart-count">{totalItems}</span>}
+                        <div className="cart-icon-container"> 
+                            <img className="nav-icon" src={ carts }/>
+                            {totalItems !== null && totalItems > 0 && <span className="cart-count">{totalItems}</span>}
+                        </div>
                     </Link>
                     
                     <Link className="customer-nav-link" to='shop'>

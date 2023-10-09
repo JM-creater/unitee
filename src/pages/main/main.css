@@ -19,10 +19,15 @@
     width: 23px;
 }
 
+.cart-icon-container {
+    position: relative; 
+    display: inline-block; 
+}
+
 .cart-count {
-    position: absolute;
-    bottom: 705px;
-    right: 140px;
+    position: absolute; 
+    top: -12px; 
+    left: 15px;
     background-color: red;
     color: white;
     border-radius: 50%;
@@ -31,6 +36,7 @@
     min-width: 20px; 
     text-align: center; 
 }
+
 
 .logo {
     width: 100%;

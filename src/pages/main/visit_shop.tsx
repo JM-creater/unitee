@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import "./visit_shop.css"
+import cartEventEmitter from "../../helpers/EventEmitter"
 
 function Visit_Shop () {
 
@@ -131,6 +132,7 @@ function Visit_Shop () {
         axios.post('https://localhost:7017/Cart/add', cartAddRequest)
         .then(() => {
             toast.success("Item added to cart");
+            cartEventEmitter.emit("itemAddedToCart");
             return axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
         })
         .then(updatedCartResponse => {

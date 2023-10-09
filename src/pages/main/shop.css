@@ -385,3 +385,9 @@
     justify-content: center;
     align-items: center;
   }
+
+  .ratingIcon {
+    width: 100%;
+    max-width: 12px;
+    margin-right: 5px;
+  }
