@@ -1,0 +1,8 @@
+.notif-main-container {
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    flex-flow: column;
+    flex-wrap: wrap;
+    min-height: 100vh;
+}

@@ -1,0 +1,110 @@
+.user-profile-main-container {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0px 140px 0px;
+}
+
+.imgProfile {
+    width: 100%;
+    max-width: 180px;
+    border: solid white 5px;
+    border-radius: 50%;
+    max-height: 180px;
+}
+
+.user-img-container {
+    display: flex;
+    justify-content:center;
+    padding-right: 60px;
+    /* border-right: solid 0.5px white; */
+}
+
+.details-container {
+    background-color: #020654;
+    display: flex;
+    flex-direction: row;
+    padding: 20px 20px;
+    border-radius: 30px;
+    height: 550px;
+    justify-content: center;
+}
+
+.user-info-container {
+    padding: 20px;
+    display: flex;
+    flex-flow: row;
+}
+
+.info-label {
+    color: #FFAA00;
+    padding: 10px;
+}
+
+.info-text {
+    color: white;
+    padding: 10px 0px 10px 20px;
+}
+
+.info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.edit-btn-container {
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    height: 20px;
+}
+
+.edit-prof-btn {
+    color: white;
+    font-weight: 500;
+}
+
+.edit-prof-btn:hover {
+    color: #FFAA00;
+}
+
+.save-prof-Btn {
+    width: 130px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(4, 87, 220);
+    border: none;
+    color: white;
+    font-weight: 600;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.103);
+    position: relative;
+    overflow: hidden;
+    transition-duration: .3s;
+  }
+  
+  .save-prof-Btn::before {
+    width: 130px;
+    height: 130px;
+    position: absolute;
+    content: "";
+    background-color: white;
+    border-radius: 50%;
+    left: -100%;
+    top: 0;
+    transition-duration: .3s;
+    mix-blend-mode: difference;
+  }
+  
+  .save-prof-Btn:hover::before {
+    transition-duration: .3s;
+    transform: translate(100%,-50%);
+    border-radius: 0;
+  }
+  
+  .save-prof-Btn:active {
+    transform: translate(5px,5px);
+    transition-duration: .3s;
+  }

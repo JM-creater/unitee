@@ -1,0 +1,93 @@
+.orderPage-main-container {
+    display: flex;
+    flex-flow: row;
+    width: auto;
+    white-space: nowrap;
+}
+.orders-customer-container {
+    max-height: 600px;
+    overflow: auto;
+    scroll-behavior: smooth;
+    display: inline-block;
+    width: 100rem;
+    margin-left: 100px;
+}
+/* 
+.customer-orderPage-title {
+    margin-left: 50px;
+    padding: 20px;
+    color: #020654;
+    font-weight: 800;
+} */
+
+.orders-nav-link {
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    width: 500px;
+    white-space: nowrap;
+    color: #004AAD;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    padding: 20px 100px 20px 100px;
+    margin: 5px 0px 5px 0px;
+}
+
+.orders-nav-link:hover {
+    color: #00A7E1;
+    background-color: #F0F0F0;
+    border-radius: 10px;
+}
+
+.orders-nav {
+    display: flex;
+    position: -webkit-sticky;
+    justify-content: center;
+    align-items: center;
+}
+
+.order-status-text {
+    font-weight: 600;
+    color: #004AAD;
+    margin-top: 70px;
+}
+
+.order-nav-pills-container {
+    width: 300px;
+    margin-top: 45px;
+}
+
+.nav-pills-icon {
+    width: 100%;
+    max-width: 18px;
+    height: 18px;
+    margin-right: 5px;
+}
+
+.pill-container {
+    display: flex;
+}
+
+.orders-nav-container {
+    background-color: #F8F9F9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: fit-content;
+    margin-left: 20px;
+    padding-top: 20px;
+    border-radius: 10px;
+}
+
+.trackImg {
+    margin: 20px 0 0 35px;
+    width: 100%;
+    max-width: 250px;
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+}
+
+.thead-row {
+    font-size: 50px;
+}

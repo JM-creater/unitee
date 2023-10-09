@@ -1,0 +1,125 @@
+.items-title{
+    font-size: 40px;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+
+}
+.supplier-header{
+    margin-left: 30px;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-top: 20px;
+}
+
+p{
+    font-size: 30px;
+    justify-content: center;
+    font-weight: 700;
+    margin-left: 20px;
+}
+
+.menu-button-container{
+    display: flex;
+    background: linear-gradient(#65A4F6 , #013E8D);
+    width: 300px;
+    height: 310px;
+    border-style: none;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    flex-flow: column;
+
+}
+
+.menu-link{
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-left: 80px;
+}
+
+.col {
+    color: white;
+}
+
+.menu-text{
+    margin: 20px;
+    font-size: 15px;
+}
+
+.iconSupplier{
+    width: 20px;
+    height: 20px;
+
+}
+
+.items-container{
+    display: flex;
+    flex-direction: row;
+}
+
+.featured-img{
+    width: 795px;
+    height: 440px;
+    padding-left: 80px;
+}
+
+.upload-featured-item{
+    position: absolute;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    margin: 20px;
+}
+
+.featured-title{
+    font-size: 20px;
+    padding-left: 80px;
+    font-weight: bold;
+}
+
+.add-item-btn{
+    border-style: solid;
+    border-radius: 25px;
+    border-color: white;
+    font-size: 15px;
+    background-color: transparent;
+    padding: 10px;
+    font-weight: 600;
+    margin-right: 130px;
+}
+
+.featured-{
+    background-color: #65A4F6;
+    position: absolute;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+}
+
+.card-title-supplier{
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.size-available, .prod-gender, .prod-department, .prod-type, .prod-stock, .prod-price{
+    font-size: 20px;
+    font-weight: 300;
+}
+
+.card-body {
+    width: 500px;
+    color: white;
+}
+
+.add-item-btn {
+    color: white;
+}

@@ -1,0 +1,61 @@
+.admin-dashboard-main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: column;
+    padding-bottom: 30px;
+}
+
+.card-container {
+    display: flex;
+    flex-flow: row; 
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.dashboard-icon {
+    width: 100%;
+    max-width: 50px;
+}
+
+.dashboard-card {
+    display: flex;
+    flex-flow: row;
+    gap: 30px;
+    padding: 15px;
+    box-shadow: 5px 8px #D3D3D3;
+    border-radius: 5px;
+}
+
+.dashboard-card-text {
+    font-weight: 700;
+    color: #FFAA00;
+}
+
+.page-title {
+    font-weight: 700;
+    color: #020654;
+}
+
+.dashboard-card-title {
+    font-weight: 650;
+    color: #020654;
+}
+
+.best-sellers-container {
+    margin-top: 40px;
+}
+
+.best-sellers-table-wrapper {
+    max-height: 300px;
+    overflow: auto;
+    overflow-x: hidden;
+    display:inline-block;
+}
+
+.home-container-2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+}

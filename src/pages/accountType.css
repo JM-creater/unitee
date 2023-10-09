@@ -1,0 +1,44 @@
+.role-main-container {
+    display: flex;
+    flex-flow: row;
+}
+
+.supplier-pic, .student-pic {
+    width: 100%;
+    max-width: 400px;
+    transition: width 2s, height 2s;
+}
+
+.supplier-pic:hover {
+    width: 100%;
+    max-width: 500px;
+    height: 500px;
+}
+
+.role-1 {
+    background-color: #004AAD;
+    height: 100vh;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.role-text-1 {
+    color: #F0F0F0;
+    font-weight: 600;
+}
+
+.role-2 {
+    background-color: #F0F0F0;
+    height: 100vh;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.role-text-2 {
+    color: #004AAD;
+    font-weight: 600;
+}

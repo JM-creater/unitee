@@ -1,0 +1,50 @@
+.back_btn{
+    font-size: 25px;
+}
+
+.item-name, .available-sizes, .department-item, .item-price, .category-item{
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.input-group-description{
+    margin: 20px;
+
+}
+
+.item-gender-container{
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    padding-left: 20px;
+    margin-bottom: 10px;
+}
+
+.genders{
+    display: flex;
+}
+
+.price-container{
+    display: flex;
+    gap: 24px;
+    align-content: center;
+    align-items: center;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.category-select{
+    gap: 45px;
+    display: flex;
+}
+
+.item-btns-container{
+    margin-top: 30px;
+    gap: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.logo{
+    height: 50px;
+}

@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap');
+:root {
+  --theme: black;
+}
+
+* {
+  color: black;
+  font-size: 12px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.bg {
+  background: white;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-position: center;
+  min-height: 100vh;
+}
+
+.link {
+  padding: 0;
+}
+
+.input, .button, .select {
+  font-size: 12px;
+  height: 40px !important;
+  border-radius: 20px !important;
+}
+
+.logo {
+  height: 50px;
+}
+
+span {
+  color: black;
+}
