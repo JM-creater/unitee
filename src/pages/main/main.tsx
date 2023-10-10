@@ -1,4 +1,4 @@
-import { Outlet } from "react-router"
+import { Outlet, useNavigate } from "react-router"
 import { Link } from "react-router-dom"
 import './main.css'
 import logo from "../../assets/images/unitee.png"
@@ -20,9 +20,10 @@ function Main() {
     }
 
     const [customer, setCustomer] = useState<Customer | null>(null); 
-    const [, setCart] = useState([]);
-    const { userId } = useParams();
     const [totalItems, setTotalItems] = useState<number | null>(null);
+    const [cart, setCart] = useState([]);
+    const { userId } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         axios.get(`https://localhost:7017/Users/${userId}`)
@@ -65,13 +66,39 @@ function Main() {
                     <Link className="customer-nav-link" to=''>
                         <img className="nav-icon" src={ homeIcon }/>
                     </Link>
+
                     <Link className="customer-nav-link" to='cart'>
                         <div className="cart-icon-container"> 
                             <img className="nav-icon" src={ carts }/>
                             {totalItems !== null && totalItems > 0 && <span className="cart-count">{totalItems}</span>}
+                            
+                            <div className="cart-dropdown">
+                                {cart.length > 0 ? (
+                                    cart.map((cartObj) => (
+                                        cartObj.items.map((item, itemIndex) => (
+                                            <div key={itemIndex} className="cart-dropdown-item">
+                                                <img 
+                                                    className="dropdown-image"
+                                                    src={`https://localhost:7017/${item.product.image}`}  
+                                                    alt={item.product.productName} 
+                                                    width="50" 
+                                                    height="50"
+                                                />
+                                                <span className="dropdown-productName">{item.product.productName}</span>
+                                                <span className="dropdown-price">₱{item.product.price}</span>
+                                            </div>
+                                        ))
+                                    ))
+                                ) : (
+                                    <div className="empty-cart-message">Your cart is empty.</div>
+                                )}
+                                <div className="hoverButton">
+                                    <button onClick={() => navigate('cart')}>Go to Cart</button>
+                                </div>
+                            </div>
                         </div>
                     </Link>
-                    
+
                     <Link className="customer-nav-link" to='shop'>
                         <img className="nav-icon" src={ notification }/>
                     </Link>
@@ -80,6 +107,7 @@ function Main() {
                     {customer ? (
                         <>
                             <img 
+                                className="imageProfile"
                                 src={`https://localhost:7017/${customer.image}`} 
                                 style={{ width:'90%', borderStyle:'solid', borderRadius:'50%', height: '50px' ,borderColor:'#D3D3D3' }} 
                                 data-bs-toggle="dropdown" 
