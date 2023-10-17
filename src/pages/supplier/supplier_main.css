@@ -1,6 +1,117 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css');
+
+.supplier-main {
+    display: flex;
+    flex-flow: row;
+}
+
 .supplier-header {
+    padding-top: 15px;
+    background-color: #004AAD;
+    justify-content: start;
     display: flex;
     align-items: center;
+    flex-flow: column;
+    width: 15%;
+    height: 100vh;
+    gap: 30px;
+}
+
+.second-nav-container {
+    height: 8vh;
+    display: flex;
+    padding: 10px 20px 10px 20px;
     justify-content: space-between;
-    padding: 15px 80px 0px 35px;
+    align-items: center;
+    width: 85vw;
+}
+
+
+.Supplierlogo {
+    width: 100%;
+    max-width: 100px;
+    height: 100%;
+    max-height: 100px;
+    cursor: pointer;
+}
+
+.supplier-home-btn {
+    justify-content: center;
+    display: flex;
+}
+
+.supplier-nav-bar {
+    display: flex;
+    flex-flow: column;
+    gap: 5px;
+}
+
+.supplier-nav-text {
+    color: white;
+    font-size: 15px;
+}
+
+.supplier-nav-icon {
+    width: 100%;
+    width: 18px;
+    height: 18px;
+}
+
+.supplier-nav-link {
+    padding: 12px;
+    gap: 10px;
+    align-items: center;
+    text-decoration: none;
+    width: 14vw;
+    border-radius: 5px;
+    display: flex;
+    justify-content: start;
+}
+
+.supplier-nav-link:hover {
+    background-color: #020654;
+}
+
+.seller-profile {
+    width: 100%;
+    max-width: 40px;
+    border: solid #f0f0f0;
+    border-radius: 50%;
+}
+
+.Supplier-SearchBar {
+    border: #f0f0f0 solid 2px;
+    padding: 7px;
+    border-radius: 10px;
+}
+
+.search-icon {
+    color: #aaa;
+    margin-right: 6px;
+}
+
+.drop-link-item {
+    text-decoration: none;
+    color: #004AAD;
+}
+
+.drop-icon {
+    width: 100%;
+    max-width: 15px;
+    height: 15px;
+    margin-right: 5px;
+}
+
+.drop-icon-logout {
+    width: 100%;
+    max-width: 12px;
+    height: 12px;
+    margin-right: 5px;
+}
+
+.drop-list {
+    padding: 5px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
 }

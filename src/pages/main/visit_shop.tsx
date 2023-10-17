@@ -194,6 +194,8 @@ function Visit_Shop () {
         }
     };
 
+
+
     return <div className="shop-main-container">
         <div className="shop-content1-container">
             <div className="col-md-10 shopDetails-container-shop">
@@ -329,15 +331,21 @@ function Visit_Shop () {
         </div>
         
         <div className="shop-content2-container">
-        {filteredProduct.map(product => (
-            <div className="prodShop-card" data-bs-toggle="modal" data-bs-target="#viewProdDetailsModal" key={product.productId} onClick={() => setSelectedProduct(product)}> 
-                <img className="visitShopProdImg" src={ `https://localhost:7017/${product.image}` }/>
-                <div className="col-md-12 shop-prodDetails-container">
-                    <h4 className="col-md-8 visitShop-prodName">{product.productName}</h4>
-                    <h3 className="visitShop-prodPrice">₱{product.price}</h3>
+            {filteredProduct.map(product => (
+                <div 
+                    className="prodShop-card" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#viewProdDetailsModal" 
+                    key={product.productId} 
+                    onClick={() => setSelectedProduct(product)}
+                > 
+                    <img className="visitShopProdImg" src={ `https://localhost:7017/${product.image}` }/>
+                    <div className="col-md-12 shop-prodDetails-container">
+                        <h4 className="col-md-8 visitShop-prodName">{product.productName}</h4>
+                        <h3 className="visitShop-prodPrice">₱{product.price}</h3>
+                    </div>
                 </div>
-            </div>
-        ))}
+            ))}
         </div>
 
         <div className="modal fade" id="viewProdDetailsModal" tabIndex={-1} aria-labelledby="viewProdDetailsModalLabel" aria-hidden="true">

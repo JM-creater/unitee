@@ -34,9 +34,24 @@ function Register() {
   const [schoolPermit, setSchoolPermit] = useState(null);
   const navigate = useNavigate();
 
+<<<<<<< HEAD
   const handleIDnumber = (value: string) => {
     setIDNumber(value);
   };
+=======
+    const [IDNumber, setIDNumber] = useState('');
+    const [address, setAddress] = useState('');
+    const [email, setEmail] = useState('');
+    const [shopName, setShopName] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [image, setImage] = useState(null);
+    const [bir, setImageBIR] = useState(null);
+    const [cityPermit, setCityPermit] = useState(null);
+    const [schoolPermit, setSchoolPermit] = useState(null);
+    const navigate = useNavigate();
+>>>>>>> NewUiSupplier
 
   const handleFirstName = (value: string) => {
     setFirstName(value);
@@ -62,6 +77,7 @@ function Register() {
     setPassword(value);
   };
 
+<<<<<<< HEAD
   const handleConfirmPassword = (value: string) => {
     setConfirmPassword(value);
   };
@@ -75,6 +91,10 @@ function Register() {
   const handleImageBirChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImageBIR(e.target.files[0]);
+=======
+    const handleAddress = (value) => {
+        setAddress(value);
+>>>>>>> NewUiSupplier
     }
   };
 
@@ -84,9 +104,18 @@ function Register() {
     }
   };
 
+<<<<<<< HEAD
   const handleImageSchoolPermit = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSchoolPermit(e.target.files[0]);
+=======
+    const handleShopName = (value) => {
+        setShopName(value);
+    }
+
+    const handlePhoneNumber = (value) => {
+        setPhoneNumber(value);
+>>>>>>> NewUiSupplier
     }
   };
 
@@ -159,6 +188,7 @@ function Register() {
       toast.error(errors.phoneNumber);
     }
 
+<<<<<<< HEAD
     if (password.length < 6) {
       errors.password = 'Password must be at least 6 characters long.';
       toast.error(errors.password);
@@ -289,6 +319,116 @@ function Register() {
                   Register
                 </button>
               </div>
+=======
+    // Handle Register
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        
+        // Check if the fields are empty or not 
+        if (
+            !IDNumber ||
+            !shopName ||
+            !address ||
+            !email ||
+            !phoneNumber ||
+            !password ||
+            !confirmPassword ||
+            !image ||
+            !bir ||
+            !cityPermit ||
+            !schoolPermit
+        ) {
+            toast.error("Please fill up the required fields.");
+            return;
+        }
+        const formData = new FormData();
+
+        formData.append('Id', IDNumber);
+        formData.append('ShopName', shopName);
+        formData.append('Address', address);
+        formData.append('Email', email);
+        formData.append('PhoneNumber', phoneNumber);
+        formData.append('Password', password);
+        formData.append('Image', image);
+        formData.append('BIR', bir);
+        formData.append('CityPermit', cityPermit);
+        formData.append('SchoolPermit', schoolPermit);
+
+        try {
+            const response = await axios.post('https://localhost:7017/Supplier/registerSupplier', formData);
+            if (response.data) {
+                toast.success('Successfully registered.');
+                navigate('/');
+            } else {
+                alert(response.data); 
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to register. Please try again later.");
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+        <div className='col-md-12 registerCustomer-main-container'>
+            <div className='col-md-8 registerCustomer-1'>
+                <h1 className='loginText-1'>Let's Get Started!</h1>
+                <h5>Create an account using your credentials</h5>
+                <div>
+                    <div className='row' style={{ display: 'flex', padding: '50px', gap: '5px', justifyContent: 'center' }}>
+                    <input className='col-md-5 input-register' 
+                            type="text" 
+                            placeholder='Store ID'
+                            onChange={(e) => handleIDnumber(e.target.value)}/>
+                        <input className='col-md-5 input-register' 
+                            type="text" 
+                            placeholder='Shop Name'
+                            onChange={(e) => handleShopName(e.target.value)}/>
+                        <input className='col-md-5 input-register' 
+                            type="text" 
+                            placeholder='Address'
+                            onChange={(e) => handleAddress(e.target.value)}/>
+                        <input className='col-md-5 input-register' 
+                            type="email" 
+                            placeholder='Email'
+                            onChange={(e) => handleEmail(e.target.value)}/>
+                        <input className='col-md-5 input-register' 
+                            type="text" 
+                            placeholder='Phone Number'
+                            onChange={(e) => handlePhoneNumber(e.target.value)}/>
+                        <input className='col-md-5 input-register' 
+                            type="password" 
+                            placeholder='Password (at least 6 characters long)'
+                            onChange={(e) => handlePassword(e.target.value)}/>
+                        <input className='col-md-5 input-register' 
+                            type="password" 
+                            placeholder='Confirm Password'
+                            onChange={(e) => handleConfirmPassword(e.target.value)}/>
+                        <div className='col-md-5 profile-pic-register-container'>
+                            <span className='col-md-4 uploadImage-register-label'>Profile Picture</span>
+                            <input type="file" onChange={handleImageProfile}/>
+                        </div>
+                        <div className='col-md-5 birPermit-pic-register-container'>
+                            <span className='col-md-4 uploadImage-register-label'>BIR Permit</span>
+                            <input type="file" onChange={handleImageBirChange}/>
+                        </div>
+                        <div className='col-md-5 cityPermit-pic-register-container'>
+                            <span className='col-md-4 uploadImage-register-label'>City Permit</span>
+                            <input type="file" onChange={handleImageCityPermit}/>
+                        </div>
+                        <div className='col-md-10 schoolPermit-pic-register-container' style={{ marginRight:'10px' }}>
+                            <span className='col-md-1 uploadImage-register-label'>School Permit</span>
+                            <input 
+                                type="file" 
+                                onChange={handleImageSchoolPermit}
+                            />
+                        </div>
+                        <div className='col-md-10 register-supplier-btn-container'>
+                            <button className='col-md-4 btn btn-lg btn-primary' type='submit'>Register</button>
+                        </div>
+                    </div>
+                </div>
+>>>>>>> NewUiSupplier
             </div>
           </div>
         </div>
