@@ -73,7 +73,7 @@ function Login() {
               navigate(`/shop/${result.data.user.id}`, { state: { userData: result.data.user } });
               break;
             case 'Supplier':
-              navigate(`/supplier_items/${result.data.user.id}`, { state: { supplierData: result.data.user } });
+              navigate(`/supplier_dashboard/${result.data.user.id}`, { state: { supplierData: result.data.user } });
               break;
             case 'Admin':
               navigate(`/admin_main/${result.data.user.id}`, { state: { adminData: result.data.user } });
