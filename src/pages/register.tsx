@@ -36,10 +36,10 @@ function Register() {
   const navigate = useNavigate();
 
   const handleIDnumber = (value) => {
-    if (value.length === 8) {
+    if (/^[0-9]*$/.test(value)) {
       setIDNumber(value);
     } else {
-      toast.error('ID Number must be exactly 8 characters.');
+      toast.error('ID Number must contain only numbers.');
     }
   };
 
@@ -64,19 +64,15 @@ function Register() {
   };
 
   const handlePhoneNumber = (value) => {
-    if (/^\d+$/.test(value) && value.length === 11) {
+    if (/^[0-9]*$/.test(value)) {
       setPhoneNumber(value);
     } else {
-      toast.error('Phone Number must be exactly 11 numeric characters.');
+      toast.error('Phone Number must contain only numbers.');
     }
   };
 
   const handlePassword = (value) => {
-    if (/^[a-zA-Z0-9]+$/.test(value)) {
       setPassword(value);
-    } else {
-      toast.error('Password must be alphanumeric.');
-    }
   };
 
   const handleConfirmPassword = (value) => {
@@ -121,6 +117,7 @@ function Register() {
           navigate('/');
         } else {
           toast.error(response.data);
+          return;
         }
       } catch (err) {
         console.error(err);
@@ -156,18 +153,27 @@ function Register() {
       toast.error(errors.email);
     }
 
-    if (!phoneNumber || !/^\d+$/.test(phoneNumber) || phoneNumber.length !== 11) {
+    if (!phoneNumber) {
+      errors.phoneNumber = 'Phone Number is required.';
+      toast.error(errors.phoneNumber);
+    } else if (phoneNumber.length !== 11 || !/^\d+$/.test(phoneNumber)) {
       errors.phoneNumber = 'Phone Number must be exactly 11 numeric characters.';
       toast.error(errors.phoneNumber);
     }
-
-    if (password.length < 6) {
+    
+    if (!password) {
+      errors.password = 'Password is required.';
+      toast.error(errors.password);
+    } else if (password.length < 6) {
       errors.password = 'Password must be at least 6 characters long.';
+      toast.error(errors.password);
+    } else if (/^[a-zA-Z0-9]*$/.test(password)) {
+      errors.password = 'Password must be alpha numeric.';
       toast.error(errors.password);
     }
 
     if (password !== confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match.';
+      errors.confirmPassword = 'Passwords did not match.';
       toast.error(errors.confirmPassword);
     }
 
@@ -222,11 +228,6 @@ function Register() {
                 placeholder="ID Number (8 digits)"
                 value={IDNumber}
                 onChange={(e) => handleIDnumber(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key < '0' || e.key > '9' || IDNumber.length >= 8) {
-                    e.preventDefault();
-                  }
-                }}
                 maxLength={8}
               />
 
@@ -275,11 +276,6 @@ function Register() {
                 placeholder="Phone Number (11 digits)"
                 value={phoneNumber}
                 onChange={(e) => handlePhoneNumber(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key < '0' || e.key > '9' || phoneNumber.length >= 11) {
-                    e.preventDefault();
-                  }
-                }}
                 maxLength={11}
               />
 
