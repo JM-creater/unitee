@@ -10,9 +10,9 @@ import 'react-toastify/dist/ReactToastify.css';
 function Register() {
 
     const [IDNumber, setIDNumber] = useState('');
-    const [firstName, setFirstName] = useState('');
     const [address, setAddress] = useState('');
     const [email, setEmail] = useState('');
+    const [shopName, setShopName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -26,16 +26,16 @@ function Register() {
         setIDNumber(value);
     }
 
-    const handleFirstName = (value) => {
-        setFirstName(value);
-    }
-
     const handleAddress = (value) => {
         setAddress(value);
     }
 
     const handleEmail = (value) => {
         setEmail(value);
+    }
+
+    const handleShopName = (value) => {
+        setShopName(value);
     }
 
     const handlePhoneNumber = (value) => {
@@ -73,7 +73,7 @@ function Register() {
         // Check if the fields are empty or not 
         if (
             !IDNumber ||
-            !firstName ||
+            !shopName ||
             !address ||
             !email ||
             !phoneNumber ||
@@ -90,7 +90,7 @@ function Register() {
         const formData = new FormData();
 
         formData.append('Id', IDNumber);
-        formData.append('FirstName', firstName);
+        formData.append('ShopName', shopName);
         formData.append('Address', address);
         formData.append('Email', email);
         formData.append('PhoneNumber', phoneNumber);
@@ -129,7 +129,7 @@ function Register() {
                         <input className='col-md-5 input-register' 
                             type="text" 
                             placeholder='Shop Name'
-                            onChange={(e) => handleFirstName(e.target.value)}/>
+                            onChange={(e) => handleShopName(e.target.value)}/>
                         <input className='col-md-5 input-register' 
                             type="text" 
                             placeholder='Address'
