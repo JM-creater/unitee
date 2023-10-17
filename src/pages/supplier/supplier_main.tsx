@@ -1,53 +1,92 @@
-import { Outlet } from "react-router"
-import { Link } from "react-router-dom"
-import logo from "../../assets/images/unitee.png"
-import profile from "../../assets/images/imageprofile.jpeg"
-import logout from "../../assets/images/icons/logout-3.png"
-import profIcon from "../../assets/images/icons/profile2.png"
 import './supplier_main.css'
+import { Outlet } from "react-router"
+import logo from "../../assets/images/unitee.png"
+import { Link } from "react-router-dom"
+import ordersSupplierIcon from "../../assets/images/icons/orders.png"
+import dashboardSupplierIcon from "../../assets/images/icons/dashboard.png"
+import shopIcon from "../../assets/images/icons/store-2.png"
+import shopProfile from "../../assets/images/shopLogo1.png"
+import editprof from "../../assets/images/icons/user-avatar.png"
+import logoutIcon from "../../assets/images/icons/logout-4.png"
+import { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
+import axios from "axios"
 
 function Supplier_Main (){
+
+    interface Customer {
+        image: string;
+    }
+
+    const [supplier, setSupplier] = useState<Customer | null>(null); 
+    const { id } = useParams();
+
+    useEffect(() => {
+        axios.get(`https://localhost:7017/Users/${id}`)
+            .then(response => {
+                setSupplier(response.data);
+            })
+            .catch(error => {
+                console.error(error);
+            })
+    }, [id]);
+
     return <div className="supplier-main">
-    <div className="supplier-nav-container">
-        <header className="supplier-header">
-            <Link to='' className="col-md-2">
-                <img className="logo" src={ logo }/>
-            </Link>
-            <div className="col-md-6 header-button-container">
-                <Link className="customer-nav-link" to='manage_prod'>
-                    <span className="nav-btn">SHOP</span>
-                </Link>
-                <Link className="customer-nav-link" to='cart'>
-                    <span className="nav-btn">ORDERS</span>
+            <header className="supplier-header">
+                <Link to='' className="col-md-12 supplier-home-btn">
+                        <img className="Supplierlogo" src={ logo }/>
                 </Link>
 
-                <div className="col-md-1 dropdown">
 
-                <img src={ profile } style={{ width:'90%', borderStyle:'solid', borderRadius:'50%', borderColor:'#D3D3D3' }} data-bs-toggle="dropdown" aria-expanded="false" />
-                <ul className="dropdown-menu dropdown-menu-dark" style={{ width:'300px'}}>
-                    <Link className="customer-nav-droplink" to='user_profile'>
-                    <li><a className="dropdown-item">
-                    <img className="dropdown-icon"  src={ profIcon } />VIEW PROFILE</a></li></Link>
-
-                    <Link className="customer-nav-droplink" to='/'>
-                    <li><a className="dropdown-item">
-                    <span className="nav-btn" style={{ color:'#FFAA00' }}>
-                        <img className="dropdown-icon" src={ logout } />
-                        LOGOUT</span>
-                </a></li></Link>
-                    
-                </ul>
-
+                <div className="supplier-nav-bar">
+                    <Link to='' className="supplier-nav-link">
+                        <img className="supplier-nav-icon" src={ dashboardSupplierIcon }/>
+                        <span className="supplier-nav-text">Dashboard</span>
+                    </Link>
+                    <Link to='supplier_orders' className="supplier-nav-link">
+                        <img className="supplier-nav-icon" src={ ordersSupplierIcon }/>
+                        <span className="supplier-nav-text">Orders</span>
+                    </Link>
+                    <Link to='manage_shop' className="supplier-nav-link">
+                        <img className="supplier-nav-icon" src={ shopIcon }/>
+                        <span className="supplier-nav-text">Shop</span>
+                    </Link>
                 </div>
+            </header>
+            <div style={{ minHeight: '100%' }}>
                 
-            </div>
-        </header>
-        <div style={{ minHeight: '100%' }}>
-            <Outlet/>
-        </div>
+                <div className="second-nav-container">
 
-    </div>
-    </div>
+                    <div className="search-container">
+                    <span className="fa fa-search form-control-feedback search-icon"></span>
+                        <input className="Supplier-SearchBar" type="text" placeholder="Search" />
+                    </div>
+
+                    <img className="seller-profile" src={shopProfile} data-bs-toggle="dropdown" aria-expanded="false"/>
+          
+                    <ul className="dropdown-menu" style={{ padding:'10px', width:'15rem' }}>
+                        <li className="drop-list">
+                            <a className="dropdown-item supplier-drop-item" style={{ fontSize:'15px' }}>
+                                <img className="drop-icon" src={ editprof }/>
+                                Manage Profile
+                            </a>
+                        </li>
+                        <Link className="drop-link-item" to="/">
+                            <li className="drop-list">
+                                <a className="dropdown-item supplier-drop-item" style={{ fontWeight:'600', fontSize:'15px' }}>
+                                    <img className="drop-icon-logout" src={ logoutIcon }/>
+                                    Log Out
+                                </a>
+                            </li>   
+                        </Link>
+                    </ul>
+      
+                </div>
+                <Outlet/>
+            </div>
+
+            
+        </div>
 }
 
 export default Supplier_Main

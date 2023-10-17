@@ -1,677 +1,534 @@
-import { useEffect, useState } from 'react'
-import product2 from "../../assets/images/shop_products/product2.png"
-import './supplier_orders.css'
-import axios from 'axios'
-import { Link, useParams } from 'react-router-dom';
+import "./supplier_orders.css"
 
+function Supplier_Orders () {
+    return <div className="manage-orders-main-container">
+    <nav id="orders-nav" className="navbar px-3 mb-3" style={{ display:'flex', justifyContent:'end' }}>
+        <ul className="nav nav-pills">
+            <li className="nav-item supplier-nav-items">
+                <a className="nav-link" href="#supplier-pending-order">Pending</a>
+            </li>
+            <li className="nav-item supplier-nav-items">
+                <a className="nav-link" href="#supplier-approved-order">Approved</a>
+            </li>
 
-function Orders () {
+            <li className="nav-item supplier-nav-items">
+                <a className="nav-link" href="#supplier-cancelled-order">Cancelled</a>
+            </li>
 
-    // Payment Type and Status
-    const PaymentType = {
-      EMoney: 'E-Money',
-      Cash: 'Cash'
-    };
+            <li className="nav-item supplier-nav-items">
+                <a className="nav-link" href="#supplier-claimed-order">Claimed</a>
+            </li>
 
-    const Status ={
-      OrderPlaced: 'OrderPlaced',
-      Pending: 'Pending',
-      Approved: 'Approved',
-      ForPickUp: 'ForPickUp',
-      Completed: 'Completed',
-      Canceled: 'Canceled'
-    };
+        </ul>
+    </nav>
 
-    const [orders, setOrders] = useState([]);
-    const [selectedOrders, setSelectedOrders] = useState(null);
-    const { id } = useParams();
-
-    useEffect(() => {
-      axios.get('https://localhost:7017/Order')
-        .then(response => {
-          setOrders(response.data)
-        })
-        .catch(error => {
-          console.log(error);
-        })
-    }, []);
-
-    // useEffect(() => {
-    //   axios.get(`https://localhost:7017/Order/${userId}`)
-    //     .then(response => {
-    //       setSelectedOrders(response.data);
-    //     })
-    //     .catch(error => {
-    //       console
-    //     })
-    // }, [userId])
-
-
-
-
-    return <div className="orders-main-container">
-        <div className="row">
-          <div className="col-3">
-            <nav id="orders-navbar" 
-            className="orders-nav-container">
-              <nav className="orders-nav nav nav-pills flex-column">
-                <a className="orders-nav-link" href="#orderplaced-orders">ORDER PLACED</a>
-                <a className="orders-nav-link" href="#pending-orders">PENDING</a>
-                <a className="orders-nav-link" href="#approved-orders">APPROVED</a>
-                <a className="orders-nav-link" href="#forpickup-orders">FOR PICK UP</a>
-                <a className="orders-nav-link" href="#completed-orders">COMPLETED</a>
-                <a className="orders-nav-link" href="#canceled-orders">CANCELED</a>
-                <Link to={`/supplier_items/${id}`}>
-                  <span className="orders-nav-link">Back</span>
-                </Link>
-              </nav>
-            </nav>
-          </div>
-
-          <div className="orders-admin-container col-9">
-            <div data-bs-spy="scroll" data-bs-target="#orders-navbar" data-bs-smooth-scroll="true" className="odersScrollspy" tabIndex={0}>
-
-            <div id="orderplaced-orders">
-                <h4 className="order-status-text">Order Placed</h4>
-                <div className='col-md-10 approved-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-                  <table className="table table-hover table-striped align-middle caption-bot table-xl">
-                  <caption>end of list of placed orders</caption>
-                  <thead className='table-dark align-middle'>
-                      <tr className='thead-row'>
-                      <th scope="col">Date</th>
-                      <th scope="col">Order No.</th>
-                      <th scope="col">Number of Items</th>
-                      <th scope="col">Total Amount</th>
-                      <th scope="col">Status</th>
-                      </tr>
-                  </thead>
-                  {orders.map((orderItem, index) => (
-                  <tbody key={index}  className="table-group-divider">
-                    <tr onClick={() => setSelectedOrders(orderItem)}>
-                      <th scope="row" data-bs-toggle="modal" data-bs-target="#orderPlacedModal">{orderItem.dateCreated}</th>
-                      <td data-bs-toggle="modal" data-bs-target="#orderPlacedModal">{orderItem.orderNumber}</td>
-                      <td data-bs-toggle="modal" data-bs-target="#orderPlacedModal">{orderItem.cart.items.length}</td>
-                      <td data-bs-toggle="modal" data-bs-target="#orderPlacedModal">{orderItem.total}</td>
-                      <td data-bs-toggle="modal" data-bs-target="#orderPlacedModal">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
-                    </tr>
-                  </tbody>
-                  ))}
-                  </table>
-                </div>
-              </div>
-
-              <div id="pending-orders">
-                <h4 className="order-status-text">Pending Orders</h4>
-                  <div className='col-md-10 pending-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-                  <table className="table table-hover table-striped align-middle caption-bot table-xl">
-                  <caption>end of list of pending orders</caption>
-                  <thead className='table-dark align-middle'>
-                    <tr className='thead-row'>
-                      <th scope="col">Date</th>
-                      <th scope="col">Order No.</th>
-                      <th scope="col">Number of Items</th>
-                      <th scope="col">Total Amount</th>
-                      <th scope="col">Status</th>
-                    </tr>
-                  </thead>
-                  {orders.map((orderItem, index) => (
-                  <tbody key={index}  className="table-group-divider">
-                    <tr onClick={() => setSelectedOrders(orderItem)}>
-                      <th scope="row" data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{orderItem.dateCreated}</th>
-                      <td data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{orderItem.orderNumber}</td>
-                      <td data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{orderItem.cart.items.length}</td>
-                      <td data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{orderItem.total}</td>
-                      <td data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
-                    </tr>
-                  </tbody>
-                  ))}
-                  </table>
-                </div>
-              </div>
-              
-              <div id="approved-orders">
-                <h4 className="order-status-text">Approved Orders</h4>
-                <div className='col-md-10 approved-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-                  <table className="table table-hover table-striped align-middle caption-bot table-xl">
-                  <caption>end of list of approved orders</caption>
-                  <thead className='table-dark align-middle'>
-                      <tr className='thead-row'>
-                      <th scope="col">Date</th>
-                      <th scope="col">Order No.</th>
-                      <th scope="col">Number of Items</th>
-                      <th scope="col">Total Amount</th>
-                      <th scope="col">Status</th>
-                      </tr>
-                  </thead>
-                  <tbody className="table-group-divider">
-                    <tr>
-                      <th scope="row" data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">08/28/2023</th>
-                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">2583792</td>
-                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">5</td>
-                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">PHP 1000</td>
-                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">Approved</td>
-                    </tr>
-                  </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div id="forpickup-orders">
-                <h4 className="order-status-text">For Pick Up</h4>
-                <div className='col-md-10 approved-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-                  <table className="table table-hover table-striped align-middle caption-bot table-xl">
-                  <caption>end of list of pick up orders</caption>
-                  <thead className='table-dark align-middle'>
-                      <tr className='thead-row'>
-                      <th scope="col">Date</th>
-                      <th scope="col">Order No.</th>
-                      <th scope="col">Number of Items</th>
-                      <th scope="col">Total Amount</th>
-                      <th scope="col">Status</th>
-                      </tr>
-                  </thead>
-                  <tbody className="table-group-divider">
-                    <tr>
-                      <th scope="row" data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">08/28/2023</th>
-                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">2583792</td>
-                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">5</td>
-                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">PHP 1000</td>
-                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">Approved</td>
-                    </tr>
-                  </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div id="completed-orders">
-                <h4 className="order-status-text">Completed</h4>
-                <div className='col-md-10 approved-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-                  <table className="table table-hover table-striped align-middle caption-bot table-xl">
-                  <caption>end of list of completed orders</caption>
-                  <thead className='table-dark align-middle'>
-                      <tr className='thead-row'>
-                      <th scope="col">Date</th>
-                      <th scope="col">Order No.</th>
-                      <th scope="col">Number of Items</th>
-                      <th scope="col">Total Amount</th>
-                      <th scope="col">Status</th>
-                      </tr>
-                  </thead>
-                  <tbody className="table-group-divider">
-                    <tr>
-                      <th scope="row" data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">08/28/2023</th>
-                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">2583792</td>
-                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">5</td>
-                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">PHP 1000</td>
-                      <td data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">Approved</td>
-                    </tr>
-                  </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div id="canceled-orders">
-                <h4 className="order-status-text">Canceled Orders</h4>
-                <div className='col-md-10 admin-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-                  <table className="table table-hover table-striped align-middle caption-bot table-xl">
-                  <caption>end of list of canceled orders</caption>
-                  <thead className='table-dark align-middle'>
-                      <tr className='thead-row'>
-                      <th scope="col">Date</th>
-                      <th scope="col">Order No.</th>
-                      <th scope="col">Number of Items</th>
-                      <th scope="col">Total Amount</th>
-                      <th scope="col">Status</th>
-                      </tr>
-                  </thead>
-                  <tbody className="table-group-divider">
-                    <tr>
-                      <th scope="row" data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">08/28/2023</th>
-                      <td data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">2583792</td>
-                      <td data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">5</td>
-                      <td data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">PHP 1000</td>
-                      <td data-bs-toggle="modal" data-bs-target="#canceledOrdersModal">Canceled</td>
-                    </tr>
-                  </tbody>
-                  </table>
-                </div>
-              </div>
-
-            </div>
-          </div>
-      </div>
-
-      <div className="pending-order-modal modal fade" id="orderPlacedModal" tabIndex={-1} aria-labelledby="orderPlacedModalModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-dialog-centered modal-xl">
-          <div className="orders-modal-content modal-content" style={{ backgroundColor:'#fff' }}>
-          <div className="modal-header">
-          <h3 className='modal-order-title'>Order Details</h3>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            {selectedOrders && (
-              <div className='col-md-12 row' style={{ display:'flex', justifyContent:'space-between', padding:'15px' }}>
-              <div className="modal-body">
-                <div style={{ display:'flex', flexFlow:'row', gap:'50px' }}>
-                    <div className='col-md-3 product-details-container' >
-                    <div className='customer-details-content'>
-                    <h3 className='order-details-titles'>Customer Details</h3>
-                    <span className="customer-details-text">First Name: <p className="customer-details-input">{selectedOrders.user.firstName}</p></span>
-                    <span className="customer-details-text">Last Name: <p className="customer-details-input">{selectedOrders.user.lastName}</p></span>
-                    <span className="customer-details-text">ID Number: <p className="customer-details-input">{selectedOrders.user.id}</p></span>
-                    <span className="customer-details-text">Phone Number: <p className="customer-details-input">{selectedOrders.user.phoneNumber}</p></span>
-                    </div>
-                    <div className='order-details-content'>
-                    <h3 className='order-details-titles'>Order Details</h3>
-                    <span className="order-details-text">Order Date: <p className="order-details-input">{selectedOrders.dateCreated}</p></span>
-                    <span className="order-details-text">Order No: <p className="order-details-input">{selectedOrders.orderNumber}</p></span>
-                    <span className="order-details-text">Number of Items: <p className="order-details-input">{selectedOrders.cart.items.length}</p></span>
-                    <span className="order-details-text">Payment option: <p className="order-details-input">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</p></span>
-                    </div>
-                    
-                    <div className='payment-details-content'>
-                    <h3 className='order-details-titles'>Payment Details</h3>
-                    <h4>Total Amount: <p className="order-details-input">{selectedOrders.total}</p></h4>
-                    <span className="order-details-text">Proof of payment:</span>
-                      <a 
-                          href={`https://localhost:7017/${selectedOrders.proofOfPayment}`}
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          style={{ fontSize:'15px', display: 'block' }}
-                      >
-                          {selectedOrders.proofOfPayment.split('\\').pop()}
-                      </a>
-                    </div>
-                    </div>
-
-                    <div className='item-details-container'>
-                      <h3>Item Details:</h3>
-                      <div className='order-table-wrapper table-responsive-sm'>
-                          <table className="col-md-12 table table-hover align-middle caption-bot table-xl">
-                            <caption>end of list</caption>
-                            <thead className='table-dark align-middle'>
-                                <tr className='thead-row'>
-                                  <th className="order-table-header" scope="col">Product</th>
-                                  <th className="order-table-header" scope="col">Size</th>
-                                  <th className="order-table-header" scope="col">Quantity</th>
-                                  <th className="order-table-header" scope="col">Price</th>
-                                </tr>
-                            </thead>
-                            <tbody className="table-group-divider">
-                                {selectedOrders.cart.items.map(item => (
-                                  <tr key={item.id}>
-                                      <th scope="row">
-                                        <img 
-                                            className="prod-image-cart" 
-                                            src={`https://localhost:7017/${item.product.image}`} 
-                                            alt={item.product.productName}
-                                        />
-                                        {item.product.productName}
-                                      </th>
-                                      <td>{item.sizeQuantity.size}</td>
-                                      <td>{item.quantity}</td>
-                                      <td>PHP {item.product.price}</td>
-                                  </tr>
-                                ))}
-                            </tbody>
-                          </table>
-                      </div>
-                  </div>
-                </div>
-              </div>
-              </div>
-            )}
-          </div>
+    <div className="orders-supplier-container">
+        <div data-bs-spy="scroll" data-bs-target="#orders-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true" className="scrollspy-example p-3 rounded-2" tabIndex={-1}>
+            <h4 id="supplier-pending-order">Pending Orders</h4>
+            <div className='col-md-11 pending-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+                                <table className="table table-hover align-middle caption-bot table-xxl">
+                                    <caption>end of list of pending orders</caption>
+                                    <thead className='table align-middle'>
+                                        <tr className='thead-row'>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Order ID</th>
+                                            <th scope="col">Number of Items</th>
+                                            <th scope="col">Total Amount</th>
+                                            <th scope="col">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="table-group-divider">
+                                        <tr data-bs-toggle="modal" data-bs-target="#pendingOrderModal">
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Pending</td>
+                                        </tr>
+                                        <tr data-bs-toggle="modal" data-bs-target="#pendingOrderModal">
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Pending</td>
+                                        </tr>
+                                        <tr data-bs-toggle="modal" data-bs-target="#pendingOrderModal">
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Pending</td>
+                                        </tr>
+                                        <tr data-bs-toggle="modal" data-bs-target="#pendingOrderModal">
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Pending</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Pending</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Pending</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Pending</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Pending</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Pending</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Pending</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Pending</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Pending</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+            <h4 className="order-status-label" id="supplier-approved-order">Approved Orders</h4>
+            <div className='col-md-11 approved-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+                                <table className="table table-hover align-middle caption-bot table-xxl">
+                                    <caption>end of list of approved orders</caption>
+                                    <thead className='table align-middle'>
+                                        <tr className='thead-row'>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Order ID</th>
+                                            <th scope="col">Number of Items</th>
+                                            <th scope="col">Total Amount</th>
+                                            <th scope="col">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="table-group-divider">
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Approved</td>
+                                            </tr>
+                                            <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Approved</td>
+                                            </tr>
+                                            <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Approved</td>
+                                            </tr>
+                                            <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Approved</td>
+                                            </tr>
+                                            <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Approved</td>
+                                            </tr>
+                                            <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Approved</td>
+                                            </tr>
+                                            <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Approved</td>
+                                            </tr>
+                                            <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Approved</td>
+                                            </tr>
+                                            <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Approved</td>
+                                            </tr>
+                                            <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Approved</td>
+                                            </tr>
+                                            <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Approved</td>
+                                            </tr>
+                                            <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Approved</td>
+                                            </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+            <h4 className="order-status-label" id="supplier-cancelled-order">Cancelled Orders</h4>
+            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+                                <table className="table table-hover align-middle caption-bot table-xxl">
+                                    <caption>end of list of cancelled orders</caption>
+                                    <thead className='table align-middle'>
+                                        <tr className='thead-row'>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Order ID</th>
+                                        <th scope="col">Number of Items</th>
+                                        <th scope="col">Total Amount</th>
+                                        <th scope="col">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="table-group-divider">
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Canceled</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Canceled</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Canceled</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Canceled</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Canceled</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Canceled</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Canceled</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Canceled</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Canceled</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Canceled</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Canceled</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Canceled</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+            <h4 className="order-status-label" id="supplier-claimed-order">Claimed Orders</h4>
+            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+                                <table className="table table-hover align-middle caption-bot table-xxl">
+                                    <caption>end of list of claimed orders</caption>
+                                    <thead className='table align-middle'>
+                                        <tr className='thead-row'>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Order ID</th>
+                                        <th scope="col">Number of Items</th>
+                                        <th scope="col">Total Amount</th>
+                                        <th scope="col">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="table-group-divider">
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Claimed</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Claimed</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Claimed</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Claimed</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Claimed</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Claimed</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Claimed</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Claimed</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Claimed</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Claimed</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Claimed</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">08/28/2023</th>
+                                            <td>2583792</td>
+                                            <td>5</td>
+                                            <td>PHP 1000</td>
+                                            <td>Claimed</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
         </div>
-      </div>
-
-      <div className="pending-order-modal modal fade" id="pendingOrdersModal" tabIndex={-1} aria-labelledby="pendingOrderModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-dialog-centered modal-xl">
-          <div className="orders-modal-content modal-content" style={{ backgroundColor:'#fff' }}>
-          <div className="modal-header">
-          <h3 className='modal-order-title'>Order Details</h3>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            {selectedOrders && (
-              <div className='col-md-12 row' style={{ display:'flex', justifyContent:'space-between', padding:'15px' }}>
-              <div className="modal-body">
-                <div style={{ display:'flex', flexFlow:'row', gap:'50px' }}>
-                    <div className='col-md-3 product-details-container' >
-                    <div className='customer-details-content'>
-                    <h3 className='order-details-titles'>Customer Details</h3>
-                    <span className="customer-details-text">First Name: <p className="customer-details-input">{selectedOrders.user.firstName}</p></span>
-                    <span className="customer-details-text">Last Name: <p className="customer-details-input">{selectedOrders.user.lastName}</p></span>
-                    <span className="customer-details-text">ID Number: <p className="customer-details-input">{selectedOrders.user.id}</p></span>
-                    <span className="customer-details-text">Phone Number: <p className="customer-details-input">{selectedOrders.user.phoneNumber}</p></span>
-                    </div>
-                    <div className='order-details-content'>
-                    <h3 className='order-details-titles'>Order Details</h3>
-                    <span className="order-details-text">Order Date: <p className="order-details-input">{selectedOrders.dateCreated}</p></span>
-                    <span className="order-details-text">Order No: <p className="order-details-input">{selectedOrders.orderNumber}</p></span>
-                    <span className="order-details-text">Number of Items: <p className="order-details-input">{selectedOrders.cart.items.length}</p></span>
-                    <span className="order-details-text">Payment option: <p className="order-details-input">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</p></span>
-                    </div>
-                    
-                    <div className='payment-details-content'>
-                    <h3 className='order-details-titles'>Payment Details</h3>
-                    <h4>Total Amount: <p className="order-details-input">{selectedOrders.total}</p></h4>
-                    <span className="order-details-text">Proof of payment:</span>
-                      <a 
-                          href={`https://localhost:7017/${selectedOrders.proofOfPayment}`}
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          style={{ fontSize:'15px', display: 'block' }}
-                      >
-                          {selectedOrders.proofOfPayment.split('\\').pop()}
-                      </a>
-                    </div>
-                    </div>
-
-                    <div className='item-details-container'>
-                      <h3>Item Details:</h3>
-                      <div className='order-table-wrapper table-responsive-sm'>
-                          <table className="col-md-12 table table-hover align-middle caption-bot table-xl">
-                            <caption>end of list</caption>
-                            <thead className='table-dark align-middle'>
-                                <tr className='thead-row'>
-                                  <th className="order-table-header" scope="col">Product</th>
-                                  <th className="order-table-header" scope="col">Size</th>
-                                  <th className="order-table-header" scope="col">Quantity</th>
-                                  <th className="order-table-header" scope="col">Price</th>
-                                </tr>
-                            </thead>
-                            <tbody className="table-group-divider">
-                                {selectedOrders.cart.items.map(item => (
-                                  <tr key={item.id}>
-                                      <th scope="row">
-                                        <img 
-                                            className="prod-image-cart" 
-                                            src={`https://localhost:7017/${item.product.image}`} 
-                                            alt={item.product.productName}
-                                        />
-                                        {item.product.productName}
-                                      </th>
-                                      <td>{item.sizeQuantity.size}</td>
-                                      <td>{item.quantity}</td>
-                                      <td>PHP {item.product.price}</td>
-                                  </tr>
-                                ))}
-                            </tbody>
-                          </table>
-                      </div>
-                  </div>
-                </div>
-              </div>
-              </div>
-            )}
-
-            <div className="modal-footer">
-            <button className="proceed-Btn"data-bs-toggle="modal" data-bs-target="#cartModal">
-                  Approve Order
-                  </button>
-            <button className="Btn" data-bs-toggle="modal" data-bs-target="#cancelOrderConfirmModal">
-                  Deny Order</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-<div className="approved-order-modal modal fade" id="approvedOrdersModal" tabIndex={-1} aria-labelledby="approvedOrderModalLabel" aria-hidden="true">
-  <div className="modal-dialog modal-dialog-centered modal-xl">
-    <div className="orders-modal-content modal-content" style={{ backgroundColor:'#fff' }}>
-    <div className="modal-header">
-    <h3 className='modal-order-title'>Order Details</h3>
-        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div className='col-md-12 row' style={{ display:'flex', justifyContent:'space-between', padding:'15px' }}>
-      <div className="modal-body">
-        <div style={{ display:'flex', flexFlow:'row', gap:'50px' }}>
-            <div className='col-md-3 product-details-container' >
-            <div className='customer-details-content'>
-            <h3 className='order-details-titles'>Customer Details</h3>
-            <span className="customer-details-text">First Name: <p className="customer-details-input">Racel Anne</p></span>
-            <span className="customer-details-text">Last Name: <p className="customer-details-input">Pitogo</p></span>
-            <span className="customer-details-text">ID Number: <p className="customer-details-input">20168619</p></span>
-            <span className="customer-details-text">Phone Number: <p className="customer-details-input">09161528419</p></span>
-            </div>
-            <div className='order-details-content'>
-            <h3 className='order-details-titles'>Order Details</h3>
-            <span className="order-details-text">Order Date: <p className="order-details-input">8/28/2023</p></span>
-            <span className="order-details-text">Order ID: <p className="order-details-input">2583792</p></span>
-            <span className="order-details-text">Number of Items: <p className="order-details-input">5</p></span>
-            <span className="order-details-text">Payment option: <p className="order-details-input">GCash</p></span>
-            </div>
-            
-            <div className='payment-details-content'>
-            <h3 className='order-details-titles'>Payment Details</h3>
-            <h4>Total Amount: <p className="order-total-input">PHP 1000</p></h4>
-            <h3 className="order-details-titles">Proof of payment:</h3>
-            <a href="" style={{ fontSize:'15px'}}>proofPayment.png</a>
-            <button type="button" className="col-md-6 receipt-btn btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#receiptModal">View Order Receipt</button>
-            </div>
-            </div>
-
-            <div className='item-details-container'>
-            <h3>Item Details:</h3>
-            <div className='order-table-wrapper table-responsive-sm'>
-              <table className="col-md-12 table table-hover align-middle caption-bot table-xl">
-              <caption>end of list</caption>
-              <thead className='table-dark align-middle'>
-                  <tr className='thead-row'>
-                  <th className="order-table-header" scope="col">Product</th>
-                  <th className="order-table-header" scope="col">Size</th>
-                  <th className="order-table-header" scope="col">Quantity</th>
-                  <th className="order-table-header" scope="col">Price</th>
-                  </tr>
-              </thead>
-                <tbody className="table-group-divider">
-                    <tr>
-                      <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-                      <td>XL</td>
-                      <td>3</td>
-                      <td>PHP 123</td>
-                    </tr>
-                </tbody>
-              </table>
-            </div>
-            </div>
-        </div>
-      </div>
-      </div>
-      <div className="modal-footer">
-      <button className="Btn" data-bs-dismiss="modal" aria-label="Close">
-            Close</button>
-      </div>
     </div>
-  </div>
-</div>
 
+    {/* ORDER DETAILS MODAL */}
+    <div className="modal fade" id="pendingOrderModal" tabIndex={-1} aria-labelledby="pendingOrderModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-fullscreen">
+            <div className="modal-content" style={{ padding:'20px' }}>
+                <div className="pending-header">
+                    <h1 className="modal-title" id="exampleModalLabel">Pending Order</h1>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div className="modal-basta-container">
+                    <span>Check pending order details</span>
+                    <div className="modal-btns-container">
+                        <button type="button" className="cancel-btn-modal">Deny</button>
+                        <button type="button" className="save-prod-btn">Approve</button>
+                    </div>
+                </div>
+                    <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
+                        {/* CUSTOMER DETAILS */}
+                        <div>
+                            <div className="order-details-customer">
+                                <h3 className="order-details-subtitle">Customer</h3>
+                                <div className="customer-details-container">
+                                    <div className="modal-details-label">
+                                        <span className="modal-label">ID Number</span>
+                                        <span className="modal-label">First Name</span>
+                                        <span className="modal-label">Last Name</span>
+                                        <span className="modal-label">Department</span>
+                                        <span className="modal-label">Gender</span>
+                                    </div>
+                                    <div className="modal-details-info">
+                                        <span className="modal-info">123456</span>
+                                        <span className="modal-info">First Name</span>
+                                        <span className="modal-info">Last Name</span>
+                                        <span className="modal-info">College of Computer Studies</span>
+                                        <span className="modal-info">Gender</span>
+                                    </div>
+                                </div>
+                            </div>
 
-<div className="canceled-order-modal modal fade" id="canceledOrdersModal" tabIndex={-1} aria-labelledby="canceledOrderModalLabel" aria-hidden="true">
-  <div className="modal-dialog modal-dialog-centered modal-xl">
-    <div className="orders-modal-content modal-content" style={{ backgroundColor:'#fff' }}>
-    <div className="modal-header">
-    <h3 className='modal-order-title'>Order Details</h3>
-        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div className='col-md-12 row' style={{ display:'flex', justifyContent:'space-between', padding:'15px' }}>
-      <div className="modal-body">
-        <div style={{ display:'flex', flexFlow:'row', gap:'50px' }}>
-            <div className='col-md-3 product-details-container' >
-            <div className='customer-details-content'>
-            <h3 className='order-details-titles'>Customer Details</h3>
-            <span className="customer-details-text">First Name: <p className="customer-details-input">Racel Anne</p></span>
-            <span className="customer-details-text">Last Name: <p className="customer-details-input">Pitogo</p></span>
-            <span className="customer-details-text">ID Number: <p className="customer-details-input">20168619</p></span>
-            <span className="customer-details-text">Phone Number: <p className="customer-details-input">09161528419</p></span>
-            </div>
-            <div className='order-details-content'>
-            <h3 className='order-details-titles'>Order Details</h3>
-            <span className="order-details-text">Order Date: <p className="order-details-input">8/28/2023</p></span>
-            <span className="order-details-text">Order ID: <p className="order-details-input">2583792</p></span>
-            <span className="order-details-text">Number of Items: <p className="order-details-input">5</p></span>
-            <span className="order-details-text">Payment option: <p className="order-details-input">GCash</p></span>
-            </div>
-            
-            <div className='payment-details-content'>
-            <span className="order-details-text"  style={{ marginTop:'15px' }}>Status: <p className="order-details-input">CANCELED ORDER</p></span>
-            <span className="order-details-text">Date canceled: <p className="order-details-input">8/24/2023</p></span>
-            </div>
-            </div>
-
-            <div className='item-details-container'>
-            <h3>Item Details:</h3>
-            <div className='order-table-wrapper table-responsive-sm'>
-              <table className="col-md-12 table table-hover align-middle caption-bot table-xl">
-                <caption>end of list</caption>
-                <thead className='table-dark align-middle'>
-                    <tr className='thead-row'>
-                    <th className="order-table-header" scope="col">Product</th>
-                    <th className="order-table-header" scope="col">Size</th>
-                    <th className="order-table-header" scope="col">Quantity</th>
-                    <th className="order-table-header" scope="col">Price</th>
-                    </tr>
-                </thead>
-                <tbody className="table-group-divider">
-                    <tr>
-                      <th scope="row"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-                      <td>XL</td>
-                      <td>3</td>
-                      <td>PHP 123</td>
-                    </tr>
-                </tbody>
-              </table>
-              </div>
+                            {/* ORDER DETAILS */}
+                            <div className="modal-order-details-container">
+                                <h3 className="order-details-subtitle">Order Details</h3>
+                                <div className="order-details-container">
+                                    <div className="modal-details-label">
+                                        <span className="modal-label">Date</span>
+                                        <span className="modal-label">Order Number</span>
+                                        <span className="modal-label">Number of Items</span>
+                                        <span className="modal-label">Total Amount</span>
+                                        <span className="modal-label">Proof of Payment</span>
+                                    </div>
+                                    <div className="modal-details-info">
+                                    <span className="modal-info">Date</span>
+                                        <span className="modal-info">Order Number</span>
+                                        <span className="modal-info">Number of Items</span>
+                                        <span className="modal-info">Total Amount</span>
+                                        <a className="modal-info" href="">proof of payment</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* ITEM LIST */}
+                        <div className="modal-item-list">
+                            <h3 className="order-details-subtitle">Item List</h3>
+                            <div className="modal-item-list-table-wrapper">
+                                <table className="table">
+                                        <thead className="table-primary">
+                                            <tr>
+                                            <th scope="col">Product Name</th>
+                                            <th scope="col">Product Type</th>
+                                            <th scope="col">Gender</th>
+                                            <th scope="col">Quantity</th>
+                                            <th scope="col">Price</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                            <th scope="row">1</th>
+                                            <td>Mark</td>
+                                            <td>Otto</td>
+                                            <td>4324</td>
+                                            <td>12345</td>
+                                            </tr>
+                                            <tr>
+                                            <th scope="row">2</th>
+                                            <td>Jacob</td>
+                                            <td>Thornton</td>
+                                            <td>532</td>
+                                            <td>12355</td>
+                                            </tr>
+                                        </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
             </div>
         </div>
-      </div>
-      </div>
-      <div className="modal-footer">
-            <button className="Btn" data-bs-dismiss="modal" aria-label="Close">
-            Close</button>
-      </div>
     </div>
-  </div>
 </div>
-
-<div className="deny-order-confirmation modal fade" id="cancelOrderConfirmModal" aria-hidden="true" aria-labelledby="cancelOrderConfirmModalLabel" tabIndex={-1}>
-  <div className="modal-dialog modal-dialog-centered">
-    <div className="modal-content">
-      <div className="modal-header">
-        <h1 className="modal-title fs-5" id="cancelOrderConfirmModalLabel">Cancel Confirmation</h1>
-        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div className="modal-body">
-        <p className="cancel-confirm-text">Are you sure you want to deny order?</p>
-      </div>
-      <div className="modal-footer">
-      <button className="proceed-Btn"data-bs-toggle="modal" data-bs-target="#cartModal">
-            Yes
-            </button>
-      <button className="Btn" data-bs-toggle="modal" data-bs-target="#pendingOrdersModal">
-            No
-            </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div className="view-receipt-modal modal fade" id="receiptModal" tabIndex={-1} aria-labelledby="receiptModalLabel" aria-hidden="true">
-  <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div className="modal-content" style={{ backgroundColor:'#fff' }}>
-      
-      <div className='col-md-12 row'>
-      <div className="modal-body">
-        <div style={{ display:'flex', flexFlow:'row', justifyContent:'center' }}>
-           <div className="col-md-8 receipt-body">
-            <h1 className="order-title">ORDER RECEIPT</h1>
-            <h5 className="receipt-labels">order no.: <span className="receipt-details">953828</span></h5>
-
-            <div className="col-md-10 row" style={{ marginTop:'15px' }}>
-            <div className="col-md-5 receipt-details-container">
-              <h4 className="receipt-details-labels">Customer ID:</h4>
-              <h4 className="receipt-details-labels">No. of Items:</h4>
-              <h4 className="receipt-details-labels">Shop:</h4>
-              <h4 className="receipt-details-labels">Total Amount</h4>
-              </div>
-              <div className="col-md-7 order-info-container">
-                <h4 className="order-info-text">198543985</h4>
-                <h4 className="order-info-text">8</h4>
-                <h4 className="order-info-text">Example Shop</h4>
-                <h4 className="order-info-text">PHP 1000</h4>
-              </div>
-            </div>
-              <div className="product-list-orders">
-              <h3 className="list-title">Product List:</h3>
-              <div className='product-list-table-wrapper table-responsive-sm'>
-        <table className="col-md-12 table table-borderless table-dark table-hover align-middle table-xl">
-        <thead className='table-dark align-middle'>
-            <tr className='thead-row'>
-            <th className="order-table-header" scope="col">Product Name</th>
-            <th className="order-table-header" scope="col">Size</th>
-            <th className="order-table-header" scope="col">Quantity</th>
-            <th className="order-table-header" scope="col">Price</th>
-            </tr>
-        </thead>
-        <tbody className="table-group-divider">
-            <tr>
-            <th scope="row">Department Shirt</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row">CCS Uniform Top</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row">Department Shirt</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row">CCS Uniform Skirt</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row">CCS ID Sling</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row">Department Shirt</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-            <tr>
-            <th scope="row">Department Shirt</th>
-            <td>XL</td>
-            <td>3</td>
-            <td>PHP 123</td>
-            </tr>
-        </tbody>
-        </table>
-        </div>
-              </div>
-           
-           </div>
-        </div>
-      </div>
-      </div>
-      <div className="modal-footer">
-            <button type="button" className="btn btn-secondary btn-lg" data-bs-toggle="modal" data-bs-target="#approvedOrdersModal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-        </div>
 }
 
-export default Orders
+export default Supplier_Orders

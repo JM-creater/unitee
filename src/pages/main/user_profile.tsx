@@ -75,7 +75,7 @@ function User_Profile () {
                           <h4 className="info-text">{getDepartmentName(customer.departmentId)}</h4>
                           <h4 className="info-text">{customer.phoneNumber}</h4>
                           <h4 className="info-text">{customer.email}</h4>
-                          <h4 className="info-text">{customer.password}</h4>
+                          <h4 className="info-text">{customer.password.replace(/./g, '*')}</h4>
                       </div>
                       <div className="col-md-3 edit-btn-container">
                           <button className="edit-prof-btn" data-bs-toggle="modal" data-bs-target="#editProfileModal">

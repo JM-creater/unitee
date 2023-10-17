@@ -12,6 +12,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
 import cartEventEmitter from "../../helpers/EventEmitter"
+import notifEventEmitter from "../../helpers/NotifEventEmitter"
 
 function Main() {
 
@@ -20,9 +21,10 @@ function Main() {
     }
 
     const [customer, setCustomer] = useState<Customer | null>(null); 
+    const [notifItem, setNotifItem] = useState([]);
     const [totalItems, setTotalItems] = useState<number | null>(null);
     const [cart, setCart] = useState([]);
-    const { userId } = useParams();
+    const { userId,  } = useParams();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -35,26 +37,54 @@ function Main() {
         })
     }, [userId]);
 
+
+    useEffect(() => {
+        const updateNotification = () => {
+            axios.get(`https://localhost:7017/Notification/${userId}`)
+                .then(response => {
+                    setNotifItem(response.data);
+                })
+                .catch(error => {
+                    console.error(error);
+                })
+        };
+        
+        notifEventEmitter.on("notifAdded", updateNotification)
+    
+        updateNotification();
+    
+        return () => {
+            notifEventEmitter.on("notifAdded", updateNotification)
+        };
+    }, [userId]);
+
+
     useEffect(() => {
         const updateCartCount = () => {
-        axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
-            .then(res => {
-                setCart(res.data);
-                setTotalItems(res.data.reduce((acc, cartItems) => acc + cartItems.items.length, 0));
-            })
-            .catch(error => {
-                console.error(error);
-            });
-        }
+            axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
+                .then(res => {
+                    setCart(res.data);
+                    setTotalItems(res.data.reduce((acc, cartItems) => acc + cartItems.items.length, 0));
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        };
+    
         cartEventEmitter.on("itemAddedToCart", updateCartCount);
+        cartEventEmitter.on("cartEmptied", updateCartCount);
+        cartEventEmitter.on("cartUpdated", updateCartCount);
     
         updateCartCount();
     
         return () => {
-            cartEventEmitter.off("itemAddedToCart", updateCartCount);
+            cartEventEmitter.on("itemAddedToCart", updateCartCount);
+            cartEventEmitter.on("cartEmptied", updateCartCount);
+            cartEventEmitter.on("cartUpdated", updateCartCount);
         };
     }, [userId]);
     
+
 
     return <div className="main">
             <header className="header" style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
@@ -67,40 +97,56 @@ function Main() {
                         <img className="nav-icon" src={ homeIcon }/>
                     </Link>
 
-                    <Link className="customer-nav-link" to='cart'>
-                        <div className="cart-icon-container"> 
-                            <img className="nav-icon" src={ carts }/>
-                            {totalItems !== null && totalItems > 0 && <span className="cart-count">{totalItems}</span>}
+                    <div className="customer-nav-link">
+                        <div className="cart-icon-container">
+                            <Link to='cart'>
+                                <img className="nav-icon" src={ carts }/>
+                                {totalItems !== null && totalItems > 0 && <span className="cart-count">{totalItems}</span>}
+                            </Link>
                             
                             <div className="cart-dropdown">
                                 {cart.length > 0 ? (
                                     cart.map((cartObj) => (
                                         cartObj.items.map((item, itemIndex) => (
-                                            <div key={itemIndex} className="cart-dropdown-item">
-                                                <img 
-                                                    className="dropdown-image"
-                                                    src={`https://localhost:7017/${item.product.image}`}  
-                                                    alt={item.product.productName} 
-                                                    width="50" 
-                                                    height="50"
-                                                />
-                                                <span className="dropdown-productName">{item.product.productName}</span>
-                                                <span className="dropdown-price">₱{item.product.price}</span>
-                                            </div>
+                                            <Link to={`visit_shop/${cartObj.supplierId}`} key={itemIndex}>
+                                                <div className="cart-dropdown-item">
+                                                    <img 
+                                                        className="dropdown-image"
+                                                        src={`https://localhost:7017/${item.product.image}`}  
+                                                        alt={item.product.productName} 
+                                                        width="50" 
+                                                        height="50"
+                                                    />
+                                                    <span className="dropdown-productName">{item.product.productName}</span>
+                                                    <span className="dropdown-price">₱{item.product.price}</span>
+                                                </div>
+                                            </Link>
                                         ))
                                     ))
                                 ) : (
                                     <div className="empty-cart-message">Your cart is empty.</div>
                                 )}
-                                <div className="hoverButton">
-                                    <button onClick={() => navigate('cart')}>Go to Cart</button>
+                                <div className="cart-dropdown-footer">
+                                    <div className="itemsTotal">
+                                        {totalItems && totalItems > 0 ? `${totalItems} Products In Cart` : 'No Products In Cart'}
+                                    </div>
+                                    <div className="hoverButton">
+                                        <button onClick={() => navigate('cart')}>Go to Cart</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </Link>
+                    </div>
 
-                    <Link className="customer-nav-link" to='shop'>
-                        <img className="nav-icon" src={ notification }/>
+
+
+                    <Link className="customer-nav-link" to='notif'>
+                    <div className="notif-icon-container">
+                        <Link to='notif'>
+                            <img className="nav-icon" src={ notification } />
+                            {notifItem !== null && notifItem.length > 0 && <span className="notif-count">{notifItem.length}</span>}
+                        </Link>
+                    </div>
                     </Link>
                     
                     <div className="col-md-1 dropdown">
@@ -109,7 +155,7 @@ function Main() {
                             <img 
                                 className="imageProfile"
                                 src={`https://localhost:7017/${customer.image}`} 
-                                style={{ width:'90%', borderStyle:'solid', borderRadius:'50%', height: '50px' ,borderColor:'#D3D3D3' }} 
+                                style={{ width:'100%', maxWidth:'35px', borderStyle:'solid', borderRadius:'50%', height: '35px' ,borderColor:'#D3D3D3' }} 
                                 data-bs-toggle="dropdown" 
                                 aria-expanded="false" 
                             />

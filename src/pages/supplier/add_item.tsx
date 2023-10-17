@@ -50,7 +50,7 @@ function Add_item(){
 
         const handleImageClick = () => {
             if (inputRef.current) {
-            inputRef.current.click();
+                inputRef.current.click();
             }
         };
 
@@ -190,7 +190,6 @@ function Add_item(){
                     aria-label="Product description" 
                     placeholder="Enter product description" 
                     onChange={(e) => setProductDescription(e.target.value)} 
-                    required
                 />
             </div>
 
@@ -232,6 +231,7 @@ function Add_item(){
                         <input
                             className="form-control"
                             type="text"
+                            id="sizeCheck1"
                             value={sizeObj.size}
                             placeholder="Enter size (e.g., S, M, L...)"
                             onChange={(e) => {
@@ -242,6 +242,8 @@ function Add_item(){
                         <input 
                             className="form-control" 
                             type="number" 
+                            name="prodSize" 
+                            id="prodSize" 
                             value={sizeObj.quantity}
                             placeholder="Enter quantity"
                             onChange={(e) => {

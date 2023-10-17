@@ -4,7 +4,9 @@ import './cart.css'
 import toast, { Toaster } from 'react-hot-toast';
 import { useEffect, useRef, useState } from "react"
 import axios from "axios"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
+import cartEventEmitter from "../../helpers/EventEmitter";
+import Modal from 'bootstrap/js/dist/modal';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const showToast = (message: string, type: number) => {
@@ -70,6 +72,24 @@ function Cart () {
       setTotalItemsChecked(count);
     };
 
+    // Handle Minus Quantity
+    const HandleMinusQuantity = (index, itemIndex) => {
+      const updatedCart = [...cart];
+      if (updatedCart[index].items[itemIndex].quantity > 0) {
+        updatedCart[index].items[itemIndex].quantity -= 1;
+      }
+      setCart(updatedCart);
+      calculateTotalAmount();
+    }
+
+    // Handle Plus Quantity
+    const HandlePlusQuantity = (index, itemIndex) => {
+      const updatedCart = [...cart];
+      updatedCart[index].items[itemIndex].quantity += 1;
+      setCart(updatedCart);
+      calculateTotalAmount();
+    }
+
     // Handle Shop Total Amount
     const handleShopCheckboxChange = (cartIndex) => {
       const updatedCart = [...cart];
@@ -91,24 +111,6 @@ function Cart () {
       (document.getElementById(`shopRadio-${cart[cartIndex].supplierId}`) as HTMLInputElement).checked = allItemsChecked;    
       calculateTotalAmount();
     };
-
-    // Handle Minus Quantity
-    const HandleMinusQuantity = (index, itemIndex) => {
-      const updatedCart = [...cart];
-      if (updatedCart[index].items[itemIndex].quantity > 0) {
-        updatedCart[index].items[itemIndex].quantity -= 1;
-      }
-      setCart(updatedCart);
-      calculateTotalAmount();
-    }
-
-    // Handle Plus Quantity
-    const HandlePlusQuantity = (index, itemIndex) => {
-      const updatedCart = [...cart];
-      updatedCart[index].items[itemIndex].quantity += 1;
-      setCart(updatedCart);
-      calculateTotalAmount();
-    }
 
     // Handle Order Place
     const HandleOrderPlace = async () => {
@@ -141,6 +143,15 @@ function Cart () {
         formData.append('referenceId', referenceId);
         formData.append('proofOfPayment', proofOfPayment);
 
+        const orderItems = cartItem.items.map(item => {
+          return {
+              ProductId: item.product.id,
+              Quantity: item.quantity,
+              SizeQuantityId: item.sizeQuantityId
+          };
+        });
+        formData.append('OrderItems', JSON.stringify(orderItems));
+
         try {
           await axios.post('https://localhost:7017/Order', formData, {
               headers: {
@@ -149,6 +160,7 @@ function Cart () {
           });
           axios.delete(`https://localhost:7017/Cart/deleteCart/${cartItem.id}`)
           toast.success("Successfully Ordered");
+          cartEventEmitter.emit("cartEmptied");
         } catch (error) {
           console.log("Error in placing order", error);
           toast.error(error.response.data);
@@ -164,7 +176,76 @@ function Cart () {
         fileInputRef.current.value = "";
       }
     };
+    
+    // Delete Method for Cart
+    const removeCartItem = async (cartId) => {
+      try {
+          await fetch(`https://localhost:7017/Cart/delete/${cartId}`, {
+            method: 'DELETE',
+          });
+      } catch (error) {
+        console.error("Error removing item from cart:", error);
+      }
+    };
+
+    // Handle for Deleting a Cart
+    const handleRemoveCart = async () => {
+      const itemsToRemove = [];
+      const shopsToRemove = [];
   
+      cart.forEach((cartItem, cartIndex) => {
+        const shopChecked = (document.getElementById(`shopRadio-${cartItem.supplierId}`) as HTMLInputElement).checked;
+        if (shopChecked) {
+          shopsToRemove.push(cartIndex);
+          cartItem.items.forEach(item => {
+            itemsToRemove.push(item.id);
+          });
+        } else {
+          cartItem.items.forEach(item => {
+            const itemChecked = (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement).checked;
+            if (itemChecked) {
+              itemsToRemove.push(item.id);
+            }
+          });
+        }
+      });
+      
+      for (const itemId of itemsToRemove) {
+        await removeCartItem(itemId);
+      }
+      
+      for (const cartIndex of shopsToRemove) {
+        await removeCartItem(cart[cartIndex].id); 
+      }
+      
+      const updatedCart = cart.filter((_, index) => !shopsToRemove.includes(index))
+                              .map(cartItem => {
+                                  cartItem.items = cartItem.items.filter(item => !itemsToRemove.includes(item.id));
+                                  return cartItem;
+                              });
+      setCart(updatedCart);
+      setTotalAmount(0); 
+      setTotalItemsChecked(0);
+      cartEventEmitter.emit("cartUpdated");
+    };
+
+    // Handle Remove Cart Modal
+    const handleRemoveCartPrompt = () => {
+      const anyProductChecked = cart.some(shop => {
+          return shop.items.some(item => {
+            return (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement).checked;
+          });
+      });
+  
+      if (!anyProductChecked) {
+          toast.error("Please select a product");
+      } else {
+        // Existing logic to show modal
+        const modalElement = document.getElementById('removeCartConfirmationModal');
+        const bootstrapModal = new Modal(modalElement);
+        bootstrapModal.show();
+      }
+  };
 
 
     return <div className="cart-container row">
@@ -175,7 +256,7 @@ function Cart () {
       <div className="col-md-8 cart-title-container">
         <h1 className="cart-title">Shopping Cart</h1>
           <div className="cart-remove-btn-container">
-            <button type="button" className="btn btn-outline-primary" >
+            <button type="button" className="btn btn-outline-primary" onClick={handleRemoveCartPrompt}>
               <img style={{ width:'20%', marginRight:'5px'}} src={ remove }/>Remove
             </button>
           </div>
@@ -203,7 +284,9 @@ function Cart () {
                                     onChange={() => handleShopCheckboxChange(index)}
                                 />
                                 <img className="shopIcon-img" src={ `https://localhost:7017/${cartItem.supplier.image}` } alt="Shop Logo" />
-                                {cartItem.supplier.shopName}
+                                <Link to={`/shop/${userId}/visit_shop/${cartItem.supplierId}`} className="plain-link-shop">
+                                  {cartItem.supplier.shopName}
+                                </Link>
                             </h4>
                         </div>
 
@@ -218,10 +301,14 @@ function Cart () {
                                 />
                                 <div className="col-md-11 prod-cart-container">
                                     <img className="prod-img-cart" src={ `https://localhost:7017/${item.product.image}` } alt="Product" />
+                                    
                                     <div className="col-md-3 prodName-container">
+                                      <Link to={`/shop/${userId}/visit_shop/${cartItem.supplierId}`} className="plain-link-shop">
                                         <h3 className="prod-name-cart">{item.product.productName}</h3>
                                         <p>{item.product.description}</p>
+                                      </Link>
                                     </div>
+                                    
                                     {/* Sizes */}
                                     <div className="col-md-3 sizeProd-container">
                                         <label className="sizeCart-label" htmlFor={`size-${item.id}`}>
@@ -299,7 +386,26 @@ function Cart () {
               </div>
           </div>
       </div>
-    </div>   
+    </div> 
+
+    <div className="modal fade" id="removeCartConfirmationModal" tabIndex={-1} aria-labelledby="removeCartConfirmationModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+                <div className="modal-header">
+                    <h5 className="modal-title" id="removeCartConfirmationModalLabel">Remove items from cart</h5>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div className="modal-body">
+                    Are you sure you want to remove the selected items from the cart?
+                </div>
+                <div className="modal-footer">
+                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleRemoveCart}>Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
   </div>
 }
 

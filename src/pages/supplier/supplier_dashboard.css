@@ -1,0 +1,123 @@
+.orders-supplier-main-container {
+    height: 92vh;
+    width: 85vw;
+    padding: 20px;
+    background-color: #F0F0F0;
+    display: flex;
+    flex-flow: row;
+}
+
+.dash-supplier-container {
+    display: flex;
+    flex-flow: row;
+    gap: 15px;
+    width: 52rem;
+}
+
+.card-content-container {
+    background-color: white;
+    height: 100px;
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    flex-flow: row;
+    width: 20rem;
+}
+
+.number-dash {
+    font-weight: 600;
+    color: #004AAD;
+}
+
+.dash-card-icon {
+    width: 100%;
+    max-width: 30px;
+    height: 30px;
+}
+
+.top-selling-prods-container {
+    margin-top: 20px;
+    background-color: white;
+    padding: 5px;
+    width: 52rem;
+    height:fit-content;
+    border-radius: 10px;
+}
+
+.top-prods-container {
+    background-color: #F0F0F0;
+    border-radius: 5px;
+    padding: 5px;
+    display: flex;
+    flex-flow: row;
+    gap: 10px;
+    align-items: center;
+    margin: 5px;
+}
+
+.top-prod-img {
+    width: 100%;
+    max-width: 90px;
+    height: 90px;
+    border-radius: 5px;
+}
+
+.top-prod-name {
+    font-size: 15px;
+    width: 30rem;
+    height: 5rem;
+}
+
+.top-prod-price {
+    font-weight: 600;
+    font-size: 22px;
+    width: 10rem;
+    height: 5rem;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}
+
+.top-selling-prods-title {
+    margin: 10px 0 10px 5px;
+    color: #020654;
+}
+
+.pending-orders-dash {
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    height: fit-content;
+    margin-top: 45px;
+}
+
+.dash-pending-ords-container {
+    background-color: #F0F0F0;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-flow: row;
+    gap: 10px;
+    justify-content: space-between;
+    margin: 5px;
+}
+
+.cust-profile-pendOrder {
+    width: 100%;
+    max-width: 60px;
+    border-radius: 50%;
+    border: solid white 4px;
+}
+
+.cust-name-dash {
+    width: 18rem;
+}
+
+.cust-order-num-dash {
+    font-weight: 600;
+    height: 5rem;
+    width: 10rem;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}

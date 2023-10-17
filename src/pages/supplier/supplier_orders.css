@@ -1,102 +1,94 @@
-.order-details-titles {
-    color: #FFAA00;
-    font-weight: 600;
+.manage-orders-main-container {
+    width: 85vw;
+    padding: 10px;
+    background-color: #f0f0f0;
+    height: 92vh;
 }
 
-.customer-details-input, .order-details-input {
-    color:#020654;
-    font-weight: 500;
-    font-size: 20px;
-}
-.order-details-content, .customer-details-content {
-    border-bottom: solid #FFAA00;
+.orders-scroll-container {
+    background-color: #f0f0f0;
 }
 
-.payment-details-content {
+.supplier-nav-items {
+    font-size: 15px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.supplier-nav-items:hover {
+    background-color: white;
+}
+
+.orders-supplier-container {
+    max-height: 580px;
+    overflow: auto;
+    overflow-x:hidden;
+    scroll-behavior: smooth;
+    display: inline-block;
+    width: 77vw;
+    margin-left: 100px;
+}
+
+.order-status-label {
+    margin-top: 50px;
+}
+
+/* MODAL */
+.pending-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.order-details-customer {
+    border: solid 2px #f0f0f0;
+    border-radius: 10px;
+    padding: 15px;
     display: flex;
     flex-flow: column;
 }
 
-.order-details-text, .customer-details-text {
+.modal-item-list {
+    border: solid 2px #f0f0f0;
+    border-radius: 10px;
+    padding: 15px;
+    width: 60rem;
+}
+
+.customer-details-container, .order-details-container {
+    display: flex;
+    flex-flow: row;
+    gap: 20px;
+    width: 35rem;
+}
+
+.order-details-subtitle{
+    border-bottom: solid 2px #f0f0f0;
+}
+
+.modal-details-label, .modal-details-info {
+    display: flex;
+    flex-flow: column;
+}
+
+.modal-label {
+    font-weight: 600;
     font-size: 15px;
 }
 
-.order-total-input {
-    font-weight: 700;
-    font-size: 20px;
-    color: #020654;
+.modal-info {
+    font-size: 15px;
 }
 
-.customer-details-text, .order-details-text {
-    font-weight: 600;
+.modal-order-details-container {
+    border: solid 2px #f0f0f0;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 20px;
 }
 
-.orders-admin-container {
-    max-height: 600px;
+.modal-item-list-table-wrapper {
+    height: 70vh;
     overflow: auto;
+    overflow-x:hidden;
     scroll-behavior: smooth;
-    display: inline-block;
-} 
-
-.boxes-img {
-    width: 100%;
-    transform: rotateY(180deg);
-}
-
-.cancel-confirm-text {
-    font-size: 20px;
-    text-align: center;
-    padding: 50px;
-}
-
-.order-table-wrapper {
-    width: 700px;
-    max-height: fit-content;
-    overflow: auto;
-    display:inline-block;
-}
-
-.receipt-btn {
-    margin-top: 15px;
-}
-
-.receipt-body {
-    border-style: none;
-    border-radius: 20px;
-    height: 600px;
-    padding: 20px;
-    background-color: #020654;
-    display: flex;
-    justify-content: start;
-    align-items: center;
-    flex-flow: column;
-}
-
-.receipt-labels, .receipt-details {
-    color: white;
-}
-
-.order-title {
-    color: #FFAA00;
-    font-weight: 600;
-}
-
-.product-list-table-wrapper {
-    max-height: 200px;
-    overflow: auto;
-    display:inline-block;
-    margin-top: 15px;
-}
-
-.list-title {
-    margin-top: 15px;
-    color: white;
-}
-
-.receipt-details-labels {
-    color: #FFAA00;
-}
-
-.order-info-text {
-    color: white;
 }
