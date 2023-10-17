@@ -101,7 +101,6 @@ function Login() {
       });
   };
 
-<<<<<<< HEAD
   return (
     <div className="col-md-12 main-container row">
       <div className="col-md-7 login-1-container">
@@ -138,46 +137,6 @@ function Login() {
           <Link className="register-link" to="/register">
             <button className="register-customer-btn">Customer</button>
           </Link>
-=======
-        const url = 'https://localhost:7017/Users/login';
-        axios.post(url, data)
-        .then((result) => {
-            if (result.status === 200) {
-                toast.success('Successfully Logged In');
-                switch (result.data.role) {
-                    case 'Customer':
-                        navigate(`/shop/${result.data.user.id}`, { state: { userData: result.data.user } });
-                        break;
-                    case 'Supplier':
-                        navigate(`/supplier_dashboard/${result.data.user.id}`, { state: { supplierData: result.data.user } });
-                        break;
-                    case 'Admin':
-                        navigate(`/admin_main/${result.data.user.id}`, { state: { adminData: result.data.user } });
-                        break;
-                    default:
-                        console.log('Unknown role');
-                        break;
-                }
-            } else {
-                alert(result.data.message);
-            }
-        })
-        .catch((error) => {
-            if (error.response && error.response.status === 400) {
-                if (error.response.data === "Invalid user id." || 
-                    error.response.data === "Invalid password." ||
-                    error.response.data === "Account is deactivated.") {
-                    
-                    toast.error(error.response.data);
-                } else {
-                    toast.error("Wrong Credentials");
-                }
-            } else {
-                toast.error('Unexpected Error');
-            }
-        });
-    }
->>>>>>> NewUiSupplier
 
           <Link className="register-link" to="/register_supplier">
             <button className="register-customer-btn"> Supplier</button>
