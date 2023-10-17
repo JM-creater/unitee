@@ -34,8 +34,8 @@ function Login() {
       errors.IDOrEmail = 'ID Number or Email is required.';
     }
 
-    if (!Password || Password.length < 6) {
-      errors.Password = 'Password must be at least 6 characters long.';
+    if (!Password) {
+      errors.Password = 'Password is required.';
     }
 
     if (Object.keys(errors).length > 0) {
