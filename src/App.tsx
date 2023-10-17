@@ -67,7 +67,7 @@ function App() {
             <Route path='add_supplier' element={ <Add_supplier/> }/>
             <Route path='orders' element={ <Orders/> }></Route>
           </Route>
-
+          
           <Route path='supplier_dashboard/:id' element={ <Supplier_Main/> }>
             <Route index element={ <Supplier/> }/>
             <Route path='supplier_orders' element={ <Supplier_Order/> }/>
