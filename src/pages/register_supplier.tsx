@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 type ValidationErrors = {
   IDNumber?: string;
-  firstName?: string;
+  shopname?: string;
   address?: string;
   email?: string;
   phoneNumber?: string;
@@ -22,7 +22,7 @@ type ValidationErrors = {
 
 function Register() {
   const [IDNumber, setIDNumber] = useState('');
-  const [firstName, setFirstName] = useState('');
+  const [shopname, setShopName] = useState('');
   const [address, setAddress] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -38,9 +38,9 @@ function Register() {
     setIDNumber(value);
   };
 
-  const handleFirstName = (value) => {
+  const handleShopName = (value) => {
     if (/^[a-zA-Z ]*$/.test(value)) {
-      setFirstName(value);
+      setShopName(value);
     } else {
       toast.error('First Name must contain only letters.');
     }
@@ -70,28 +70,20 @@ function Register() {
     setConfirmPassword(value);
   };
 
-  const handleImageProfile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+  const handleImageProfile = (e) => {
       setImage(e.target.files[0]);
-    }
   };
 
-  const handleImageBirChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+  const handleImageBirChange = (e) => {
       setImageBIR(e.target.files[0]);
-    }
   };
 
-  const handleImageCityPermit = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+  const handleImageCityPermit = (e) => {
       setCityPermit(e.target.files[0]);
-    }
   };
 
-  const handleImageSchoolPermit = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+  const handleImageSchoolPermit = (e) => {
       setSchoolPermit(e.target.files[0]);
-    }
   };
 
   // Handle Register
@@ -104,7 +96,7 @@ function Register() {
       const formData = new FormData();
 
       formData.append('Id', IDNumber);
-      formData.append('FirstName', firstName);
+      formData.append('ShopName', shopname);
       formData.append('Address', address);
       formData.append('Email', email);
       formData.append('PhoneNumber', phoneNumber);
@@ -114,6 +106,7 @@ function Register() {
       formData.append('CityPermit', cityPermit);
       formData.append('SchoolPermit', schoolPermit);
 
+      
       try {
         const response = await axios.post(
           'https://localhost:7017/Supplier/registerSupplier',
@@ -140,9 +133,9 @@ function Register() {
       toast.error(errors.IDNumber);
     }
 
-    if (!firstName) {
-      errors.firstName = 'Shop Name is required.';
-      toast.error(errors.firstName);
+    if (!shopname) {
+      errors.shopname = 'Shop Name is required.';
+      toast.error(errors.shopname);
     }
 
     if (!address) {
@@ -233,7 +226,7 @@ function Register() {
                 className="col-md-5 input-register"
                 type="text"
                 placeholder="Shop Name"
-                onChange={(e) => handleFirstName(e.target.value)}
+                onChange={(e) => handleShopName(e.target.value)}
               />
               <input
                 className="col-md-5 input-register"
