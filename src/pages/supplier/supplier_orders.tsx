@@ -1,6 +1,124 @@
+import { useEffect, useState } from "react";
 import "./supplier_orders.css"
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import notifEventEmitter from "../../helpers/NotifEventEmitter";
 
 function Supplier_Orders () {
+
+   // Payment Type and Status
+  const PaymentType = {
+    EMoney: 'E-Money',
+    Cash: 'Cash'
+  };
+
+  const Status = {
+    Pending: 'Pending',
+    Approved: 'Approved',
+    ForPickUp: 'ForPickUp',
+    Completed: 'Completed',
+    Canceled: 'Canceled',
+    Denied: 'Denied'
+  };
+
+  const [orders, setOrders] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [productTypes, setProductTypes] = useState([]);
+  const [selectedOrders, setSelectedOrders] = useState(null);
+  const { id } = useParams();
+
+  useEffect(() => {
+    axios.get(`https://localhost:7017/Order/BySupplier/${id}`)
+      .then(response => {
+        setOrders(response.data);
+      })
+      .catch(error => {
+        console.error(error);
+      })
+  }, [id])
+
+  //Read All Departments
+  useEffect(() => {
+    axios.get('https://localhost:7017/Department')
+        .then(res => {
+            setDepartments(res.data);
+        })
+        .catch((err) => {console.error(err)
+    });
+  }, []);
+
+  // Get Department Names
+  const getDepartmentName = (departmentId) => {
+      const department = departments.find(d => d.departmentId === departmentId);
+      return department ? department.department_Name : 'Unknown Department';
+  };
+
+  //Read All Product Types
+  useEffect(() => {
+    axios.get('https://localhost:7017/ProductType')
+        .then(res => {
+            setProductTypes(res.data);
+        })
+        .catch((err) => {console.error(err)
+    });
+  }, []);
+
+  // Get Product Type Name
+  const getProductTypeName = (productTypeId) => {
+      const productType = productTypes.find(p => p.productTypeId === productTypeId);
+      return productType ? productType.product_Type : 'Unknown Type';
+  };
+
+  const HandleApprovedOrders = (orderId) => {
+    axios.put(`https://localhost:7017/Order/approvedOrder/${orderId}`)
+      .then(response => {
+        const updatedOrders = orders.map(order => {
+          if (order.Id === response.data.Id) {
+            return response.data;
+          }
+          return order;
+        });
+        setOrders(updatedOrders);
+        toast.success("Order approved successfully");
+        notifEventEmitter.emit("notifAdded")
+      })
+      .catch(error => {
+        console.error(error);
+        toast.error("Failed to approve the order. Please try again");
+      });
+  }
+
+  const HandleDeniedOrders = (orderId) => {
+    axios.put(`https://localhost:7017/Order/deniedOrder/${orderId}`)
+      .then(response => {
+        const updatedOrders = orders.map(order => {
+          if (order.Id === response.data.Id) {
+            return response.data;
+          }
+          return order;
+        });
+        setOrders(updatedOrders);
+        toast.success("Order approved successfully");
+        notifEventEmitter.emit("notifAdded")
+      })
+      .catch(error => {
+        console.error(error);
+        toast.error("Failed to approve the order. Please try again");
+      });
+  }
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); 
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${month}/${day}/${year} ${hours}:${minutes}`;
+  };
+
+
     return <div className="manage-orders-main-container">
     <nav id="orders-nav" className="navbar px-3 mb-3" style={{ display:'flex', justifyContent:'end' }}>
         <ul className="nav nav-pills">
@@ -26,408 +144,104 @@ function Supplier_Orders () {
         <div data-bs-spy="scroll" data-bs-target="#orders-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true" className="scrollspy-example p-3 rounded-2" tabIndex={-1}>
             <h4 id="supplier-pending-order">Pending Orders</h4>
             <div className='col-md-11 pending-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-                                <table className="table table-hover align-middle caption-bot table-xxl">
-                                    <caption>end of list of pending orders</caption>
-                                    <thead className='table align-middle'>
-                                        <tr className='thead-row'>
-                                            <th scope="col">Date</th>
-                                            <th scope="col">Order ID</th>
-                                            <th scope="col">Number of Items</th>
-                                            <th scope="col">Total Amount</th>
-                                            <th scope="col">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="table-group-divider">
-                                        <tr data-bs-toggle="modal" data-bs-target="#pendingOrderModal">
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                        <tr data-bs-toggle="modal" data-bs-target="#pendingOrderModal">
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                        <tr data-bs-toggle="modal" data-bs-target="#pendingOrderModal">
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                        <tr data-bs-toggle="modal" data-bs-target="#pendingOrderModal">
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                <table className="table table-hover align-middle caption-bot table-xxl">
+                    <caption>end of list of pending orders</caption>
+                    <thead className='table align-middle'>
+                        <tr className='thead-row'>
+                            <th scope="col">Date</th>
+                            <th scope="col">Order No.</th>
+                            <th scope="col">Number of Items</th>
+                            <th scope="col">Total Amount</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).map((orderItem, index) => (
+                      <tbody key={index} className="table-group-divider">
+                        <tr data-bs-toggle="modal" data-bs-target="#pendingOrderModal" onClick={() => setSelectedOrders(orderItem)}>
+                            <th scope="row">{formatDate(orderItem.dateCreated)}</th>
+                            <td>{orderItem.orderNumber}</td>
+                            <td>{orderItem.cart.items.length}</td>
+                            <td>{orderItem.total}</td>
+                            <td>{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                        </tr>
+                      </tbody>
+                    ))}
+                </table>
+            </div>
             <h4 className="order-status-label" id="supplier-approved-order">Approved Orders</h4>
             <div className='col-md-11 approved-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-                                <table className="table table-hover align-middle caption-bot table-xxl">
-                                    <caption>end of list of approved orders</caption>
-                                    <thead className='table align-middle'>
-                                        <tr className='thead-row'>
-                                            <th scope="col">Date</th>
-                                            <th scope="col">Order ID</th>
-                                            <th scope="col">Number of Items</th>
-                                            <th scope="col">Total Amount</th>
-                                            <th scope="col">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="table-group-divider">
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Approved</td>
-                                            </tr>
-                                            <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Approved</td>
-                                            </tr>
-                                            <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Approved</td>
-                                            </tr>
-                                            <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Approved</td>
-                                            </tr>
-                                            <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Approved</td>
-                                            </tr>
-                                            <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Approved</td>
-                                            </tr>
-                                            <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Approved</td>
-                                            </tr>
-                                            <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Approved</td>
-                                            </tr>
-                                            <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Approved</td>
-                                            </tr>
-                                            <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Approved</td>
-                                            </tr>
-                                            <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Approved</td>
-                                            </tr>
-                                            <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Approved</td>
-                                            </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                <table className="table table-hover align-middle caption-bot table-xxl">
+                    <caption>end of list of approved orders</caption>
+                    <thead className='table align-middle'>
+                        <tr className='thead-row'>
+                            <th scope="col">Date</th>
+                            <th scope="col">Order ID</th>
+                            <th scope="col">Number of Items</th>
+                            <th scope="col">Total Amount</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Approved).map((orderItem, index) => (
+                      <tbody key={index} className="table-group-divider">
+                        <tr data-bs-toggle="modal" data-bs-target="#pendingOrderModal" onClick={() => setSelectedOrders(orderItem)}>
+                            <th scope="row">{formatDate(orderItem.dateCreated)}</th>
+                            <td>{orderItem.orderNumber}</td>
+                            <td>{orderItem.cart ? orderItem.cart.items.length : 0}</td> 
+                            <td>{orderItem.total}</td>
+                            <td>{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                        </tr>
+                      </tbody>
+                    ))}
+                </table>
+            </div>
             <h4 className="order-status-label" id="supplier-cancelled-order">Cancelled Orders</h4>
             <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-                                <table className="table table-hover align-middle caption-bot table-xxl">
-                                    <caption>end of list of cancelled orders</caption>
-                                    <thead className='table align-middle'>
-                                        <tr className='thead-row'>
-                                        <th scope="col">Date</th>
-                                        <th scope="col">Order ID</th>
-                                        <th scope="col">Number of Items</th>
-                                        <th scope="col">Total Amount</th>
-                                        <th scope="col">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="table-group-divider">
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Canceled</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Canceled</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Canceled</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Canceled</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Canceled</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Canceled</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Canceled</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Canceled</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Canceled</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Canceled</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Canceled</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Canceled</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                <table className="table table-hover align-middle caption-bot table-xxl">
+                    <caption>end of list of cancelled orders</caption>
+                    <thead className='table align-middle'>
+                        <tr className='thead-row'>
+                        <th scope="col">Date</th>
+                        <th scope="col">Order No.</th>
+                        <th scope="col">Number of Items</th>
+                        <th scope="col">Total Amount</th>
+                        <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody className="table-group-divider">
+                        <tr>
+                            <th scope="row">08/28/2023</th>
+                            <td>2583792</td>
+                            <td>5</td>
+                            <td>PHP 1000</td>
+                            <td>Canceled</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <h4 className="order-status-label" id="supplier-claimed-order">Claimed Orders</h4>
             <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-                                <table className="table table-hover align-middle caption-bot table-xxl">
-                                    <caption>end of list of claimed orders</caption>
-                                    <thead className='table align-middle'>
-                                        <tr className='thead-row'>
-                                        <th scope="col">Date</th>
-                                        <th scope="col">Order ID</th>
-                                        <th scope="col">Number of Items</th>
-                                        <th scope="col">Total Amount</th>
-                                        <th scope="col">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="table-group-divider">
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Claimed</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Claimed</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Claimed</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Claimed</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Claimed</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Claimed</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Claimed</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Claimed</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Claimed</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Claimed</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Claimed</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">08/28/2023</th>
-                                            <td>2583792</td>
-                                            <td>5</td>
-                                            <td>PHP 1000</td>
-                                            <td>Claimed</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                <table className="table table-hover align-middle caption-bot table-xxl">
+                    <caption>end of list of claimed orders</caption>
+                    <thead className='table align-middle'>
+                        <tr className='thead-row'>
+                        <th scope="col">Date</th>
+                        <th scope="col">Order No.</th>
+                        <th scope="col">Number of Items</th>
+                        <th scope="col">Total Amount</th>
+                        <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody className="table-group-divider">
+                        <tr>
+                            <th scope="row">08/28/2023</th>
+                            <td>2583792</td>
+                            <td>5</td>
+                            <td>PHP 1000</td>
+                            <td>Claimed</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -442,11 +256,12 @@ function Supplier_Orders () {
                 <div className="modal-basta-container">
                     <span>Check pending order details</span>
                     <div className="modal-btns-container">
-                        <button type="button" className="cancel-btn-modal">Deny</button>
-                        <button type="button" className="save-prod-btn">Approve</button>
+                        <button type="button" className="cancel-btn-modal" onClick={() => HandleDeniedOrders(selectedOrders.id)}>Deny</button>
+                        <button type="button" className="save-prod-btn" onClick={() => HandleApprovedOrders(selectedOrders.id)}>Approve</button>
                     </div>
                 </div>
-                    <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
+                    {selectedOrders && (
+                      <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
                         {/* CUSTOMER DETAILS */}
                         <div>
                             <div className="order-details-customer">
@@ -460,11 +275,11 @@ function Supplier_Orders () {
                                         <span className="modal-label">Gender</span>
                                     </div>
                                     <div className="modal-details-info">
-                                        <span className="modal-info">123456</span>
-                                        <span className="modal-info">First Name</span>
-                                        <span className="modal-info">Last Name</span>
-                                        <span className="modal-info">College of Computer Studies</span>
-                                        <span className="modal-info">Gender</span>
+                                        <span className="modal-info">{selectedOrders.user.id}</span>
+                                        <span className="modal-info">{selectedOrders.user.firstName}</span>
+                                        <span className="modal-info">{selectedOrders.user.lastName}</span>
+                                        <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
+                                        <span className="modal-info">{selectedOrders.user.gender}</span>
                                     </div>
                                 </div>
                             </div>
@@ -479,13 +294,24 @@ function Supplier_Orders () {
                                         <span className="modal-label">Number of Items</span>
                                         <span className="modal-label">Total Amount</span>
                                         <span className="modal-label">Proof of Payment</span>
+                                        <span className="modal-label">Reference No.</span>
+                                        <span className="modal-label">Payment Type</span>
                                     </div>
                                     <div className="modal-details-info">
-                                    <span className="modal-info">Date</span>
-                                        <span className="modal-info">Order Number</span>
-                                        <span className="modal-info">Number of Items</span>
-                                        <span className="modal-info">Total Amount</span>
-                                        <a className="modal-info" href="">proof of payment</a>
+                                      <span className="modal-info">{selectedOrders.dateCreated}</span>
+                                      <span className="modal-info">{selectedOrders.orderNumber}</span>
+                                      <span className="modal-info">{selectedOrders.cart.items.length}</span>
+                                      <span className="modal-info">{selectedOrders.total}</span>
+                                      <a 
+                                        className="modal-info" 
+                                        rel="noopener noreferrer" 
+                                        target="_blank" 
+                                        href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
+                                      >
+                                        {selectedOrders.proofOfPayment.split('\\').pop()}
+                                      </a>
+                                      <span className="modal-info">{selectedOrders.referenceId}</span>
+                                      <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
                                     </div>
                                 </div>
                             </div>
@@ -493,38 +319,36 @@ function Supplier_Orders () {
                         
                         {/* ITEM LIST */}
                         <div className="modal-item-list">
-                            <h3 className="order-details-subtitle">Item List</h3>
-                            <div className="modal-item-list-table-wrapper">
-                                <table className="table">
-                                        <thead className="table-primary">
-                                            <tr>
-                                            <th scope="col">Product Name</th>
-                                            <th scope="col">Product Type</th>
-                                            <th scope="col">Gender</th>
-                                            <th scope="col">Quantity</th>
-                                            <th scope="col">Price</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                            <th scope="row">1</th>
-                                            <td>Mark</td>
-                                            <td>Otto</td>
-                                            <td>4324</td>
-                                            <td>12345</td>
-                                            </tr>
-                                            <tr>
-                                            <th scope="row">2</th>
-                                            <td>Jacob</td>
-                                            <td>Thornton</td>
-                                            <td>532</td>
-                                            <td>12355</td>
-                                            </tr>
-                                        </tbody>
-                                </table>
-                            </div>
+                          <h3 className="order-details-subtitle">Item List</h3>
+                          <div className="modal-item-list-table-wrapper">
+                            <table className="table">
+                              <thead className="table-primary">
+                                  <tr>
+                                  <th scope="col">Product Name</th>
+                                  <th scope="col">Product Type</th>
+                                  <th scope="col">Gender</th>
+                                  <th scope="col">Size</th>
+                                  <th scope="col">Quantity</th>
+                                  <th scope="col">Price</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                {selectedOrders.cart.items.map(item => (
+                                  <tr key={item.id}>
+                                    <th scope="row">{item.product.productName}</th>
+                                    <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                    <td>{item.product.category}</td>
+                                    <td>{item.sizeQuantity.size}</td>
+                                    <td>{item.sizeQuantity.quantity}</td>
+                                    <td>{item.product.price}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                     </div>
+                    )}
             </div>
         </div>
     </div>

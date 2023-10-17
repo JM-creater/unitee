@@ -5,7 +5,6 @@ import { Link } from "react-router-dom"
 import ordersSupplierIcon from "../../assets/images/icons/orders.png"
 import dashboardSupplierIcon from "../../assets/images/icons/dashboard.png"
 import shopIcon from "../../assets/images/icons/store-2.png"
-import shopProfile from "../../assets/images/shopLogo1.png"
 import editprof from "../../assets/images/icons/user-avatar.png"
 import logoutIcon from "../../assets/images/icons/logout-4.png"
 import { useEffect, useState } from "react"
@@ -14,11 +13,11 @@ import axios from "axios"
 
 function Supplier_Main (){
 
-    interface Customer {
+    interface Supplier {
         image: string;
     }
 
-    const [supplier, setSupplier] = useState<Customer | null>(null); 
+    const [supplier, setSupplier] = useState<Supplier | null>(null); 
     const { id } = useParams();
 
     useEffect(() => {
@@ -29,7 +28,7 @@ function Supplier_Main (){
             .catch(error => {
                 console.error(error);
             })
-    }, [id]);
+      }, [id]);
 
     return <div className="supplier-main">
             <header className="supplier-header">
@@ -61,9 +60,17 @@ function Supplier_Main (){
                     <span className="fa fa-search form-control-feedback search-icon"></span>
                         <input className="Supplier-SearchBar" type="text" placeholder="Search" />
                     </div>
+                    {supplier && (
+                        <>
+                            <img 
+                                className="seller-profile" 
+                                src={ `https://localhost:7017/${supplier.image}` } 
+                                data-bs-toggle="dropdown" 
+                                aria-expanded="false"
+                            />
+                        </>
+                    )}
 
-                    <img className="seller-profile" src={shopProfile} data-bs-toggle="dropdown" aria-expanded="false"/>
-          
                     <ul className="dropdown-menu" style={{ padding:'10px', width:'15rem' }}>
                         <li className="drop-list">
                             <a className="dropdown-item supplier-drop-item" style={{ fontSize:'15px' }}>
