@@ -50,11 +50,11 @@ function Register() {
     setEmail(value);
   };
 
-  const handlePhoneNumber = (value: string) => {
-    if (/^\d+$/.test(value) && value.length <= 11) {
+  const handlePhoneNumber = (value) => {
+    if (/^[0-9]*$/.test(value)) {
       setPhoneNumber(value);
     } else {
-      toast.error('Phone Number must be exactly 11 numeric characters.');
+      toast.error('Phone Number must contain only numbers.');
     }
   };
 
@@ -159,13 +159,19 @@ function Register() {
       toast.error(errors.phoneNumber);
     }
 
-    if (password.length < 6) {
+    if (!password) {
+      errors.password = 'Password is required.';
+      toast.error(errors.password);
+    } else if (password.length < 6) {
       errors.password = 'Password must be at least 6 characters long.';
+      toast.error(errors.password);
+    } else if (/^[a-zA-Z0-9]*$/.test(password)) {
+      errors.password = 'Password must be alpha numeric.';
       toast.error(errors.password);
     }
 
     if (password !== confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match.';
+      errors.confirmPassword = 'Passwords did not match.';
       toast.error(errors.confirmPassword);
     }
 
@@ -243,11 +249,7 @@ function Register() {
                 placeholder="Phone Number"
                 value={phoneNumber}
                 onChange={(e) => handlePhoneNumber(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key < '0' || e.key > '9' || phoneNumber.length >= 11) {
-                    e.preventDefault();
-                  }
-                }}
+                maxLength={11}
               />
               <input
                 className="col-md-5 input-register"
