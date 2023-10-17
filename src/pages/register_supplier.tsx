@@ -38,8 +38,12 @@ function Register() {
     setIDNumber(value);
   };
 
-  const handleFirstName = (value: string) => {
-    setFirstName(value);
+  const handleFirstName = (value) => {
+    if (/^[a-zA-Z ]*$/.test(value)) {
+      setFirstName(value);
+    } else {
+      toast.error('First Name must contain only letters.');
+    }
   };
 
   const handleAddress = (value: string) => {

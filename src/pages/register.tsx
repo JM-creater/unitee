@@ -44,7 +44,7 @@ function Register() {
   };
 
   const handleFirstName = (value) => {
-    if (/^[a-zA-Z]*$/.test(value)) {
+    if (/^[a-zA-Z ]*$/.test(value)) {
       setFirstName(value);
     } else {
       toast.error('First Name must contain only letters.');
@@ -52,7 +52,7 @@ function Register() {
   };
 
   const handleLastName = (value) => {
-    if (/^[a-zA-Z]*$/.test(value)) {
+    if (/^[a-zA-Z ]*$/.test(value)) {
       setLastName(value);
     } else {
       toast.error('Last Name must contain only letters.');
@@ -130,7 +130,10 @@ function Register() {
     const errors: ValidationErrors = {};
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
-    if (!IDNumber || !/^\d+$/.test(IDNumber) || IDNumber.length !== 8) {
+    if (!IDNumber) {
+      errors.IDNumber = 'ID Number is required.';
+      toast.error(errors.IDNumber);
+    } else if (!/^\d+$/.test(IDNumber) || IDNumber.length !== 8) {
       errors.IDNumber = 'ID Number must be 8 numeric characters.';
       toast.error(errors.IDNumber);
     }
@@ -178,7 +181,7 @@ function Register() {
     }
 
     if (!image) {
-      errors.image = 'Please upload an image';
+      errors.image = 'Please upload profile picture';
       toast.error(errors.image);
     }
 
@@ -193,7 +196,7 @@ function Register() {
     }
 
     if (!studyLoad) {
-      errors.studyLoad = 'Please upload an image';
+      errors.studyLoad = 'Please upload study load.';
       toast.error(errors.studyLoad);
     }
 

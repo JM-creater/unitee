@@ -13,6 +13,7 @@ type ValidationErrors = {
 };
 
 function Login() {
+  
   const [IDOrEmail, setIDOrEmail] = useState('');
   const [Password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -64,6 +65,7 @@ function Login() {
     axios
       .post(url, data)
       .then((result) => {
+        
         if (result.status === 200) {
           toast.success('Successfully Logged In');
           switch (result.data.role) {
@@ -81,17 +83,16 @@ function Login() {
               break;
           }
         } else {
+          
           alert(result.data.message);
         }
       })
       .catch((error) => {
         if (error.response && error.response.status === 400) {
-          if (
-            error.response.data === 'Invalid user id.' ||
-            error.response.data === 'Invalid password.' ||
-            error.response.data === 'Account is deactivated.'
-          ) {
+          if (error.response.data === 'Invalid user id.' || error.response.data === 'Invalid password.') {
             toast.error(error.response.data);
+          } else if (error.response.data === 'Waiting for validation') {
+            toast.info('Please Wait for Validation.');
           } else {
             toast.error('Wrong Credentials');
           }
