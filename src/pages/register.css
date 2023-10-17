@@ -278,3 +278,7 @@
 .back-to-loginBTN:hover {
   background-color: #e8e7e7;
 }
+
+.error-border {
+  border: 2px solid red;
+}
