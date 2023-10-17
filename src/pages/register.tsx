@@ -35,9 +35,8 @@ function Register() {
   const [studyLoad, setStudyLoad] = useState(null);
   const navigate = useNavigate();
 
-
   const handleIDnumber = (value) => {
-    if (value.length <= 8) {
+    if (value.length === 8) {
       setIDNumber(value);
     } else {
       toast.error('ID Number must be exactly 8 characters.');
@@ -51,7 +50,7 @@ function Register() {
       toast.error('First Name must contain only letters.');
     }
   };
-  
+
   const handleLastName = (value) => {
     if (/^[a-zA-Z]*$/.test(value)) {
       setLastName(value);
@@ -65,7 +64,7 @@ function Register() {
   };
 
   const handlePhoneNumber = (value) => {
-    if (/^\d+$/.test(value) && value.length <= 11) {
+    if (/^\d+$/.test(value) && value.length === 11) {
       setPhoneNumber(value);
     } else {
       toast.error('Phone Number must be exactly 11 numeric characters.');

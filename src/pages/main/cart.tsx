@@ -41,6 +41,14 @@ function Cart () {
     const { userId } = useParams();
     const fileInputRef = useRef(null);
 
+    const handleReferenceId = (value) => {
+      if (/^[0-9]*$/.test(value)) {
+        setReferenceId(value);
+      } else {
+        toast.error('Reference ID must contain only numbers.');
+      }
+    };
+
   useEffect(() => {
       axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
       .then(res => {
@@ -132,6 +140,11 @@ function Cart () {
   
       if (checkedCartItems.length === 0) {
         toast.error("Please select items to order");
+        return;
+      }
+
+      if (referenceId.length !== 13) {
+        toast.error("Reference ID must be 13 characters in length to place an order.");
         return;
       }
   
@@ -373,7 +386,18 @@ function Cart () {
                       <h2 className="total-amount-text">Upload Proof of Payment:</h2>
                       <input type="file" ref={fileInputRef} className="proof-payment-img" accept="image/png, image/gif, image/jpeg" onChange={handleProofOfPaymentChange}/>
                       <h2 className="total-amount-text">Reference Id (GCash):</h2>
-                      <input type="text" className="proof-payment-img" value={referenceId} onChange={(e) => setReferenceId(e.target.value)} />
+                      <input 
+                      type="text" 
+                      className="proof-payment-img" 
+                      value={referenceId} 
+                      onChange={(e) => handleReferenceId(e.target.value)} 
+                      onKeyPress={(e) => {
+                        if (e.key < '0' || e.key > '9') {
+                          e.preventDefault();
+                        }
+                      }}
+                      maxLength={13}
+                      />
                   </div>
                   <div className="btn-container">
                       <button className="place-order" onClick={HandleOrderPlace}>
