@@ -10,17 +10,30 @@ import axios from 'axios'
 function Shop() {
 
     const [shop, setShop] = useState([]);
+    const [departmentId, setDepartmentId] = useState<number | null>(null);
     const { userId } = useParams();
 
+    
     useEffect(() => {
-        axios.get('https://localhost:7017/Users/getSuppliers')
+        axios.get(`https://localhost:7017/Users/UserDepartment/${userId}`)
+            .then(res => {
+                setDepartmentId(res.data.departmentId);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }, [userId]);
+
+    useEffect(() => {
+        if (!departmentId) return;
+        axios.get(`https://localhost:7017/Users/getSuppliersProduct/${departmentId}`)
             .then(async res => {
                 setShop(res.data);
             })
             .catch(err => {
                 console.error(err);
             });
-    }, []);
+    }, [departmentId]);
 
     return <div className='container shop-contianer'>
         <div className='content-container'>
@@ -54,16 +67,16 @@ function Shop() {
             <div className='supplier-container'>
             {shop.map((shops, index) => (
                 <Link key={index} className='link-to-seller' to={`/shop/${userId}/visit_shop/${shops.id}`}>
-                        <div className="supplier-card">
-                            <img src={ `https://localhost:7017/${shops.image}` } className="supplierCard-img"/>
-                            <div className='col-md-5 shop-card-details'>
-                                <h5 className="supplier-card-title">{shops.shopName}</h5>
-                                <h5 className='shop-rating-card'><img className="ratingIcon" src={ starIcon }/>No Rating Yet</h5>
-                                <h5 className='shop-rating-card'>{shops.address}</h5>
-                            </div>
+                    <div className="supplier-card">
+                        <img src={ `https://localhost:7017/${shops.image}` } className="supplierCard-img"/>
+                        <div className='col-md-5 shop-card-details'>
+                            <h5 className="supplier-card-title">{shops.shopName}</h5>
+                            <h5 className='shop-rating-card'><img className="ratingIcon" src={ starIcon }/>No Rating Yet</h5>
+                            <h5 className='shop-rating-card'>{shops.address}</h5>
                         </div>
+                    </div>
                 </Link>
-                ))}
+            ))}
             </div>
         </div>
     </div>
