@@ -118,6 +118,11 @@ function Login() {
           placeholder="ID Number or Email"
           value={IDOrEmail}
           onChange={(e) => handleIDOrEmail(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              handleLogin();
+            }
+          }}
         />
         <input
           className="col-md-7 input-login"
@@ -125,6 +130,11 @@ function Login() {
           placeholder="Password"
           value={Password}
           onChange={(e) => handlePassword(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              handleLogin();
+            }
+          }}
         />
 
         <button className="col-md-7 login-btn" onClick={() => handleLogin()}>
