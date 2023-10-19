@@ -10,7 +10,6 @@ function Notif() {
   const [notification, setNotification] = useState([]);
   const { userId } = useParams();
 
-
   useEffect(() => {
     axios.get(`https://localhost:7017/Notification/${userId}`)
       .then(response => {
@@ -68,9 +67,12 @@ function Notif() {
                   <p>
                     Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total}</span>
                   </p>
-                  <p>
-                    <span className="font-weight-bold">{notificationItem.message}</span>
-                  </p>
+                  {notificationItem.order.status === "DENIED" && (
+                    <p>
+                      <span className="font-weight-bold">{notificationItem.message}</span>
+                    </p>
+                  )}
+
                 </div>
               </div>
               {/* Add class 'active' to progress */}
