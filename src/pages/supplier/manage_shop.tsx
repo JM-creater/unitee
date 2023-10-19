@@ -228,25 +228,7 @@ function Manage_Shop() {
           Add New Product
         </button>
       </div>
-
-      {/* PRODUCTS */}
-      <div className="col-md-12 supplier-prods-container">
-        {products.map((productItem, index) => (
-          <div key={index} className="prod-card" data-bs-toggle="modal" data-bs-target="#editProductModal">
-            <div className="prod-shop-image-container">
-              <img className="supplier-shop-prod-image" src={`https://localhost:7017/${productItem.image}`} />
-            </div>
-            <div className="col-md-11 prod-shop-details">
-              <span className="col-md-3 supplier-prod-details">{productItem.productName}</span>
-              <span className="col-md-2 supplier-prod-details">{getProductTypeName(productItem.productTypeId)}</span>
-              <span className="col-md-1 supplier-prod-details">{productItem.category}</span>
-              <span className="col-md-1 supplier-prod-details">{totalStock(productItem.sizes)}</span>
-              <span className="col-md-1 supplier-prod-details">{productItem.isActive ? "Active" : "Inactive"}</span>
-              <h4 className="col-md-2 supplier-prod-price">₱{productItem.price}</h4>
-            </div>
-          </div>
-        ))}
-      </div>
+      
         {/* PRODUCTS */}
         <div className="col-md-12 supplier-prods-container">
         {products.map((productItem, index) => (
@@ -266,8 +248,6 @@ function Manage_Shop() {
             ))}
         </div>
         
-        
-
       {/* ADD NEW PRODUCT - MODAL  */}
       <div className="modal fade" id="addProductModal" tabIndex={-1} aria-labelledby="addProductModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-fullscreen">
@@ -615,8 +595,6 @@ function Manage_Shop() {
             </div>
             )}
         </div>
-        
-
         </div>
       </div>
   );
