@@ -50,6 +50,10 @@ function Supplier_Main (){
                         <img className="supplier-nav-icon" src={ shopIcon }/>
                         <span className="supplier-nav-text">Shop</span>
                     </Link>
+                    <Link to='reports' className="supplier-nav-link">
+                        <img className="supplier-nav-icon" src={ shopIcon }/>
+                        <span className="supplier-nav-text">Reports</span>
+                    </Link>
                 </div>
             </header>
             <div style={{ minHeight: '100%' }}>

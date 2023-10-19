@@ -17,7 +17,6 @@ import Admin_Dashboard from './pages/admin/admin-dashboard'
 import Add_supplier from './pages/admin/add_supplier'
 import View_Customers from './pages/admin/view_customers'
 import Admin_Main from './pages/admin/admin_main'
-import Orders from './pages/admin/orders'
 import Purchase_History from './pages/main/purchase_history'
 import AccountType from './pages/accountType'
 import Notif from './pages/main/notif'
@@ -28,6 +27,7 @@ import RegisterSupplier from './pages/register_supplier'
 import Manage_Shop from './pages/supplier/manage_shop'
 import Supplier_Main from './pages/supplier/supplier_main'
 import Supplier from './pages/supplier/supplier_dashboard'
+import Reports from './pages/supplier/reports'
 
 
 function App() {
@@ -65,13 +65,13 @@ function App() {
             <Route index element={ <Admin_Dashboard /> } />
             <Route path='view_customers' element={ <View_Customers/> }/>
             <Route path='add_supplier' element={ <Add_supplier/> }/>
-            <Route path='orders' element={ <Orders/> }></Route>
           </Route>
 
           <Route path='supplier_dashboard/:id' element={ <Supplier_Main/> }>
             <Route index element={ <Supplier/> }/>
             <Route path='supplier_orders' element={ <Supplier_Order/> }/>
             <Route path='manage_shop' element={ <Manage_Shop/> }/>
+            <Route path='reports' element={ <Reports/> }/>
           </Route>
 
           <Route path='/update_item/:id/:productId' element={ <Update_item/> }></Route>
