@@ -1,24 +1,21 @@
 //import profile from "../../assets/images/imageprofile.jpeg"
-import edit from "../../assets/images/icons/edit.png"
+//import edit from "../../assets/images/icons/edit.png"
 import './user_profile.css'
 import { useState, useEffect } from 'react';
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
-function User_Profile () {
-
+function User_Profile () {  
+  
   interface Customer {
-    departmentId(departmentId: unknown): import("react").ReactNode;
-    image: string;
-    id: number;
     firstName: string;
     lastName: string;
-    gender: string;
-    department: string;
-    phoneNumber: string;
+    departmentId: number;
     email: string;
-    password: string;
-}
+    phoneNumber: string;
+    gender: string;
+    image: string;
+  }
 
   const [customer, setCustomer] = useState<Customer | null>(null); 
   const [departments, setDepartments] = useState([]);
@@ -49,95 +46,57 @@ function User_Profile () {
       return department ? department.department_Name : 'Unknown Department';
   };
 
-    return <div className="user-profile-main-container">
-        <div className="col-md-10 details-container">
-          {customer ? (
-              <>
-                  <div className="col-md-3 user-img-container">
-                      <img className="imgProfile" src={`https://localhost:7017/${customer.image}`} />
+    return (
+      <div className="container container-fluid my-profile-container">
+            <h2 className="mt-5 ml-5">My Profile</h2>
+            {customer ? ( 
+              <div className="row justify-content-around mt-5 user-info">
+                  <div className="col-12 col-md-3">
+                      <figure className="avatar avatar-profile">
+                        <img
+                          className="rounded-circle img-fluid"
+                          src={`https://localhost:7017/${customer.image}`}
+                          alt=""
+                          style={{
+                            width: '200px',
+                            height: '200px',
+                            objectFit: 'cover', 
+                            maxWidth: '100%', 
+                          }}
+                        />
+                      </figure>
+                      <a href="#" id="edit_profile" className="btn btn-primary btn-block my-5">
+                          Edit Profile
+                      </a>
                   </div>
-                  <div className="col-md-8 user-info-container">
-                      <div className="col-md-4 info-1">
-                          <h4 className="info-label">ID Number:</h4>
-                          <h4 className="info-label">First Name:</h4>
-                          <h4 className="info-label">Last Name:</h4>
-                          <h4 className="info-label">Gender:</h4>
-                          <h4 className="info-label">Department:</h4>
-                          <h4 className="info-label">Phone Number:</h4>
-                          <h4 className="info-label">Email:</h4>
-                          <h4 className="info-label">Password:</h4>
-                      </div>
-                      <div className="col-md-7 info-2">
-                          <h4 className="info-text">{customer.id}</h4>
-                          <h4 className="info-text">{customer.firstName}</h4>
-                          <h4 className="info-text">{customer.lastName}</h4>
-                          <h4 className="info-text">{customer.gender}</h4>
-                          <h4 className="info-text">{getDepartmentName(customer.departmentId)}</h4>
-                          <h4 className="info-text">{customer.phoneNumber}</h4>
-                          <h4 className="info-text">{customer.email}</h4>
-                          <h4 className="info-text">{customer.password.replace(/./g, '*')}</h4>
-                      </div>
-                      <div className="col-md-3 edit-btn-container">
-                          <button className="edit-prof-btn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                              <img src={edit} style={{ paddingRight:'5px', width:'100%', maxWidth:'20px' }}/>
-                              Edit Profile
-                          </button>
-                      </div>
+                  <div className="col-12 col-md-5">
+                      <h4>Full Name</h4>
+                      <p>{customer.firstName} {customer.lastName}</p>
+
+                      <h4>Department</h4>
+                      <p>{getDepartmentName(customer.departmentId)}</p>
+
+                      <h4>Email Address</h4>
+                      <p>{customer.email}</p>
+
+                      <h4>Phone Number</h4>
+                      <p>{customer.phoneNumber}</p>
+
+                      <h4>Gender</h4>
+                      <p>{customer.gender}</p>
+
+                      <a href={`/shop/${id}/cart`} className="btn btn-danger btn-block mt-5">
+                          My Cart
+                      </a>
+
+                      <a href="#" className="btn btn-primary btn-block mt-3">
+                          Change Password
+                      </a>
                   </div>
-              </>
-          ) : null}
+              </div>
+            ) : null}
         </div>
-
-        <div className="edit-profile-modal modal fade" id="editProfileModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="editSupplierDetailsModalLabel" aria-hidden="true">
-  <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div className="modal-content" style={{ backgroundColor:'#ffff' }}>
-      <div className="modal-header">
-        <h3 className='modal-supplier-title'>Edit User Details</h3>
-        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div className='col-md-12 row'>
-      <div className="modal-body">
-        <div style={{ display:'flex', flexFlow:'row' }}>
-        <div className="col-md-12 supplier-details-container">
-            <div className="col-md-3">
-                <label className="form-label">ID Number</label>
-                <input type="number" className="form-control" id="exampleFormControlInput1"/>
-                <label className="form-label">First Name</label>
-                <input type="text" className="form-control" id="exampleFormControlInput1"/>
-                <label className="form-label">Last Name</label>
-                <input type="text" className="form-control" id="exampleFormControlInput1"/>
-                <label className="form-label">Phone Number</label>
-                <input type="number" className="form-control" id="exampleFormControlInput1"/>
-                </div>
-
-                <div className="col-md-3">
-                <label className="form-label">Email</label>
-                <input type="email" className="form-control" id="exampleFormControlInput1" placeholder="name@example.com"/>
-                <label className="form-label">Password</label>
-                <input type="password" className="form-control" id="exampleFormControlInput1"/>
-                <label className="form-label">Confirm Password</label>
-                <input type="password" className="form-control" id="exampleFormControlInput1"/>
-                <div style={{ marginTop:'15px' }}>
-                <label className="col-md-8 form-label">Profile Picture</label>
-                <input className="upload-profile-btn" type="file" accept="image/png, image/jpg, image/gif, image/jpeg, image/heic"/>
-                </div>
-             
-            </div>         
-    </div>
-        </div>
-      </div>
-      </div>
-      <div className="modal-footer">
-       <div>
-       <button className="save-prof-Btn">
-            Save
-            </button>
-       </div>
-      </div>
-    </div>
-  </div>
-</div>
-    </div>
+    )
 }
 
 export default User_Profile

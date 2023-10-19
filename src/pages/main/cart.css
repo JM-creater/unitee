@@ -310,13 +310,17 @@ button {
     border-radius: 5px;
   }
 
-  .plus-quanti-btn, .minus-quanti-btn {
+  .plus-quantity-btn, .minus-quantity-btn {
     border-radius: 50%;
     width: 20px;
     height: 20px;
     background-color: #3A8AEE;
     color: white;
     font-weight: 600;
+  }
+
+  .prod-cart-checkBox {
+    background: red;
   }
 
   .quanti-input {
@@ -338,7 +342,7 @@ button {
     margin-left: 50px;
   }
 
-  .quanti-container {
+  .qua-container {
     display: flex;
     justify-content: space-around;
     gap: 5px;

@@ -83,6 +83,14 @@
     color: #020654;
 }
 
+
+.cust-profile-pendOrder {
+    width: 100%;
+    max-width: 60px;
+    border-radius: 50%;
+    border: solid white 4px;
+}
+
 .pending-orders-dash {
     background-color: white;
     padding: 10px;
@@ -100,17 +108,23 @@
     gap: 10px;
     justify-content: space-between;
     margin: 5px;
+    align-items: center; /* Added for vertical centering */
 }
 
-.cust-profile-pendOrder {
-    width: 100%;
-    max-width: 60px;
-    border-radius: 50%;
-    border: solid white 4px;
+.cust-details-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .cust-name-dash {
     width: 18rem;
+    font-weight: 700; 
+    font-size: 15px;
+}
+
+.cust-name-dash.total {
+    font-weight: 400; 
 }
 
 .cust-order-num-dash {
@@ -120,4 +134,17 @@
     display: flex;
     justify-content: end;
     align-items: center;
+}
+
+.no-underline-link {
+    text-decoration: none;
+}
+
+.no-pending-orders {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    margin-bottom: 15px;
 }

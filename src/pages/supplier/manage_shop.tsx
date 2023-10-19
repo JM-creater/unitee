@@ -47,6 +47,15 @@ function Manage_Shop () {
         }
     };
 
+    const handleCategoryChange = (e, gender) => {
+        if (productCategory === gender) {
+            setProductCategory('');
+            e.target.checked = false; 
+        } else {
+            setProductCategory(gender);
+        }
+    };
+
     //Upload Image
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
@@ -286,9 +295,10 @@ function Manage_Shop () {
                             className="form-check-input" 
                             type="radio" 
                             value="Male" 
+                            name="gender"
                             id="departmentCheck1"
                             defaultChecked={productCategory === 'Male'}
-                            onChange={(e) => setProductCategory(e.target.value)}
+                            onClick={(e) => handleCategoryChange(e, 'Male')}
                         />
                         <label 
                             className="departmentCheckLabel" 
@@ -302,9 +312,10 @@ function Manage_Shop () {
                             className="form-check-input" 
                             type="radio" 
                             value="Female" 
+                            name="gender"
                             id="departmentCheck2"
                             defaultChecked={productCategory === 'Female'}
-                            onChange={(e) => setProductCategory(e.target.value)}
+                            onClick={(e) => handleCategoryChange(e, 'Female')}
                         />
                         <label 
                             className="departmentCheckLabel" 
@@ -318,9 +329,10 @@ function Manage_Shop () {
                             className="form-check-input" 
                             type="radio" 
                             value="Unisex" 
+                            name="gender"
                             id="departmentCheck3"
                             defaultChecked={productCategory === 'Unisex'}
-                            onChange={(e) => setProductCategory(e.target.value)}
+                            onClick={(e) => handleCategoryChange(e, 'Unisex')}
                         />
                         <label 
                             className="departmentCheckLabel" 

@@ -293,6 +293,7 @@ function Cart () {
                         {cartItem.items.map((item, itemIndex) => (
                             <div key={item.id} className="prod-main-container">
                                 <input 
+                                    style={{ marginRight: '840px', height: '20px' }}
                                     className="form-check-input prod-cart-checkBox" 
                                     type="checkbox" 
                                     value="" 
@@ -327,12 +328,12 @@ function Cart () {
                                         </select>
                                     </div>
                                     {/* Quantity */}
-                                    <div className="col-md-2 quanti-container">
-                                        <button className="minus-quanti-btn" onClick={() => HandleMinusQuantity(index, itemIndex)}>
+                                    <div className="col-md-2 qua-container">
+                                        <button className="minus-quantity-btn" onClick={() => HandleMinusQuantity(index, itemIndex)}>
                                             -
                                         </button>
                                         <input className="quanti-input" type="text" value={item.quantity} readOnly />
-                                        <button className="plus-quanti-btn" onClick={() => HandlePlusQuantity(index, itemIndex)}>
+                                        <button className="plus-quantity-btn" onClick={() => HandlePlusQuantity(index, itemIndex)}>
                                             +
                                         </button>
                                     </div>

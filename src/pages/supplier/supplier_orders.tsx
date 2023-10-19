@@ -70,6 +70,7 @@ function Supplier_Orders () {
       return productType ? productType.product_Type : 'Unknown Type';
   };
 
+  // Handle Approved Orders
   const HandleApprovedOrders = (orderId) => {
     axios.put(`https://localhost:7017/Order/approvedOrder/${orderId}`)
       .then(response => {
@@ -89,6 +90,7 @@ function Supplier_Orders () {
       });
   }
 
+  // Handle Denied Orders
   const HandleDeniedOrders = (orderId) => {
     axios.put(`https://localhost:7017/Order/deniedOrder/${orderId}`)
       .then(response => {
@@ -99,7 +101,7 @@ function Supplier_Orders () {
           return order;
         });
         setOrders(updatedOrders);
-        toast.success("Order approved successfully");
+        toast.success("Order denied successfully");
         notifEventEmitter.emit("notifAdded")
       })
       .catch(error => {
@@ -130,13 +132,16 @@ function Supplier_Orders () {
             </li>
 
             <li className="nav-item supplier-nav-items">
-                <a className="nav-link" href="#supplier-cancelled-order">Cancelled</a>
+                <a className="nav-link" href="#supplier-forpickup-order">For Pick Up</a>
             </li>
 
             <li className="nav-item supplier-nav-items">
-                <a className="nav-link" href="#supplier-claimed-order">Claimed</a>
+                <a className="nav-link" href="#supplier-completed-order">Completed</a>
             </li>
 
+            <li className="nav-item supplier-nav-items">
+                <a className="nav-link" href="#supplier-cancelled-order">Cancelled</a>
+            </li>
         </ul>
     </nav>
 
@@ -161,7 +166,7 @@ function Supplier_Orders () {
                             <th scope="row">{formatDate(orderItem.dateCreated)}</th>
                             <td>{orderItem.orderNumber}</td>
                             <td>{orderItem.cart.items.length}</td>
-                            <td>{orderItem.total}</td>
+                            <td>₱{orderItem.total}</td>
                             <td>{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                         </tr>
                       </tbody>
@@ -187,11 +192,59 @@ function Supplier_Orders () {
                             <th scope="row">{formatDate(orderItem.dateCreated)}</th>
                             <td>{orderItem.orderNumber}</td>
                             <td>{orderItem.cart ? orderItem.cart.items.length : 0}</td> 
-                            <td>{orderItem.total}</td>
+                            <td>₱{orderItem.total}</td>
                             <td>{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                         </tr>
                       </tbody>
                     ))}
+                </table>
+            </div>
+            <h4 className="order-status-label" id="supplier-forpickup-order">For Pick Up</h4>
+            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+                <table className="table table-hover align-middle caption-bot table-xxl">
+                    <caption>end of list of for pick up orders</caption>
+                    <thead className='table align-middle'>
+                        <tr className='thead-row'>
+                        <th scope="col">Date</th>
+                        <th scope="col">Order No.</th>
+                        <th scope="col">Number of Items</th>
+                        <th scope="col">Total Amount</th>
+                        <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody className="table-group-divider">
+                        {/* <tr>
+                            <th scope="row">08/28/2023</th>
+                            <td>2583792</td>
+                            <td>5</td>
+                            <td>PHP 1000</td>
+                            <td>Canceled</td>
+                        </tr> */}
+                    </tbody>
+                </table>
+            </div>
+            <h4 className="order-status-label" id="supplier-completed-order">Completed Orders</h4>
+            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+                <table className="table table-hover align-middle caption-bot table-xxl">
+                    <caption>end of list of claimed orders</caption>
+                    <thead className='table align-middle'>
+                        <tr className='thead-row'>
+                        <th scope="col">Date</th>
+                        <th scope="col">Order No.</th>
+                        <th scope="col">Number of Items</th>
+                        <th scope="col">Total Amount</th>
+                        <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody className="table-group-divider">
+                        {/* <tr>
+                            <th scope="row">08/28/2023</th>
+                            <td>2583792</td>
+                            <td>5</td>
+                            <td>PHP 1000</td>
+                            <td>Claimed</td>
+                        </tr> */}
+                    </tbody>
                 </table>
             </div>
             <h4 className="order-status-label" id="supplier-cancelled-order">Cancelled Orders</h4>
@@ -208,37 +261,13 @@ function Supplier_Orders () {
                         </tr>
                     </thead>
                     <tbody className="table-group-divider">
-                        <tr>
+                        {/* <tr>
                             <th scope="row">08/28/2023</th>
                             <td>2583792</td>
                             <td>5</td>
                             <td>PHP 1000</td>
                             <td>Canceled</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <h4 className="order-status-label" id="supplier-claimed-order">Claimed Orders</h4>
-            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-                <table className="table table-hover align-middle caption-bot table-xxl">
-                    <caption>end of list of claimed orders</caption>
-                    <thead className='table align-middle'>
-                        <tr className='thead-row'>
-                        <th scope="col">Date</th>
-                        <th scope="col">Order No.</th>
-                        <th scope="col">Number of Items</th>
-                        <th scope="col">Total Amount</th>
-                        <th scope="col">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody className="table-group-divider">
-                        <tr>
-                            <th scope="row">08/28/2023</th>
-                            <td>2583792</td>
-                            <td>5</td>
-                            <td>PHP 1000</td>
-                            <td>Claimed</td>
-                        </tr>
+                        </tr> */}
                     </tbody>
                 </table>
             </div>
@@ -301,7 +330,7 @@ function Supplier_Orders () {
                                       <span className="modal-info">{selectedOrders.dateCreated}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
                                       <span className="modal-info">{selectedOrders.cart.items.length}</span>
-                                      <span className="modal-info">{selectedOrders.total}</span>
+                                      <span className="modal-info">₱{selectedOrders.total}</span>
                                       <a 
                                         className="modal-info" 
                                         rel="noopener noreferrer" 

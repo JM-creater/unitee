@@ -7,6 +7,10 @@
     height: 100vh;
 }
 
+.main-container {
+    padding: 0%;
+}
+
 .web-logo {
     width: 100%;
     max-width: 350px;
@@ -29,6 +33,7 @@
     flex-flow: column;
     justify-content: center;
     align-items: center;
+    padding: 0%
 }
 
 .login-title {
@@ -108,3 +113,4 @@
 .register-text {
     margin: 70px 0px 20px 0px
 }
+
