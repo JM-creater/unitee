@@ -22,12 +22,6 @@ function Admin_Main() {
                     </Link></li>
                     </ul>
                     
-                    <Link className="admin-nav-link" to='orders'>
-                    <span className="admin-nav-btn">Orders</span>
-                    </Link>
-                    <Link className="admin-nav-link" to='shop'>
-                    <span className="admin-nav-btn">Report</span>
-                    </Link>
                     <Link className="admin-nav-link" to='/'>
                     <span className="admin-nav-btn">Logout</span>
                     </Link>
