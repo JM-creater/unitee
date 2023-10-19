@@ -34,8 +34,12 @@ function Register() {
   const [schoolPermit, setSchoolPermit] = useState(null);
   const navigate = useNavigate();
 
-  const handleIDnumber = (value: string) => {
-    setIDNumber(value);
+  const handleIDnumber = (value) => {
+    if (/^[0-9]*$/.test(value)) {
+      setIDNumber(value);
+    } else {
+      toast.error('Store ID must contain only numbers.');
+    }
   };
 
   const handleShopName = (value) => {
@@ -127,9 +131,13 @@ function Register() {
 
   const validateForm = (): ValidationErrors => {
     const errors: ValidationErrors = {};
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
     if (!IDNumber) {
       errors.IDNumber = 'Store ID is required.';
+      toast.error(errors.IDNumber);
+    } else if (!/^\d+$/.test(IDNumber) || IDNumber.length !== 8) {
+      errors.IDNumber = 'Store ID must be 8 numeric characters.';
       toast.error(errors.IDNumber);
     }
 
@@ -144,7 +152,10 @@ function Register() {
     }
 
     if (!email) {
-      errors.email = 'Email is required.';
+      errors.email = 'Email is required';
+      toast.error(errors.email);
+    } else if (!regex.test(email)) {
+      errors.email = 'This is not a valid email format';
       toast.error(errors.email);
     }
 
@@ -216,29 +227,28 @@ function Register() {
                 type="text"
                 placeholder="Store ID"
                 onChange={(e) => handleIDnumber(e.target.value)}
-                onKeyPress={(e) => {
-                    if (e.key < '0' || e.key > '9') {
-                      e.preventDefault();
-                    }
-                  }}
+                value={IDNumber}
               />
               <input
                 className="col-md-5 input-register"
                 type="text"
                 placeholder="Shop Name"
                 onChange={(e) => handleShopName(e.target.value)}
+                value={shopname}
               />
               <input
                 className="col-md-5 input-register"
                 type="text"
                 placeholder="Address"
                 onChange={(e) => handleAddress(e.target.value)}
+                value={address}
               />
               <input
                 className="col-md-5 input-register"
                 type="email"
                 placeholder="Email"
                 onChange={(e) => handleEmail(e.target.value)}
+                value={email}
               />
               <input
                 className="col-md-5 input-register"
@@ -253,12 +263,14 @@ function Register() {
                 type="password"
                 placeholder="Password (at least 6 characters long)"
                 onChange={(e) => handlePassword(e.target.value)}
+                value={password}
               />
               <input
                 className="col-md-5 input-register"
                 type="password"
                 placeholder="Confirm Password"
                 onChange={(e) => handleConfirmPassword(e.target.value)}
+                value={confirmPassword}
               />
               <div className="col-md-5 profile-pic-register-container">
                 <span className="col-md-4 uploadImage-register-label">
