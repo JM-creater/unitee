@@ -160,7 +160,7 @@ function Main() {
                             />
                         </>
                     ) : null}
-                    <ul className="dropdown-menu dropdown-menu-dark" style={{ width:'300px'}}>
+                    <ul className="dropdown-menu dropdown-menu-light" style={{ width:'300px'}}>
                         <Link className="customer-nav-droplink" to={`user_profile/${userId}`}>
                             <li><a className="dropdown-item">
                             <img className="dropdown-icon"  src={ profIcon } />VIEW PROFILE</a></li></Link>

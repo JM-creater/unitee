@@ -40,11 +40,20 @@ function Manage_Shop() {
   const { id } = useParams();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageClick = () => {
-    if (inputRef.current) {
-      inputRef.current.click();
-    }
-  };
+    const handleImageClick = () => {
+        if (inputRef.current) {
+            inputRef.current.click();
+        }
+    };
+
+    const handleCategoryChange = (e, gender) => {
+        if (productCategory === gender) {
+            setProductCategory('');
+            e.target.checked = false; 
+        } else {
+            setProductCategory(gender);
+        }
+    };
 
   // Upload Image
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -356,47 +365,59 @@ function Manage_Shop() {
                         </select>
                     </div>
 
-                {/* GENDER OPTIONS */}
-                <label className="prod-details-labels">Gender</label>
-                <div className="department-option">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    value="Male"
-                    id="departmentCheck1"
-                    defaultChecked={productCategory === "Male"}
-                    onChange={(e) => setProductCategory(e.target.value)}
-                  />
-                  <label className="departmentCheckLabel" htmlFor="departmentCheck1">
-                    Male
-                  </label>
-                </div>
-                <div className="department-option">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    value="Female"
-                    id="departmentCheck2"
-                    defaultChecked={productCategory === "Female"}
-                    onChange={(e) => setProductCategory(e.target.value)}
-                  />
-                  <label className="departmentCheckLabel" htmlFor="departmentCheck2">
-                    Female
-                  </label>
-                </div>
-                <div className="department-option">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    value="Unisex"
-                    id="departmentCheck3"
-                    defaultChecked={productCategory === "Unisex"}
-                    onChange={(e) => setProductCategory(e.target.value)}
-                  />
-                  <label className="departmentCheckLabel" htmlFor="departmentCheck3">
-                    Unisex
-                  </label>
-                </div>
+                    {/* GENDER OPTIONS */}
+                    <label className="prod-details-labels">Gender</label>
+                    <div className="department-option">
+                        <input 
+                            className="form-check-input" 
+                            type="radio" 
+                            value="Male" 
+                            name="gender"
+                            id="departmentCheck1"
+                            defaultChecked={productCategory === 'Male'}
+                            onClick={(e) => handleCategoryChange(e, 'Male')}
+                        />
+                        <label 
+                            className="departmentCheckLabel" 
+                            htmlFor="departmentCheck1"
+                        >
+                            Male
+                        </label>
+                    </div>
+                    <div className="department-option">
+                        <input 
+                            className="form-check-input" 
+                            type="radio" 
+                            value="Female" 
+                            name="gender"
+                            id="departmentCheck2"
+                            defaultChecked={productCategory === 'Female'}
+                            onClick={(e) => handleCategoryChange(e, 'Female')}
+                        />
+                        <label 
+                            className="departmentCheckLabel" 
+                            htmlFor="departmentCheck2"
+                        >
+                            Female
+                        </label>
+                    </div>
+                    <div className="department-option">
+                        <input 
+                            className="form-check-input" 
+                            type="radio" 
+                            value="Unisex" 
+                            name="gender"
+                            id="departmentCheck3"
+                            defaultChecked={productCategory === 'Unisex'}
+                            onClick={(e) => handleCategoryChange(e, 'Unisex')}
+                        />
+                        <label 
+                            className="departmentCheckLabel" 
+                            htmlFor="departmentCheck3"
+                        >
+                            Unisex
+                        </label>
+                    </div>
 
                 <label className="prod-details-labels">Product Type</label>
                 <select

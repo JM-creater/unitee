@@ -1,6 +1,7 @@
   .registerCustomer-main-container {
     display: flex;
     flex-flow: row;
+    padding: 0%;
    }
 
    .registerCustomer-1 {

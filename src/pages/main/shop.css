@@ -173,6 +173,7 @@
 .shop-card-details {
   gap: 15px;
   height: 100%;
+  margin-right: 10px;
 }
 
 .shop-radio-inputs {

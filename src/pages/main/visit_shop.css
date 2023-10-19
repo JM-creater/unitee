@@ -17,6 +17,7 @@
     max-width: 100px;
     border-radius: 50%;
     border: solid 5px white;
+    margin-left: 53px;
 }
 
 .shopDetails-container-shop {
@@ -46,7 +47,7 @@
     padding-bottom: 15px;
 }
 
-.prod-type-checkbox, .prod-gender-checkbox {
+.prod-type-checkbox, .prod-gender-checkbox, .prod-price-checkbox {
     display: flex;
     justify-content: start;
     flex-flow: column;
@@ -68,7 +69,7 @@
     justify-content: center;
 }
 
-.type-filter-label, .gender-filter-label {
+.type-filter-label, .gender-filter-label, .price-filter-label {
     font-size: 12px;
     display: flex;
     align-items: center;

@@ -44,9 +44,15 @@ function Add_item(){
     const inputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
-        const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setProductCategory(e.target.value);
-        };
+    const handleCategoryChange = (e) => {
+        const newValue = e.target.value;
+        if (productCategory === newValue) {
+            setProductCategory('');
+            e.target.checked = false; 
+        } else {
+            setProductCategory(newValue);
+        }
+    };
 
         const handleImageClick = () => {
             if (inputRef.current) {
@@ -267,8 +273,7 @@ function Add_item(){
                                 name='flexRadioDefault'
                                 id='flexRadioDefault1'
                                 value='Male'
-                                onChange={handleCategoryChange}
-                                required
+                                onClick={handleCategoryChange}
                                 checked={productCategory === 'Male'} 
                             />
                             <label className="form-check-label">
@@ -283,8 +288,7 @@ function Add_item(){
                                 name='flexRadioDefault'
                                 id='flexRadioDefault2'
                                 value='Female'
-                                onChange={handleCategoryChange}
-                                required
+                                onClick={handleCategoryChange}
                                 checked={productCategory === 'Female'}
                             />
                             <label className="form-check-label">
@@ -299,8 +303,7 @@ function Add_item(){
                                 name='flexRadioDefault'
                                 id='flexRadioDefault3'
                                 value='Unisex'
-                                onChange={handleCategoryChange}
-                                required
+                                onClick={handleCategoryChange}
                                 checked={productCategory === 'Unisex'}
                             />
                             <label className="form-check-label">

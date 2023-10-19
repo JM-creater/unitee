@@ -13,7 +13,14 @@ body {
     height: 100%;
     background-color: #8C9EFF;
     background-repeat: no-repeat;
+}
 
+.notifItem-container {
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .card {
@@ -25,6 +32,7 @@ body {
     border-radius: 10px;
     width: 100%; /* Adjust the width as needed */
     margin: 0 auto; /* Center the card horizontally */
+    /* margin-top: 40px */
 }
 
 .top {
@@ -120,13 +128,15 @@ body {
 }
 
 .icon {
-    max-width: 45px;
-    max-height: 45px;
+    width: 60px;
+    height: 60px;
     margin-right: 15px;
 }
 
 .icon-content { 
     padding-bottom: 20px;
+    display: flex;
+    align-items: center;
 }
 
 @media screen and (max-width: 992px) {

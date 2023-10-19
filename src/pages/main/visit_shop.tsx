@@ -27,6 +27,7 @@ function Visit_Shop () {
     const [displayProduct, setDisplayProduct] = useState([]);
     const [departments, setDepartments] = useState<Department[]>([]);
     const [selectedProductType, setSelectedProductType] = useState('');
+    const [selectedPriceRange, setSelectedPriceRange] = useState('');
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [suppliers, setSuppliers] = useState<Record<number, Supplier>>({});
     const [selectedGender, setSelectedGender] = useState('');
@@ -97,10 +98,27 @@ function Visit_Shop () {
         (
             selectedProductType === '' || 
             product.productTypeId.toString() === selectedProductType
+        ) && 
+        (
+            selectedPriceRange === '' || 
+            (selectedPriceRange === '<100' && product.price < 100) ||
+            (selectedPriceRange === '100-500' && product.price >= 100 && product.price <= 500) ||
+            (selectedPriceRange === '>500' && product.price > 500)
         )
     );
+    
+    // Handle Product Type Filter
+    const handleProductTypeClick = (e) => {
+        const value = e.target.value;
+        if (selectedProductType === value) {
+            setSelectedProductType(''); 
+            e.target.checked = false; 
+        } else {
+            setSelectedProductType(value);
+        }
+    }
 
-    // Handle Gender 
+    // Handle Gender Filter
     const handleGenderClick = (e, gender) => {
         if (selectedGender === gender) {
             setSelectedGender('');
@@ -110,16 +128,15 @@ function Visit_Shop () {
         }
     }
 
-    // Handle Product Type
-    const handleProductTypeClick = (e) => {
-        const value = e.target.value;
-        if (selectedProductType === value) {
-            setSelectedProductType('');
+    const handlePriceRangeClick = (e, priceRange) => {
+        if (selectedPriceRange === priceRange) {
+            setSelectedPriceRange('');
+            e.target.checked = false;
         } else {
-            setSelectedProductType(value);
+            setSelectedPriceRange(priceRange);
         }
     }
-
+    
     // Add To Cart
     const addToCart = () => {
         if (!selectedProduct) return;
@@ -235,66 +252,132 @@ function Visit_Shop () {
                         </div>
                         {/* check button product types */}
                         <div className="col-md-8 prod-type-checkbox">
-                        <h4 className="type-filter-label">
+                            {/* <h4 className="type-filter-label">
                                 <input 
                                     className="form-check-input prod-cart-checkBox" 
-                                    type="checkbox" 
+                                    type="radio" 
                                     value="1" 
-                                    id="shopProdCheckbox1"
+                                    name="productType"
+                                    id="shopProdTypeAll"
+                                    checked={selectedProductType === '1'}
+                                    onChange={handleProductTypeChange}
+                                />
+                                <hr/> All
+                            </h4> */}
+                            <h4 className="type-filter-label">
+                                <input 
+                                    className="form-check-input prod-cart-checkBox" 
+                                    type="radio" 
+                                    value="1" 
+                                    name="productType"
+                                    id="shopProdTypeSchoolUniform"
+                                    checked={selectedProductType === '1'}
                                     onClick={handleProductTypeClick}
                                 />
-                                School Uniform
+                                <hr/> School Uniform
                             </h4>
                             <h4 className="type-filter-label">
                                 <input 
                                     className="form-check-input prod-cart-checkBox" 
-                                    type="checkbox" 
-                                    value="4" 
-                                    id="shopProdCheckbox"
-                                    onClick={handleProductTypeClick}
-                                />
-                                PE Uniform
-                            </h4>
-                            <h4 className="type-filter-label">
-                                <input 
-                                    className="form-check-input prod-cart-checkBox" 
-                                    type="checkbox" 
-                                    value="3" 
-                                    id="shopProdCheckbox"
-                                    onClick={handleProductTypeClick}
-                                />
-                                Department Shirt
-                            </h4>
-                            <h4 className="type-filter-label">
-                                <input 
-                                    className="form-check-input prod-cart-checkBox" 
-                                    type="checkbox" 
+                                    type="radio" 
                                     value="2" 
+                                    name="productType"
                                     id="shopProdCheckbox"
+                                    checked={selectedProductType === '2'}
                                     onClick={handleProductTypeClick}
                                 />
-                                Event T-shirt
+                                <hr/> Event T-shirt
                             </h4>
                             <h4 className="type-filter-label">
                                 <input 
                                     className="form-check-input prod-cart-checkBox" 
-                                    type="checkbox" 
+                                    type="radio" 
+                                    value="3" 
+                                    name="productType"
+                                    id="shopProdCheckbox"
+                                    checked={selectedProductType === '3'}
+                                    onClick={handleProductTypeClick}
+                                />
+                                <hr/> Department Shirt
+                            </h4>
+                            <h4 className="type-filter-label">
+                                <input 
+                                    className="form-check-input prod-cart-checkBox" 
+                                    type="radio" 
+                                    value="4" 
+                                    name="productType"
+                                    id="shopProdCheckbox"
+                                    checked={selectedProductType === '4'}
+                                    onClick={handleProductTypeClick}
+                                />
+                                <hr/> PE Uniform
+                            </h4>
+                            <h4 className="type-filter-label">
+                                <input 
+                                    className="form-check-input prod-cart-checkBox" 
+                                    type="radio" 
                                     value="5" 
+                                    name="productType"
                                     id="shopProdCheckbox"
+                                    checked={selectedProductType === '5'}
                                     onClick={handleProductTypeClick}
                                 />
-                                ID Sling
+                                <hr/> ID Sling
                             </h4>
                             <h4 className="type-filter-label">
                                 <input 
                                     className="form-check-input prod-cart-checkBox" 
-                                    type="checkbox" 
-                                    value="" 
+                                    type="radio" 
+                                    value="6" 
+                                    name="productType"
                                     id="shopProdCheckbox"
+                                    checked={selectedProductType === '6'}
+                                    onClick={handleProductTypeClick}
                                 />
-                                Accessories
+                                <hr/> Accessories
                             </h4>
                         </div>
+
+                        {/* Price filter */}
+                        <div className="prod-price-filter-container row">
+                            <div className="col-md-3 filter-price-text">
+                                <h4 className="prodType-filter-title">Price</h4>
+                            </div>
+                            <div className="col-md-8 prod-price-checkbox">
+                                <h4 className="price-filter-label">
+                                    <input 
+                                        className="form-check-input prod-cart-checkBox" 
+                                        type="radio" 
+                                        value="<100"
+                                        checked={selectedPriceRange === '<100'}
+                                        onClick={(e) => handlePriceRangeClick(e, '<100')}
+                                    />
+                                    <hr/> Below ₱100
+                                </h4>
+                                <h4 className="price-filter-label">
+                                    <input 
+                                        className="form-check-input prod-cart-checkBox" 
+                                        type="radio" 
+                                        value="100-500"
+                                        checked={selectedPriceRange === '100-500'}
+                                        onClick={(e) => handlePriceRangeClick(e, '100-500')}
+                                    />
+                                    <hr/> ₱100 - ₱500
+                                </h4>
+                                <h4 className="price-filter-label">
+                                    <input 
+                                        className="form-check-input prod-cart-checkBox" 
+                                        type="radio" 
+                                        value=">500"
+                                        checked={selectedPriceRange === '>500'}
+                                        onClick={(e) => handlePriceRangeClick(e, '>500')}
+                                    />
+                                    <hr/> Above ₱500
+                                </h4>
+                            </div>
+                        </div>
+
+
                             {/* GENDER filter */}
                         <div className="prod-gender-filter-container row">
                             <div className="col-md-3 filter-gender-text">
@@ -302,41 +385,45 @@ function Visit_Shop () {
                             </div>
                             {/* check button GENDER */}
                             <div className="col-md-8 prod-gender-checkbox">
-                            <h4 className="gender-filter-label">
+                                <h4 className="gender-filter-label">
                                     <input 
                                         className="form-check-input prod-cart-checkBox" 
-                                        type="checkbox" 
+                                        type="radio" 
                                         value="male" 
-                                        id="shopProdCheckbox"
+                                        name="gender"
+                                        id="shopProdGenderMale"
                                         defaultChecked={selectedGender === 'male'}
                                         onClick={(e) => handleGenderClick(e, 'male')}
                                     />
-                                    Male
+                                    <hr/> Male
                                 </h4>
                                 <h4 className="gender-filter-label">
                                     <input 
                                         className="form-check-input prod-cart-checkBox" 
-                                        type="checkbox" 
+                                        type="radio" 
                                         value="female" 
-                                        id="shopProdCheckbox"
+                                        name="gender"
+                                        id="shopProdGenderFemale"
                                         defaultChecked={selectedGender === 'female'}
                                         onClick={(e) => handleGenderClick(e, 'female')}
                                     />
-                                    Female
+                                    <hr/> Female
                                 </h4>
                                 <h4 className="gender-filter-label">
                                     <input 
                                         className="form-check-input prod-cart-checkBox" 
-                                        type="checkbox" 
+                                        type="radio" 
                                         value="unisex" 
-                                        id="shopProdCheckbox"
+                                        name="gender"
+                                        id="shopProdGenderUnisex"
                                         defaultChecked={selectedGender === 'unisex'}
                                         onClick={(e) => handleGenderClick(e, 'unisex')}
                                     />
-                                    Unisex
+                                    <hr/> Unisex
                                 </h4>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
