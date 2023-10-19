@@ -483,7 +483,7 @@ function Manage_Shop() {
             <div className="modal-body" style={{ display:'flex', flexFlow:'row' }}>
                 <div>
                     <div className="thumbnail-container">
-                        <h3 className="prod-info-titles">Thumbnail</h3>
+                        <h3 className="prod-info-titles">Product Image</h3>
                         <img className="supplier-modal-addprod-img" src={`https://localhost:7017/${selectedProduct.image}`} />
                         <input type="file" name="prodImage" accept="image/*" />
                     </div>
