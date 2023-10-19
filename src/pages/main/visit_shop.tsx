@@ -33,6 +33,7 @@ function Visit_Shop () {
     const [selectedSize, setSelectedSize] = useState(null);
     const [quantity, setQuantity] = useState(0);
     const [newQuantity, setNewQuantity] = useState(0);
+    const [departmentId, setDepartmentId] = useState<number | null>(null);
     const { userId, id: shopId } = useParams();
     const supplier = suppliers[shopId];
 
@@ -53,9 +54,20 @@ function Visit_Shop () {
         return department ? department.department_Name : 'Unknown Department';
     };
 
+    useEffect(() => {
+        axios.get(`https://localhost:7017/Users/UserDepartment/${userId}`)
+            .then(res => {
+                setDepartmentId(res.data.departmentId);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }, [userId]);
+
     // Get All Products
     useEffect(() => {
-        axios.get(`https://localhost:7017/Product/ByShop/${shopId}`)
+        if (!departmentId) return;
+        axios.get(`https://localhost:7017/Product/ByShop/${shopId}/ByDepartment/${departmentId}`)
             .then(async res => {
                 setDisplayProduct(res.data);
 
@@ -74,7 +86,7 @@ function Visit_Shop () {
             .catch(err => {
                 console.error(err);
             });
-    }, [shopId]);
+    }, [shopId, departmentId]);
 
     //Filter Products
     const filteredProduct = displayProduct.filter(product => 

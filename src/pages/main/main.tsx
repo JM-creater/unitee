@@ -139,7 +139,6 @@ function Main() {
                     </div>
 
 
-
                     <Link className="customer-nav-link" to='notif'>
                     <div className="notif-icon-container">
                         <Link to='notif'>
