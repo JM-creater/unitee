@@ -148,3 +148,21 @@
     height: 100px;
     margin-bottom: 15px;
 }
+
+.no-productsDashboard-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh; 
+    font-size: 24px; 
+    overflow: -moz-hidden-unscrollable;
+}
+
+.no-productsDashboard-icon {
+    font-size: 50px; 
+}
+
+.btn-dashboardProduct {
+    margin: 10px;
+}

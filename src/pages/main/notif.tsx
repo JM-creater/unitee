@@ -49,6 +49,13 @@ function Notif() {
     <div className="container">
       {notification.length > 0 ? (
         notification.map((notificationItem, index) => {
+          if (notificationItem.order.status === "DENIED") {
+            return (
+                <div key={index} className="card">
+                    <p className="font-weight-bold">{notificationItem.message}</p>
+                </div>
+            );
+        }
           const [placed, approved, pickup, completed] = getActiveStatus(
             notificationItem.order.status
           );
@@ -67,12 +74,9 @@ function Notif() {
                   <p>
                     Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total}</span>
                   </p>
-                  {notificationItem.order.status === "DENIED" && (
-                    <p>
-                      <span className="font-weight-bold">{notificationItem.message}</span>
-                    </p>
-                  )}
-
+                  <p>
+                    <span className="font-weight-bold">{notificationItem.message}</span>
+                  </p>
                 </div>
               </div>
               {/* Add class 'active' to progress */}

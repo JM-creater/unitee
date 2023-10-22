@@ -139,6 +139,7 @@ function Visit_Shop () {
     
     // Add To Cart
     const addToCart = () => {
+        const CloseBtn = document.getElementById("btnClose");
         if (!selectedProduct) return;
     
         if (!selectedSize) {
@@ -162,6 +163,8 @@ function Visit_Shop () {
         .then(() => {
             toast.success("Item added to cart");
             cartEventEmitter.emit("itemAddedToCart");
+            CloseBtn.click();
+            HandleCloseButton();
             return axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
         })
         .then(updatedCartResponse => {
@@ -457,6 +460,7 @@ function Visit_Shop () {
                             data-bs-dismiss="modal" 
                             aria-label="Close"
                             onClick={HandleCloseButton}
+                            id="btnClose"
                         >
                         </button>
                     </div>
