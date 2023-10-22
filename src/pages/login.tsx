@@ -26,6 +26,12 @@ function Login() {
     setPassword(value);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  }
+
   // Login Account
   const handleLogin = () => {
     const errors: ValidationErrors = {};
@@ -118,6 +124,7 @@ function Login() {
           placeholder="ID Number or Email"
           value={IDOrEmail}
           onChange={(e) => handleIDOrEmail(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <input
           className="col-md-7 input-login"
@@ -125,6 +132,7 @@ function Login() {
           placeholder="Password"
           value={Password}
           onChange={(e) => handlePassword(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
 
         <button className="col-md-7 login-btn" onClick={() => handleLogin()}>

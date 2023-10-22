@@ -143,8 +143,18 @@ function Cart () {
         return;
       }
 
+      if (!referenceId) {
+        toast.error("Reference ID is required.");
+        return;
+      }
+
       if (referenceId.length !== 13) {
         toast.error("Reference ID must be 13 characters in length to place an order.");
+        return;
+      }
+
+      if (!proofOfPayment) {
+        toast.error("Please upload Proof of Payment.");
         return;
       }
   
@@ -156,6 +166,10 @@ function Cart () {
         formData.append('referenceId', referenceId);
         formData.append('proofOfPayment', proofOfPayment);
 
+        cartItem.items.forEach((item, index) => {
+          formData.append(`CartItemIds[${index}]`, item.id.toString());
+        });
+        
         const orderItems = cartItem.items.map(item => {
           return {
               ProductId: item.product.id,
@@ -388,16 +402,16 @@ function Cart () {
                       <input type="file" ref={fileInputRef} className="proof-payment-img" accept="image/png, image/gif, image/jpeg" onChange={handleProofOfPaymentChange}/>
                       <h2 className="total-amount-text">Reference Id (GCash):</h2>
                       <input 
-                      type="text" 
-                      className="proof-payment-img" 
-                      value={referenceId} 
-                      onChange={(e) => handleReferenceId(e.target.value)} 
-                      onKeyPress={(e) => {
-                        if (e.key < '0' || e.key > '9') {
-                          e.preventDefault();
-                        }
-                      }}
-                      maxLength={13}
+                        type="text" 
+                        className="proof-payment-img" 
+                        value={referenceId} 
+                        onChange={(e) => handleReferenceId(e.target.value)} 
+                        onKeyDown={(e) => {
+                          if (e.key < '0' || e.key > '9') {
+                            e.preventDefault();
+                          }
+                        }}
+                        maxLength={13}
                       />
                   </div>
                   <div className="btn-container">

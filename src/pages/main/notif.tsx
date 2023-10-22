@@ -10,7 +10,6 @@ function Notif() {
   const [notification, setNotification] = useState([]);
   const { userId } = useParams();
 
-
   useEffect(() => {
     axios.get(`https://localhost:7017/Notification/${userId}`)
       .then(response => {
@@ -50,6 +49,13 @@ function Notif() {
     <div className="container">
       {notification.length > 0 ? (
         notification.map((notificationItem, index) => {
+          if (notificationItem.order.status === "DENIED") {
+            return (
+                <div key={index} className="card">
+                    <p className="font-weight-bold">{notificationItem.message}</p>
+                </div>
+            );
+        }
           const [placed, approved, pickup, completed] = getActiveStatus(
             notificationItem.order.status
           );

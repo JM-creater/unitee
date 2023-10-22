@@ -7,6 +7,20 @@
     font-weight: 500;
 }
 
+/* CSS */
+.button-addNewSize {
+    background-color: #007bff; /* Change this to your preferred background color */
+    color: #fff; /* Text color */
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 10px; /* Adjust the margin as needed */
+}
+
+.button-addNewSize:hover {
+    background-color: #0056b3; /* Change this to the hover color you want */
+}
+
 .input-group-description{
     margin: 20px;
 
