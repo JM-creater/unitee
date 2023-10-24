@@ -1,16 +1,17 @@
 import './purchase_history.css'
-import product2 from "../../assets/images/shop_products/product2.png"
+//import product2 from "../../assets/images/shop_products/product2.png"
 import { useEffect, useState } from 'react'
 import axios from 'axios';
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function Purchase_History () {
 
     const PaymentType = {
         EMoney: 'E-Money',
         Cash: 'Cash'
-      };
+    };
 
     const Status = {
         OrderPlaced: 'OrderPlaced',
@@ -23,8 +24,43 @@ function Purchase_History () {
     };
 
     const [purchases, setPurchases] = useState([]);
+    const [productTypes, setProductTypes] = useState([]);
     const [selectedPurchases, setSelectedPurchases] = useState(null);
+    const [rating, setRating] = useState(null);
     const { userId } = useParams();
+
+    const handleSubmitRating = async () => {
+        const closeBtn = document.getElementById("btnClose");
+        
+        if (rating === null) {
+            alert('Please select a rating before submitting.');
+            return;
+        }
+
+        const request = {
+            UserId: userId,
+            Value: rating
+        };
+
+        try {
+            const response = await fetch('https://localhost:7017/Rating/rate-product', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request)
+            });
+
+            if (response.ok) {
+                toast.success('Rating submitted successfully.');
+                closeBtn.click();
+            } else {
+                const data = await response.json();
+                toast.error(`Error: ${data}`);
+            }
+
+        } catch (error) {
+            console.error('Error submitting rating:', error);
+        }
+    };
 
     useEffect(() => {
         axios.get(`https://localhost:7017/Order/${userId}`)
@@ -36,6 +72,23 @@ function Purchase_History () {
             })
     }, [userId]);
 
+    //Read All Product Types
+    useEffect(() => {
+        axios.get('https://localhost:7017/ProductType')
+            .then(res => {
+                setProductTypes(res.data);
+            })
+            .catch(error => {
+                console.error(error)
+            });
+    }, []);
+    
+    // Get Product Type Name
+    const getProductTypeName = (productTypeId) => {
+        const productType = productTypes.find(p => p.productTypeId === productTypeId);
+        return productType ? productType.product_Type : 'Unknown Type';
+    };
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
@@ -45,6 +98,11 @@ function Purchase_History () {
         const minutes = String(date.getMinutes()).padStart(2, '0');
         return `${month}/${day}/${year} ${hours}:${minutes}`;
     };
+
+    const handleCLose = () => {
+        const closeBtn = document.getElementById("btnClose");
+        closeBtn.click();
+    }
 
     return <div className="purchase-history-main-container">
         <div className='col-md-12 purchase-title-container'>
@@ -92,11 +150,11 @@ function Purchase_History () {
                         ) : (
                         <tbody className="table-group-divider">
                             <tr data-bs-toggle="modal" className="text-center">
-                            <td></td>
-                            <td></td>
-                            <td>No completed orders available</td>
-                            <td></td>
-                            <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>No completed orders available</td>
+                                <td></td>
+                                <td></td>
                             </tr>
                         </tbody>
                     )}
@@ -109,7 +167,7 @@ function Purchase_History () {
             <div className="orders-modal-content modal-content" style={{ backgroundColor:'#fff' }}>
                 <div className="modal-header">
                     <h3 className='modal-order-title'>Order Details</h3>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose"></button>
                 </div>
                 <div className='col-md-12 row' style={{ display:'flex', justifyContent:'space-between', padding:'15px' }}>
                 {selectedPurchases && (
@@ -135,7 +193,7 @@ function Purchase_History () {
                             
                             <div className='payment-details-content'>
                                 <h3 className='order-details-titles'>Payment Details</h3>
-                                <h4>Total Amount: ₱<p className="order-details-input">{selectedPurchases.total}</p></h4>
+                                <p style={{ fontSize: "15px" }}>Total Amount: ₱{selectedPurchases.total}</p>
                                 <span className="order-details-text">Proof of payment:</span>
                                 <a 
                                     className="modal-info" 
@@ -143,14 +201,14 @@ function Purchase_History () {
                                     target="_blank" 
                                     href={`https://localhost:7017/${selectedPurchases.proofOfPayment}`} 
                                 >
-                                {selectedPurchases.proofOfPayment.split('\\').pop()}
+                                    {selectedPurchases.proofOfPayment.split('\\').pop()}
                                 </a>
                             </div>
 
                             <div className="claimed-details-container">
-                                <h3>Status: <p className="order-details-input">Claimed</p></h3>
-                                <span className="order-details-text">Date Claimed: <p className="order-details-input">8/28/2023</p></span>
-                                <span className="order-details-text">Receiver: <p className="order-details-input">Example Name</p></span>
+                                <h3 style={{ fontSize: "15px" }}>Status: {Status[Object.keys(Status)[selectedPurchases.status - 1]]}</h3>
+                                <p style={{ fontSize: "15px" }}>Date Claimed: {formatDate(selectedPurchases.estimateDate)}</p>
+                                <p style={{ fontSize: "15px" }}>Receiver: {selectedPurchases.user.firstName} {selectedPurchases.user.lastName}</p>
                             </div>
                         </div>
 
@@ -161,26 +219,32 @@ function Purchase_History () {
                                 <caption>end of list</caption>
                                 <thead className='table-dark align-middle'>
                                     <tr className='thead-row'>
-                                    <th className="order-table-header" scope="col">Product</th>
+                                    <th className="order-table-header" scope="col">Product Name</th>
+                                    <th className="order-table-header" scope="col">Product Type</th>
+                                    <th className="order-table-header" scope="col">Gender</th>
                                     <th className="order-table-header" scope="col">Size</th>
                                     <th className="order-table-header" scope="col">Quantity</th>
                                     <th className="order-table-header" scope="col">Price</th>
                                     </tr>
                                 </thead>
                                 <tbody className="table-group-divider">
-                                    <tr>
-                                    <th scope="row" data-bs-toggle="modal" data-bs-target="#cartProductModal"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-                                    <td>XL</td>
-                                    <td>3</td>
-                                    <td>PHP 123</td>
-                                    </tr>
+                                    {selectedPurchases.cart.items.map(item => (
+                                        <tr key={item.id}>
+                                            <th scope="row" data-bs-toggle="modal" data-bs-target="#cartProductModal"><img className="prod-image-cart" src={ `https://localhost:7017/${selectedPurchases.proofOfPayment}` }/>{item.product.productName}</th>
+                                            <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                            <td>{item.product.category}</td>
+                                            <td>{item.sizeQuantity.size}</td>
+                                            <td>{item.sizeQuantity.quantity}</td>
+                                            <td>{item.product.price}</td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
                         <input type="radio" id="star-4" name="star-radio" value="star-1"/>
                         <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Product Rating:</h3>
                         <div className="rating" style={{ display:'flex', justifyContent:'start' }}>
-                            <input type="radio" id="star-1" name="star-radio" value="star-1"/>
+                            <input type="radio" id="star-1" name="star-radio-" value="1" onChange={(e) => setRating(parseInt(e.target.value))} />
                             <label htmlFor="star-1">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
@@ -193,7 +257,7 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-2" name="star-radio" value="star-1"/>
+                            <input type="radio" id="star-2" name="star-radio" value="2" onChange={(e) => setRating(parseInt(e.target.value))} />
                             <label htmlFor="star-2">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
@@ -206,7 +270,7 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-3" name="star-radio" value="star-1"/>
+                            <input type="radio" id="star-3" name="star-radio" value="3" onChange={(e) => setRating(parseInt(e.target.value))} />
                             <label htmlFor="star-3">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
@@ -219,6 +283,7 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
+                            <input type="radio" id="star-4" name="star-radio" value="4" onChange={(e) => setRating(parseInt(e.target.value))} />
                             <label htmlFor="star-4">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
@@ -231,7 +296,7 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-5" name="star-radio" value="star-1"/>
+                            <input type="radio" id="star-5" name="star-radio" value="5" onChange={(e) => setRating(parseInt(e.target.value))} />
                             <label htmlFor="star-5">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
@@ -249,7 +314,7 @@ function Purchase_History () {
                     
                         <h3 className='order-details-titles' style={{ marginTop:'30px' }}>Supplier Rating:</h3>
                         <div className="rating" style={{ display:'flex', justifyContent:'start' }}>
-                            <input type="radio" id="star-1" name="star-radio" value="star-1"/>
+                            <input type="radio" id="star-1" name="star-radio" value="1" onChange={(e) => setRating(parseInt(e.target.value))}/>
                             <label htmlFor="star-1">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
@@ -262,7 +327,7 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-2" name="star-radio" value="star-1"/>
+                            <input type="radio" id="star-2" name="star-radio" value="2" onChange={(e) => setRating(parseInt(e.target.value))}/>
                             <label htmlFor="star-2">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
@@ -275,7 +340,7 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-3" name="star-radio" value="star-1"/>
+                            <input type="radio" id="star-3" name="star-radio" value="3" onChange={(e) => setRating(parseInt(e.target.value))}/>
                             <label htmlFor="star-3">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
@@ -288,6 +353,7 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
+                            <input type="radio" id="star-5" name="star-radio" value="4" onChange={(e) => setRating(parseInt(e.target.value))}/>
                             <label htmlFor="star-4">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
@@ -300,7 +366,7 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-5" name="star-radio" value="star-1"/>
+                            <input type="radio" id="star-5" name="star-radio" value="5" onChange={(e) => setRating(parseInt(e.target.value))}/>
                             <label htmlFor="star-5">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
@@ -314,6 +380,7 @@ function Purchase_History () {
                                 </svg>
                             </label>
                         </div>
+
                         </div>
                     </div>
                 </div>
@@ -322,12 +389,17 @@ function Purchase_History () {
                 {selectedPurchases && (
                     <div className="modal-footer">
                         <Link to={`/shop/${userId}/visit_shop/${selectedPurchases.cart.supplier.id}`}>
-                            <button className="proceed-Btn">
+                            <button className="proceed-Btn" onClick={handleCLose}>
                                 Buy Again
                             </button>
                         </Link>
                     </div>
                 )}
+                <div className="modal-footer" onClick={handleSubmitRating}>
+                    <button className="proceed-Btn">
+                        Submit
+                    </button>
+                </div>
             </div>
         </div>
     </div>
