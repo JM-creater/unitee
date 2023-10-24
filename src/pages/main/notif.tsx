@@ -33,15 +33,17 @@ function Notif() {
   const getActiveStatus = (status) => {
     switch (status) {
       case 1:
-          return [true, false, false, false];
-      case 2: 
-          return [true, true, false, false];
+        return [true, false, false, false, false];
+      case 2:
+        return [true, true, false, false, false];
       case 3: 
-          return [true, true, true, false];
+        return [true, true, true, false, false];
       case 4: 
-          return [true, true, true, true];
+        return [true, true, true, true, false];
+      case 5: 
+        return [true, true, true, true, true];
       default:
-          return [false, false, false, false];
+        return [false, false, false, false, false];
     }
   }
 
@@ -51,12 +53,12 @@ function Notif() {
         notification.map((notificationItem, index) => {
           if (notificationItem.order.status === "DENIED") {
             return (
-                <div key={index} className="card">
-                    <p className="font-weight-bold">{notificationItem.message}</p>
-                </div>
+              <div key={index} className="card">
+                <p className="font-weight-bold">{notificationItem.message}</p>
+              </div>
             );
-        }
-          const [placed, approved, pickup, completed] = getActiveStatus(
+          }
+          const [placed, pending, approved, pickup, completed] = getActiveStatus(
             notificationItem.order.status
           );
           return (
@@ -64,56 +66,81 @@ function Notif() {
               <div className="row d-flex justify-content-between px-3 top">
                 <div className="d-flex">
                   <h5>
-                    ORDER <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
+                    <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
                   </h5>
                 </div>
                 <div className="d-flex flex-column text-sm-left">
                   <p className="mb-0">
-                    Expected Arrival <span>{formatDate(notificationItem.dateCreated)}</span>
+                    Order Created: <span>{formatDate(notificationItem.dateCreated)}</span>
                   </p>
                   <p>
                     Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total}</span>
                   </p>
                   <p>
-                    <span className="font-weight-bold">{notificationItem.message}</span>
+                    <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
                   </p>
                 </div>
               </div>
               {/* Add class 'active' to progress */}
               <div className="row d-flex justify-content-center">
                 <div className="col-12">
-                    <ul id="progressbar" className="text-center">
-                        <li className={placed ? "active step0" : "step0"}></li>
-                        <li className={approved ? "active step0" : "step0"}></li>
-                        <li className={pickup ? "active step0" : "step0"}></li>
-                        <li className={completed ? "active step0" : "step0"}></li>
-                    </ul>
-                </div>
-              </div>
-              <div className="row justify-content-between top">
-                <div className="col-md-3 mb-3 d-flex icon-content">
-                    <img className="icon" src={ orderProcess } alt="Order Processed Icon" style={{ width: '60px', height: '60px' }} />
-                    <div className="d-flex flex-column">
-                    <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
-                    </div>
-                </div>
-                <div className="col-md-3 mb-3 d-flex icon-content">
-                    <img className="icon" src={ orderProcess } alt="Order Shipped Icon" style={{ width: '60px', height: '60px' }} />
-                    <div className="d-flex flex-column">
-                    <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
-                    </div>
-                </div>
-                <div className="col-md-3 mb-3 d-flex icon-content">
-                    <img className="icon" src={ orderProcess } alt="Order En Route Icon" style={{ width: '60px', height: '60px' }} />
-                    <div className="d-flex flex-column">
-                    <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
-                    </div>
-                </div>
-                <div className="col-md-3 mb-3 d-flex icon-content">
-                    <img className="icon" src={ orderProcess } alt="Order Arrived Icon" style={{ width: '60px', height: '60px' }} />
-                    <div className="d-flex flex-column">
-                    <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
-                    </div>
+                  <ul id="progressbar" className="text-center">
+                    <li className={placed ? "active step0" : "step0"}>
+                      <div className="icon-content">
+                        <img
+                          className="icon"
+                          src={orderProcess}
+                          alt="Order Processed Icon"
+                          style={{ width: '60px', height: '60px', marginLeft: '70px'}}
+                        />
+                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
+                      </div>
+                    </li>
+                    <li className={pending ? "active step0" : "step0"}>
+                      <div className="icon-content">
+                        <img
+                          className="icon"
+                          src={orderProcess}
+                          alt="Order Shipped Icon"
+                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                        />
+                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
+                      </div>
+                    </li>
+                    <li className={approved ? "active step0" : "step0"}>
+                      <div className="icon-content">
+                        <img
+                          className="icon"
+                          src={orderProcess}
+                          alt="Order Shipped Icon"
+                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                        />
+                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
+                      </div>
+                    </li>
+                    <li className={pickup ? "active step0" : "step0"}>
+                      <div className="icon-content">
+                        <img
+                          className="icon"
+                          src={orderProcess}
+                          alt="Order En Route Icon"
+                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                        />
+                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
+                      </div>
+                    </li>
+                    <li className={completed ? "active step0" : "step0"}>
+                      <div className="icon-content">
+                        <img
+                          className="icon"
+                          src={orderProcess}
+                          alt="Order Arrived Icon"
+                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                        />
+                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
+                      </div>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -131,11 +158,8 @@ function Notif() {
             <p className="font-weight-bold mt-3" style={{ fontSize: '24px' }}>No notifications available</p>
           </div>
         </div>
-       
-
       )}
     </div>
-
   )
 }
-export default Notif
+export default Notif;
