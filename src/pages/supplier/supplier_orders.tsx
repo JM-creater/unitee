@@ -153,6 +153,29 @@ function Supplier_Orders () {
         });
     }
 
+    // Handle Completed Orders
+    const HandleOrderCompleted = (orderId) => {
+      const CloseBtn = document.getElementById("btnClose");
+      if (!singleApproval) {
+        toast.error("Please check the Single Approval checkbox before completed the order.");
+        return; 
+      }
+      axios.put(`https://localhost:7017/Order/orderCompleted/${orderId}`)
+        .then(response => {
+          const updatedOrder = orders.find(order => order.Id === response.data.Id);
+            if (updatedOrder) {
+                Object.assign(updatedOrder, response.data);
+            }
+            toast.success("Order completed success");
+            notifEventEmitter.emit("notifAdded")
+            CloseBtn.click();
+        })
+        .catch(error => {
+          console.error(error);
+            toast.error("Failed to complete the order. Please try again");
+        });
+    }
+
     const formatDate = (dateString) => {
       const date = new Date(dateString);
       const day = String(date.getDate()).padStart(2, '0');
@@ -320,7 +343,7 @@ function Supplier_Orders () {
                     {orders.length > 0 ? (
                       orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Completed).map((orderItem, index) => (
                         <tbody key={index} className="table-group-divider">
-                          <tr data-bs-toggle="modal" data-bs-target="#forPickUpOrderModal" onClick={() => setSelectedOrders(orderItem)}>
+                          <tr data-bs-toggle="modal" data-bs-target="#orderCompletedOrderModal" onClick={() => setSelectedOrders(orderItem)}>
                             <th scope="row">{formatDate(orderItem.dateCreated)}</th>
                             <td>{orderItem.orderNumber}</td>
                             <td>{orderItem.cart.items.length}</td>
@@ -639,7 +662,7 @@ function Supplier_Orders () {
                 <div className="modal-basta-container">
                     <span>Check for pick up orders details</span>
                     <div className="modal-btns-container">
-                        <button type="button" className="save-prod-btn">Completed</button>
+                        <button type="button" className="save-prod-btn" onClick={() => HandleOrderCompleted(selectedOrders.id)}>Completed</button>
                     </div>
                 </div>
                     {selectedOrders && (
@@ -734,6 +757,110 @@ function Supplier_Orders () {
             </div>
         </div>
     </div>
+
+    {/* COMPLETED ORDER DETAILS MODAL */}
+    <div className="modal fade" id="orderCompletedOrderModal" tabIndex={-1} aria-labelledby="orderCompletedOrderModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-fullscreen">
+            <div className="modal-content" style={{ padding:'20px' }}>
+                <div className="pending-header">
+                    <h1 className="modal-title" id="exampleModalLabel">Completed Orders</h1>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose"></button>
+                </div>
+                <div className="modal-basta-container">
+                    <span>Check for pick up orders details</span>
+                </div>
+                    {selectedOrders && (
+                      <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
+                        {/* CUSTOMER DETAILS */}
+                        <div>
+                            <div className="order-details-customer">
+                                <h3 className="order-details-subtitle">Customer</h3>
+                                <div className="customer-details-container">
+                                    <div className="modal-details-label">
+                                        <span className="modal-label">ID Number</span>
+                                        <span className="modal-label">First Name</span>
+                                        <span className="modal-label">Last Name</span>
+                                        <span className="modal-label">Department</span>
+                                        <span className="modal-label">Gender</span>
+                                    </div>
+                                    <div className="modal-details-info">
+                                        <span className="modal-info">{selectedOrders.user.id}</span>
+                                        <span className="modal-info">{selectedOrders.user.firstName}</span>
+                                        <span className="modal-info">{selectedOrders.user.lastName}</span>
+                                        <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
+                                        <span className="modal-info">{selectedOrders.user.gender}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ORDER DETAILS */}
+                            <div className="modal-order-details-container">
+                                <h3 className="order-details-subtitle">Order Details</h3>
+                                <div className="order-details-container">
+                                    <div className="modal-details-label">
+                                        <span className="modal-label">Date</span>
+                                        <span className="modal-label">Order Number</span>
+                                        <span className="modal-label">Number of Items</span>
+                                        <span className="modal-label">Total Amount</span>
+                                        <span className="modal-label">Proof of Payment</span>
+                                        <span className="modal-label">Reference No.</span>
+                                        <span className="modal-label">Payment Type</span>
+                                    </div>
+                                    <div className="modal-details-info">
+                                      <span className="modal-info">{selectedOrders.dateCreated}</span>
+                                      <span className="modal-info">{selectedOrders.orderNumber}</span>
+                                      <span className="modal-info">{selectedOrders.cart.items.length}</span>
+                                      <span className="modal-info">₱{selectedOrders.total}</span>
+                                      <a 
+                                        className="modal-info" 
+                                        rel="noopener noreferrer" 
+                                        target="_blank" 
+                                        href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
+                                      >
+                                        {selectedOrders.proofOfPayment.split('\\').pop()}
+                                      </a>
+                                      <span className="modal-info">{selectedOrders.referenceId}</span>
+                                      <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* ITEM LIST */}
+                        <div className="modal-item-list">
+                          <h3 className="order-details-subtitle">Item List</h3>
+                          <div className="modal-item-list-table-wrapper">
+                            <table className="table">
+                              <thead className="table-primary">
+                                  <tr>
+                                  <th scope="col">Product Name</th>
+                                  <th scope="col">Product Type</th>
+                                  <th scope="col">Gender</th>
+                                  <th scope="col">Size</th>
+                                  <th scope="col">Quantity</th>
+                                  <th scope="col">Price</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                {selectedOrders.cart.items.map(item => (
+                                  <tr key={item.id}>
+                                    <th scope="row">{item.product.productName}</th>
+                                    <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                    <td>{item.product.category}</td>
+                                    <td>{item.sizeQuantity.size}</td>
+                                    <td>{item.sizeQuantity.quantity}</td>
+                                    <td>{item.product.price}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                    </div>
+                    )}
+            </div>
+        </div>
+    </div>                              
 
 </div>
 }
