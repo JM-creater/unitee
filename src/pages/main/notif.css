@@ -81,7 +81,7 @@ body {
 /*ProgressBar connectors*/
 #progressbar li:after {
     content: '';
-    width: 400px;
+    width: 100%;
     height: 12px;
     background: #C5CAE9;
     position: absolute;
