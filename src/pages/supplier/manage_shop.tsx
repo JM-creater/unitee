@@ -21,6 +21,7 @@ function Manage_Shop() {
     size: string;
     quantity: string;
   }
+
   
   const [products, setProducts] = useState([]);
   const [productName, setProductName] = useState("");
@@ -30,15 +31,16 @@ function Manage_Shop() {
   const [productTypes, setProductTypes] = useState<ProductType[]>([]);
   const [productTypeId, setSelectedProductType] = useState("");
   const [sizes, setSizes] = useState<SizeQuantity[]>([]);
+  const [Newsizes, setNewSizes] = useState([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [departmentId, setSelectedDepartment] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [isActive, setIsActive] = useState(false); 
+  const [isActive, setIsActive] = useState(); 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const { id } = useParams();
   const inputRef = useRef<HTMLInputElement>(null);
-
+  
     const handleImageClick = () => {
         if (inputRef.current) {
             inputRef.current.click();
@@ -105,14 +107,19 @@ function Manage_Shop() {
     setSizes([...sizes, { size: "", quantity: "" }]);
   };
 
+  const addNewSizeInput2 = () => {
+    setNewSizes([...Newsizes, { size: "", quantity: "" }]);
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleAddItem();
     }
   }
 
-  // Add Item
-  const handleAddItem = () => {
+  // Edit Item
+  const handleEdit = () => {
+    console.log(selectedProduct)
     const selectedSizes = sizes.filter(({ size }) => size);
 
     const errorMessages = [];
@@ -124,6 +131,7 @@ function Manage_Shop() {
     if (!productTypeId) errorMessages.push("Product Type is required");
     if (!departmentId) errorMessages.push("Department is required");
     if (!selectedImage) errorMessages.push("Image is required");
+    if (!isActive) errorMessages.push("Status is required");
     if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
 
     if (errorMessages.length > 0) {
@@ -140,6 +148,82 @@ function Manage_Shop() {
     formData.append("Price", productPrice);
     formData.append("Image", selectedImage as File);
     formData.append("SupplierId", id);
+    formData.append("isActive", isActive);
+
+    axios
+      .put(`https://localhost:7017/Product/${selectedProduct.productId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then(async (productResponse) => {
+        if (productResponse.status === 200) {
+          toast.success("Successfully Added An Item");
+
+          const sizeApiCalls = selectedSizes.map(({ size, quantity }) => {
+            const sizeFormData = new FormData();
+            sizeFormData.append("size", size);
+            sizeFormData.append("productId", productResponse.data);
+            sizeFormData.append("quantity", quantity);
+            window.location.reload();
+
+            return axios.post(
+              "https://localhost:7017/SizeQuantity/createsizequantity",
+              sizeFormData,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+          });
+
+          try {
+            await Promise.all(sizeApiCalls);
+          } catch (error) {
+            console.log(productResponse.data);
+            toast.warning("Network error or server not responding while adding sizes");
+          }
+        } else {
+          toast.error(productResponse.data.message);
+        }
+      })
+      .catch(() => {
+        toast.error("Network error or server not responding");
+      });
+  };
+
+  // Add Item
+  const handleAddItem = () => {
+    const selectedSizes = sizes.filter(({ size }) => size);
+
+    const errorMessages = [];
+
+    if (!productName) errorMessages.push("Product Name is required");
+    if (!productDescription) errorMessages.push("Product Description is required");
+    if (!productPrice || isNaN(Number(productPrice))) errorMessages.push("Valid Product Price is required");
+    if (!productCategory) errorMessages.push("Product Category is required");
+    if (!productTypeId) errorMessages.push("Product Type is required");
+    if (!departmentId) errorMessages.push("Department is required");
+    if (!selectedImage) errorMessages.push("Image is required");
+    if (!isActive) errorMessages.push("Status is required");
+    if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
+
+    if (errorMessages.length > 0) {
+      errorMessages.forEach(message => toast.error(message));
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("ProductTypeId", productTypeId);
+    formData.append("DepartmentId", departmentId);
+    formData.append("ProductName", productName);
+    formData.append("Description", productDescription);
+    formData.append("Category", productCategory);
+    formData.append("Price", productPrice);
+    formData.append("Image", selectedImage as File);
+    formData.append("SupplierId", id);
+    formData.append("isActive", isActive);
 
     axios
       .post("https://localhost:7017/Product/addproduct", formData, {
@@ -156,6 +240,7 @@ function Manage_Shop() {
             sizeFormData.append("size", size);
             sizeFormData.append("productId", productResponse.data);
             sizeFormData.append("quantity", quantity);
+            window.location.reload();
 
             return axios.post(
               "https://localhost:7017/SizeQuantity/createsizequantity",
@@ -220,7 +305,7 @@ function Manage_Shop() {
         <div className="col-md-12 supplier-prods-container">
           {products.length > 0 ? (
               products.map((productItem, index) => (
-                  <div key={index} className="prod-card" data-bs-toggle="modal" data-bs-target="#editProductModal" onClick={() => setSelectedProduct(productItem)}>
+                  <div key={index} className="prod-card" data-bs-toggle="modal" data-bs-target="#editProductModal" onClick={() => {setSelectedProduct(productItem); setNewSizes(productItem.sizes);}}>
                       <div className="prod-shop-image-container">
                           <img className="supplier-shop-prod-image" src={ productItem.image ? `https://localhost:7017/${productItem.image}` : prodImage }/>
                       </div>
@@ -251,7 +336,7 @@ function Manage_Shop() {
               <h1 className="modal-title" id="exampleModalLabel">
                 Add New Product
               </h1>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => window.location.reload()}></button>
             </div>
             <div className="modal-basta-container">
               <span>You can add new products to your shop here</span>
@@ -295,14 +380,12 @@ function Manage_Shop() {
                     <select 
                         name="prodStatus" 
                         id="prodStatus" 
-                        value={isActive ? "Active" : "Inactive"}
                         style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem', marginTop:'5px' }}
-                        onChange={(e) => setIsActive(e.target.value === "Active")}
                         onKeyDown={handleKeyDown}
                     >
-                      <option value="" defaultChecked disabled hidden>Select a Status</option>
-                      <option value="Active">Activate</option>
-                      <option value="Inactive">Deactivate</option>
+                      <option value="" defaultChecked>Select a Status</option>
+                      <option value="Active" onClick={() => setIsActive(true)}>Activate</option>
+                      <option value="Inactive" onClick={() => setIsActive(false)}>Deactivate</option>
                     </select>
                 </div>
               </div>
@@ -315,6 +398,7 @@ function Manage_Shop() {
                       className="modal-input-box" 
                       type="text" 
                       name="prodName" 
+                      placeholder="Enter product name"
                       id="prodName" 
                       onChange={(e) => setProductName(e.target.value)} 
                       onKeyDown={handleKeyDown}
@@ -339,7 +423,7 @@ function Manage_Shop() {
                     onChange={(e) => setSelectedDepartment(e.target.value)}
                     onKeyDown={handleKeyDown}
                   >
-                    <option value="" defaultChecked disabled hidden>Select a Department</option>
+                    <option value="" defaultChecked>Select a Department</option>
                     {departments.map((department, index) => (
                       <option key={index} value={department.departmentId}>
                         {department.department_Name}
@@ -355,7 +439,6 @@ function Manage_Shop() {
                             value="Male" 
                             name="gender"
                             id="departmentCheck1"
-                            checked={selectedProduct && selectedProduct.gender === 'Male'}
                             onChange={(e) => handleCategoryChange(e, 'Male')}
                             onKeyDown={handleKeyDown}
                         />
@@ -369,7 +452,6 @@ function Manage_Shop() {
                             value="Female" 
                             name="gender"
                             id="departmentCheck2"
-                            checked={selectedProduct && selectedProduct.gender === 'Female'}
                             onChange={(e) => handleCategoryChange(e, 'Female')}
                             onKeyDown={handleKeyDown}
                         />
@@ -383,7 +465,6 @@ function Manage_Shop() {
                             value="Unisex" 
                             name="gender"
                             id="departmentCheck3"
-                            checked={selectedProduct && selectedProduct.gender === 'Unisex'}
                             onChange={(e) => handleCategoryChange(e, 'Unisex')}
                             onKeyDown={handleKeyDown}
                         />
@@ -400,7 +481,7 @@ function Manage_Shop() {
                     onChange={(e) => setSelectedProductType(e.target.value)}
                     onKeyDown={handleKeyDown}
                 >
-                    <option value="" defaultChecked disabled hidden>Select Type of Product</option>
+                    <option value="" defaultChecked>Select Type of Product</option>
                     {productTypes.map((productType, index) => (
                         <option key={index} value={productType.productTypeId}>
                             {productType.product_Type}
@@ -413,6 +494,7 @@ function Manage_Shop() {
                   className="modal-input-box" 
                   type="text" 
                   name="prodPrice" 
+                  placeholder="Enter product price"
                   id="prodPrice" 
                   onChange={(e) => setProductPrice(e.target.value)} 
                   onKeyDown={handleKeyDown}
@@ -455,13 +537,13 @@ function Manage_Shop() {
             <div className="modal-content" style={{ padding:'15px', height:'100vh' }}>
             <div className="prod-header">
                 <h1 className="modal-title" id="exampleModalLabel">Edit Product</h1>
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => window.location.reload()}></button>
             </div>
             <div className="modal-basta-container">
                 <span>You can edit product details here</span>
                 <div className="modal-btns-container">
-                    <button type="button" className="cancel-btn-modal" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" className="save-prod-btn">Save</button>
+                    <button type="button" className="cancel-btn-modal" data-bs-dismiss="modal" onClick={() => window.location.reload()}>Cancel</button>
+                    <button type="button" className="save-prod-btn" onClick={handleEdit}>Save</button>
                 </div>
             </div>
             <div className="modal-body" style={{ display:'flex', flexFlow:'row' }}>
@@ -492,13 +574,11 @@ function Manage_Shop() {
                     <select 
                         name="prodStatus" 
                         id="prodStatus" 
-                        value={isActive ? "Active" : "Inactive"}
                         style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem', marginTop:'5px' }}
-                        onChange={(e) => setIsActive(e.target.value === "Active")}
                     >
                         <option value="" defaultChecked disabled hidden>Select a Status</option>
-                        <option value="Active">Activate</option>
-                        <option value="Inactive">Deactivate</option>
+                        <option value="Active" selected={selectedProduct.isActive === true} onClick={() => setIsActive(true)}>Activate</option>
+                        <option value="Inactive" selected={selectedProduct.isActive === false} onClick={() => setIsActive(false)}>Deactivate</option>
                     </select>
                   </div>
 
@@ -507,14 +587,15 @@ function Manage_Shop() {
                 <div className="col-md supplier-prod-details-modal">
                     <h3 className="prod-details-titles">Product Details</h3>
 
-                    <label className="prod-details-labels" htmlFor="prodName">{selectedProduct.productName}</label>
-                    <input className="modal-input-box" type="text" name="prodName" id="prodName" />
+                    <label className="prod-details-labels" htmlFor="prodName">Product Name</label>
+                    <input className="modal-input-box" type="text" name="prodName" id="prodName" placeholder="Enter product name" defaultValue={selectedProduct.productName} />
 
                     <label className="prodDescription-label">Description</label>
                     <textarea 
                         className="form-control" 
                         aria-label="Product description" 
                         placeholder="Enter product description" 
+                        defaultValue={selectedProduct.description}
                         onChange={(e) => setProductDescription(e.target.value)} 
                     />
 
@@ -527,9 +608,9 @@ function Manage_Shop() {
                             style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem' }}
                             onChange={(e) => setSelectedDepartment(e.target.value)}
                         >
-                            <option defaultChecked>Select a Department</option>
+                            
                             {departments.map((department, index) => (
-                                <option key={index} value={department.departmentId}>
+                                <option key={index} value={department.departmentId} selected={selectedProduct.departmentId === department.departmentId}>
                                     {department.department_Name}
                                 </option>
                             ))}
@@ -544,7 +625,7 @@ function Manage_Shop() {
                             value="Male" 
                             name="gender"
                             id="departmentCheck1"
-                            defaultChecked={productCategory === 'Male'}
+                            defaultChecked={selectedProduct.category === 'Male'}
                             onClick={(e) => handleCategoryChange(e, 'Male')}
                         />
                         <label 
@@ -560,7 +641,7 @@ function Manage_Shop() {
                             value="Female" 
                             name="gender"
                             id="departmentCheck2"
-                            defaultChecked={productCategory === 'Female'}
+                            defaultChecked={selectedProduct.category === 'Female'}
                             onClick={(e) => handleCategoryChange(e, 'Female')}
                         />
                         <label 
@@ -576,7 +657,7 @@ function Manage_Shop() {
                             value="Unisex" 
                             name="gender"
                             id="departmentCheck3"
-                            defaultChecked={productCategory === 'Unisex'}
+                            defaultChecked={selectedProduct.category === 'Unisex'}
                             onClick={(e) => handleCategoryChange(e, 'Unisex')}
                         />
                         <label 
@@ -596,56 +677,40 @@ function Manage_Shop() {
                     >
                         <option value="0" selected>Select Type of Product</option>
                         {productTypes.map((productType, index) => (
-                            <option key={index} value={productType.productTypeId}>
+                            <option key={index} value={productType.productTypeId} selected={selectedProduct.productTypeId === productType.productTypeId}>
                                 {productType.product_Type}
                             </option>
                         ))}
                     </select>
 
-                    {/* GENDER OPTIONS */}
-                    <label className="prod-details-labels">Gender</label>
-                    <select name="prodGender" id="prodGender" style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem' }}>
-                        <option value="0" selected>Select a gender</option>
-                        <option value="1">Male</option>
-                        <option value="2">Female</option>
-                        <option value="3">Unisex</option>
-                    </select>
-
                     {/* SIZES AVAILABLE CHECKBOX */}
                     <label className="prod-details-labels">Sizes Available</label>
-                    <div className="suppliers-sizes-avail-checkbox">
-                    <div className="suppliers-sizes-avail-checkbox">
-                        {sizes.map((sizeObj, index) => (
-                            <div className="sizes-option" key={index}>
-                                <input 
-                                    className="form-control" 
-                                    type="text" 
-                                    value={sizeObj.size}
-                                    id="sizeCheck1"
-                                    placeholder="Enter size (e.g., S, M, L...)"
-                                    onChange={(e) => {
-                                        const newSize = e.target.value;
-                                        setSizes(sizes.map((s, i) => i === index ? { ...s, size: newSize } : s));
-                                    }}
-                                />
-                                <input 
-                                    className="form-control" 
-                                    type="number" 
-                                    name="prodSize" 
-                                    id="prodSize" 
-                                    placeholder="Enter quantity"
-                                    onChange={(e) => {
-                                        const newQuantity = e.target.value;
-                                        setSizes(sizes.map((s, i) => i === index ? { ...s, quantity: newQuantity } : s));
-                                    }}
-                                />
-                            </div>
-                        ))}
-                        <button className="addSizeBtn" onClick={addNewSizeInput}>Add Another Size</button>
+                <div className="suppliers-sizes-avail-checkbox">
+                  {Newsizes.map((sizeQty, index) => (
+                    <div key={index} className="supplier-size-avail-item">
+                      <input
+                        className="supplier-size-avail-checkbox"
+                        type="text"
+                        placeholder="Size"
+                        defaultValue={sizeQty.size}
+                        onChange={(e) => (sizeQty.size = e.target.value)}
+                      />
+                      <input
+                        className="supplier-size-avail-checkbox"
+                        type="text"
+                        placeholder="Quantity"
+                        defaultValue={sizeQty.quantity}
+                        onChange={(e) => (sizeQty.quantity = e.target.value)}
+                      />
+                      <span onClick={() => setNewSizes(Newsizes.filter((_, i) => i !== index))} style={{ cursor: "pointer", color: "red" }}>
+                        X
+                      </span>
                     </div>
-                    </div>
+                  ))}
+                </div>
+                <button className="addSizeBtn" onClick={addNewSizeInput2}>Add Size +</button>
                     <label className="prod-details-labels">Price</label>
-                    <input className="modal-input-box" type="text" name="prodPrice" id="prodPrice" />
+                    <input className="modal-input-box" type="text" name="prodPrice" id="prodPrice" placeholder="Enter product price" defaultValue={selectedProduct.price}/>
                 </div>
             </div>    
             </div>
