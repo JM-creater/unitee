@@ -177,12 +177,16 @@ const HandleOrderCanceled = (orderId) => {
               <div>
               <button 
                 className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" ? 'btn-secondary' : 'btn-danger'}`}
-                style={{ marginLeft: '30px' }} 
-                onClick={() => HandleOrderCanceled(notificationItem.orderId)}
-                disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied"}
-              >
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
+                  style={{ marginLeft: '30px' }} 
+                  onClick={() => HandleOrderCanceled(notificationItem.orderId)}
+                  disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
+                >
                 Cancel Order
               </button>
               </div>
@@ -272,11 +276,15 @@ const HandleOrderCanceled = (orderId) => {
               <div>
               <button 
                 className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" ? 'btn-secondary' : 'btn-danger'}`}
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
                 style={{ marginLeft: '30px' }} 
                 onClick={() => HandleOrderCanceled(notificationItem.orderId)}
                 disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied"}
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
               >
                 Cancel Order
               </button>
@@ -285,7 +293,7 @@ const HandleOrderCanceled = (orderId) => {
             );
           }
           const [placed, pending, approved, pickup, completed] = getActiveStatus(
-            Status[Object.keys(Status)[notificationItem.order.status - 1]]
+            notificationItem.order.status
           );
           return (
             <div key={index} className="card">
@@ -306,7 +314,7 @@ const HandleOrderCanceled = (orderId) => {
                     <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
                   </p>
                   <p>
-                    <span className="font-weight-bold">{notificationItem.order.estimateDate}</span>
+                    <span className="font-weight-bold">{formatDate(notificationItem.order.estimateDate)}</span>
                   </p>
                 </div>
               </div>
@@ -374,11 +382,17 @@ const HandleOrderCanceled = (orderId) => {
               </div>
               <div>
               <button 
-                className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" ? 'btn-secondary' : 'btn-danger'}`} 
-                style={{ marginLeft: '30px' }} 
-                onClick={() => HandleOrderCanceled(notificationItem.orderId)}
-                disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved"}
-              >
+                className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
+                  style={{ marginLeft: '30px' }} 
+                  onClick={() => HandleOrderCanceled(notificationItem.orderId)}
+                  disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
+                >
                 Cancel Order
               </button>
               </div>

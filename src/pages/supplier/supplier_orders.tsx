@@ -612,12 +612,12 @@ function Supplier_Orders () {
                             <table className="table">
                               <thead className="table-primary">
                                   <tr>
-                                  <th scope="col">Product Name</th>
-                                  <th scope="col">Product Type</th>
-                                  <th scope="col">Gender</th>
-                                  <th scope="col">Size</th>
-                                  <th scope="col">Quantity</th>
-                                  <th scope="col">Price</th>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col">Product Type</th>
+                                    <th scope="col">Gender</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Price</th>
                                   </tr>
                               </thead>
                               <tbody>
