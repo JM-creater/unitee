@@ -19,14 +19,14 @@ function Main() {
     interface Customer {
         image: string;
     }
-
+    
     const [customer, setCustomer] = useState<Customer | null>(null); 
     const [notifItem, setNotifItem] = useState([]);
     const [totalItems, setTotalItems] = useState<number | null>(null);
     const [cart, setCart] = useState([]);
-    const { userId,  } = useParams();
+    const { userId } = useParams();
     const navigate = useNavigate();
-
+    
     useEffect(() => {
         axios.get(`https://localhost:7017/Users/${userId}`)
         .then(response => {
@@ -34,31 +34,28 @@ function Main() {
         })
         .catch(error => {
             console.error(error);
-        })
+        });
     }, [userId]);
-
-
-    useEffect(() => {
-        const updateNotification = () => {
-            axios.get(`https://localhost:7017/Notification/${userId}`)
-                .then(response => {
-                    setNotifItem(response.data);
-                })
-                .catch(error => {
-                    console.error(error);
-                })
-        };
-        
-        notifEventEmitter.on("notifAdded", updateNotification)
     
+    const updateNotification = () => {
+        axios.get(`https://localhost:7017/Notification/unread/${userId}`)
+        .then(response => {
+            setNotifItem(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    };
+    
+    useEffect(() => {  
+        notifEventEmitter.on("notifAdded", updateNotification);
         updateNotification();
     
         return () => {
-            notifEventEmitter.on("notifAdded", updateNotification)
+            notifEventEmitter.off("notifAdded", updateNotification);
         };
     }, [userId]);
-
-
+    
     useEffect(() => {
         const updateCartCount = () => {
             axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
@@ -74,17 +71,25 @@ function Main() {
         cartEventEmitter.on("itemAddedToCart", updateCartCount);
         cartEventEmitter.on("cartEmptied", updateCartCount);
         cartEventEmitter.on("cartUpdated", updateCartCount);
-    
         updateCartCount();
     
         return () => {
-            cartEventEmitter.on("itemAddedToCart", updateCartCount);
-            cartEventEmitter.on("cartEmptied", updateCartCount);
-            cartEventEmitter.on("cartUpdated", updateCartCount);
+            cartEventEmitter.off("itemAddedToCart", updateCartCount);
+            cartEventEmitter.off("cartEmptied", updateCartCount);
+            cartEventEmitter.off("cartUpdated", updateCartCount);
         };
     }, [userId]);
     
-
+    const handleNotificationClick = () => {
+        axios.post(`https://localhost:7017/Notification/markRead/${userId}`)
+        .then(() => {
+            // setNotifItem([]);
+            updateNotification();
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }
 
     return <div className="main">
             <header className="header" style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
@@ -138,14 +143,11 @@ function Main() {
                         </div>
                     </div>
 
-
-                    <Link className="customer-nav-link" to='notif'>
-                    <div className="notif-icon-container">
-                        <Link to='notif'>
-                            <img className="nav-icon" src={ notification } />
-                            {notifItem !== null && notifItem.length > 0 && <span className="notif-count">{notifItem.length}</span>}
-                        </Link>
-                    </div>
+                    <Link className="customer-nav-link" to='notif' onClick={handleNotificationClick}>
+                        <div className="notif-icon-container">
+                            <img className="nav-icon" src={notification} />
+                            {notifItem.length > 0 && <span className="notif-count">{notifItem.length}</span>}
+                        </div>
                     </Link>
                     
                     <div className="col-md-1 dropdown">
@@ -165,7 +167,7 @@ function Main() {
                             <li><a className="dropdown-item">
                             <img className="dropdown-icon"  src={ profIcon } />VIEW PROFILE</a></li></Link>
 
-                        <Link className="customer-nav-droplink" to='orders'>
+                        <Link className="customer-nav-droplink" to='purchase_history'>
                             <li><a className="dropdown-item">
                             <img className="dropdown-icon" src={ orders } alt="" />PURCHASE HISTORY</a></li></Link>
 

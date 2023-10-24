@@ -30,10 +30,11 @@ body {
     margin-top: 90px;
     margin-bottom: 90px;
     border-radius: 10px;
-    width: 100%; /* Adjust the width as needed */
-    margin: 0 auto; /* Center the card horizontally */
-    /* margin-top: 40px */
+    width: 100%; 
+    margin: 0 auto;
 }
+
+
 
 .top {
     padding-top: 40px;
@@ -53,7 +54,7 @@ body {
 #progressbar li {
     list-style-type: none;
     font-size: 13px;
-    width: 25%;
+    width: 20%;
     float: left;
     position: relative;
     font-weight: 400;
@@ -80,7 +81,7 @@ body {
 /*ProgressBar connectors*/
 #progressbar li:after {
     content: '';
-    width: 100%;
+    width: 400px;
     height: 12px;
     background: #C5CAE9;
     position: absolute;

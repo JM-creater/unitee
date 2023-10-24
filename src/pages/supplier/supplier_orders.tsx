@@ -14,6 +14,7 @@ function Supplier_Orders () {
     };
 
     const Status = {
+      OrderPlaced: 'OrderPlaced',
       Pending: 'Pending',
       Approved: 'Approved',
       ForPickUp: 'ForPickUp',
@@ -66,7 +67,7 @@ function Supplier_Orders () {
           console.error(error)
         });
     }, []);
-
+    
     // Get Product Type Name
     const getProductTypeName = (productTypeId) => {
         const productType = productTypes.find(p => p.productTypeId === productTypeId);
@@ -75,6 +76,7 @@ function Supplier_Orders () {
 
     // Handle Approved Orders
     const HandleApprovedOrders = (orderId) => {
+      const CloseBtn = document.getElementById("btnClose");
       if (!singleApproval) {
         toast.error("Please check the Single Approval checkbox before approving.");
         return; 
@@ -97,6 +99,7 @@ function Supplier_Orders () {
           }
           toast.success("Order approved successfully");
           notifEventEmitter.emit("notifAdded")
+          CloseBtn.click();
         })
         .catch(error => {
             console.error(error);
@@ -106,6 +109,7 @@ function Supplier_Orders () {
 
     // Handle Denied Orders
     const HandleDeniedOrders = (orderId) => {
+      const CloseBtn = document.getElementById("btnClose");
       if (!singleApproval) {
         toast.error("Please check the Single Approval checkbox before denying.");
         return; 
@@ -118,10 +122,34 @@ function Supplier_Orders () {
             }
             toast.success("Order denied successfully");
             notifEventEmitter.emit("notifAdded")
+            CloseBtn.click();
         })
         .catch(error => {
             console.error(error);
             toast.error("Failed to deny the order. Please try again");
+        });
+    }
+
+    // Handle Pick Up Orders
+    const HandleForPickUpOrders = (orderId) => {
+      const CloseBtn = document.getElementById("btnClose");
+      if (!singleApproval) {
+        toast.error("Please check the Single Approval checkbox before picking up the order.");
+        return; 
+      }
+      axios.put(`https://localhost:7017/Order/forPickUp/${orderId}`)
+        .then(response => {
+          const updatedOrder = orders.find(order => order.Id === response.data.Id);
+            if (updatedOrder) {
+                Object.assign(updatedOrder, response.data);
+            }
+            toast.success("For pick up order success");
+            notifEventEmitter.emit("notifAdded")
+            CloseBtn.click();
+        })
+        .catch(error => {
+          console.error(error);
+            toast.error("Failed to pick up the order. Please try again");
         });
     }
 
@@ -207,7 +235,7 @@ function Supplier_Orders () {
                     <thead className='table align-middle'>
                         <tr className='thead-row'>
                             <th scope="col">Date</th>
-                            <th scope="col">Order ID</th>
+                            <th scope="col">Order No.</th>
                             <th scope="col">Number of Items</th>
                             <th scope="col">Total Amount</th>
                             <th scope="col">Status</th>
@@ -251,15 +279,29 @@ function Supplier_Orders () {
                         <th scope="col">Status</th>
                         </tr>
                     </thead>
-                    <tbody className="table-group-divider">
-                        {/* <tr>
-                            <th scope="row">08/28/2023</th>
-                            <td>2583792</td>
-                            <td>5</td>
-                            <td>PHP 1000</td>
-                            <td>Canceled</td>
-                        </tr> */}
-                    </tbody>
+                    {orders.length > 0 ? (
+                      orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.ForPickUp).map((orderItem, index) => (
+                        <tbody key={index} className="table-group-divider">
+                          <tr data-bs-toggle="modal" data-bs-target="#forPickUpOrderModal" onClick={() => setSelectedOrders(orderItem)}>
+                            <th scope="row">{formatDate(orderItem.dateCreated)}</th>
+                            <td>{orderItem.orderNumber}</td>
+                            <td>{orderItem.cart.items.length}</td>
+                            <td>₱{orderItem.total}</td>
+                            <td>{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                          </tr>
+                        </tbody>
+                      ))
+                    ) : (
+                      <tbody className="table-group-divider">
+                        <tr data-bs-toggle="modal" className="text-center">
+                          <td></td>
+                          <td></td>
+                          <td>No pick up orders available</td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    )}
                 </table>
             </div>
             <h4 className="order-status-label" id="supplier-completed-order">Completed Orders</h4>
@@ -275,15 +317,29 @@ function Supplier_Orders () {
                         <th scope="col">Status</th>
                         </tr>
                     </thead>
-                    <tbody className="table-group-divider">
-                        {/* <tr>
-                            <th scope="row">08/28/2023</th>
-                            <td>2583792</td>
-                            <td>5</td>
-                            <td>PHP 1000</td>
-                            <td>Claimed</td>
-                        </tr> */}
-                    </tbody>
+                    {orders.length > 0 ? (
+                      orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Completed).map((orderItem, index) => (
+                        <tbody key={index} className="table-group-divider">
+                          <tr data-bs-toggle="modal" data-bs-target="#forPickUpOrderModal" onClick={() => setSelectedOrders(orderItem)}>
+                            <th scope="row">{formatDate(orderItem.dateCreated)}</th>
+                            <td>{orderItem.orderNumber}</td>
+                            <td>{orderItem.cart.items.length}</td>
+                            <td>₱{orderItem.total}</td>
+                            <td>{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                          </tr>
+                        </tbody>
+                      ))
+                    ) : (
+                      <tbody className="table-group-divider">
+                        <tr data-bs-toggle="modal" className="text-center">
+                          <td></td>
+                          <td></td>
+                          <td>No completed orders available</td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    )}
                 </table>
             </div>
             <h4 className="order-status-label" id="supplier-cancelled-order">Cancelled Orders</h4>
@@ -299,15 +355,29 @@ function Supplier_Orders () {
                         <th scope="col">Status</th>
                         </tr>
                     </thead>
-                    <tbody className="table-group-divider">
-                        {/* <tr>
-                            <th scope="row">08/28/2023</th>
-                            <td>2583792</td>
-                            <td>5</td>
-                            <td>PHP 1000</td>
-                            <td>Canceled</td>
-                        </tr> */}
-                    </tbody>
+                    {orders.length > 0 ? (
+                      orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Canceled).map((orderItem, index) => (
+                        <tbody key={index} className="table-group-divider">
+                          <tr data-bs-toggle="modal" data-bs-target="#forPickUpOrderModal" onClick={() => setSelectedOrders(orderItem)}>
+                            <th scope="row">{formatDate(orderItem.dateCreated)}</th>
+                            <td>{orderItem.orderNumber}</td>
+                            <td>{orderItem.cart.items.length}</td>
+                            <td>₱{orderItem.total}</td>
+                            <td>{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                          </tr>
+                        </tbody>
+                      ))
+                    ) : (
+                      <tbody className="table-group-divider">
+                        <tr data-bs-toggle="modal" className="text-center">
+                          <td></td>
+                          <td></td>
+                          <td>No canceled orders available</td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    )}
                 </table>
             </div>
         </div>
@@ -329,13 +399,130 @@ function Supplier_Orders () {
                       Single Approval
                     </label>
                     <h1 className="modal-title" id="exampleModalLabel">Pending Order</h1>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose"></button>
                 </div>
                 <div className="modal-basta-container">
                     <span>Check pending order details</span>
                     <div className="modal-btns-container">
                         <button type="button" className="cancel-btn-modal" onClick={() => HandleDeniedOrders(selectedOrders.id)}>Deny</button>
                         <button type="button" className="save-prod-btn" onClick={() => HandleApprovedOrders(selectedOrders.id)}>Approve</button>
+                    </div>
+                </div>
+                    {selectedOrders && (
+                      <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
+                        {/* CUSTOMER DETAILS */}
+                        <div>
+                            <div className="order-details-customer">
+                                <h3 className="order-details-subtitle">Customer</h3>
+                                <div className="customer-details-container">
+                                    <div className="modal-details-label">
+                                        <span className="modal-label">ID Number</span>
+                                        <span className="modal-label">First Name</span>
+                                        <span className="modal-label">Last Name</span>
+                                        <span className="modal-label">Department</span>
+                                        <span className="modal-label">Gender</span>
+                                    </div>
+                                    <div className="modal-details-info">
+                                        <span className="modal-info">{selectedOrders.user.id}</span>
+                                        <span className="modal-info">{selectedOrders.user.firstName}</span>
+                                        <span className="modal-info">{selectedOrders.user.lastName}</span>
+                                        <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
+                                        <span className="modal-info">{selectedOrders.user.gender}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ORDER DETAILS */}
+                            <div className="modal-order-details-container">
+                                <h3 className="order-details-subtitle">Order Details</h3>
+                                <div className="order-details-container">
+                                    <div className="modal-details-label">
+                                        <span className="modal-label">Date</span>
+                                        <span className="modal-label">Order Number</span>
+                                        <span className="modal-label">Number of Items</span>
+                                        <span className="modal-label">Total Amount</span>
+                                        <span className="modal-label">Proof of Payment</span>
+                                        <span className="modal-label">Reference No.</span>
+                                        <span className="modal-label">Payment Type</span>
+                                    </div>
+                                    <div className="modal-details-info">
+                                      <span className="modal-info">{selectedOrders.dateCreated}</span>
+                                      <span className="modal-info">{selectedOrders.orderNumber}</span>
+                                      <span className="modal-info">{selectedOrders.cart.items.length}</span>
+                                      <span className="modal-info">₱{selectedOrders.total}</span>
+                                      <a 
+                                        className="modal-info" 
+                                        rel="noopener noreferrer" 
+                                        target="_blank" 
+                                        href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
+                                      >
+                                        {selectedOrders.proofOfPayment.split('\\').pop()}
+                                      </a>
+                                      <span className="modal-info">{selectedOrders.referenceId}</span>
+                                      <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* ITEM LIST */}
+                        <div className="modal-item-list">
+                          <h3 className="order-details-subtitle">Item List</h3>
+                          <div className="modal-item-list-table-wrapper">
+                            <table className="table">
+                              <thead className="table-primary">
+                                  <tr>
+                                  <th scope="col">Product Name</th>
+                                  <th scope="col">Product Type</th>
+                                  <th scope="col">Gender</th>
+                                  <th scope="col">Size</th>
+                                  <th scope="col">Quantity</th>
+                                  <th scope="col">Price</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                {selectedOrders.cart.items.map(item => (
+                                  <tr key={item.id}>
+                                    <th scope="row">{item.product.productName}</th>
+                                    <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                    <td>{item.product.category}</td>
+                                    <td>{item.sizeQuantity.size}</td>
+                                    <td>{item.quantity}</td>
+                                    <td>{item.product.price}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                    </div>
+                    )}
+            </div>
+        </div>
+    </div>
+    
+    {/* APPROVED ORDER DETAILS MODAL */}
+    <div className="modal fade" id="approvedOrderModal" tabIndex={-1} aria-labelledby="approvedOrderModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-fullscreen">
+            <div className="modal-content" style={{ padding:'20px' }}>
+                <div className="pending-header">
+                    <label style={{ fontSize: '18px', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
+                      <input 
+                        type="checkbox" 
+                        id="singleApprovalCheckbox" 
+                        checked={singleApproval} 
+                        onChange={() => setSingleApproval(prev => !prev)}
+                        style={{ marginRight: '8px', width: '20px', height: '20px' }}
+                      />
+                      Single Approval
+                    </label>
+                    <h1 className="modal-title" id="exampleModalLabel">Approved Order</h1>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose"></button>
+                </div>
+                <div className="modal-basta-container">
+                    <span>Check approved order details</span>
+                    <div className="modal-btns-container">
+                        <button type="button" className="save-prod-btn" onClick={() => HandleForPickUpOrders(selectedOrders.id)}>For Pick Up</button>
                     </div>
                 </div>
                     {selectedOrders && (
@@ -430,9 +617,9 @@ function Supplier_Orders () {
             </div>
         </div>
     </div>
-    
-    {/* APPROVED ORDER DETAILS MODAL */}
-    <div className="modal fade" id="approvedOrderModal" tabIndex={-1} aria-labelledby="approvedOrderModalLabel" aria-hidden="true">
+
+    {/* FOR PICK UP ORDER DETAILS MODAL */}
+    <div className="modal fade" id="forPickUpOrderModal" tabIndex={-1} aria-labelledby="forPickUpOrderModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-fullscreen">
             <div className="modal-content" style={{ padding:'20px' }}>
                 <div className="pending-header">
@@ -446,13 +633,13 @@ function Supplier_Orders () {
                       />
                       Single Approval
                     </label>
-                    <h1 className="modal-title" id="exampleModalLabel">Approved Order</h1>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h1 className="modal-title" id="exampleModalLabel">For Pick Up Orders</h1>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose"></button>
                 </div>
                 <div className="modal-basta-container">
-                    <span>Check approved order details</span>
+                    <span>Check for pick up orders details</span>
                     <div className="modal-btns-container">
-                        <button type="button" className="save-prod-btn">For Pick Up</button>
+                        <button type="button" className="save-prod-btn">Completed</button>
                     </div>
                 </div>
                     {selectedOrders && (
