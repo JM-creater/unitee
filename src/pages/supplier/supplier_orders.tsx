@@ -627,7 +627,7 @@ function Supplier_Orders () {
                                     <td>{getProductTypeName(item.product.productTypeId)}</td>
                                     <td>{item.product.category}</td>
                                     <td>{item.sizeQuantity.size}</td>
-                                    <td>{item.sizeQuantity.quantity}</td>
+                                    <td>{item.quantity}</td>
                                     <td>{item.product.price}</td>
                                   </tr>
                                 ))}
@@ -744,7 +744,7 @@ function Supplier_Orders () {
                                     <td>{getProductTypeName(item.product.productTypeId)}</td>
                                     <td>{item.product.category}</td>
                                     <td>{item.sizeQuantity.size}</td>
-                                    <td>{item.sizeQuantity.quantity}</td>
+                                    <td>{item.quantity}</td>
                                     <td>{item.product.price}</td>
                                   </tr>
                                 ))}
@@ -848,7 +848,7 @@ function Supplier_Orders () {
                                     <td>{getProductTypeName(item.product.productTypeId)}</td>
                                     <td>{item.product.category}</td>
                                     <td>{item.sizeQuantity.size}</td>
-                                    <td>{item.sizeQuantity.quantity}</td>
+                                    <td>{item.quantity}</td>
                                     <td>{item.product.price}</td>
                                   </tr>
                                 ))}

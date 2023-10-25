@@ -278,12 +278,14 @@ const HandleOrderCanceled = (orderId) => {
                 className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
                 style={{ marginLeft: '30px' }} 
                 onClick={() => HandleOrderCanceled(notificationItem.orderId)}
                 disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
               >
                 Cancel Order
@@ -314,7 +316,7 @@ const HandleOrderCanceled = (orderId) => {
                     <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
                   </p>
                   <p>
-                    <span className="font-weight-bold">{formatDate(notificationItem.order.estimateDate)}</span>
+                    <span className="font-weight-bold">Estimated pickup date for your order. {formatDate(notificationItem.order.estimateDate)}</span>
                   </p>
                 </div>
               </div>

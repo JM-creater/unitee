@@ -171,7 +171,7 @@ function Visit_Shop () {
             setCart(updatedCartResponse.data);
         })
         .catch(error => {
-            toast.error(error.response.data.message || "Failed to add item to cart");
+            toast.error(error);
         });
     };
 

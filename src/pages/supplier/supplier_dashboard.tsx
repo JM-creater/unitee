@@ -11,7 +11,13 @@ import { Link } from 'react-router-dom'
 function Supplier (){
 
     const Status = {
-        Pending: 'Pending'
+        OrderPlaced: 'OrderPlaced',
+        Pending: 'Pending',
+        Approved: 'Approved',
+        ForPickUp: 'ForPickUp',
+        Completed: 'Completed',
+        Canceled: 'Canceled',
+        Denied: 'Denied'
     }
 
     const [orders, setOrders] = useState([]);

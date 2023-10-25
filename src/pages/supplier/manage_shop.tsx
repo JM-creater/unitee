@@ -54,8 +54,6 @@ function Manage_Shop() {
   const [isActive, setIsActive] = useState(); 
   const [NewisActive, setNewIsActive] = useState(); 
 
-  
-  
 
   const { id } = useParams();
   const inputRef = useRef<HTMLInputElement>(null);
