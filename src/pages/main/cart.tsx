@@ -355,7 +355,7 @@ function Cart () {
                                         </select>
                                     </div>
                                     {/* Quantity */}
-                                    <div className="col-md-2 qua-container">
+                                    <div className="qua-container">
                                         <button className="minus-quantity-btn" onClick={() => HandleMinusQuantity(index, itemIndex)}>
                                             -
                                         </button>

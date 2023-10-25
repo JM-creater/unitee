@@ -302,7 +302,7 @@ const HandleOrderCanceled = (orderId) => {
               <div className="row d-flex justify-content-between px-3 top">
                 <div className="d-flex">
                   <h5>
-                    <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
+                    <span className="text-primary font-weight-bold" style={{ fontSize:'18px' }}>#{notificationItem.order.orderNumber}</span>
                   </h5>
                 </div>
                 <div className="d-flex flex-column text-sm-left">

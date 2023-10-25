@@ -129,7 +129,7 @@ function Main() {
                                         ))
                                     ))
                                 ) : (
-                                    <div className="empty-cart-message">Your cart is empty.</div>
+                                    <div className="pop-up-empty-cart-message">Your cart is empty.</div>
                                 )}
                                 <div className="cart-dropdown-footer">
                                     <div className="itemsTotal">
@@ -156,7 +156,7 @@ function Main() {
                             <img 
                                 className="imageProfile"
                                 src={`https://localhost:7017/${customer.image}`} 
-                                style={{ width:'100%', maxWidth:'35px', borderStyle:'solid', borderRadius:'50%', height: '35px' ,borderColor:'#D3D3D3' }} 
+                                style={{ width:'100%', maxWidth:'30px', borderStyle:'solid', borderRadius:'50%', maxHeight: '30px' ,borderColor:'#D3D3D3' }} 
                                 data-bs-toggle="dropdown" 
                                 aria-expanded="false" 
                             />

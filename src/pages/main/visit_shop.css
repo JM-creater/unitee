@@ -277,6 +277,10 @@
     align-items: center;
 }
 
+.prodModal-add-to-cart-btn:hover {
+    background-color: #005AAD;
+}
+
 .prodModal-cart-icon {
     width: 100%;
     max-width: 12px;

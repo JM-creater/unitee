@@ -69,6 +69,7 @@
 }
 
 .supplier-nav-link:hover {
+    text-decoration: none;
     background-color: #020654;
 }
 
