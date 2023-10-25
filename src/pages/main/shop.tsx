@@ -61,7 +61,7 @@ function Shop() {
                     <p className='shop-title2'>New Passion.</p>
                 </div> 
             </div>
-        <div className='col-md-9 shopLabel-text-container'>
+        <div className='col-md-10 shopLabel-text-container'>
             <h2 className='visit-shop-text'>Shops for you to visit</h2>
         </div>
             <div className='supplier-container'>
@@ -69,7 +69,7 @@ function Shop() {
                 <Link key={index} className='link-to-seller' to={`/shop/${userId}/visit_shop/${shops.id}`}>
                     <div className="supplier-card">
                         <img src={ `https://localhost:7017/${shops.image}` } className="supplierCard-img"/>
-                        <div className='col-md-5 shop-card-details'>
+                        <div className='col-md-8 shop-card-details'>
                             <h5 className="supplier-card-title">{shops.shopName}</h5>
                             <h5 className='shop-rating-card'><img className="ratingIcon" src={ starIcon }/>No Rating Yet</h5>
                             <h5 className='shop-rating-card'>{shops.address}</h5>
