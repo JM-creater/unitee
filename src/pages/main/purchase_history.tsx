@@ -26,20 +26,21 @@ function Purchase_History () {
     const [purchases, setPurchases] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [selectedPurchases, setSelectedPurchases] = useState(null);
-    const [rating, setRating] = useState(null);
+    const [ratingProduct, setRatingProduct] = useState(null);
+    const [ratingSupplier, setRatingSupplier] = useState(null);
     const { userId } = useParams();
 
-    const handleSubmitRating = async () => {
+    const handleRatingProduct = async () => {
         const closeBtn = document.getElementById("btnClose");
         
-        if (rating === null) {
+        if (ratingProduct === null) {
             alert('Please select a rating before submitting.');
             return;
         }
 
         const request = {
             UserId: userId,
-            Value: rating
+            Value: ratingProduct
         };
 
         try {
@@ -61,6 +62,58 @@ function Purchase_History () {
             console.error('Error submitting rating:', error);
         }
     };
+
+    const handleRatingSupplier = async () => {
+        const closeBtn = document.getElementById("btnClose");
+        
+        if (ratingSupplier === null) {
+            alert('Please select a rating before submitting.');
+            return;
+        }
+
+        const request = {
+            UserId: userId,
+            Value: ratingSupplier
+        };
+
+        try {
+            const response = await fetch('https://localhost:7017/Rating/rate-product', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request)
+            });
+
+            if (response.ok) {
+                toast.success('Rating submitted successfully.');
+                closeBtn.click();
+            } else {
+                const data = await response.json();
+                toast.error(`Error: ${data}`);
+            }
+
+        } catch (error) {
+            console.error('Error submitting rating:', error);
+        }
+    };
+
+    const handleBothRatings = async () => {
+        await handleRatingProduct();
+        await handleRatingSupplier();
+    
+        // Set flags in local storage to indicate that ratings have been submitted
+        localStorage.setItem('productRatingSubmitted', 'true');
+        localStorage.setItem('supplierRatingSubmitted', 'true');
+    };
+    
+    useEffect(() => {
+        // Check if ratings have been submitted
+        if (localStorage.getItem('productRatingSubmitted') === 'true') {
+            setRatingProduct(null); // or set to the specific value saved in local storage if desired
+        }
+        if (localStorage.getItem('supplierRatingSubmitted') === 'true') {
+            setRatingSupplier(null); // or set to the specific value saved in local storage if desired
+        }
+    }, []);
 
     useEffect(() => {
         axios.get(`https://localhost:7017/Order/${userId}`)
@@ -104,12 +157,34 @@ function Purchase_History () {
         closeBtn.click();
     }
 
+    // Update the Product Details Modal
+    useEffect(() => {
+        const modal = document.getElementById('viewProdDetailsModal') 
+        if (modal) {
+            modal.addEventListener('hidden.bs.modal', HandleCloseButton);
+
+            return () => {
+                modal.removeEventListener('hidden.bs.modal', HandleCloseButton);
+            };
+        }
+    }, []);
+
+    const HandleCloseButton = () => {
+        setRatingProduct(0);
+        setRatingSupplier(0);
+
+        const productStars = document.querySelectorAll('input[name="product-star-radio"]');
+        productStars.forEach(star => {
+            (star as HTMLInputElement).checked = false;
+        });
+    }
+
     return <div className="purchase-history-main-container">
         <div className='col-md-12 purchase-title-container'>
         <h1 className='history-title'>Purchase History</h1>
             <div className="col-md-10 search-date-container row" style={{ gap:'10px', marginTop:'20px'}}>
                 <div className='col-md-4 history-search-container' style={{  display:'flex', flexFlow:'row', paddingLeft:'20px'}}>
-                    <input className="form-control me-2" type="search" placeholder="Search by Order ID" aria-label="Search"/>
+                    <input className="form-control me-2" type="search" placeholder="Search by Order No." aria-label="Search"/>
                     <button className="col-md-3 btn btn-outline-primary" type="submit">Search</button>
                 </div>
 
@@ -126,12 +201,12 @@ function Purchase_History () {
                     <caption>end of list of purchase history</caption>
                     <thead className='table-dark align-middle'>
                         <tr className='thead-row'>
-                        <th scope="col">Date</th>
-                        <th scope="col">Order No.</th>
-                        <th scope="col">Shop</th>
-                        <th scope="col">Number of Items</th>
-                        <th scope="col">Total Amount</th>
-                        <th scope="col">Rating</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Order No.</th>
+                            <th scope="col">Shop</th>
+                            <th scope="col">Number of Items</th>
+                            <th scope="col">Total Amount</th>
+                            {/* <th scope="col">Rating</th> */}
                         </tr>
                     </thead>
                     {purchases.length > 0 ? (
@@ -143,7 +218,7 @@ function Purchase_History () {
                                     <td>{purchaseItem.cart.supplier.shopName}</td>
                                     <td>{purchaseItem.cart.items.length}</td>
                                     <td>{purchaseItem.total}</td>
-                                    <td>0</td>
+                                    {/* <td>0</td> */}
                                 </tr>
                             </tbody>
                         ))
@@ -152,7 +227,7 @@ function Purchase_History () {
                             <tr data-bs-toggle="modal" className="text-center">
                                 <td></td>
                                 <td></td>
-                                <td>No completed orders available</td>
+                                <td>No purchase history available</td>
                                 <td></td>
                                 <td></td>
                             </tr>
@@ -230,22 +305,30 @@ function Purchase_History () {
                                 <tbody className="table-group-divider">
                                     {selectedPurchases.cart.items.map(item => (
                                         <tr key={item.id}>
-                                            <th scope="row" data-bs-toggle="modal" data-bs-target="#cartProductModal"><img className="prod-image-cart" src={ `https://localhost:7017/${selectedPurchases.proofOfPayment}` }/>{item.product.productName}</th>
+                                            <th scope="row" data-bs-toggle="modal" data-bs-target="#cartProductModal"><img className="prod-image-cart" src={ `https://localhost:7017/${item.product.image}` }/>{item.product.productName}</th>
                                             <td>{getProductTypeName(item.product.productTypeId)}</td>
                                             <td>{item.product.category}</td>
                                             <td>{item.sizeQuantity.size}</td>
-                                            <td>{item.sizeQuantity.quantity}</td>
+                                            <td>{item.quantity}</td>
                                             <td>{item.product.price}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
-                        <input type="radio" id="star-4" name="star-radio" value="star-1"/>
+                        
                         <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Product Rating:</h3>
                         <div className="rating" style={{ display:'flex', justifyContent:'start' }}>
-                            <input type="radio" id="star-1" name="star-radio-" value="1" onChange={(e) => setRating(parseInt(e.target.value))} />
-                            <label htmlFor="star-1">
+                            <input 
+                                type="radio" 
+                                id="product-star-1" 
+                                name="product-star-radio" 
+                                value="1" 
+                                defaultChecked={ratingProduct === 1} 
+                                onChange={(e) => setRatingProduct(parseInt(e.target.value))}
+                                //disabled={ratingProduct === null}
+                            />
+                            <label htmlFor="product-star-1">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
                                     viewBox="0 0 24 24"
@@ -257,8 +340,16 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-2" name="star-radio" value="2" onChange={(e) => setRating(parseInt(e.target.value))} />
-                            <label htmlFor="star-2">
+                            <input 
+                                type="radio" 
+                                id="product-star-2" 
+                                name="product-star-radio" 
+                                value="2" 
+                                defaultChecked={ratingProduct === 2} 
+                                onChange={(e) => setRatingProduct(parseInt(e.target.value))}
+                                //disabled={ratingProduct === null}
+                            />
+                            <label htmlFor="product-star-2">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
                                     viewBox="0 0 24 24"
@@ -270,8 +361,16 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-3" name="star-radio" value="3" onChange={(e) => setRating(parseInt(e.target.value))} />
-                            <label htmlFor="star-3">
+                            <input 
+                                type="radio" 
+                                id="product-star-3" 
+                                name="product-star-radio" 
+                                value="3" 
+                                defaultChecked={ratingProduct === 3} 
+                                onChange={(e) => setRatingProduct(parseInt(e.target.value))}
+                                //disabled={ratingProduct === null}
+                            />
+                            <label htmlFor="product-star-3">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
                                     viewBox="0 0 24 24"
@@ -283,8 +382,16 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-4" name="star-radio" value="4" onChange={(e) => setRating(parseInt(e.target.value))} />
-                            <label htmlFor="star-4">
+                            <input 
+                                type="radio" 
+                                id="product-star-4" 
+                                name="product-star-radio" 
+                                value="4" 
+                                defaultChecked={ratingProduct === 4} 
+                                onChange={(e) => setRatingProduct(parseInt(e.target.value))}
+                                //disabled={ratingProduct === null}
+                            />
+                            <label htmlFor="product-star-4">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
                                     viewBox="0 0 24 24"
@@ -296,8 +403,16 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-5" name="star-radio" value="5" onChange={(e) => setRating(parseInt(e.target.value))} />
-                            <label htmlFor="star-5">
+                            <input 
+                                type="radio" 
+                                id="product-star-5" 
+                                name="product-star-radio" 
+                                value="5" 
+                                defaultChecked={ratingProduct === 5} 
+                                onChange={(e) => setRatingProduct(parseInt(e.target.value))}
+                                //disabled={ratingProduct === null}
+                            />
+                            <label htmlFor="product-star-5">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
                                     viewBox="0 0 24 24"
@@ -311,11 +426,18 @@ function Purchase_History () {
                             </label>
                         </div>
 
-                    
                         <h3 className='order-details-titles' style={{ marginTop:'30px' }}>Supplier Rating:</h3>
                         <div className="rating" style={{ display:'flex', justifyContent:'start' }}>
-                            <input type="radio" id="star-1" name="star-radio" value="1" onChange={(e) => setRating(parseInt(e.target.value))}/>
-                            <label htmlFor="star-1">
+                            <input 
+                                type="radio" 
+                                id="supplier-star-1" 
+                                name="supplier-star-radio" 
+                                value="1" 
+                                defaultChecked={ratingSupplier === 1} 
+                                onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
+                                //disabled={ratingSupplier === null}
+                            />
+                            <label htmlFor="supplier-star-1">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
                                     viewBox="0 0 24 24"
@@ -327,8 +449,16 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-2" name="star-radio" value="2" onChange={(e) => setRating(parseInt(e.target.value))}/>
-                            <label htmlFor="star-2">
+                            <input 
+                                type="radio" 
+                                id="supplier-star-2" 
+                                name="supplier-star-radio" 
+                                value="2" 
+                                defaultChecked={ratingSupplier === 2} 
+                                onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
+                                //disabled={ratingSupplier === null}
+                            />
+                            <label htmlFor="supplier-star-2">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
                                     viewBox="0 0 24 24"
@@ -340,8 +470,16 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-3" name="star-radio" value="3" onChange={(e) => setRating(parseInt(e.target.value))}/>
-                            <label htmlFor="star-3">
+                            <input 
+                                type="radio" 
+                                id="supplier-star-3" 
+                                name="supplier-star-radio" 
+                                value="3" 
+                                defaultChecked={ratingSupplier === 3} 
+                                onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
+                                //disabled={ratingSupplier === null}
+                            />
+                            <label htmlFor="supplier-star-3">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
                                     viewBox="0 0 24 24"
@@ -353,8 +491,16 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-5" name="star-radio" value="4" onChange={(e) => setRating(parseInt(e.target.value))}/>
-                            <label htmlFor="star-4">
+                            <input 
+                                type="radio" 
+                                id="supplier-star-4" 
+                                name="supplier-star-radio" 
+                                value="4" 
+                                defaultChecked={ratingSupplier === 4} 
+                                onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
+                                //disabled={ratingSupplier === null}
+                            />
+                            <label htmlFor="supplier-star-4">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
                                     viewBox="0 0 24 24"
@@ -366,8 +512,16 @@ function Purchase_History () {
                                     </path>
                                 </svg>
                             </label>
-                            <input type="radio" id="star-5" name="star-radio" value="5" onChange={(e) => setRating(parseInt(e.target.value))}/>
-                            <label htmlFor="star-5">
+                            <input 
+                                type="radio" 
+                                id="supplier-star-5" 
+                                name="supplier-star-radio" 
+                                value="5" 
+                                defaultChecked={ratingSupplier === 5} 
+                                onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
+                                //disabled={ratingSupplier === null}
+                            />
+                            <label htmlFor="supplier-star-5">
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
                                     viewBox="0 0 24 24"
@@ -380,6 +534,7 @@ function Purchase_History () {
                                 </svg>
                             </label>
                         </div>
+
 
                         </div>
                     </div>
@@ -395,8 +550,8 @@ function Purchase_History () {
                         </Link>
                     </div>
                 )}
-                <div className="modal-footer" onClick={handleSubmitRating}>
-                    <button className="proceed-Btn">
+                <div className="modal-footer">
+                    <button className="proceed-Btn" onClick={handleBothRatings}>
                         Submit
                     </button>
                 </div>
