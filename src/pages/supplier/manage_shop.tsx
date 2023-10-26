@@ -158,6 +158,43 @@ function Manage_Shop() {
     }
   }
 
+  //Handle Change Status
+  function handleChangeStatus(active) {
+    if (active == true) {
+    const userConfirmed = window.confirm('Do you want to Deactivate this product?');
+    if (userConfirmed) {
+      axios.put(`https://localhost:7017/Product/deactivate/${selectedProduct.productId}`)
+      window.location.reload();
+    } else {
+    }
+  } else if (active == false){
+    const userConfirmed = window.confirm('Do you want to Activate this product?');
+    if (userConfirmed) {
+            axios.put(`https://localhost:7017/Product/activate/${selectedProduct.productId}`)
+            window.location.reload();
+          } else {
+
+          }
+  }
+  }
+  
+  //Handle Change Button
+  function handleChangeButton(active) {
+    if ( active == true) {
+      const button = document.getElementById('btnStatus');
+          button.textContent='Deactivate';
+          button.style.color = 'white';
+          button.style.backgroundColor = 'red';
+          button.style.borderColor = 'red';
+    } else if (active == false) {
+          const button = document.getElementById('btnStatus');
+          button.textContent='Activate';
+          button.style.backgroundColor = 'green';
+          button.style.borderColor = 'green';
+          button.style.color = 'white';
+    }
+  }
+
   // Edit Item
   const handleEdit = () => {
     const selectedSizes = Newsizes.filter(({ size }) => size);
@@ -354,7 +391,7 @@ function Manage_Shop() {
         <div className="col-md-12 supplier-prods-container">
           {products.length > 0 ? (
               products.map((productItem, index) => (
-                  <div key={index} className="prod-card" data-bs-toggle="modal" data-bs-target="#editProductModal" 
+                  <div key={index} className="prod-card" data-bs-toggle="modal" data-bs-target="#editProductModal" style={{backgroundColor : productItem.isActive? '' : '#FF6961'}}
                   onClick={() => {
                     setSelectedProduct(productItem); 
                     setNewSizes(productItem.sizes); 
@@ -366,8 +403,7 @@ function Manage_Shop() {
                     setNewName(productItem.productName);
                     setNewProductType(productItem.productTypeId);
                     setNewSelectedImage(productItem.image);
-                    handleCategoryChange2(productItem.category)
-
+                    handleCategoryChange2(productItem.category);
                     }}>
                       <div className="prod-shop-image-container">
                           <img className="supplier-shop-prod-image" src={ productItem.image ? `https://localhost:7017/${productItem.image}` : prodImage }/>
@@ -580,8 +616,8 @@ function Manage_Shop() {
         {/* EDIT PRODUCT INFO MODAL */}
         <div className="modal fade" id="editProductModal" tabIndex={-1} aria-labelledby="editProductModalLabel" aria-hidden="true">
             <div className="modal-dialog modal-fullscreen">
-            {selectedProduct && (
-            <div className="modal-content" style={{ padding:'15px', height:'100vh' }}>
+            {selectedProduct &&  (
+            <div className="modal-content" style={{ padding:'15px', height:'100vh' }} onLoad={() => handleChangeButton(NewisActive)}>
             <div className="prod-header">
                 <h1 className="modal-title" id="exampleModalLabel">Edit Product</h1>
                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => window.location.reload()}></button>
@@ -589,6 +625,7 @@ function Manage_Shop() {
             <div className="modal-basta-container">
                 <span>You can edit product details here</span>
                 <div className="modal-btns-container">
+                    <button type="button" className="cancel-btn-modal" onClick={() => handleChangeStatus(NewisActive)} id="btnStatus"></button>
                     <button type="button" className="cancel-btn-modal" data-bs-dismiss="modal" onClick={() => window.location.reload()}>Cancel</button>
                     <button type="button" className="save-prod-btn" onClick={handleEdit}>Save</button>
                 </div>
