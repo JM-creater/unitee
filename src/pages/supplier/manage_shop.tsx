@@ -263,6 +263,7 @@ function Manage_Shop() {
                 },
               });
           });
+          window.location.reload();
 
           try {
             await Promise.all(sizeApiCalls);
@@ -638,7 +639,7 @@ function Manage_Shop() {
                           id="productImage2"
                           alt="Upload Product"
                           className="supplier-modal-addprod-img"
-                          src={`https://localhost:7017/${newSelectedImage}`}  
+                          src={newSelectedImage?`https://localhost:7017/${newSelectedImage}`: prodImage}  
                           onClick={handleImageClick}
                         />
                         <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
