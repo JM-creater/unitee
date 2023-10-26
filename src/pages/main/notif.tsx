@@ -432,7 +432,7 @@ const HandleOrderCanceled = (orderId) => {
 
 {/* RECEIPT MODAL  */}
 <div className="modal fade" id="viewReceiptModal" tabIndex={-1} aria-labelledby="viewReceiptModalLabel" aria-hidden="true">
-  <div className="modal-dialog modal-dialog-centered">
+  <div className="modal-dialog modal-dialog-centered modal-xl">
     <div className="modal-content">
       <div className="modal-body" style={{ padding:'30px' }}>
         <div className='modal-receipt-header'>
@@ -440,52 +440,92 @@ const HandleOrderCanceled = (orderId) => {
           <h2 className="modal-title" id="exampleModalLabel">Order Receipt</h2>
           <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        {/* ORDER DETAILS */}
-        <div className='notif-order-details-label'>
-          {/* CUSTOMER INFORMATION */}
-          <div className='customer-info-container-notif'>
-            <h4 className='notif-order-details-subTitle'>Customer Details</h4>
-            <div className='notif-order-details-container'>
-              <div className='notif-order-details-1'>
-                <span>ID Number</span>
-                <span>First Name</span>
-                <span>Last Name</span>
-                <span>Reference ID (GCash)</span>
-              </div>
+        <div className='order-details-itemList-container'>
+            {/* ORDER DETAILS */}
+          <div className='col-md-6 notif-order-details-label'>
+            {/* CUSTOMER INFORMATION */}
+            <div className='customer-info-container-notif'>
+              <h4 className='notif-order-details-subTitle'>Customer Details</h4>
+              <div className='notif-order-details-container'>
+                <div className='notif-order-details-1'>
+                  <span>ID Number</span>
+                  <span>First Name</span>
+                  <span>Last Name</span>
+                  <span>Reference ID (GCash)</span>
+                </div>
 
-              <div className='notif-order-details-2'>
-                <span>ID Number</span>
-                <span>First Name</span>
-                <span>Last Name</span>
-                <span>Reference ID (GCash)</span>
+                <div className='notif-order-details-2'>
+                  <span>ID Number</span>
+                  <span>First Name</span>
+                  <span>Last Name</span>
+                  <span>Reference ID (GCash)</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* ORDER INFORMATION */}
-          <div className='order-info-container-notif'>
-            <h4 className='notif-order-details-subTitle'>Order Details</h4>
-            <div className='notif-order-details-container'>
-              <div className='notif-order-details-1'>
-                <span>Order Number</span>
-                <span>Number of items</span>
-                <span>Shop Name</span>
-                <span>Total Amount</span>
-              </div>
+            {/* ORDER INFORMATION */}
+            <div className='order-info-container-notif'>
+              <h4 className='notif-order-details-subTitle'>Order Details</h4>
+              <div className='notif-order-details-container'>
+                <div className='notif-order-details-1'>
+                  <span>Order Number</span>
+                  <span>Number of items</span>
+                  <span>Shop Name</span>
+                </div>
 
-              <div className='notif-order-details-2'>
-                <span>Order Number</span>
-                <span>Number of items</span>
-                <span>Shop Name</span>
-                <span>Total Amount</span>
+                <div className='notif-order-details-2'>
+                  <span>Order Number</span>
+                  <span>Number of items</span>
+                  <span>Shop Name</span>
+                </div>
               </div>
             </div>
+
+            {/* TOTAL AMOUNT */}
+            <div className='order-info-totalAmount-receiptContainer'>
+              <div className='total-amount-text-receipt'>
+                <h4 className='totalAmount-receipt'>Total Amount</h4>
+              </div>
+              <div className='total-amount-receipt'>
+                <h4 className='receipt-amount'>4000</h4>
+              </div>
+            </div>
+          </div> 
+          {/* END OF ORDER DETAILS CONTAINER */}
+          <div className='col-md-6 item-list-container-receipt'>
+            <h4 style={{ borderBottom:'solid 2px #F0F0F0' }}>Item List</h4>
+            <table className="table align-middle receipt-itemList ">
+              <thead className='table-secondary'>
+                <tr>
+                  <th scope="col">Product Name</th>
+                  <th scope="col">Size</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Sample</th>
+                  <td>M</td>
+                  <td>5</td>
+                  <td>1243</td>
+                </tr>
+                <tr>
+                  <th scope="row">Sample</th>
+                  <td>S</td>
+                  <td>12</td>
+                  <td>123</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
+
+      
       </div>
       <div className="modal-footer">
-        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" className="btn btn-primary">Download</button>
+        <button type="button" className="close-receipt-btn" data-bs-dismiss="modal">Close</button>
+        <button type="button" className="save-receipt-btn">Download</button>
       </div>
     </div>
   </div>
