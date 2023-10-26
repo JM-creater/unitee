@@ -13,6 +13,7 @@ import { useParams } from "react-router-dom"
 import axios from "axios"
 import cartEventEmitter from "../../helpers/EventEmitter"
 import notifEventEmitter from "../../helpers/NotifEventEmitter"
+import navEmptyCartImg from "../../assets/images/icons/empty-cart.png"
 
 function Main() {
 
@@ -129,15 +130,17 @@ function Main() {
                                         ))
                                     ))
                                 ) : (
-                                    <div className="pop-up-empty-cart-message">Your cart is empty.</div>
+                                    <div className="pop-up-empty-cart-message">
+                                        <img className="pop-up-empty-cart-img" src={ navEmptyCartImg }/>
+                                        Your cart is empty.</div>
                                 )}
                                 <div className="cart-dropdown-footer">
                                     <div className="itemsTotal">
                                         {totalItems && totalItems > 0 ? `${totalItems} Products In Cart` : 'No Products In Cart'}
                                     </div>
-                                    <div className="hoverButton">
+                                    {/* <div className="hoverButton">
                                         <button onClick={() => navigate('cart')}>Go to Cart</button>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>

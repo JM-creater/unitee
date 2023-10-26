@@ -102,6 +102,10 @@
   text-decoration: none;
 }
 
+.register-to-login:hover {
+  text-decoration: none;
+}
+
 .back-to-login-btn-container {
   display: flex;
   justify-content: center;
