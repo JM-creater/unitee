@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { color } from "chart.js/helpers";
 
 function Manage_Shop() {
   interface Department {
@@ -371,7 +372,6 @@ function Manage_Shop() {
     }
     return sizes.reduce((acc, currentSize) => acc + Number(currentSize.quantity), 0);
   };
-
   
 
   return (
@@ -392,7 +392,7 @@ function Manage_Shop() {
         <div className="col-md-12 supplier-prods-container">
           {products.length > 0 ? (
               products.map((productItem, index) => (
-                  <div key={index} className="prod-card" data-bs-toggle="modal" data-bs-target="#editProductModal" style={{backgroundColor : productItem.isActive? '' : '#FF6961'}}
+                  <div key={index} className="prod-card" data-bs-toggle="modal" data-bs-target="#editProductModal" 
                   onClick={() => {
                     setSelectedProduct(productItem); 
                     setNewSizes(productItem.sizes); 
@@ -410,12 +410,12 @@ function Manage_Shop() {
                           <img className="supplier-shop-prod-image" src={ productItem.image ? `https://localhost:7017/${productItem.image}` : prodImage }/>
                       </div>
                       <div className="col-md-11 prod-shop-details">
-                          <span className="col-md-3 supplier-prod-details">{productItem.productName}</span>
-                          <span className="col-md-2 supplier-prod-details">{getProductTypeName(productItem.productTypeId)}</span>
-                          <span className="col-md-1 supplier-prod-details">{productItem.category}</span>
-                          <span className="col-md-1 supplier-prod-details">{totalStock(productItem.sizes)}</span>
-                          <span className="col-md-1 supplier-prod-details">{productItem.isActive ? 'Active' : 'Inactive'}</span>
-                          <h4 className="col-md-2 supplier-prod-price">₱{productItem.price}</h4>
+                          <span className="col-md-3 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{productItem.productName}</span>
+                          <span className="col-md-2 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{getProductTypeName(productItem.productTypeId)}</span>
+                          <span className="col-md-1 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{productItem.category}</span>
+                          <span className="col-md-1 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{totalStock(productItem.sizes)}</span>
+                          <span className="col-md-1 supplier-prod-details" style={{backgroundColor: productItem.isActive? 'green' : 'red', color: 'white'}}>{productItem.isActive ? 'Active' : 'Inactive'}</span>
+                          <h4 className="col-md-2 supplier-prod-price" style={{color: productItem.isActive? '' : 'black'}}>₱{productItem.price}</h4>
                       </div>
                   </div>
               ))
