@@ -28,6 +28,7 @@ import Manage_Shop from './pages/supplier/manage_shop'
 import Supplier_Main from './pages/supplier/supplier_main'
 import Supplier from './pages/supplier/supplier_dashboard'
 import Reports from './pages/supplier/reports'
+import Forgot_Password from './pages/forgot_password'
 
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
           <Route path='/accountType' element={ <AccountType /> }/>
           <Route path='/register' element={ <Register/> }/>
           <Route path='/register_supplier' element={ <RegisterSupplier/> }/>
+          <Route path='/forgot_password' element={ <Forgot_Password/> }/>
           <Route path='/shop/:userId' element={ <Main/> }>
             {/* <Route index element={ <Home/> }/> */}
             <Route index element={ <Shop/> }/>

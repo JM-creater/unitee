@@ -414,6 +414,84 @@ const HandleOrderCanceled = (orderId) => {
           </div>
         </div>
       )}
+
+<p className="d-inline-flex gap-1">
+  <a className="show-more-btn-notif" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+    Show more
+  </a>
+  {/* <button className="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    Button with data-bs-target
+  </button> */}
+</p>
+<div className="collapse" id="collapseExample">
+  <div className="card card-body">
+    {/* BUTTON TO VIEW RECEIPT */}
+    <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal">View Order Receipt</button>
+  </div>
+</div>
+
+{/* RECEIPT MODAL  */}
+<div className="modal fade" id="viewReceiptModal" tabIndex={-1} aria-labelledby="viewReceiptModalLabel" aria-hidden="true">
+  <div className="modal-dialog modal-dialog-centered">
+    <div className="modal-content">
+      <div className="modal-body" style={{ padding:'30px' }}>
+        <div className='modal-receipt-header'>
+          {/* HEADER */}
+          <h2 className="modal-title" id="exampleModalLabel">Order Receipt</h2>
+          <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        {/* ORDER DETAILS */}
+        <div className='notif-order-details-label'>
+          {/* CUSTOMER INFORMATION */}
+          <div className='customer-info-container-notif'>
+            <h4 className='notif-order-details-subTitle'>Customer Details</h4>
+            <div className='notif-order-details-container'>
+              <div className='notif-order-details-1'>
+                <span>ID Number</span>
+                <span>First Name</span>
+                <span>Last Name</span>
+                <span>Reference ID (GCash)</span>
+              </div>
+
+              <div className='notif-order-details-2'>
+                <span>ID Number</span>
+                <span>First Name</span>
+                <span>Last Name</span>
+                <span>Reference ID (GCash)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ORDER INFORMATION */}
+          <div className='order-info-container-notif'>
+            <h4 className='notif-order-details-subTitle'>Order Details</h4>
+            <div className='notif-order-details-container'>
+              <div className='notif-order-details-1'>
+                <span>Order Number</span>
+                <span>Number of items</span>
+                <span>Shop Name</span>
+                <span>Total Amount</span>
+              </div>
+
+              <div className='notif-order-details-2'>
+                <span>Order Number</span>
+                <span>Number of items</span>
+                <span>Shop Name</span>
+                <span>Total Amount</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="modal-footer">
+        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" className="btn btn-primary">Download</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
     </div>
   )
 }

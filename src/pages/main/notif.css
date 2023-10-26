@@ -145,3 +145,53 @@ body {
         width: 50%;
     }
 }
+
+.show-more-btn-notif {
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.show-more-btn-notif:hover {
+    text-decoration: none;
+}
+
+.modal-receipt-header {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+}
+
+.notif-order-details-label {
+    display: flex;
+    flex-flow: column;
+}
+
+.notif-order-details-container {
+    display: flex;
+    justify-content: start;
+}
+
+.notif-order-details-1, .notif-order-details-2 {
+    display: flex;
+    flex-flow: column;
+}
+
+.notif-order-details-subTitle {
+    margin-bottom: 15px;
+}
+
+.notif-order-details-2 {
+    margin-left: 5rem;
+}
+
+.notif-order-details-1 {
+    font-weight: 600;
+}
+
+.customer-info-container-notif, .order-info-container-notif {
+    border: solid #F0F0F0 2px;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 10px;
+
+}

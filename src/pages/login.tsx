@@ -4,6 +4,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import illustration from '../../src/assets/images/loginPic.png';
 import logo from '../../src/assets/images/unitee.png';
+import forgotPass from '../../src/assets/images/icons/forgot.png'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -134,6 +135,14 @@ function Login() {
           onChange={(e) => handlePassword(e.target.value)}
           onKeyDown={handleKeyDown}
         />
+
+        <div className='col-md-7 forgot-pwd-container'>
+          <Link to="/forgot_password">
+            <button className='forgot-pwd-btn'>
+              <img className='forgot-pwd-icon' src={ forgotPass }/>
+              Forgot Password</button>
+          </Link>
+        </div>
 
         <button className="col-md-7 login-btn" onClick={() => handleLogin()}>
           Log In
