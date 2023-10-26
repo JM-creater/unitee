@@ -140,6 +140,10 @@
     text-decoration: none;
 }
 
+.no-underline-link:hover {
+    text-decoration: none;
+}
+
 .no-pending-orders {
     display: flex;
     flex-direction: column;

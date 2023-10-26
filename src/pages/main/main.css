@@ -169,6 +169,11 @@
     text-decoration: none;
 }
 
+.customer-nav-droplink:hover {
+    text-decoration: none;
+    color: #FFAA00;
+}
+
 /* .customer-nav-link :hover{
     color: #FFAA00;
     text-decoration: none;

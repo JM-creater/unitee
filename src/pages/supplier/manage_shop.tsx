@@ -51,7 +51,6 @@ function Manage_Shop() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [newSelectedImage, setNewSelectedImage] = useState<File | null>(null);
 
-  const [isActive, setIsActive] = useState(); 
   const [NewisActive, setNewIsActive] = useState(); 
 
 
@@ -162,7 +161,6 @@ function Manage_Shop() {
       ,newPrice
       ,newSelectedImage
       ,newTypeId
-      ,NewisActive
       ,Newsizes
       ,selectedProduct.productId
     )
@@ -249,7 +247,6 @@ function Manage_Shop() {
     if (!productTypeId) errorMessages.push("Product Type is required");
     if (!departmentId) errorMessages.push("Department is required");
     if (!selectedImage) errorMessages.push("Image is required");
-    if (!isActive) errorMessages.push("Status is required");
     if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
 
     if (errorMessages.length > 0) {
@@ -266,7 +263,6 @@ function Manage_Shop() {
     formData.append("Price", productPrice);
     formData.append("Image", selectedImage as File);
     formData.append("SupplierId", id);
-    formData.append("isActive", isActive);
 
     axios
       .post("https://localhost:7017/Product/addproduct", formData, {
@@ -429,21 +425,6 @@ function Manage_Shop() {
                     onKeyDown={handleKeyDown}
                 />
               </div>
-
-                {/* status */}
-                <div className="supplier-prod-status">
-                  <h3 className="prod-info-titles">Status</h3>
-                    <select 
-                        name="prodStatus" 
-                        id="prodStatus" 
-                        style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem', marginTop:'5px' }}
-                        onKeyDown={handleKeyDown}
-                    >
-                      <option value="" defaultChecked>Select a Status</option>
-                      <option value="Active" onClick={() => setIsActive(true)}>Activate</option>
-                      <option value="Inactive" onClick={() => setIsActive(false)}>Deactivate</option>
-                    </select>
-                  </div>
                 </div>
 
                 <div className="col-md supplier-prod-details-modal">
@@ -624,7 +605,7 @@ function Manage_Shop() {
                         />
                     </div>
 
-                  {/* status */}
+                  {/* status
                 <div className="supplier-prod-status">
                     <h3 className="prod-info-titles">Status</h3>
                     <select 
@@ -639,7 +620,7 @@ function Manage_Shop() {
                       <option value="Active">Activate</option>
                       <option value="Inactive">Deactivate</option>
                     </select>
-                </div>
+                </div> */}
               </div>
 
                 <div className="col-md supplier-prod-details-modal">

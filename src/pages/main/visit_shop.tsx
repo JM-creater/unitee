@@ -23,6 +23,8 @@ function Visit_Shop () {
         image: string | null;
     }
 
+    const [ratings, setRatings] = useState(null);
+    const [averageRating, setAverageRating] = useState(0);
     const [, setCart] = useState([]);
     const [displayProduct, setDisplayProduct] = useState([]);
     const [departments, setDepartments] = useState<Department[]>([]);
@@ -226,6 +228,18 @@ function Visit_Shop () {
         }
     };
 
+    useEffect(() => {
+        axios.get(`https://localhost:7017/Rating/${userId}`)
+            .then((response) => {
+                setRatings(response.data);
+
+                const totalValue = response.data.reduce((acc, cur) => acc + cur.value, 0);
+                const avg = response.data.length > 0 ? (totalValue / response.data.length) : 0;
+                setAverageRating(+avg.toFixed(1)); 
+            }).catch((error) => {
+                console.error(error);
+            });
+    }, [userId]);
 
 
     return <div className="shop-main-container">
@@ -241,8 +255,14 @@ function Visit_Shop () {
                         <p>Loading supplier details...</p>
                     )}
                 </div>
-                <h5 className="visitShop-rating">
-                <img className="ratingIcon" src={ starIcon }/>No Rating Yet</h5>
+
+                {ratings && (
+                    <>
+                        <h5 className="visitShop-rating">
+                        <img className="ratingIcon" src={ starIcon }/>{averageRating}/5</h5>
+                    </>
+                )}
+                
                 
                 {/* Filter */}
                 <div className="prodFilter-container">
@@ -497,10 +517,16 @@ function Visit_Shop () {
                             </div>
                             <div className="col-md-5 prodModal-details-container">
                                 <h2 className="col-md-12 prodModal-Name">{selectedProduct.productName}</h2>
-                                <h5 className="prodModal-text">
-                                    <img className="prodModalRating-icon" src={ prodRatingModal }/>
-                                    No Rating Yet
-                                </h5>
+
+                                {ratings && (
+                                    <>
+                                        <h5 className="prodModal-text">
+                                            <img className="prodModalRating-icon" src={ prodRatingModal }/>
+                                            {averageRating}/5
+                                        </h5>
+                                    </>
+                                )}
+
                                 <h5 className="prodModal-text">
                                     {getDepartmentName(selectedProduct.departmentId)}
                                 </h5>

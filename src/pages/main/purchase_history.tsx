@@ -1,6 +1,6 @@
 import './purchase_history.css'
 //import product2 from "../../assets/images/shop_products/product2.png"
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import axios from 'axios';
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -30,7 +30,7 @@ function Purchase_History () {
     const [ratingSupplier, setRatingSupplier] = useState(null);
     const { userId } = useParams();
 
-    const handleRatingProduct = async () => {
+    const handleRatingProduct = async (productId, supplierId) => {
         const closeBtn = document.getElementById("btnClose");
         
         if (ratingProduct === null) {
@@ -40,6 +40,8 @@ function Purchase_History () {
 
         const request = {
             UserId: userId,
+            ProductId: productId,
+            SupplierId: supplierId,
             Value: ratingProduct
         };
 
@@ -63,7 +65,7 @@ function Purchase_History () {
         }
     };
 
-    const handleRatingSupplier = async () => {
+    const handleRatingSupplier = async (productId, supplierId) => {
         const closeBtn = document.getElementById("btnClose");
         
         if (ratingSupplier === null) {
@@ -73,6 +75,8 @@ function Purchase_History () {
 
         const request = {
             UserId: userId,
+            ProductId: productId,
+            SupplierId: supplierId,
             Value: ratingSupplier
         };
 
@@ -96,22 +100,25 @@ function Purchase_History () {
         }
     };
 
-    const handleBothRatings = async () => {
-        await handleRatingProduct();
-        await handleRatingSupplier();
+    const handleBothRatings = async (items) => {
+        if (!items || items.length === 0) {
+            alert('No items to rate.');
+            return;
+        }
     
-        // Set flags in local storage to indicate that ratings have been submitted
-        localStorage.setItem('productRatingSubmitted', 'true');
-        localStorage.setItem('supplierRatingSubmitted', 'true');
+        items.forEach((item) => {
+            handleRatingProduct(item.product.productId, item.product.supplierId);
+            handleRatingSupplier(item.product.productId, item.product.supplierId);
+        });
     };
     
+
     useEffect(() => {
-        // Check if ratings have been submitted
         if (localStorage.getItem('productRatingSubmitted') === 'true') {
-            setRatingProduct(null); // or set to the specific value saved in local storage if desired
+            setRatingProduct(null);
         }
         if (localStorage.getItem('supplierRatingSubmitted') === 'true') {
-            setRatingSupplier(null); // or set to the specific value saved in local storage if desired
+            setRatingSupplier(null);
         }
     }, []);
 
@@ -206,11 +213,12 @@ function Purchase_History () {
                             <th scope="col">Shop</th>
                             <th scope="col">Number of Items</th>
                             <th scope="col">Total Amount</th>
-                            {/* <th scope="col">Rating</th> */}
+                            <th scope="col">Rating</th>
                         </tr>
                     </thead>
                     {purchases.length > 0 ? (
-                        purchases.filter(purchase => Status[Object.keys(Status)[purchase.status - 1]] === Status.Completed).map((purchaseItem, index) => (
+                        purchases.filter(purchase => Status[Object.keys(Status)[purchase.status - 1]] === Status.Completed ||
+                            Status[Object.keys(Status)[purchase.status - 1]] === Status.Canceled).map((purchaseItem, index) => (
                             <tbody key={index} className="table-group-divider">
                                 <tr data-bs-toggle="modal" data-bs-target="#purchaseHistoryModal" onClick={() => setSelectedPurchases(purchaseItem)}>
                                     <th scope="row">{formatDate(purchaseItem.dateCreated)}</th>
@@ -218,7 +226,7 @@ function Purchase_History () {
                                     <td>{purchaseItem.cart.supplier.shopName}</td>
                                     <td>{purchaseItem.cart.items.length}</td>
                                     <td>{purchaseItem.total}</td>
-                                    {/* <td>0</td> */}
+                                    <td></td>
                                 </tr>
                             </tbody>
                         ))
@@ -317,222 +325,54 @@ function Purchase_History () {
                             </table>
                         </div>
                         
+                        {/* Product Rating */}
                         <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Product Rating:</h3>
                         <div className="rating" style={{ display:'flex', justifyContent:'start' }}>
-                            <input 
-                                type="radio" 
-                                id="product-star-1" 
-                                name="product-star-radio" 
-                                value="1" 
-                                defaultChecked={ratingProduct === 1} 
-                                onChange={(e) => setRatingProduct(parseInt(e.target.value))}
-                                //disabled={ratingProduct === null}
-                            />
-                            <label htmlFor="product-star-1">
-                                <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path 
-                                        pathLength="360" 
-                                        d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                                    >
-                                    </path>
-                                </svg>
-                            </label>
-                            <input 
-                                type="radio" 
-                                id="product-star-2" 
-                                name="product-star-radio" 
-                                value="2" 
-                                defaultChecked={ratingProduct === 2} 
-                                onChange={(e) => setRatingProduct(parseInt(e.target.value))}
-                                //disabled={ratingProduct === null}
-                            />
-                            <label htmlFor="product-star-2">
-                                <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path 
-                                        pathLength="360" 
-                                        d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                                    >
-                                    </path>
-                                </svg>
-                            </label>
-                            <input 
-                                type="radio" 
-                                id="product-star-3" 
-                                name="product-star-radio" 
-                                value="3" 
-                                defaultChecked={ratingProduct === 3} 
-                                onChange={(e) => setRatingProduct(parseInt(e.target.value))}
-                                //disabled={ratingProduct === null}
-                            />
-                            <label htmlFor="product-star-3">
-                                <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path 
-                                        pathLength="360" 
-                                        d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                                    >
-                                    </path>
-                                </svg>
-                            </label>
-                            <input 
-                                type="radio" 
-                                id="product-star-4" 
-                                name="product-star-radio" 
-                                value="4" 
-                                defaultChecked={ratingProduct === 4} 
-                                onChange={(e) => setRatingProduct(parseInt(e.target.value))}
-                                //disabled={ratingProduct === null}
-                            />
-                            <label htmlFor="product-star-4">
-                                <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path 
-                                        pathLength="360" 
-                                        d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                                    >
-                                    </path>
-                                </svg>
-                            </label>
-                            <input 
-                                type="radio" 
-                                id="product-star-5" 
-                                name="product-star-radio" 
-                                value="5" 
-                                defaultChecked={ratingProduct === 5} 
-                                onChange={(e) => setRatingProduct(parseInt(e.target.value))}
-                                //disabled={ratingProduct === null}
-                            />
-                            <label htmlFor="product-star-5">
-                                <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path 
-                                        pathLength="360" 
-                                        d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                                    >
-                                    </path>
-                                </svg>
-                            </label>
+                            {[...Array(5)].map((_, i) => {
+                                const ratingValue = i + 1;
+                                return (
+                                    <Fragment key={ratingValue}>
+                                        <input 
+                                            type="radio" 
+                                            id={`product-star-${ratingValue}`} 
+                                            name="product-star-radio" 
+                                            value={ratingValue} 
+                                            checked={ratingProduct === ratingValue} 
+                                            onChange={(e) => setRatingProduct(parseInt(e.target.value))}
+                                        />
+                                        <label htmlFor={`product-star-${ratingValue}`}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                <path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path>
+                                            </svg>
+                                        </label>
+                                    </Fragment>
+                                );
+                            })}
                         </div>
 
-                        <h3 className='order-details-titles' style={{ marginTop:'30px' }}>Supplier Rating:</h3>
+                        {/* Supplier Rating */}
+                        <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Supplier Rating:</h3>
                         <div className="rating" style={{ display:'flex', justifyContent:'start' }}>
-                            <input 
-                                type="radio" 
-                                id="supplier-star-1" 
-                                name="supplier-star-radio" 
-                                value="1" 
-                                defaultChecked={ratingSupplier === 1} 
-                                onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
-                                //disabled={ratingSupplier === null}
-                            />
-                            <label htmlFor="supplier-star-1">
-                                <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path 
-                                        pathLength="360" 
-                                        d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                                    >
-                                    </path>
-                                </svg>
-                            </label>
-                            <input 
-                                type="radio" 
-                                id="supplier-star-2" 
-                                name="supplier-star-radio" 
-                                value="2" 
-                                defaultChecked={ratingSupplier === 2} 
-                                onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
-                                //disabled={ratingSupplier === null}
-                            />
-                            <label htmlFor="supplier-star-2">
-                                <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path 
-                                        pathLength="360" 
-                                        d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                                    >
-                                    </path>
-                                </svg>
-                            </label>
-                            <input 
-                                type="radio" 
-                                id="supplier-star-3" 
-                                name="supplier-star-radio" 
-                                value="3" 
-                                defaultChecked={ratingSupplier === 3} 
-                                onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
-                                //disabled={ratingSupplier === null}
-                            />
-                            <label htmlFor="supplier-star-3">
-                                <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path 
-                                        pathLength="360" 
-                                        d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                                    >
-                                    </path>
-                                </svg>
-                            </label>
-                            <input 
-                                type="radio" 
-                                id="supplier-star-4" 
-                                name="supplier-star-radio" 
-                                value="4" 
-                                defaultChecked={ratingSupplier === 4} 
-                                onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
-                                //disabled={ratingSupplier === null}
-                            />
-                            <label htmlFor="supplier-star-4">
-                                <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path 
-                                        pathLength="360" 
-                                        d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                                    >
-                                    </path>
-                                </svg>
-                            </label>
-                            <input 
-                                type="radio" 
-                                id="supplier-star-5" 
-                                name="supplier-star-radio" 
-                                value="5" 
-                                defaultChecked={ratingSupplier === 5} 
-                                onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
-                                //disabled={ratingSupplier === null}
-                            />
-                            <label htmlFor="supplier-star-5">
-                                <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path 
-                                        pathLength="360" 
-                                        d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                                    >
-                                    </path>
-                                </svg>
-                            </label>
+                            {[...Array(5)].map((_, i) => {
+                                const supplierValue = i + 1;
+                                return (
+                                    <Fragment key={supplierValue}>
+                                        <input 
+                                            type="radio" 
+                                            id={`supplier-star-${supplierValue}`} 
+                                            name="supplier-star-radio" 
+                                            value={supplierValue} 
+                                            checked={ratingSupplier === supplierValue} 
+                                            onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
+                                        />
+                                        <label htmlFor={`supplier-star-${supplierValue}`}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                <path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path>
+                                            </svg>
+                                        </label>
+                                    </Fragment>
+                                );
+                            })}
                         </div>
 
 
@@ -541,19 +381,19 @@ function Purchase_History () {
                 </div>
                 )}
                 </div>
+                <div className="modal-footer">
                 {selectedPurchases && (
-                    <div className="modal-footer">
+                    <>
                         <Link to={`/shop/${userId}/visit_shop/${selectedPurchases.cart.supplier.id}`}>
                             <button className="proceed-Btn" onClick={handleCLose}>
                                 Buy Again
                             </button>
                         </Link>
-                    </div>
+                        <button className="proceed-Btn" style={{ background: '#FFAA00' }} onClick={() => handleBothRatings(selectedPurchases.cart.items)}>
+                            Submit
+                        </button>
+                    </>
                 )}
-                <div className="modal-footer">
-                    <button className="proceed-Btn" onClick={handleBothRatings}>
-                        Submit
-                    </button>
                 </div>
             </div>
         </div>
