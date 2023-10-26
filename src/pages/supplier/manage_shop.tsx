@@ -50,8 +50,7 @@ function Manage_Shop() {
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [newSelectedImage, setNewSelectedImage] = useState<File | null>(null);
-
-  const [isActive, setIsActive] = useState(); 
+  
   const [NewisActive, setNewIsActive] = useState(); 
 
 
@@ -66,6 +65,7 @@ function Manage_Shop() {
 
     const handleCategoryChange = (e, gender) => {
         if (productCategory === gender) {
+            setNewCategory('');
             setProductCategory('');
             e.target.checked = false; 
         } else {
@@ -73,6 +73,14 @@ function Manage_Shop() {
             setProductCategory(gender);
         }
     };
+
+    const handleCategoryChange2 = (gender) => {
+      if (productCategory === gender) {
+          setNewCategory('');
+      } else {
+          setNewCategory(gender);
+      }
+  };
 
   // Upload Image
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,7 +173,9 @@ function Manage_Shop() {
       ,NewisActive
       ,Newsizes
       ,selectedProduct.productId
+      , selectedProduct.description
     )
+    console.log(selectedProduct)
     const errorMessages = [];
 
     if (!newName) errorMessages.push("Product Name is required");
@@ -175,7 +185,6 @@ function Manage_Shop() {
     if (!newTypeId) errorMessages.push("Product Type is required");
     if (!newDepartmentId) errorMessages.push("Department is required");
     if (!newSelectedImage) errorMessages.push("Image is required");
-    if (!NewisActive) errorMessages.push("Status is required");
     if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
 
     if (errorMessages.length > 0) {
@@ -188,14 +197,13 @@ function Manage_Shop() {
     formData.append("DepartmentId", newDepartmentId);
     formData.append("ProductName", newName);
     formData.append("Description", newDescription);
-    formData.append("Category", productCategory);
+    formData.append("Category", newCategory);
     formData.append("Price", newPrice);
     formData.append("Image", newSelectedImage as File);
     formData.append("SupplierId", id);
-    formData.append("isActive", NewisActive);
 
     axios
-      .put(`https://localhost:7017/Product/updateProduct/${parseInt(selectedProduct.productId)}`, formData, {
+      .put(`https://localhost:7017/Product/${parseInt(selectedProduct.productId)}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -204,28 +212,26 @@ function Manage_Shop() {
         if (productResponse.status === 200) {
           toast.success("Successfully Updated An Item");
 
-          const sizeApiCalls = selectedSizes.map(({ size, quantity }) => {
+          const sizeApiCalls = selectedSizes.map(({ size, quantity, id}) => {
             const sizeFormData = new FormData();
-            sizeFormData.append("size", size);
-            sizeFormData.append("productId", selectedProduct.productId);
-            sizeFormData.append("quantity", quantity);
-
-            return axios.post(
-              "https://localhost:7017/SizeQuantity/createsizequantity",
+            sizeFormData.append("Size", size);
+            sizeFormData.append("Quantity", quantity);
+            console.log(id, size, quantity)
+            axios.put(
+              `https://localhost:7017/SizeQuantity/Update/${id}`,
               sizeFormData,
               {
                 headers: {
-                  "Content-Type": "application/json",
+                  "Content-Type": "multipart/form-data",
                 },
-              }
-            );
+              });
           });
 
           try {
             await Promise.all(sizeApiCalls);
           } catch (error) {
             console.log(productResponse.data);
-            toast.warning("Network error or server not responding while adding sizes");
+            toast.warning("Network error or server not responding while updating sizes");
           }
         } else {
           toast.error(productResponse.data.message);
@@ -249,7 +255,6 @@ function Manage_Shop() {
     if (!productTypeId) errorMessages.push("Product Type is required");
     if (!departmentId) errorMessages.push("Department is required");
     if (!selectedImage) errorMessages.push("Image is required");
-    if (!isActive) errorMessages.push("Status is required");
     if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
 
     if (errorMessages.length > 0) {
@@ -266,7 +271,6 @@ function Manage_Shop() {
     formData.append("Price", productPrice);
     formData.append("Image", selectedImage as File);
     formData.append("SupplierId", id);
-    formData.append("isActive", isActive);
 
     axios
       .post("https://localhost:7017/Product/addproduct", formData, {
@@ -362,6 +366,7 @@ function Manage_Shop() {
                     setNewName(productItem.productName);
                     setNewProductType(productItem.productTypeId);
                     setNewSelectedImage(productItem.image);
+                    handleCategoryChange2(productItem.category)
 
                     }}>
                       <div className="prod-shop-image-container">
@@ -430,20 +435,6 @@ function Manage_Shop() {
                 />
               </div>
 
-                {/* status */}
-                <div className="supplier-prod-status">
-                  <h3 className="prod-info-titles">Status</h3>
-                    <select 
-                        name="prodStatus" 
-                        id="prodStatus" 
-                        style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem', marginTop:'5px' }}
-                        onKeyDown={handleKeyDown}
-                    >
-                      <option value="" defaultChecked>Select a Status</option>
-                      <option value="Active" onClick={() => setIsActive(true)}>Activate</option>
-                      <option value="Inactive" onClick={() => setIsActive(false)}>Deactivate</option>
-                    </select>
-                  </div>
                 </div>
 
                 <div className="col-md supplier-prod-details-modal">
@@ -610,7 +601,7 @@ function Manage_Shop() {
                           id="productImage2"
                           alt="Upload Product"
                           className="supplier-modal-addprod-img"
-                          src={`https://localhost:7017/${newSelectedImage}`}
+                          src={`https://localhost:7017/${newSelectedImage}`}  
                           onClick={handleImageClick}
                         />
                         <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
@@ -623,23 +614,6 @@ function Manage_Shop() {
                           style={{ display: "none" }}
                         />
                     </div>
-
-                  {/* status */}
-                <div className="supplier-prod-status">
-                    <h3 className="prod-info-titles">Status</h3>
-                    <select 
-                        name="prodStatus" 
-                        id="prodStatus" 
-                        style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem', marginTop:'5px' }}
-                        onKeyDown={handleKeyDown}
-                        value={NewisActive? "Active" : "Inactive"}
-                        onChange={(e) => e.target.value == "Active"? setNewIsActive(true): setNewIsActive(false)}
-                    >
-                      <option value="" defaultChecked>Select a Status</option>
-                      <option value="Active">Activate</option>
-                      <option value="Inactive">Deactivate</option>
-                    </select>
-                </div>
               </div>
 
                 <div className="col-md supplier-prod-details-modal">
@@ -691,7 +665,7 @@ function Manage_Shop() {
                             name="gender"
                             id="departmentCheck1"
                             checked={newCategory === 'Male'}
-                            onChange={() => setNewCategory('Male')}
+                            onChange={(e) => handleCategoryChange(e, 'Male')}
                         />
                         <label 
                             className="departmentCheckLabel" 
@@ -707,7 +681,7 @@ function Manage_Shop() {
                             name="gender"
                             id="departmentCheck2"
                             checked={newCategory === 'Female'}
-                            onChange={() => setNewCategory('Female')}
+                            onChange={(e) => handleCategoryChange(e, 'Female')}
                         />
                         <label 
                             className="departmentCheckLabel" 
@@ -723,7 +697,7 @@ function Manage_Shop() {
                             name="gender"
                             id="departmentCheck3"
                             checked={newCategory === 'Unisex'}
-                            onChange={() => setNewCategory('Unisex')}
+                            onChange={(e) => handleCategoryChange(e, 'Unisex')}
                         />
                         <label 
                             className="departmentCheckLabel" 
