@@ -161,6 +161,18 @@ body {
     justify-content: space-between;
 }
 
+.receipt-num-header {
+    margin-left: 20px;
+    color: #004AAD;
+}
+
+.order-num-receipt-header-container {
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    align-items: center;
+}
+
 .notif-order-details-label {
     display: flex;
     flex-flow: column;

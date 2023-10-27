@@ -437,7 +437,10 @@ const HandleOrderCanceled = (orderId) => {
       <div className="modal-body" style={{ padding:'30px' }}>
         <div className='modal-receipt-header'>
           {/* HEADER */}
-          <h2 className="modal-title" id="exampleModalLabel">Order Receipt</h2>
+          <div className='order-num-receipt-header-container'>
+            <h2 className="modal-title" id="exampleModalLabel">Order Receipt</h2>
+            <h2 className='receipt-num-header'>#543523423</h2>
+          </div>
           <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div className='order-details-itemList-container'>
