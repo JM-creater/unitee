@@ -1,9 +1,10 @@
 .admin-dashboard-main-container {
+    height: 92vh;
+    width: 85vw;
+    padding: 20px;
+    background-color: #F0F0F0;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-flow: column;
-    padding-bottom: 30px;
+    flex-flow: row;
 }
 
 .card-container {

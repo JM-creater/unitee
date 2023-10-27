@@ -408,9 +408,9 @@ const HandleOrderCanceled = (orderId) => {
               className="icon"
               src={noNotification}
               alt="No Notifications Icon"
-              style={{ width: '100%', maxWidth:'100px', height: '100px' }}
+              style={{ width: '100%', maxWidth:'80px', height: '80px' }}
             />
-            <p className="font-weight-bold mt-3" style={{ fontSize: '24px' }}>No notifications available</p>
+            <p className="mt-3" style={{ fontSize: '18px' }}>No notifications available</p>
           </div>
         </div>
       )}

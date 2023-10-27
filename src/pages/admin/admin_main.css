@@ -1,45 +1,124 @@
-.admin-main {
-   padding-top: 20px;
-    padding-bottom: 20px;
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css');
+
+
+.admin-main-container {
+   display: flex;
+   flex-flow: row; 
 }
 
-.admin-header-button-container {
-    display: flex;
-    justify-content: end;
-    align-items: center;
-}
-
-.admin-nav-btn {
-    margin: 30px;
-    font-size: 15px;
-    font-weight: 600;
-}
-
-.admin-nav-link {
-    text-decoration: none;
-}
-
-.admin-nav-link :hover {
-    color: #FFAA00;
+.unitee-logo-admin {
+    width: 100%;
+    max-width: 100px;
+    height: 100%;
+    max-height: 100px;
+    cursor: pointer;
+    margin-left: 3rem;
 }
 
 .admin-header {
+    padding-top: 15px;
+    background-color: #004AAD;
+    justify-content: start;
     display: flex;
-    flex-flow: row;
-    justify-content: space-around;
+    align-items: center;
+    flex-flow: column;
+    width: 15%;
+    height: 100vh;
+    gap: 30px;
 }
 
-.admin-dropdown-nav-link {
-    text-decoration: none;
+.admin-nav-bar {
+    display: flex;
+    flex-flow: column;
+    gap: 5px;
+    height: fit-content;
+}
+
+.admin-nav-icon, .admin-nav-icon-users {
+    width: 100%;
+    width: 18px;
+    height: 18px;
+}
+
+.admin-nav-icon-users {
+    margin-right: 10px;
+}
+
+.admin-nav-text, .admin-nav-text-collapse {
+    color: white;
     font-size: 15px;
-    color: black;
+}
+
+.admin-nav-text-collapse {
+    margin-left: 2.5rem;
+}
+
+.admin-nav-link {
+    padding: 12px;
+    gap: 10px;
+    align-items: center;
+    text-decoration: none;
+    width: 14vw;
+    border-radius: 5px;
+    display: flex;
+    justify-content: start;
+}
+
+.admin-nav-link-users {
+    padding: 12px;
+    gap: 10px;
+    align-items: start;
+    text-decoration: none;
+    width: 14vw;
+    border-radius: 5px;
+    display: flex;
+    justify-content: start;
+    flex-flow: column;
+}
+
+.admin-nav-link:hover, .admin-nav-link-users:hover {
+    text-decoration: none;
+    background-color: #020654;
+}
+
+.users-collapse-container {
+    width: 15rem;
+    display: flex;
+    flex-flow: column;
+}
+
+.admin-collapse-users-link {
+    text-decoration: none;
+    border-radius: 5px;
+    padding: 10px 20px 10px 20px;
+}
+
+.admin-collapse-users-link:hover {
+    background-color: #004AAD;
+    text-decoration: none;
+}
+
+.admin-second-nav-container {
+    height: 8vh;
+    display: flex;
+    padding: 10px 20px 10px 20px;
+    justify-content: space-between;
+    align-items: center;
+    width: 85vw;
+}
+
+.admin-logout-container {
+    margin-top: 23rem;
+}
+
+.admin-logout-btn {
+    font-size: 15px;
     font-weight: 600;
 }
 
-.admin-dropdown-nav-link:hover {
-    color: #FFAA00;
-}
-
-.admin-header-container {
-    max-width: 100%;
+.logout-admin-icon {
+    width: 100%;
+    max-width: 15px;
+    height: 15px;
+    margin-right: 5px;
 }

@@ -1,0 +1,13 @@
+.unauthorized-main-container {
+    height: 100vh;
+    width: 100vw;
+    background-color: #004AAD;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.imgUnauthorized {
+    width: 100%;
+    max-width: 40rem;
+}
