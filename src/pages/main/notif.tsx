@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './notif.css';
-import noNotification from '../../assets/images/icons/no-spam.png'
+import noNotification from '../../assets/images/icons/notification-bell.png'
 import orderProcess from "../../assets/images/icons/orderProcessed.png"
 import axios from 'axios';
 import { useParams } from 'react-router';
@@ -408,7 +408,7 @@ const HandleOrderCanceled = (orderId) => {
               className="icon"
               src={noNotification}
               alt="No Notifications Icon"
-              style={{ width: '150px', height: '150px' }}
+              style={{ width: '100%', maxWidth:'100px', height: '100px' }}
             />
             <p className="font-weight-bold mt-3" style={{ fontSize: '24px' }}>No notifications available</p>
           </div>
