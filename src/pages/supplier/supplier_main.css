@@ -116,3 +116,17 @@
     justify-content: start;
     align-items: center;
 }
+
+.notifOrder-count {
+    position: absolute; 
+    margin-left: 100px;
+    margin-top: 3px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 1px 3px 3px 2px;
+    font-size: 10px;
+    min-width: 15px; 
+    max-height: 15px;
+    text-align: center; 
+}

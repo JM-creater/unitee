@@ -1,9 +1,21 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./supplier_orders.css"
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import notifEventEmitter from "../../helpers/NotifEventEmitter";
+import orderEventEmitter from "../../helpers/OrderEmitter";
+
+// eslint-disable-next-line react-refresh/only-export-components
+const StatusMapping = {
+  1: 'OrderPlaced',
+  2: 'Pending',
+  3: 'Approved',
+  4: 'ForPickUp',
+  5: 'Completed',
+  6: 'Canceled',
+  7: 'Denied'
+};
 
 function Supplier_Orders () {
 
@@ -20,7 +32,7 @@ function Supplier_Orders () {
       ForPickUp: 'ForPickUp',
       Completed: 'Completed',
       Canceled: 'Canceled',
-      Denied: 'Denied'
+      Denied: 'Denied',
     };
 
     const [orders, setOrders] = useState([]);
@@ -28,6 +40,20 @@ function Supplier_Orders () {
     const [productTypes, setProductTypes] = useState([]);
     const [selectedOrders, setSelectedOrders] = useState(null);
     const [singleApproval, setSingleApproval] = useState(false);
+    const [statusCounts, setStatusCounts] = useState({
+      Pending: 0,
+      Approved: 0,
+      ForPickUp: 0,
+      Completed: 0,
+      Canceled: 0
+    });
+    const statuses = [
+      { key: 'Pending', href: '#supplier-pending-order' },
+      { key: 'Approved', href: '#supplier-approved-order' },
+      { key: 'ForPickUp', href: '#supplier-for-pickup-order' },
+      { key: 'Completed', href: '#supplier-completed-order' },
+      { key: 'Canceled', href: '#supplier-canceled-order' },
+    ];
     const { id } = useParams();
 
     useEffect(() => {
@@ -185,30 +211,58 @@ function Supplier_Orders () {
       const minutes = String(date.getMinutes()).padStart(2, '0');
       return `${month}/${day}/${year} ${hours}:${minutes}`;
     };
+  
+    const updateNotification = useCallback(() => {
+      axios.get(`https://localhost:7017/Notification/supplierUnread/${id}`)
+        .then(response => {
+          const counts = { ...statusCounts };
+          response.data.forEach(notification => {
+            const orderStatus = notification.order && notification.order.status;
+            const statusName = StatusMapping[orderStatus];
+            if (counts[statusName] !== undefined) {
+              counts[statusName] += 1;
+            }
+          });
+          setStatusCounts(counts);
+        })
+        .catch(error => console.error(error));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id]);
+  
+    useEffect(() => {
+      orderEventEmitter.on("notifNewOrderAdded", updateNotification);
+      updateNotification();
 
+      return () => {
+        orderEventEmitter.off("notifNewOrderAdded", updateNotification);
+      };
+    }, [updateNotification]);
+    
 
     return <div className="manage-orders-main-container">
     <nav id="orders-nav" className="navbar px-3 mb-3" style={{ display:'flex', justifyContent:'end' }}>
-        <ul className="nav nav-pills">
-            <li className="nav-item supplier-nav-items">
-                <a className="nav-link" href="#supplier-pending-order">Pending</a>
-            </li>
-            <li className="nav-item supplier-nav-items">
-                <a className="nav-link" href="#supplier-approved-order">Approved</a>
-            </li>
-
-            <li className="nav-item supplier-nav-items">
-                <a className="nav-link" href="#supplier-forpickup-order">For Pick Up</a>
-            </li>
-
-            <li className="nav-item supplier-nav-items">
-                <a className="nav-link" href="#supplier-completed-order">Completed</a>
-            </li>
-
-            <li className="nav-item supplier-nav-items">
-                <a className="nav-link" href="#supplier-cancelled-order">Cancelled</a>
-            </li>
-        </ul>
+    <ul className="nav nav-pills">
+    {statuses.map((status) => (
+        <li key={status.key} className="nav-item supplier-nav-items">
+          <a className="nav-link" href={status.href}>
+            {status.key}
+            {statusCounts[status.key] > 0 && (
+              <span 
+                style={{ 
+                  color: 'white', 
+                  backgroundColor: 'red', 
+                  padding: '2px 7px', 
+                  borderRadius: '50%', 
+                  marginLeft: '5px' 
+                }}
+              >
+                {statusCounts[status.key]}
+              </span>
+            )}
+          </a>
+        </li>
+      ))}
+    </ul>
     </nav>
 
     <div className="orders-supplier-container">

@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router"
+import { Outlet } from "react-router"
 import { Link } from "react-router-dom"
 import './main.css'
 import logo from "../../assets/images/unitee.png"
@@ -8,11 +8,13 @@ import homeIcon from "../../assets/images/icons/homeIcon.png"
 import carts from "../../assets/images/icons/cartIcon.png"
 import orders from "../../assets/images/icons/shopping-bag-4.png"
 import notification from "../../assets/images/icons/notifIcon.png"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
 import cartEventEmitter from "../../helpers/EventEmitter"
 import notifEventEmitter from "../../helpers/NotifEventEmitter"
+import * as signalR from "@microsoft/signalr"
+import { toast } from "react-toastify"
 import navEmptyCartImg from "../../assets/images/icons/empty-cart.png"
 
 function Main() {
@@ -26,7 +28,6 @@ function Main() {
     const [totalItems, setTotalItems] = useState<number | null>(null);
     const [cart, setCart] = useState([]);
     const { userId } = useParams();
-    const navigate = useNavigate();
     
     useEffect(() => {
         axios.get(`https://localhost:7017/Users/${userId}`)
@@ -36,25 +37,6 @@ function Main() {
         .catch(error => {
             console.error(error);
         });
-    }, [userId]);
-    
-    const updateNotification = () => {
-        axios.get(`https://localhost:7017/Notification/unread/${userId}`)
-        .then(response => {
-            setNotifItem(response.data);
-        })
-        .catch(error => {
-            console.error(error);
-        });
-    };
-    
-    useEffect(() => {  
-        notifEventEmitter.on("notifAdded", updateNotification);
-        updateNotification();
-    
-        return () => {
-            notifEventEmitter.off("notifAdded", updateNotification);
-        };
     }, [userId]);
     
     useEffect(() => {
@@ -81,16 +63,55 @@ function Main() {
         };
     }, [userId]);
     
+    const updateNotification = useCallback(() => {
+        axios.get(`https://localhost:7017/Notification/unread/${userId}`)
+        .then(response => {
+            setNotifItem(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }, [userId]);
+    
+    useEffect(() => {  
+        notifEventEmitter.on("notifAdded", updateNotification);
+        updateNotification();
+    
+        return () => {
+            notifEventEmitter.off("notifAdded", updateNotification);
+        };
+    }, [userId, updateNotification]);
+
     const handleNotificationClick = () => {
         axios.post(`https://localhost:7017/Notification/markRead/${userId}`)
         .then(() => {
-            // setNotifItem([]);
             updateNotification();
         })
         .catch(error => {
             console.error(error);
         });
     }
+
+    useEffect(() => {
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:7017/notificationHub", {
+                skipNegotiation: true,
+                transport: signalR.HttpTransportType.WebSockets
+            })
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+    
+        connection.start().then(() => {
+            //console.log("Connected!");
+        }).catch(err => console.error("SignalR Connection Error: ", err));
+    
+        connection.on("OrderStatusUpdated", (message) => {
+            toast.success(`New Notification: ${message}`);
+            updateNotification();
+        });
+    
+    }, [updateNotification]);
+    
 
     return <div className="main">
             <header className="header" style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>

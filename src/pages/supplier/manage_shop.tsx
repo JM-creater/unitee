@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { color } from "chart.js/helpers";
 
 function Manage_Shop() {
   interface Department {
@@ -166,16 +165,13 @@ function Manage_Shop() {
     if (userConfirmed) {
       axios.put(`https://localhost:7017/Product/deactivate/${selectedProduct.productId}`)
       window.location.reload();
-    } else {
-    }
+    } else { /* empty */ }
   } else if (active == false){
     const userConfirmed = window.confirm('Do you want to Activate this product?');
     if (userConfirmed) {
             axios.put(`https://localhost:7017/Product/activate/${selectedProduct.productId}`)
             window.location.reload();
-          } else {
-
-          }
+          } else { /* empty */ }
   }
   }
   
@@ -208,7 +204,6 @@ function Manage_Shop() {
       ,newPrice
       ,newSelectedImage
       ,newTypeId
-      ,NewisActive
       ,Newsizes
       ,selectedProduct.productId
       , selectedProduct.description
@@ -471,7 +466,6 @@ function Manage_Shop() {
                     onKeyDown={handleKeyDown}
                 />
               </div>
-
                 </div>
 
                 <div className="col-md supplier-prod-details-modal">

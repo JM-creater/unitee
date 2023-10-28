@@ -9,10 +9,12 @@ import axios from 'axios'
 
 function Shop() {
 
+    const [ratings, setRatings] = useState(null);
+    const [averageRating, setAverageRating] = useState(0);
     const [shop, setShop] = useState([]);
     const [departmentId, setDepartmentId] = useState<number | null>(null);
     const { userId } = useParams();
-
+    
     
     useEffect(() => {
         axios.get(`https://localhost:7017/Users/UserDepartment/${userId}`)
@@ -34,6 +36,21 @@ function Shop() {
                 console.error(err);
             });
     }, [departmentId]);
+
+    useEffect(() => {
+        axios.get(`https://localhost:7017/Rating/${userId}`)
+            .then((response) => {
+                setRatings(response.data);
+
+                // Calculate average rating
+                const totalValue = response.data.reduce((acc, cur) => acc + cur.value, 0);
+                const avg = response.data.length > 0 ? (totalValue / response.data.length) : 0;
+                setAverageRating(+avg.toFixed(1)); 
+            }).catch((error) => {
+                console.error(error);
+            });
+    }, [userId]);
+    
 
     return <div className='container shop-contianer'>
         <div className='content-container'>
@@ -71,7 +88,14 @@ function Shop() {
                         <img src={ `https://localhost:7017/${shops.image}` } className="supplierCard-img"/>
                         <div className='col-md-8 shop-card-details'>
                             <h5 className="supplier-card-title">{shops.shopName}</h5>
-                            <h5 className='shop-rating-card'><img className="ratingIcon" src={ starIcon }/>No Rating Yet</h5>
+                            {ratings && (
+                                <>
+                                    <h5 className='shop-rating-card'>
+                                        <img className="ratingIcon" src={starIcon} alt="Star icon" />
+                                        {averageRating}/5
+                                    </h5>
+                                </>
+                            )}
                             <h5 className='shop-rating-card'>{shops.address}</h5>
                         </div>
                     </div>

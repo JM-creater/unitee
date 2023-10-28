@@ -7,6 +7,8 @@ import axios from "axios"
 import { Link, useParams } from "react-router-dom"
 import cartEventEmitter from "../../helpers/EventEmitter";
 import Modal from 'bootstrap/js/dist/modal';
+import notifEventEmitter from "../../helpers/NotifEventEmitter";
+import orderEventEmitter from "../../helpers/OrderEmitter";
 import emptyCartImg from "../../assets/images/icons/empty-cart.png"
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -189,6 +191,8 @@ function Cart () {
           axios.delete(`https://localhost:7017/Cart/deleteCart/${cartItem.id}`)
           toast.success("Successfully Ordered");
           cartEventEmitter.emit("cartEmptied");
+          notifEventEmitter.emit("notifAdded");
+          orderEventEmitter.emit("notifNewOrderAdded");
         } catch (error) {
           console.log("Error in placing order", error);
           toast.error(error.response.data);

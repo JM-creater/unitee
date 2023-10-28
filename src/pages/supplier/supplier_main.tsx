@@ -7,9 +7,12 @@ import dashboardSupplierIcon from "../../assets/images/icons/dashboard.png"
 import shopIcon from "../../assets/images/icons/store-2.png"
 import editprof from "../../assets/images/icons/user-avatar.png"
 import logoutIcon from "../../assets/images/icons/logout-4.png"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
+import notifEventEmitter from '../../helpers/NotifEventEmitter'
+// import * as signalR from "@microsoft/signalr"
+// import { toast } from 'react-toastify'
 
 function Supplier_Main (){
 
@@ -17,6 +20,7 @@ function Supplier_Main (){
         image: string;
     }
 
+    const [notifItem, setNotifItem] = useState([]);
     const [supplier, setSupplier] = useState<Supplier | null>(null); 
     const { id } = useParams();
 
@@ -28,7 +32,27 @@ function Supplier_Main (){
             .catch(error => {
                 console.error(error);
             })
-      }, [id]);
+    }, [id]);
+
+    const updateNotification = useCallback(() => {
+        axios.get(`https://localhost:7017/Notification/supplierUnread/${id}`)
+        .then(response => {
+            setNotifItem(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }, [id]);
+
+    useEffect(() => {  
+        notifEventEmitter.on("notifNewOrderAdded", updateNotification);
+        updateNotification();
+    
+        return () => {
+            notifEventEmitter.off("notifNewOrderAdded", updateNotification);
+        };
+    }, [id, updateNotification]);
+
 
     return <div className="supplier-main">
             <header className="supplier-header">
@@ -44,7 +68,8 @@ function Supplier_Main (){
                     </Link>
                     <Link to='supplier_orders' className="supplier-nav-link">
                         <img className="supplier-nav-icon" src={ ordersSupplierIcon }/>
-                        <span className="supplier-nav-text">Orders</span>
+                        <span className="supplier-nav-text">Orders {notifItem.length > 0 && <span className='notifOrder-count'>{notifItem.length}</span>}</span>
+                        
                     </Link>
                     <Link to='manage_shop' className="supplier-nav-link">
                         <img className="supplier-nav-icon" src={ shopIcon }/>
