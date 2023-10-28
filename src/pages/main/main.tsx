@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router"
+import { Outlet } from "react-router"
 import { Link } from "react-router-dom"
 import './main.css'
 import logo from "../../assets/images/unitee.png"
@@ -15,6 +15,7 @@ import cartEventEmitter from "../../helpers/EventEmitter"
 import notifEventEmitter from "../../helpers/NotifEventEmitter"
 import * as signalR from "@microsoft/signalr"
 import { toast } from "react-toastify"
+import navEmptyCartImg from "../../assets/images/icons/empty-cart.png"
 
 function Main() {
 
@@ -27,7 +28,6 @@ function Main() {
     const [totalItems, setTotalItems] = useState<number | null>(null);
     const [cart, setCart] = useState([]);
     const { userId } = useParams();
-    const navigate = useNavigate();
     
     useEffect(() => {
         axios.get(`https://localhost:7017/Users/${userId}`)
@@ -151,15 +151,17 @@ function Main() {
                                         ))
                                     ))
                                 ) : (
-                                    <div className="pop-up-empty-cart-message">Your cart is empty.</div>
+                                    <div className="pop-up-empty-cart-message">
+                                        <img className="pop-up-empty-cart-img" src={ navEmptyCartImg }/>
+                                        Your cart is empty.</div>
                                 )}
                                 <div className="cart-dropdown-footer">
                                     <div className="itemsTotal">
                                         {totalItems && totalItems > 0 ? `${totalItems} Products In Cart` : 'No Products In Cart'}
                                     </div>
-                                    <div className="hoverButton">
+                                    {/* <div className="hoverButton">
                                         <button onClick={() => navigate('cart')}>Go to Cart</button>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>

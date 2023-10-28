@@ -9,6 +9,7 @@ import cartEventEmitter from "../../helpers/EventEmitter";
 import Modal from 'bootstrap/js/dist/modal';
 import notifEventEmitter from "../../helpers/NotifEventEmitter";
 import orderEventEmitter from "../../helpers/OrderEmitter";
+import emptyCartImg from "../../assets/images/icons/empty-cart.png"
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const showToast = (message: string, type: number) => {
@@ -299,6 +300,7 @@ function Cart () {
           <div className="SHOPS-MAIN-CONTAINER">
             {cart.length === 0 ? (
                 <div className="empty-cart-message">
+                  <img className="empty-cart-img" src={ emptyCartImg }/>
                     Your cart is currently empty. Start shopping now!
                 </div>
             ) : (
@@ -407,6 +409,7 @@ function Cart () {
                       <h2 className="total-amount-text">Reference Id (GCash):</h2>
                       <input 
                         type="text" 
+                        style={{ borderRadius:'5px' }}
                         className="proof-payment-img" 
                         value={referenceId} 
                         onChange={(e) => handleReferenceId(e.target.value)} 

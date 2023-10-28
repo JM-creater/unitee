@@ -50,7 +50,7 @@ function Manage_Shop() {
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [newSelectedImage, setNewSelectedImage] = useState<File | null>(null);
-
+  
   const [NewisActive, setNewIsActive] = useState(); 
 
 
@@ -65,6 +65,7 @@ function Manage_Shop() {
 
     const handleCategoryChange = (e, gender) => {
         if (productCategory === gender) {
+            setNewCategory('');
             setProductCategory('');
             e.target.checked = false; 
         } else {
@@ -72,6 +73,14 @@ function Manage_Shop() {
             setProductCategory(gender);
         }
     };
+
+    const handleCategoryChange2 = (gender) => {
+      if (productCategory === gender) {
+          setNewCategory('');
+      } else {
+          setNewCategory(gender);
+      }
+  };
 
   // Upload Image
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,6 +158,40 @@ function Manage_Shop() {
     }
   }
 
+  //Handle Change Status
+  function handleChangeStatus(active) {
+    if (active == true) {
+    const userConfirmed = window.confirm('Do you want to Deactivate this product?');
+    if (userConfirmed) {
+      axios.put(`https://localhost:7017/Product/deactivate/${selectedProduct.productId}`)
+      window.location.reload();
+    } else { /* empty */ }
+  } else if (active == false){
+    const userConfirmed = window.confirm('Do you want to Activate this product?');
+    if (userConfirmed) {
+            axios.put(`https://localhost:7017/Product/activate/${selectedProduct.productId}`)
+            window.location.reload();
+          } else { /* empty */ }
+  }
+  }
+  
+  //Handle Change Button
+  function handleChangeButton(active) {
+    if ( active == true) {
+      const button = document.getElementById('btnStatus');
+          button.textContent='Deactivate';
+          button.style.color = 'white';
+          button.style.backgroundColor = 'red';
+          button.style.borderColor = 'red';
+    } else if (active == false) {
+          const button = document.getElementById('btnStatus');
+          button.textContent='Activate';
+          button.style.backgroundColor = 'green';
+          button.style.borderColor = 'green';
+          button.style.color = 'white';
+    }
+  }
+
   // Edit Item
   const handleEdit = () => {
     const selectedSizes = Newsizes.filter(({ size }) => size);
@@ -163,7 +206,9 @@ function Manage_Shop() {
       ,newTypeId
       ,Newsizes
       ,selectedProduct.productId
+      , selectedProduct.description
     )
+    console.log(selectedProduct)
     const errorMessages = [];
 
     if (!newName) errorMessages.push("Product Name is required");
@@ -173,7 +218,6 @@ function Manage_Shop() {
     if (!newTypeId) errorMessages.push("Product Type is required");
     if (!newDepartmentId) errorMessages.push("Department is required");
     if (!newSelectedImage) errorMessages.push("Image is required");
-    if (!NewisActive) errorMessages.push("Status is required");
     if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
 
     if (errorMessages.length > 0) {
@@ -186,14 +230,13 @@ function Manage_Shop() {
     formData.append("DepartmentId", newDepartmentId);
     formData.append("ProductName", newName);
     formData.append("Description", newDescription);
-    formData.append("Category", productCategory);
+    formData.append("Category", newCategory);
     formData.append("Price", newPrice);
     formData.append("Image", newSelectedImage as File);
     formData.append("SupplierId", id);
-    formData.append("isActive", NewisActive);
 
     axios
-      .put(`https://localhost:7017/Product/updateProduct/${parseInt(selectedProduct.productId)}`, formData, {
+      .put(`https://localhost:7017/Product/${parseInt(selectedProduct.productId)}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -202,28 +245,27 @@ function Manage_Shop() {
         if (productResponse.status === 200) {
           toast.success("Successfully Updated An Item");
 
-          const sizeApiCalls = selectedSizes.map(({ size, quantity }) => {
+          const sizeApiCalls = selectedSizes.map(({ size, quantity, id}) => {
             const sizeFormData = new FormData();
-            sizeFormData.append("size", size);
-            sizeFormData.append("productId", selectedProduct.productId);
-            sizeFormData.append("quantity", quantity);
-
-            return axios.post(
-              "https://localhost:7017/SizeQuantity/createsizequantity",
+            sizeFormData.append("Size", size);
+            sizeFormData.append("Quantity", quantity);
+            console.log(id, size, quantity)
+            axios.put(
+              `https://localhost:7017/SizeQuantity/Update/${id}`,
               sizeFormData,
               {
                 headers: {
-                  "Content-Type": "application/json",
+                  "Content-Type": "multipart/form-data",
                 },
-              }
-            );
+              });
           });
+          window.location.reload();
 
           try {
             await Promise.all(sizeApiCalls);
           } catch (error) {
             console.log(productResponse.data);
-            toast.warning("Network error or server not responding while adding sizes");
+            toast.warning("Network error or server not responding while updating sizes");
           }
         } else {
           toast.error(productResponse.data.message);
@@ -325,7 +367,6 @@ function Manage_Shop() {
     }
     return sizes.reduce((acc, currentSize) => acc + Number(currentSize.quantity), 0);
   };
-
   
 
   return (
@@ -358,18 +399,18 @@ function Manage_Shop() {
                     setNewName(productItem.productName);
                     setNewProductType(productItem.productTypeId);
                     setNewSelectedImage(productItem.image);
-
+                    handleCategoryChange2(productItem.category);
                     }}>
                       <div className="prod-shop-image-container">
                           <img className="supplier-shop-prod-image" src={ productItem.image ? `https://localhost:7017/${productItem.image}` : prodImage }/>
                       </div>
                       <div className="col-md-11 prod-shop-details">
-                          <span className="col-md-3 supplier-prod-details">{productItem.productName}</span>
-                          <span className="col-md-2 supplier-prod-details">{getProductTypeName(productItem.productTypeId)}</span>
-                          <span className="col-md-1 supplier-prod-details">{productItem.category}</span>
-                          <span className="col-md-1 supplier-prod-details">{totalStock(productItem.sizes)}</span>
-                          <span className="col-md-1 supplier-prod-details">{productItem.isActive ? 'Active' : 'Inactive'}</span>
-                          <h4 className="col-md-2 supplier-prod-price">₱{productItem.price}</h4>
+                          <span className="col-md-3 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{productItem.productName}</span>
+                          <span className="col-md-2 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{getProductTypeName(productItem.productTypeId)}</span>
+                          <span className="col-md-1 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{productItem.category}</span>
+                          <span className="col-md-1 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{totalStock(productItem.sizes)}</span>
+                          <span className="col-md-1 supplier-prod-details" style={{backgroundColor: productItem.isActive? 'green' : 'red', color: 'white'}}>{productItem.isActive ? 'Active' : 'Inactive'}</span>
+                          <h4 className="col-md-2 supplier-prod-price" style={{color: productItem.isActive? '' : 'black'}}>₱{productItem.price}</h4>
                       </div>
                   </div>
               ))
@@ -570,8 +611,8 @@ function Manage_Shop() {
         {/* EDIT PRODUCT INFO MODAL */}
         <div className="modal fade" id="editProductModal" tabIndex={-1} aria-labelledby="editProductModalLabel" aria-hidden="true">
             <div className="modal-dialog modal-fullscreen">
-            {selectedProduct && (
-            <div className="modal-content" style={{ padding:'15px', height:'100vh' }}>
+            {selectedProduct &&  (
+            <div className="modal-content" style={{ padding:'15px', height:'100vh' }} onLoad={() => handleChangeButton(NewisActive)}>
             <div className="prod-header">
                 <h1 className="modal-title" id="exampleModalLabel">Edit Product</h1>
                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => window.location.reload()}></button>
@@ -579,6 +620,7 @@ function Manage_Shop() {
             <div className="modal-basta-container">
                 <span>You can edit product details here</span>
                 <div className="modal-btns-container">
+                    <button type="button" className="cancel-btn-modal" onClick={() => handleChangeStatus(NewisActive)} id="btnStatus"></button>
                     <button type="button" className="cancel-btn-modal" data-bs-dismiss="modal" onClick={() => window.location.reload()}>Cancel</button>
                     <button type="button" className="save-prod-btn" onClick={handleEdit}>Save</button>
                 </div>
@@ -591,7 +633,7 @@ function Manage_Shop() {
                           id="productImage2"
                           alt="Upload Product"
                           className="supplier-modal-addprod-img"
-                          src={`https://localhost:7017/${newSelectedImage}`}
+                          src={newSelectedImage?`https://localhost:7017/${newSelectedImage}`: prodImage}  
                           onClick={handleImageClick}
                         />
                         <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
@@ -604,23 +646,6 @@ function Manage_Shop() {
                           style={{ display: "none" }}
                         />
                     </div>
-
-                  {/* status
-                <div className="supplier-prod-status">
-                    <h3 className="prod-info-titles">Status</h3>
-                    <select 
-                        name="prodStatus" 
-                        id="prodStatus" 
-                        style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem', marginTop:'5px' }}
-                        onKeyDown={handleKeyDown}
-                        value={NewisActive? "Active" : "Inactive"}
-                        onChange={(e) => e.target.value == "Active"? setNewIsActive(true): setNewIsActive(false)}
-                    >
-                      <option value="" defaultChecked>Select a Status</option>
-                      <option value="Active">Activate</option>
-                      <option value="Inactive">Deactivate</option>
-                    </select>
-                </div> */}
               </div>
 
                 <div className="col-md supplier-prod-details-modal">
@@ -672,7 +697,7 @@ function Manage_Shop() {
                             name="gender"
                             id="departmentCheck1"
                             checked={newCategory === 'Male'}
-                            onChange={() => setNewCategory('Male')}
+                            onChange={(e) => handleCategoryChange(e, 'Male')}
                         />
                         <label 
                             className="departmentCheckLabel" 
@@ -688,7 +713,7 @@ function Manage_Shop() {
                             name="gender"
                             id="departmentCheck2"
                             checked={newCategory === 'Female'}
-                            onChange={() => setNewCategory('Female')}
+                            onChange={(e) => handleCategoryChange(e, 'Female')}
                         />
                         <label 
                             className="departmentCheckLabel" 
@@ -704,7 +729,7 @@ function Manage_Shop() {
                             name="gender"
                             id="departmentCheck3"
                             checked={newCategory === 'Unisex'}
-                            onChange={() => setNewCategory('Unisex')}
+                            onChange={(e) => handleCategoryChange(e, 'Unisex')}
                         />
                         <label 
                             className="departmentCheckLabel" 
