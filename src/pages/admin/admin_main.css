@@ -12,7 +12,19 @@
     height: 100%;
     max-height: 100px;
     cursor: pointer;
-    margin-left: 3rem;
+}
+
+.adminLogo-container {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+.adminIcon {
+    width: 100%;
+    max-width: 30px;
+    height: 30px;
+    margin-right: 5px;
 }
 
 .admin-header {

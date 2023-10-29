@@ -2,6 +2,7 @@ import { Outlet } from "react-router"
 import { Link } from "react-router-dom"
 import logo from "../../assets/images/unitee.png"
 import dashboardAdminIcon from "../../assets/images/icons/dashboard.png"
+import adminIcon from "../../assets/images/icons/software-engineer.png"
 import './admin_main.css'
 import usersIcon from "../../assets/images/icons/profile.png"
 import adminReportsIcon from "../../assets/images/icons/reports.png"
@@ -13,7 +14,10 @@ function Admin_Main() {
     return <div className="admin-main-container">
         <header className="admin-header">
             <Link to='' className="col-md-12 admin-home-btn">
-                <img className="unitee-logo-admin" src={ logo }/>
+                <div className="adminLogo-container">
+                    <img className="adminIcon" src={ adminIcon }/>
+                    <img className="unitee-logo-admin" src={ logo }/>
+                </div>
             </Link>
 
             <div className="admin-nav-bar">
