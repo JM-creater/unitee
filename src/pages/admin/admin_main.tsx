@@ -27,28 +27,28 @@ function Admin_Main() {
                     <span className="admin-nav-text">Products</span>
                 </Link>
 
-                <Link className="admin-nav-link-users" to='' 
-                    type="button"
-                    data-bs-toggle="collapse" 
-                    data-bs-target="#usersCollapse" 
-                    aria-expanded="false" 
-                    aria-controls="usersCollapse">
-                    <div style={{ display:'flex', flexFlow:'row' }}>
-                        <img className="admin-nav-icon-users" src={ usersIcon }/>
-                        <span className="admin-nav-text">Users</span>
+                <div className="admin-nav-link"
+                data-bs-toggle="collapse"
+                href="#usersTypeCollapse" 
+                role="button" aria-expanded="false" 
+                aria-controls="usersTypeCollapse">
+                    <img className="admin-nav-icon" src={ usersIcon } alt="" />
+                    <span className="users-type-collapse">
+                    Users
+                    </span>
+                </div>
+
+                <div className="collapse" id="usersTypeCollapse">
+                    <div className="users-collapse-container" 
+                    style={{ backgroundColor:'#020654' }}>
+                        <Link className="admin-collapse-users-link" to='view_customers'>
+                            <span className="admin-nav-text-collapse">Customers</span>
+                        </Link>
+                        <Link className="admin-collapse-users-link" to='suppliers'>
+                            <span className="admin-nav-text-collapse">Suppliers</span>
+                        </Link>
                     </div>
-                    <div className="collapse"
-                    id="usersCollapse">
-                        <div className="users-collapse-container">
-                            <Link className="admin-collapse-users-link" to='view_customers'>
-                                <span className="admin-nav-text-collapse">Customers</span>
-                            </Link>
-                            <Link className="admin-collapse-users-link" to='view_customers'>
-                                <span className="admin-nav-text-collapse">Suppliers</span>
-                            </Link>
-                        </div>
-                    </div>
-                </Link>
+                </div>
                 
 
                 <Link className="admin-nav-link" to=''>

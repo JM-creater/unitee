@@ -14,6 +14,7 @@ import Visit_Shop from './pages/main/visit_shop'
 import Add_item from './pages/supplier/add_item'
 import Update_item from './pages/supplier/update_item'
 import Admin_Dashboard from './pages/admin/admin-dashboard'
+import Suppliers from './pages/admin/suppliers'
 import Add_supplier from './pages/admin/add_supplier'
 import View_Customers from './pages/admin/view_customers'
 import Admin_Main from './pages/admin/admin_main'
@@ -70,6 +71,7 @@ function App() {
           {/* ADMIN */}
           <Route path='admin_dashboard/:id' element={ <Admin_Main/> }>
             <Route index element={ <Admin_Dashboard /> } />
+            <Route path='suppliers' element={ <Suppliers/> }></Route>
             <Route path='view_customers' element={ <View_Customers/> }/>
             <Route path='add_supplier' element={ <Add_supplier/> }/>
           </Route>

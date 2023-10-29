@@ -44,13 +44,17 @@
     margin-right: 10px;
 }
 
-.admin-nav-text, .admin-nav-text-collapse {
+.admin-nav-text, .admin-nav-text-collapse, .users-type-collapse {
     color: white;
     font-size: 15px;
 }
 
 .admin-nav-text-collapse {
     margin-left: 2.5rem;
+}
+
+.users-btn-collapse {
+    background-color: #020654;
 }
 
 .admin-nav-link {
@@ -82,9 +86,16 @@
 }
 
 .users-collapse-container {
-    width: 15rem;
+    width: 17rem;
     display: flex;
     flex-flow: column;
+    background-color: #020654;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.users-type-collapse {
+    
 }
 
 .admin-collapse-users-link {

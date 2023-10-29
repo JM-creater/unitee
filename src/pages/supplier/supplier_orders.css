@@ -12,11 +12,13 @@
 .supplier-nav-items {
     font-size: 15px;
     margin: 5px;
-    border-radius: 5px;
+    border-radius: 20px;
+    border: solid 1px #004AAD;
 }
 
 .supplier-nav-items:hover {
     background-color: white;
+    font-weight: 600;
 }
 
 .orders-supplier-container {

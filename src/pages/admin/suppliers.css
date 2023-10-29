@@ -1,0 +1,71 @@
+.view-suppliers-main-container {
+    height: 92vh;
+    width: 85vw;
+    padding: 20px;
+    background-color: #F0F0F0;
+    display: flex;
+    flex-flow: column;
+}
+
+.filter-suppliers-container {
+    background-color: #A4BFEB;
+    border-radius: 5px;
+    color: #020654;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 15rem;
+    flex-flow: row;
+    width: 82vw;
+}
+
+.view-supp-header {
+    margin-bottom: 10px;
+}
+
+.supplierStatus-label, .supplierDepartment-label {
+    font-size: 15px;
+    margin-right: 5px;
+    color: #020654;
+}
+
+.sup-status-select, .sup-depa-select {
+    padding: 10px;
+}
+
+.status-filter-container {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+}
+
+.supp-icon {
+    width: 100%;
+    max-width: 50px;
+    margin-right: 10px;
+    background-color: white;
+    border-radius: 50%;
+    padding: 5px;
+}
+
+.supplier-list-wrapper {
+    overflow: auto;
+    scroll-behavior: smooth;
+    display: inline-block;
+}
+
+.validation-btn-supp {
+    border: solid 1px black;
+    color: black;
+    padding: 5px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.validation-icon {
+    width: 100%;
+    margin-right: 5px;
+    max-width: 12px;
+}
