@@ -17,6 +17,7 @@ import Admin_Dashboard from './pages/admin/admin-dashboard'
 import Suppliers from './pages/admin/suppliers'
 import Add_supplier from './pages/admin/add_supplier'
 import View_Customers from './pages/admin/view_customers'
+import Admin_Shops from './pages/admin/admin_shops'
 import Admin_Main from './pages/admin/admin_main'
 import Purchase_History from './pages/main/purchase_history'
 import AccountType from './pages/accountType'
@@ -73,6 +74,7 @@ function App() {
             <Route index element={ <Admin_Dashboard /> } />
             <Route path='suppliers' element={ <Suppliers/> }></Route>
             <Route path='view_customers' element={ <View_Customers/> }/>
+            <Route path='admin_shops' element={ <Admin_Shops/> }/>
             <Route path='add_supplier' element={ <Add_supplier/> }/>
           </Route>
           

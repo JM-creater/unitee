@@ -145,3 +145,30 @@
     height: 15px;
     margin-right: 5px;
 }
+
+.logout-confirmation-modalBody {
+    padding: 50px;
+    display: flex;
+    justify-content: center;
+    flex-flow: column;
+    height: 20rem;
+}
+
+.logout-btn-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.logout-btn, .cancel-logout-btn {
+    width: 15rem;
+    border: solid 1px black;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.logout-btn:hover, .cancel-logout-btn:hover {
+    padding: 9px;
+    font-weight: 700;
+    border: solid 2px black;
+}

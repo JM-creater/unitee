@@ -6,7 +6,8 @@ import adminIcon from "../../assets/images/icons/software-engineer.png"
 import './admin_main.css'
 import usersIcon from "../../assets/images/icons/profile.png"
 import adminReportsIcon from "../../assets/images/icons/reports.png"
-import productsIcon from "../../assets/images/icons/product.png"
+import shopsIcon from "../../assets/images/icons/store-2.png"
+// import productsIcon from "../../assets/images/icons/product.png"
 import logoutAdminIcon from "../../assets/images/icons/logout-4.png"
 
 
@@ -26,9 +27,9 @@ function Admin_Main() {
                     <span className="admin-nav-text">Dashboard</span>
                 </Link>
 
-                <Link className="admin-nav-link" to=''>
-                <img className="admin-nav-icon" src={ productsIcon }/>
-                    <span className="admin-nav-text">Products</span>
+                <Link className="admin-nav-link" to='admin_shops'>
+                <img className="admin-nav-icon" src={ shopsIcon }/>
+                    <span className="admin-nav-text">Shops</span>
                 </Link>
 
                 <div className="admin-nav-link"
@@ -71,12 +72,31 @@ function Admin_Main() {
                 </div>
 
                 <div>
-                    <Link to='/'>
-                        <button className="admin-logout-btn">
-                            <img className="logout-admin-icon" src={ logoutAdminIcon } alt="" />
-                            logout
-                        </button>
-                    </Link>
+                        <Link to='/'>
+                            <button className="admin-logout-btn"
+                            data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                <img className="logout-admin-icon" src={ logoutAdminIcon } alt="" />
+                                logout
+                            </button>
+                        </Link>
+
+
+                    {/* LOGOUT CONFIRMATION MODAL
+                    <div className="modal fade" id="exampleModal" tabIndex={1} aria-labelledby="exampleModalLabel" aria-hidden="false">
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content">
+                                <div className="logout-confirmation-modalBody">
+                                    <h3>Are you sure you want to logout?</h3>
+                                    <div className="col-md-12 logout-btn-container">
+                                        <Link to='/'>
+                                            <button className="logout-btn">Log Out</button>
+                                        </Link>
+                                        <button className="cancel-logout-btn">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> */}
                 </div>
             </div>
             <Outlet/>

@@ -285,8 +285,7 @@ function View_Customers () {
           Customers</h2>
           <div className='customer-status-filter-container'>
           <h3
-          style={{ marginRight:'30px', color:'#020654' }}
-          >Sort by</h3>
+          style={{ marginRight:'30px', color:'#020654' }}>Sort by</h3>
               <label className='customerStatus-label' htmlFor="status">Status:</label>
               <select
               style={{ padding: '10px', border: '2px solid white' }}
