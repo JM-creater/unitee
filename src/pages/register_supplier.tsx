@@ -273,7 +273,7 @@ function Register() {
                 value={confirmPassword}
               />
               <div className="col-md-5 profile-pic-register-container">
-                <span className="col-md-4 uploadImage-register-label">
+                <span className="col-md-5 uploadImage-register-label">
                   Profile Picture
                 </span>
                 <input type="file" onChange={handleImageProfile} />
@@ -283,20 +283,20 @@ function Register() {
                 <input type="file" onChange={handleImageBirChange} />
               </div>
               <div className="col-md-5 cityPermit-pic-register-container">
-                <span className="col-md-4 uploadImage-register-label">City Permit</span>
+                <span className="col-md-5 uploadImage-register-label">City Permit</span>
                 <input type="file" onChange={handleImageCityPermit} />
               </div>
               <div
                 className="col-md-10 schoolPermit-pic-register-container"
                 style={{ marginRight: '10px' }}
               >
-                <span className="col-md-1 uploadImage-register-label">
+                <span className="uploadImage-register-label" style={{ marginRight:'20px' }}>
                   School Permit
                 </span>
                 <input type="file" onChange={handleImageSchoolPermit} />
               </div>
               <div className="col-md-10 register-supplier-btn-container">
-                <button className="col-md-4 btn btn-lg btn-primary" type="submit">
+                <button className="col-md-4 btn btn-lg btn-primary" style={{ borderRadius:'20px' }} type="submit">
                   Register
                 </button>
               </div>

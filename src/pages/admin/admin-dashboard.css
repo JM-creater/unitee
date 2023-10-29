@@ -1,11 +1,12 @@
 .admin-dashboard-main-container {
+    height: 92vh;
+    width: 85vw;
+    padding: 20px;
+    background-color: #F0F0F0;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-flow: column;
-    padding-bottom: 30px;
+    flex-flow: row;
 }
-
+/*
 .card-container {
     display: flex;
     flex-flow: row; 
@@ -58,4 +59,45 @@
     justify-content: center;
     align-items: center;
     gap: 50px;
+} */
+
+/* NEW */
+.dash-admin-container {
+    display: flex;
+    flex-flow: row;
+    gap: 15px;
+    width: 52rem;
+}
+
+.shop-profile-top-seller {
+    width: 100%;
+    max-width: 60px;
+    border-radius: 50%;
+    border: solid white 4px;
+}
+
+.top-sellers-dash {
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    height: fit-content;
+    margin-top: 45px;
+}
+
+.top-shop-details-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.dash-top-sellers-container {
+    background-color: #F0F0F0;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-flow: row;
+    gap: 10px;
+    justify-content: space-between;
+    margin: 5px;
+    align-items: center;
 }

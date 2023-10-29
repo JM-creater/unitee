@@ -1,0 +1,19 @@
+.notFound-img {
+    width: 100%;
+    max-width: 300px;
+}
+
+.not-found-main-container {
+    background-color: #004AAD;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: column;
+}
+
+.notFound-text {
+    color: white;
+    font-weight: 300;
+    font-size: 40px;
+}

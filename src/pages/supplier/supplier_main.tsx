@@ -4,6 +4,7 @@ import logo from "../../assets/images/unitee.png"
 import { Link } from "react-router-dom"
 import ordersSupplierIcon from "../../assets/images/icons/orders.png"
 import dashboardSupplierIcon from "../../assets/images/icons/dashboard.png"
+import supplierReportsIcon from "../../assets/images/icons/reports.png"
 import shopIcon from "../../assets/images/icons/store-2.png"
 import editprof from "../../assets/images/icons/user-avatar.png"
 import logoutIcon from "../../assets/images/icons/logout-4.png"
@@ -76,7 +77,7 @@ function Supplier_Main (){
                         <span className="supplier-nav-text">Shop</span>
                     </Link>
                     <Link to='reports' className="supplier-nav-link">
-                        <img className="supplier-nav-icon" src={ shopIcon }/>
+                        <img className="supplier-nav-icon" src={ supplierReportsIcon }/>
                         <span className="supplier-nav-text">Reports</span>
                     </Link>
                 </div>
@@ -86,7 +87,7 @@ function Supplier_Main (){
                 <div className="second-nav-container">
 
                     <div className="search-container">
-                    <span className="fa fa-search form-control-feedback search-icon"></span>
+                        <span className="fa fa-search form-control-feedback search-icon"></span>
                         <input className="Supplier-SearchBar" type="text" placeholder="Search" />
                     </div>
                     {supplier && (
@@ -120,8 +121,6 @@ function Supplier_Main (){
                 </div>
                 <Outlet/>
             </div>
-
-            
         </div>
 }
 

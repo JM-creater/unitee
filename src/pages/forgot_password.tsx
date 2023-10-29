@@ -12,7 +12,7 @@ function Forgot_Password () {
                 <img className='webLogo' src={ uniteeLogo }/>
             </div>
             <div className='col-md-12 instruction-container'>
-                <h2 className='instruction-title'>Don't Worry</h2>
+                <h1 className='instruction-title'>Don't Worry</h1>
                 <span className='forgot-pwd-instruction'>We are here to help you to recover your password.
                 </span>
                 <span>Enter the ID Number and Email address you used when you registered.</span>

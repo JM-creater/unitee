@@ -323,7 +323,7 @@ function Register() {
               </div>
 
               <div className="col-md-5 profile-pic-register-container">
-                <span className="col-md-4 uploadImage-register-label">Profile Picture</span>
+                <span className="col-md-5 uploadImage-register-label">Profile Picture</span>
                 <input type="file" onChange={handleImage} />
               </div>
 
@@ -333,7 +333,7 @@ function Register() {
               </div>
 
               <div className="col-md-10 register-customer-btn-container">
-                <button className="col-md-4 btn btn-lg btn-primary" type="submit">
+                <button className="col-md-4 btn btn-lg btn-primary" style={{ borderRadius:'20px' }} type="submit">
                   Register
                 </button>
               </div>

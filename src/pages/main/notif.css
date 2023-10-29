@@ -161,6 +161,18 @@ body {
     justify-content: space-between;
 }
 
+.receipt-num-header {
+    margin-left: 20px;
+    color: #004AAD;
+}
+
+.order-num-receipt-header-container {
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    align-items: center;
+}
+
 .notif-order-details-label {
     display: flex;
     flex-flow: column;
@@ -168,7 +180,8 @@ body {
 
 .notif-order-details-container {
     display: flex;
-    justify-content: start;
+    justify-content: space-between;
+
 }
 
 .notif-order-details-1, .notif-order-details-2 {
@@ -181,7 +194,9 @@ body {
 }
 
 .notif-order-details-2 {
-    margin-left: 5rem;
+    margin-right: 2rem;
+    justify-content: end;
+    align-items: end;
 }
 
 .notif-order-details-1 {
@@ -193,5 +208,47 @@ body {
     padding: 10px;
     border-radius: 10px;
     margin-top: 10px;
+}
 
+.order-info-totalAmount-receiptContainer {
+    margin-top: 35px;
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+}
+
+.totalAmount-receipt {
+    font-weight: 400;
+    color: #004AAD;
+}
+
+.receipt-amount {
+    font-weight: 600;
+}
+
+.close-receipt-btn, .save-receipt-btn {
+    border: solid 1px black;
+    padding: 5px 15px 5px 15px;
+    border-radius: 15px;
+}
+
+.close-receipt-btn:hover {
+    background-color: #F0F0F0;
+}
+
+.save-receipt-btn:hover {
+    background-color: #004AAD;
+    border: solid 1px white;
+    color: white;
+}
+
+.order-details-itemList-container {
+    display: flex;
+    flex-flow: row;
+}
+
+.item-list-container-receipt {
+    border: solid 2px #f0f0f0;
+    padding: 15px;
+    border-radius: 10px;
 }

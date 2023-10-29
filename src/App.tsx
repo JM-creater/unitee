@@ -14,8 +14,10 @@ import Visit_Shop from './pages/main/visit_shop'
 import Add_item from './pages/supplier/add_item'
 import Update_item from './pages/supplier/update_item'
 import Admin_Dashboard from './pages/admin/admin-dashboard'
+import Suppliers from './pages/admin/suppliers'
 import Add_supplier from './pages/admin/add_supplier'
 import View_Customers from './pages/admin/view_customers'
+import Admin_Shops from './pages/admin/admin_shops'
 import Admin_Main from './pages/admin/admin_main'
 import Purchase_History from './pages/main/purchase_history'
 import AccountType from './pages/accountType'
@@ -29,6 +31,9 @@ import Supplier_Main from './pages/supplier/supplier_main'
 import Supplier from './pages/supplier/supplier_dashboard'
 import Reports from './pages/supplier/reports'
 import Forgot_Password from './pages/forgot_password'
+import Unauthorized_Error from './pages/common/unauthorized_error'
+import Internal_Error from './pages/common/internal_error'
+import Bad_Request from './pages/common/bad_request'
 
 
 function App() {
@@ -52,6 +57,7 @@ function App() {
           <Route path='/forgot_password' element={ <Forgot_Password/> }/>
           <Route path='/shop/:userId' element={ <Main/> }>
             {/* <Route index element={ <Home/> }/> */}
+             {/* CUSTOMER */}
             <Route index element={ <Shop/> }/>
             <Route path='visit_shop/:id' element={ <Visit_Shop/> }/>
             <Route path='cart' element={ <Cart/> }/>
@@ -63,12 +69,16 @@ function App() {
             {/* <Route path='/main/:id' element={ <Main/> }></Route>   */}
           </Route>
           
-          <Route path="/admin_main/:id" element={ <Admin_Main/> }>
+          {/* ADMIN */}
+          <Route path='admin_dashboard/:id' element={ <Admin_Main/> }>
             <Route index element={ <Admin_Dashboard /> } />
+            <Route path='suppliers' element={ <Suppliers/> }></Route>
             <Route path='view_customers' element={ <View_Customers/> }/>
+            <Route path='admin_shops' element={ <Admin_Shops/> }/>
             <Route path='add_supplier' element={ <Add_supplier/> }/>
           </Route>
           
+          {/* SUPPLIER */}
           <Route path='supplier_dashboard/:id' element={ <Supplier_Main/> }>
             <Route index element={ <Supplier/> }/>
             <Route path='supplier_orders' element={ <Supplier_Order/> }/>
@@ -80,8 +90,13 @@ function App() {
 
           {/* <Route path='supplier_items/:id' element={ <Supplier/> }></Route> */}
 
-          <Route path='/add_item/:id' element={ <Add_item/> }></Route>       
+          <Route path='/add_item/:id' element={ <Add_item/> }></Route>
+
+          {/* ERROR WEBPAGES        */}
           <Route path='*' element={ <NotFound/> }/>
+          {/* <Route path='*' element={ <Unauthorized_Error/> }/> */}
+          {/* <Route path='*' element={ <Internal_Error/> }/> */}
+          {/* <Route path='*' element={ <Bad_Request/> }/> */}
         </Routes>
       </Router>
     </div>
