@@ -69,3 +69,96 @@
     margin-right: 5px;
     max-width: 12px;
 }
+
+.shop-profile-img {
+    width: 100%;
+    max-width: 18rem;
+    border-radius: 50%;
+    margin-left: 2rem;
+}
+
+.supplier-info-modal-body {
+    padding: 20px;
+}
+
+.supplier-profile-container {
+    display: flex;
+    flex-flow: row;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.supplier-text-info {
+    margin-left: 30px;
+}
+
+.supplier-info-container {
+    display: flex;
+    flex-flow: row;
+    width: 40rem;
+    justify-content: space-between;
+}
+
+.info-2-supp {
+    display: flex;
+    justify-content: end;
+}
+
+.edit-supplier-btn {
+    border: solid 1px black;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 5px;
+  
+}
+
+.permits-link {
+    font-size: 15px;
+    font-weight: 500;
+    padding: 10px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.permits-link:hover {
+    background-color: #f0f0f0;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.supp-collapse-btn-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-flow: column;
+}
+
+.changePassLabel {
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.input-changePass {
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.saveChanges-btn-container {
+    display: flex;
+    justify-content: end;
+    align-items: end;
+}
+
+.saveChanges-btn {
+    padding: 10px;
+    border: solid 2px black;
+    border-radius: 10px;
+    margin-top: 3rem;
+    width: 10rem;
+}
+
+.saveChanges-btn:hover {
+    background-color: #020654;
+    color: white;
+}
