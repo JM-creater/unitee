@@ -330,6 +330,7 @@ function View_Customers () {
       <th scope="col">Customer ID</th>
           <th scope="col">First Name</th>
           <th scope="col">Last Name</th>
+          <th scope="col">Gender</th>
           <th scope="col">Department</th>
           <th scope="col">Email</th>
           <th scope="col">Phone Number</th>
@@ -340,6 +341,7 @@ function View_Customers () {
   <tbody>
       <tr>
       <th scope="row" data-bs-toggle="modal" data-bs-target="#customerInfoModal">1</th>
+      <td data-bs-toggle="modal" data-bs-target="#customerInfoModal">Mark</td>
       <td data-bs-toggle="modal" data-bs-target="#customerInfoModal">Mark</td>
       <td data-bs-toggle="modal" data-bs-target="#customerInfoModal">Otto</td>
       <td data-bs-toggle="modal" data-bs-target="#customerInfoModal">Otto</td>
@@ -352,6 +354,7 @@ function View_Customers () {
       </tr>
       <tr>
       <th scope="row" data-bs-toggle="modal" data-bs-target="#customerInfoModal">1</th>
+      <td data-bs-toggle="modal" data-bs-target="#customerInfoModal">Mark</td>
       <td data-bs-toggle="modal" data-bs-target="#customerInfoModal">Mark</td>
       <td data-bs-toggle="modal" data-bs-target="#customerInfoModal">Otto</td>
       <td data-bs-toggle="modal" data-bs-target="#customerInfoModal">Otto</td>
