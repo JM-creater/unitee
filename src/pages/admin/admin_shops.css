@@ -7,6 +7,12 @@
     flex-flow: column;
 }
 
+.shopProfileImgCard {
+    width: 100%;
+    max-width: 10rem;
+    border-radius: 5px;
+}
+
 .admin-shops-header {
     padding: 10px;
     width: 82vw;
@@ -29,17 +35,9 @@
     flex-flow: row;
     max-width: 85vw;
     flex-wrap: wrap;
-    gap: 20px;
     overflow-y: auto;
     scroll-behavior: smooth;
     padding: 10px;
-}
-
-.shopImgCard {
-    width: 100%;
-    max-width: 100px;
-    height: 100px;
-    border-radius: 5px;
 }
 
 .admin-shop-card {
@@ -61,4 +59,97 @@
     display: flex;
     align-items: start;
     flex-flow: column;
+}
+
+/* VIEW PRODUCTS MODAL */
+.viewProds-modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.productList-modalBody {
+    display: flex;
+    flex-flow: row;
+    justify-content: start;
+    align-items: start;
+    gap: 20px;
+}
+
+.admin-viewProds-card {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-prodFilter-container {
+    border-top: solid 3px white;
+    padding: 15px;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #F0F0F0;
+    width: 20vw;
+    border-radius: 10px;
+}
+
+.adminShop-prods-container {
+    width: 80%;
+    height: 80vh;
+    display: flex;
+    overflow-y: auto;
+    flex-wrap: wrap;
+    scroll-behavior: smooth;
+    flex-flow: column;
+    justify-content: flex-start; 
+    gap: 20px;
+}
+
+.admin-viewProd-img {
+    width: 100%;
+    max-width: 8rem;
+    border-radius: 5px;
+}
+
+.admin-prodPrice, .admin-prodStocks {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    color: white;
+}
+
+.admin-prodName {
+    color: white;
+}
+
+.totalStocks-adminProd, .price-adminProd {
+    font-size: 18px;
+    margin-left: 8px;
+    color: white;
+}
+
+.admin-prodShowDetails-btn {
+    border: solid 1px white;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    width: fit-content;
+    margin-left: 82rem;
+}
+
+.admin-prodShowDetails-btn:hover {
+    font-weight: 600;
+    padding: 4px;
+    border: solid 2px white;
+}
+
+.admin-prodDetails-labels {
+    font-weight: 600;
+}
+
+.admin-prodDetails-text {
+    font-weight: 400;
 }
