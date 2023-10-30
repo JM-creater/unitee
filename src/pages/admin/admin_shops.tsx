@@ -307,25 +307,29 @@ function Admin_Shops () {
 
                                 {/* PRODUCT CARD */}
                                 <div className='col-md-12' style={{ backgroundColor:'#004AAD', padding:'10px', borderRadius:'5px' }}>
-                                    <div className='admin-viewProds-card'>
-                                        <img className='admin-viewProd-img' src={prodImg}/>
-                                        <h4 className='col-md-4 admin-prodName' style={{ display:'flex', flexFlow:'column' }}>Example Product Name
-                                            <span className='admin-prodRating' style={{ color:'white', marginTop:'8px', display:'flex', alignItems:'center' }}>
-                                                <img style={{ marginRight:'5px', width:'100%', maxWidth:'12px' }} src={ prodRating } alt="product rating icon" />
-                                                No rating yet</span>
-                                        </h4>
-                                        <h4 className='col-md-3 admin-prodStocks'>Total Stocks:
-                                            <span className='totalStocks-adminProd'>5534</span>
-                                        </h4>
-                                        <h4 className='col-md-3 admin-prodPrice'>Price:
-                                            <span className='price-adminProd'>123435</span>
-                                        </h4>
+                                    <div style={{ display:'flex', flexFlow:'column' }}>
+                                        <div className='admin-viewProds-card'>
+                                            <img className='admin-viewProd-img' src={prodImg}/>
+                                            <h4 className='col-md-4 admin-prodName' style={{ display:'flex', flexFlow:'column' }}>Example Product Name
+                                                <span className='admin-prodRating' style={{ color:'white', marginTop:'8px', display:'flex', alignItems:'center' }}>
+                                                    <img style={{ marginRight:'5px', width:'100%', maxWidth:'12px' }} src={ prodRating } alt="product rating icon" />
+                                                    No rating yet</span>
+                                            </h4>
+                                            <h4 className='col-md-3 admin-prodStocks'>Total Stocks:
+                                                <span className='totalStocks-adminProd'>5534</span>
+                                            </h4>
+                                            <h4 className='col-md-3 admin-prodPrice'>Price:
+                                                <span className='price-adminProd'>123435</span>
+                                            </h4>
+                                        </div>
+                                        
+                                        <div className='showMore-btn-container'>
+                                                    {/* SHOW MORE BUTTON */}
+                                            <button className="admin-prodShowDetails-btn" type="button" data-bs-toggle="collapse" data-bs-target="#prodDetailsCollapse" aria-expanded="false" aria-controls="prodDetailsCollapse">
+                                                Show More
+                                            </button>
+                                        </div>
                                     </div>
-                                    
-                                            {/* SHOW MORE BUTTON */}
-                                    <button className="admin-prodShowDetails-btn" type="button" data-bs-toggle="collapse" data-bs-target="#prodDetailsCollapse" aria-expanded="false" aria-controls="prodDetailsCollapse">
-                                        Show More
-                                    </button>
 
 
                                     <div className="collapse" id="prodDetailsCollapse" 
