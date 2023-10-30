@@ -31,9 +31,9 @@ import Supplier_Main from './pages/supplier/supplier_main'
 import Supplier from './pages/supplier/supplier_dashboard'
 import Reports from './pages/supplier/reports'
 import Forgot_Password from './pages/forgot_password'
-import Unauthorized_Error from './pages/common/unauthorized_error'
-import Internal_Error from './pages/common/internal_error'
-import Bad_Request from './pages/common/bad_request'
+// import Unauthorized_Error from './pages/common/unauthorized_error'
+// import Internal_Error from './pages/common/internal_error'
+// import Bad_Request from './pages/common/bad_request'
 
 
 function App() {

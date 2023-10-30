@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import logo from '../../src/assets/images/unitee.png';
 import './register.css';
+import registerUsersEventEmitter from '../helpers/RegisterUsersEmitter';
 
 function Register() {
   type ValidationErrors = {
@@ -113,8 +114,10 @@ function Register() {
       try {
         const response = await axios.post('https://localhost:7017/Users/register', formData);
         if (response.data) {
-          toast.success('Successfully registered.');
-          navigate('/');
+          registerUsersEventEmitter.emit("registerCustomer");
+          toast.success('Successfully registered.', {
+            onClose: () => navigate('/')
+          });
         } else {
           toast.error(response.data);
           return;
@@ -240,7 +243,7 @@ function Register() {
                 value={departmentId}
                 onChange={(e) => setSelectedDepartment(e.target.value)}
               >
-                <option>Select Department*</option>
+                <option>Select Department</option>
                 {departments.map((department) => (
                   <option key={department.departmentId} value={department.departmentId}>
                     {department.department_Name}

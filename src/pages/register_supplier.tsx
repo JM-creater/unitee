@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import logo from '../../src/assets/images/unitee.png';
 import 'react-toastify/dist/ReactToastify.css';
+import registerUsersEventEmitter from '../helpers/RegisterUsersEmitter';
 
 type ValidationErrors = {
   IDNumber?: string;
@@ -117,8 +118,10 @@ function Register() {
           formData
         );
         if (response.data) {
-          toast.success('Successfully registered.');
-          navigate('/');
+          registerUsersEventEmitter.emit("registerSupplier");
+          toast.success('Successfully registered.', {
+            onClose: () => navigate('/')
+          });
         } else {
           alert(response.data);
         }
