@@ -8,68 +8,111 @@ import customerIcon from "../../assets/images/icons/male-student.png"
 import './admin-dashboard.css'
 import { useEffect, useState } from "react"
 import axios from "axios"
+import { toast } from "react-toastify"
+import validationEventEmitter from "../../helpers/ValidationEmitter"
+import registerUsersEventEmitter from "../../helpers/RegisterUsersEmitter"
 
 function Admin_Dashboard () {
 
   const [customer, setCustomer] = useState([]);
   const [supplierData, setSupplierData] = useState([]);
 
-  // Get All Customers
-  useEffect(() => {
-      axios.get('https://localhost:7017/Users/getCustomers')
-          .then(res => {
-              setCustomer(res.data);
-          })
-          .catch((err) => {console.error(err)
-      });
+    // * Get All Customers with Event Emitter 
+    useEffect(() => {
+      const validationRequest = async () => {
+          try {
+              const response = await axios.get('https://localhost:7017/Users/getCustomers');
+              setCustomer(response.data);
+          } catch (error) {
+              toast.error('Network error or server not responding');
+          }
+      };
+      const validationListener = () => {
+          validationRequest();
+      };
+
+      validationEventEmitter.on("validInvalid", validationListener);
+      registerUsersEventEmitter.on("registerCustomer", validationListener)
+      validationRequest();
+
+      return () => {
+          validationEventEmitter.off("validInvalid", validationListener);
+          registerUsersEventEmitter.off("registerCustomer", validationListener)
+      };
+    }, []);
+
+
+    // * Windows Event Listener Focus for Customer
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+                const response = await axios.get('https://localhost:7017/Users/getCustomers');
+                setCustomer(response.data);
+            } catch (error) {
+                toast.error('Network error or server not responding');
+            }
+        };
+
+        const handleFocus = () => {
+            fetchData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [])
+
+    // * Get All Suppliers with Event Emitter
+    useEffect(() => {
+      const fetchShops = async () => {
+          try {
+              const response = await axios.get('https://localhost:7017/Users/getSuppliers');
+              setSupplierData(response.data);
+          } catch (error) {
+              toast.error('Network error or server not responding');
+          }
+      };
+
+      const validationListener = () => {
+          fetchShops();
+      };
+
+      validationEventEmitter.on("validInvalid", validationListener);
+      registerUsersEventEmitter.on("registerSupplier", validationListener)
+      fetchShops();
+
+      return () => {
+          validationEventEmitter.off("validInvalid", validationListener);
+          registerUsersEventEmitter.off("registerSupplier", validationListener)
+      };
   }, []);
 
-  // Get All Suppliers
+  // * Windows Event Listener Focus for Supplier
   useEffect(() => {
-    axios.get('https://localhost:7017/Users/getSuppliers')
-        .then(res => {
-            setSupplierData(res.data);
-        })
-        .catch((err) => {console.error(err)
-    });
-}, []);
+      const fetchData = async () => {
+      try {
+              const response = await axios.get('https://localhost:7017/Users/getSuppliers');
+              setSupplierData(response.data);
+          } catch (error) {
+              toast.error('Network error or server not responding');
+          }
+      };
+
+      const handleFocus = () => {
+          fetchData();
+      };
+
+      window.addEventListener('focus', handleFocus);
+
+      return () => {
+          window.removeEventListener('focus', handleFocus);
+      };
+  }, [])
 
 
     return <div className='admin-dashboard-main-container'>
-
-      {/* OLD */}
-        {/* <h1 className='page-title'>Dashboard</h1>
-        <div className='card-container'>
-        
-
-
-<div className="card-dashboard-admin card" style={{ width:'20rem'}}>
-  <div className="dashboard-card card-body2">
-    <div className='customer-content'>
-    <h5 className="dashboard-card-title2">Customers</h5>
-    {customer.length > 0 && (
-      <h3 className='dashboard-card-text2'>{customer.length}</h3>
-    )}
-    </div>
-    <img className='dashboard-icon' src={ user } alt="" />
-  </div>
-</div>
-
-<div className="card-dashboard-admin card" style={{ width:'20rem'}}>
-  <div className="dashboard-card card-body2">
-    <div className='suppliers-content'>
-    <h5 className="dashboard-card-title2">Suppliers</h5>
-    {supplierData.length > 0 && (
-      <h3 className='dashboard-card-text2'>{supplierData.length}</h3>
-    )}
-    </div>
-    <img className='dashboard-icon' src={ supplier } alt="" />
-  </div>
-</div>
-        </div>
-
-        */}
-
         {/* NEW */}
         <div className="col-md-7">
           <h3 style={{ marginBottom:'20px', color:'#020654', fontWeight:'600' }}>Dashboard</h3>
@@ -89,7 +132,9 @@ function Admin_Dashboard () {
           <div className="card-content-container">
             <div className="col-md-9 dash-card">
               <span>Suppliers</span>
-              <h1 className="col-md-11 number-dash">0</h1>
+              {supplierData.length > 0 && (
+              <h1 className="col-md-11 number-dash">{supplierData.length}</h1>
+              )}
             </div>
             <img className="dash-card-icon" src={ supplierIcon }/>
           </div>
@@ -98,7 +143,9 @@ function Admin_Dashboard () {
           <div className="card-content-container">
             <div className="col-md-9 dash-card">
               <span>Customers</span>
-              <h1 className="col-md-11 number-dash">0</h1>
+              {customer.length > 0 && (
+              <h1 className="col-md-11 number-dash">{customer.length}</h1>
+              )}
             </div>
             <img className="dash-card-icon" src={ customerIcon } alt="" />
           </div>

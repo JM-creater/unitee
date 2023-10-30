@@ -83,7 +83,7 @@ function Login() {
               navigate(`/supplier_dashboard/${result.data.user.id}`, { state: { supplierData: result.data.user } });
               break;
             case 'Admin':
-              navigate(`/admin_main/${result.data.user.id}`, { state: { adminData: result.data.user } });
+              navigate(`/admin_dashboard/${result.data.user.id}`, { state: { adminData: result.data.user } });
               break;
             default:
               console.log('Unknown role');
