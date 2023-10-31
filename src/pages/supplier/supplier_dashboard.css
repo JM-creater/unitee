@@ -173,8 +173,8 @@
 
 .generate-report-btn {
     padding: 5px 8px 5px 8px;
-    border: solid 2px;
-    border-radius: 5px;
+    border: solid 1px;
+    border-radius: 20px;
     font-size: 15px;
 }
 

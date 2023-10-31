@@ -30,28 +30,28 @@ function Supplier (){
                 label: '1st Week',
                 data: [ 3,6,7 ],
                 backgroundColor: '#004AAD',
-                borderColor: 'black',
+                borderColor: 'white',
                 borderWidth: 1,
             },
             {
                 label: '2nd Week',
                 data: [ 4,5,1 ],
                 backgroundColor: '#65A4F6',
-                borderColor: 'black',
+                borderColor: 'white',
                 borderWidth: 1,
             },
             {
                 label: '3rd Week',
                 data: [ 8,3,5 ],
                 backgroundColor: '#020654',
-                borderColor: 'black',
+                borderColor: 'white',
                 borderWidth: 1,
             },
             {
                 label: '4th Week',
                 data: [ 7,1,6 ],
-                backgroundColor: '#65A4F6',
-                borderColor: 'black',
+                backgroundColor: '#FDB833',
+                borderColor: 'white',
                 borderWidth: 1,
             }
         ]
@@ -148,14 +148,21 @@ function Supplier (){
                     </div>
                 </div>
 
-                
+                {/* SALES REVIEW CHART */}
                  <div className='monthly-sales-chart-container'
                     style={{ width:'51.7rem',
                     border:'solid 5px white',
                     marginTop:'20px',
                     padding:'20px',
                     borderRadius:'10px'}}>
+                    
+                    <h1 style={{ color:'#020654' }}>Sales Review</h1>
+                    <span>Your average sales for the past 
+                        <span className='num-months-chartReview'> number of months </span>
+                            is <span className='total-sales-chartReview'> $100000</span>
+                    </span>
                     <Bar
+                        style={{ marginTop:'15px' }}
                         data= { data }
                         options= { options }
                     ></Bar>
