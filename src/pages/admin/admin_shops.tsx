@@ -306,7 +306,8 @@ function Admin_Shops () {
                             <div className='adminShop-prods-container'>
 
                                 {/* PRODUCT CARD */}
-                                <div className='col-md-12' style={{ backgroundColor:'#004AAD', padding:'10px', borderRadius:'5px' }}>
+                                <div className='col-md-12' 
+                                style={{ backgroundColor:'#004AAD', padding:'10px', borderRadius:'5px' }}>
                                     <div style={{ display:'flex', flexFlow:'column' }}>
                                         <div className='admin-viewProds-card'>
                                             <img className='admin-viewProd-img' src={prodImg}/>

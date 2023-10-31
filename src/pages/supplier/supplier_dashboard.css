@@ -170,3 +170,16 @@
 .btn-dashboardProduct {
     margin: 10px;
 }
+
+.generate-report-btn {
+    padding: 5px 8px 5px 8px;
+    border: solid 2px;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.generate-report-btn:hover {
+    background-color: #020654;
+    color: white;
+    font-weight: 600;
+}
