@@ -2,6 +2,7 @@ import './supplier_dashboard.css'
 import totalSalesIcon from "../../assets/images/icons/dollar.png"
 import totalOrdersIcon from "../../assets/images/icons/checkout.png"
 import totalProducts from "../../assets/images/icons/products.png"
+import noProdsImg from "../../assets/images/icons/empty-box.png"
 import noOder from "../../assets/images/icons/no-order.png"
 import { useEffect, useState } from 'react'
 import axios from 'axios'
@@ -95,7 +96,8 @@ function Supplier (){
                     </>
                 ) : (
                     <div className="no-productsDashboard-message">
-                        <i className="no-productsDashboard-icon fa fa-exclamation-circle"></i>
+                        {/* <i className="no-productsDashboard-icon fa fa-exclamation-circle"></i> */}
+                        <img src={ noProdsImg }/>
                         <p>No products available</p>
                     </div>
                 )}

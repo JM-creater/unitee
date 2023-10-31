@@ -19,6 +19,8 @@
 .supplier-nav-items:hover {
     background-color: white;
     font-weight: 600;
+    font-size: 14px;
+    border: solid 2px #004AAD;
 }
 
 .orders-supplier-container {
@@ -32,7 +34,9 @@
 }
 
 .order-status-label {
-    margin-top: 50px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #004AAD;
 }
 
 /* MODAL */

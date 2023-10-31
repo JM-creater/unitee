@@ -1,5 +1,6 @@
-import prodImage from "../../assets/images/shop_products/product2.png";
+import prodImage from "../../assets/images/shop_products/picture-2.png";
 import addIcon from "../../assets/images/icons/plus-4.png";
+import noProdsIcon from "../../assets/images/icons/empty-box.png"
 import "./manage_shop.css";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -372,7 +373,7 @@ function Manage_Shop() {
   return (
     <div className="manage-shop-main-container">
       <div className="add-prod-btn-container">
-        <h1>Manage Shop</h1>
+      <h3 style={{ marginBottom:'20px', color:'#020654', fontWeight:'600' }}>Manage Shop</h3>
         <button
           className="supplier-add-prod-btn"
           data-bs-toggle="modal"
@@ -416,7 +417,7 @@ function Manage_Shop() {
               ))
           ) : (
               <div className="no-productsShop-message">
-                  <i className="no-productsShop-icon fa fa-exclamation-circle"></i>
+                  <img src={ noProdsIcon } />
                   <p>No products available</p>
               </div>
           )}

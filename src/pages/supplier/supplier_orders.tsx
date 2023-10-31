@@ -50,7 +50,7 @@ function Supplier_Orders () {
     const statuses = [
       { key: 'Pending', href: '#supplier-pending-order' },
       { key: 'Approved', href: '#supplier-approved-order' },
-      { key: 'ForPickUp', href: '#supplier-for-pickup-order' },
+      { key: 'For Pick Up', href: '#supplier-forpickup-order' },
       { key: 'Completed', href: '#supplier-completed-order' },
       { key: 'Canceled', href: '#supplier-canceled-order' },
     ];
@@ -267,8 +267,9 @@ function Supplier_Orders () {
 
     <div className="orders-supplier-container">
         <div data-bs-spy="scroll" data-bs-target="#orders-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true" className="scrollspy-example p-3 rounded-2" tabIndex={-1}>
-            <h4 id="supplier-pending-order">Pending Orders</h4>
-            <div className='col-md-11 pending-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+            <h4 className="order-status-label" id="supplier-pending-order">Pending Orders</h4>
+            <div className='col-md-11 pending-orders-table-wrapper table-responsive-sm' 
+              style={{ marginBottom:'25px', marginTop:'12px'}}>
               <table className="table table-hover align-middle caption-bot table-xxl">
                   <caption>end of list of pending orders</caption>
                   <thead className='table align-middle'>
@@ -306,7 +307,7 @@ function Supplier_Orders () {
               </table>
             </div>
             <h4 className="order-status-label" id="supplier-approved-order">Approved Orders</h4>
-            <div className='col-md-11 approved-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+            <div className='col-md-11 approved-orders-table-wrapper table-responsive-sm' style={{ marginBottom:'25px', marginTop:'12px'}}>
                 <table className="table table-hover align-middle caption-bot table-xxl">
                     <caption>end of list of approved orders</caption>
                     <thead className='table align-middle'>
@@ -344,7 +345,7 @@ function Supplier_Orders () {
                 </table>
             </div>
             <h4 className="order-status-label" id="supplier-forpickup-order">For Pick Up</h4>
-            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginBottom:'25px', marginTop:'12px'}}>
                 <table className="table table-hover align-middle caption-bot table-xxl">
                     <caption>end of list of for pick up orders</caption>
                     <thead className='table align-middle'>
@@ -382,7 +383,7 @@ function Supplier_Orders () {
                 </table>
             </div>
             <h4 className="order-status-label" id="supplier-completed-order">Completed Orders</h4>
-            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginBottom:'25px', marginTop:'12px'}}>
                 <table className="table table-hover align-middle caption-bot table-xxl">
                     <caption>end of list of claimed orders</caption>
                     <thead className='table align-middle'>
@@ -419,8 +420,8 @@ function Supplier_Orders () {
                     )}
                 </table>
             </div>
-            <h4 className="order-status-label" id="supplier-cancelled-order">Cancelled Orders</h4>
-            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
+            <h4 className="order-status-label" id="supplier-canceled-order">Canceled Orders</h4>
+            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginBottom:'25px', marginTop:'12px'}}>
                 <table className="table table-hover align-middle caption-bot table-xxl">
                     <caption>end of list of cancelled orders</caption>
                     <thead className='table align-middle'>

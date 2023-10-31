@@ -1,7 +1,7 @@
 .manage-shop-main-container {
     width: 85vw;
     height: 92vh;
-    padding: 10px;
+    padding: 20px;
     background-color: #f0f0f0;
 }
 
@@ -199,7 +199,7 @@
 }
 
 /* INPUTS */
-.prod-details-labels {
+.prod-details-labels, .prodDescription-label {
     font-weight: 500;
     font-size: 15px;
     margin-top: 10px;
@@ -235,7 +235,7 @@
     align-items: center;
     justify-content: center;
     font-size: 24px; 
-    height: 50vh;
+    height: 75vh;
 }
 
 .no-productsShop-icon {
