@@ -70,7 +70,7 @@ function Admin_Main() {
                 </div>
                 
 
-                <Link className="admin-nav-link" to=''>
+                <Link className="admin-nav-link" to='admin_reports'>
                     <img className="admin-nav-icon" src={ adminReportsIcon }/>
                     <span className="admin-nav-text">Reports</span>
                 </Link>
