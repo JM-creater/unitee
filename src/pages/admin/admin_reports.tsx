@@ -1,6 +1,7 @@
 import './admin_reports.css'
 import totalOrdersIcon from "../../assets/images/icons/order-2.png"
 import salesIcon from "../../assets/images/icons/sales.png"
+import { Link } from "react-router-dom"
 import {
     Chart as ChartJS,
     BarElement,
@@ -61,7 +62,7 @@ function Admin_Reports () {
 
     // END OF BAR GRAPH``
 
-    // PIE CHART GRAPH
+    // PIE CHART CHART
     const ordersData = {
         labels: ['Supplier 1', 'Supplier 2', 'Supplier 3', 'Supplier 4'],
         datasets: [
@@ -71,7 +72,7 @@ function Admin_Reports () {
             }
         ]
     };
-
+    // END OF PIE CHART
 
     const options = {
 
@@ -83,9 +84,20 @@ function Admin_Reports () {
             {/* HEADER CARDS */}
             <div className='admin-reports-allOrders-card'>
                 <div className='col-md-9'>
-                    <h5>Total Orders</h5>
+                    <h5 className='header-adminSales-label'>Total Orders</h5>
                     <h3>53485</h3>
-                    <button className='view-allOrders-btn-admin'>View all orders</button>
+                  
+                    <ul className="nav nav-pills"
+                    style={{
+                        display:'flex',
+                        justifyContent:'center',
+                        borderRadius:'20px',
+                        border:'solid 1px black' }}>
+                        <a className="nav-link view-allOrders-btn-admin" 
+                        href="#orderListAdmin" 
+                        id="navbar-ordersList">View all orders</a>
+                    </ul>
+
                 </div>
                     <img className='admin-reports-headerIcons' src={ totalOrdersIcon } alt="" />
                 <div>
@@ -97,7 +109,7 @@ function Admin_Reports () {
                 <div className='admin-sales-card'>
                     {/* WEEKLY */}
                     <div className='col-md-9'>
-                        <h5>Weekly Sales</h5>
+                        <h5 className='header-adminSales-label'>Weekly Sales</h5>
                         <h3>4533</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
@@ -106,7 +118,7 @@ function Admin_Reports () {
                 {/* MONTHLY */}
                 <div className='admin-sales-card'>
                     <div className='col-md-9'>
-                        <h5>Monthly Sales</h5>
+                        <h5 className='header-adminSales-label'>Monthly Sales</h5>
                         <h3>4533</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
@@ -115,7 +127,7 @@ function Admin_Reports () {
                 {/* YEARLY */}
                 <div className='admin-sales-card'>
                     <div className='col-md-9'>
-                        <h5>Yearly Sales</h5>
+                        <h5 className='header-adminSales-label'>Yearly Sales</h5>
                         <h3>4533</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
@@ -156,7 +168,7 @@ function Admin_Reports () {
             <div style={{ 
                 marginTop:'20px',
                 border: 'solid 5px white',
-                borderRadius: '5px',
+                borderRadius: '10px',
                 padding: '20px',
                 width:'500px'
              }}>
@@ -175,6 +187,78 @@ function Admin_Reports () {
                 </div>
             </div>
         </div>
+    
+        <div data-bs-spy="scroll"
+            data-bs-target="#navbar-ordersList" 
+            data-bs-root-margin="0px 0px -40%" 
+            data-bs-smooth-scroll="true" 
+            className="scrollspy-example bg-body-tertiary p-3 rounded-2 orderList-admin-container" 
+            tabIndex={0}>
+            <h1 id="orderListAdmin" style={{ color:'#020654' }}>Order List</h1>
+            {/* FILTER */}
+            <div className='admin-listOrders-filter-container'>
+                <h4>Sort by</h4>
+                <div>
+                    <label style={{ marginRight:'10px' }} htmlFor="statusOrderFilter">Order Status: </label>
+                    <select style={{ padding: '10px', border: '2px solid white' }}
+                     name="order-status-filter-admin" id="statusOrderFilter">
+                        <option value="pending">Select an order status</option>
+                        <option value="pending">Pending</option>
+                        <option value="pending">Approved</option>
+                        <option value="pending">Canceled</option>
+                        <option value="pending">Claimed</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style={{ marginRight:'10px' }} htmlFor="supplierFilter">Shop</label>
+                    <select style={{ padding: '10px', border: '2px solid white' }}
+                     name="order-status-filter-admin" id="supplierFilter">
+                        <option value="pending">Select a shop</option>
+                        <option value="pending">Shop 1</option>
+                        <option value="pending">Shop 2</option>
+                        <option value="pending">Shop 3</option>
+                        <option value="pending">Shop 4</option>
+                    </select>
+                </div>
+            </div>
+
+
+                {/* TABLE */}
+                <table className="table">
+                <thead>
+                    <tr>
+                    <th scope="col">Order No.</th>
+                    <th scope="col">Shop</th>
+                    <th scope="col">Customer</th>
+                    <th scope="col">Number of Items</th>
+                    <th scope="col">Total Amount</th>
+                    <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <th scope="row">1</th>
+                    <td>Mark</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                    </tr>
+                    <tr>
+                    <th scope="row">2</th>
+                    <td>Jacob</td>
+                    <td>Thornton</td>
+                    <td>@fat</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                    </tr>
+                </tbody>
+                </table>
+        </div>
+
+        
+        
     </div>
 }
 

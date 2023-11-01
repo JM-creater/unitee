@@ -5,6 +5,8 @@
     background-color: #F0F0F0;
     display: flex;
     flex-flow: column;
+    overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
 .admin-reports-allOrders-card {
@@ -49,17 +51,6 @@
     justify-content: space-between;
 }
 
-.view-allOrders-btn-admin {
-    padding: 5px;
-    background-color: #004AAD;
-    color: white;
-    border-radius: 5px;
-}
-
-.view-allOrders-btn-admin:hover {
-    background-color: #020654;
-}
-
 .admin-generate-report-btn {
     background-color: #004AAD;
     height: 3rem;
@@ -70,5 +61,21 @@
 
 .admin-generate-report-btn:hover {
     background-color: #020654;
+}
 
+.header-adminSales-label {
+    font-weight: 600;
+}
+
+.orderList-admin-container {
+    margin-top: 60px;
+}
+
+.admin-listOrders-filter-container {
+    display: flex;
+    flex-flow: row;
+    gap: 50px;
+    margin-top: 15px;
+    justify-content: end;
+    margin-bottom: 15px;
 }
