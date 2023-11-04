@@ -2,24 +2,130 @@ import './admin_shops.css'
 import { useEffect, useState } from 'react'
 import starIcon from "../../assets/images/icons/starRating.png"
 import prodRating from "../../assets/images/icons/star.png"
-import shopImg from "../../assets/images/imageprofile.jpeg"
-import prodImg from "../../assets/images/shop_products/college-uniform.jpg"
 import axios from 'axios'
 import { toast } from 'react-toastify';
 import validationEventEmitter from '../../helpers/ValidationEmitter';
 import registerUsersEventEmitter from '../../helpers/RegisterUsersEmitter';
+import addProductEventEmitter from '../../helpers/AddProductEventEmitter'
 
 
 function Admin_Shops () {
 
     const [shop, setShop] = useState([]);
+    const [departments, setDepartments] = useState([]);
+    const [productTypes, setProductTypes] = useState([]);
+    const [selectedShop, setSelectedShop] = useState(null);
     const [selectedStatus, setSelectedStatus] = useState('All');
+    const [selectedGender, setSelectedGender] = useState('');
+    const [selectedProductType, setSelectedProductType] = useState('');
+    const [selectedPriceRange, setSelectedPriceRange] = useState('');
+    
+    // * Get All Departments
+    useEffect(() => {
+        const fetchDepartments = async () => {
+            try {
+                const response = await axios.get('https://localhost:7017/Department');
+                setDepartments(response.data);
+            } catch(error) {
+                console.error(error)
+            }
+        }
+        fetchDepartments();
+    }, []);
 
-    const filteredShops = shop.filter((departmentItem) => {
-        const matchesStatus = selectedStatus === 'All' || (departmentItem.isValidate ? 'Validated' : 'Invalid') === selectedStatus;
-        
+    // * Get the Department Name
+    const getDepartmentName = (departmentId) => {
+        const department = departments.find(d => d.departmentId === departmentId);
+        return department ? department.department_Name : 'Unknown Department';
+    };
+
+    // * Get All Product Types
+    useEffect(() => {
+        const fetchProductType = async () => {
+            try {
+                const response = await axios.get("https://localhost:7017/ProductType");
+                setProductTypes(response.data);
+            } catch(error) {
+                console.error(error);
+            }
+        }
+        fetchProductType();
+    }, []);
+
+    // * Get the Product Type Name
+    const getProductTypeName = (productTypeId) => {
+        const productType = productTypes.find((p) => p.productTypeId === productTypeId);
+        return productType ? productType.product_Type : "Unknown Type";
+    };
+
+    // * Filter shops based on their status (Validated/Invalid)
+    const filteredShopsByStatus = shop.filter((shopItem) => {
+        const matchesStatus = selectedStatus === 'All' || (shopItem.isValidate ? 'Validated' : 'Invalid') === selectedStatus;
+
         return matchesStatus;
     });
+
+    // * Filter products based on gender and product type
+    const filteredProducts = (selectedShop && selectedShop.products) ? selectedShop.products.filter((product) => {
+
+        const matchesGender = !selectedGender || (product.category && product.category.toLowerCase() === selectedGender);
+        
+        const matchesProductType = !selectedProductType || (product.productTypeId && product.productTypeId.toString() === selectedProductType);
+        
+        const matchesPriceRange = !selectedPriceRange || 
+                                (selectedPriceRange === '<100' && product.price < 100) || 
+                                (selectedPriceRange === '100-500' && product.price >= 100 && product.price <= 500) || 
+                                (selectedPriceRange === '>500' && product.price > 500)
+
+        return matchesGender && matchesProductType && matchesPriceRange;
+
+    }) : [];
+
+    // * Handle Gender Filter
+    const handleGenderClick = (e, gender) => {
+        if (selectedGender === gender) {
+            setSelectedGender('');
+            e.target.checked = false;
+        } else {
+            setSelectedGender(gender);
+        }
+    }
+
+    // * Handle Product Type Filter
+    const handleProductTypeClick = (e) => {
+        const value = e.target.value;
+        if (selectedProductType === value) {
+            setSelectedProductType(''); 
+            e.target.checked = false; 
+        } else {
+            setSelectedProductType(value);
+        }
+    }
+
+    // * Handle Price Filter
+    const handlePriceRangeClick = (e, priceRange) => {
+        if (selectedPriceRange === priceRange) {
+            setSelectedPriceRange('');
+            e.target.checked = false;
+        } else {
+            setSelectedPriceRange(priceRange);
+        }
+    }
+
+    // * Handle Reset Button
+    const HandleResetButton = () => {
+        setSelectedProductType('');
+        setSelectedPriceRange('');
+        setSelectedGender('');
+    }
+
+    // * Compute all stocks
+    const totalStock = (sizes) => {
+        if (!sizes || sizes.length === 0) {
+            return 0;
+        }
+        return sizes.reduce((acc, currentSize) => acc + currentSize.quantity, 0);
+    }
 
     // * Get All Suppliers with Event Emitter
     useEffect(() => {
@@ -37,12 +143,14 @@ function Admin_Shops () {
         };
 
         validationEventEmitter.on("validInvalid", validationListener);
-        registerUsersEventEmitter.on("registerSupplier", validationListener)
+        registerUsersEventEmitter.on("registerSupplier", validationListener);
+        addProductEventEmitter.on("addProduct", validationListener);
         fetchShops();
 
         return () => {
             validationEventEmitter.off("validInvalid", validationListener);
-            registerUsersEventEmitter.off("registerSupplier", validationListener)
+            registerUsersEventEmitter.off("registerSupplier", validationListener);
+            addProductEventEmitter.off("addProduct", validationListener);
         };
     }, []);
 
@@ -68,7 +176,31 @@ function Admin_Shops () {
         };
     }, [])
 
-    
+    // * Reset Modal
+    useEffect(() => {
+        const modalElement = document.getElementById('viewProdsModal');
+
+        const handleModalClose = () => {
+            setSelectedProductType('');
+            setSelectedPriceRange('');
+            setSelectedGender('');
+
+            const allCollapse = document.querySelectorAll('.collapse');
+
+            allCollapse.forEach(collapseElement => {
+                if (collapseElement.classList.contains('show')) {
+                    collapseElement.classList.remove('show');
+                }
+            });
+        };
+
+        modalElement.addEventListener('hidden.bs.modal', handleModalClose);
+
+        return () => {
+            modalElement.removeEventListener('hidden.bs.modal', handleModalClose);
+        };
+    }, []);
+
 
     return <div className="admin-shops-main-container">
         <div className='admin-shops-header'>
@@ -91,17 +223,23 @@ function Admin_Shops () {
         </div>
 
         <div className='shops-admin-container'>
-            <div className='admin-shop-card'
-            data-bs-toggle="modal"
-            data-bs-target="#viewProdsModal">
-                <img className='shopProfileImgCard' src={ shopImg } />
-                <div className='col-md-8 adminShop-card-details'>
-                    <h5 className="supplier-card-title"></h5>
-                    <h5 className='shop-rating-card'><img className="ratingIcon" src={ starIcon }/>No Rating Yet</h5>
-                    <h5 className='shop-rating-card'></h5>
+
+            {filteredShopsByStatus.map(shopItem => (
+                <div 
+                    key={shopItem.id} 
+                    className='admin-shop-card' 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#viewProdsModal" 
+                    onClick={() => setSelectedShop(shopItem)}
+                >
+                    <img className='shopProfileImgCard' src={ `https://localhost:7017/${shopItem.image}` } />
+                    <div className='col-md-8 adminShop-card-details'>
+                        <h5 className="supplier-card-title">{shopItem.shopName}</h5>
+                        <h5 className='shop-rating-card'><img className="ratingIcon" src={ starIcon }/>No Rating Yet</h5>
+                        <h5 className='shop-rating-card'>{shopItem.address}</h5>
+                    </div>
                 </div>
-            </div>
-            
+            ))}
 
             {/* VIEW PRODUCTS MODAL */}
             <div className="modal fade" id="viewProdsModal" tabIndex={-1} aria-labelledby="viewProdsModalLabel" aria-hidden="true">
@@ -111,7 +249,7 @@ function Admin_Shops () {
                         <div className="viewProds-modalHeader">
                             <h1
                                 style={{ color:'#020654' }}>Product List</h1>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={HandleResetButton}></button>
                         </div>
                         <div className="productList-modalBody">
                             {/* Filter */}
@@ -144,8 +282,8 @@ function Admin_Shops () {
                                                 value="1" 
                                                 name="productType"
                                                 id="shopProdTypeSchoolUniform"
-                                                // checked={selectedProductType === '1'}
-                                                // onClick={handleProductTypeClick}
+                                                checked={selectedProductType === '1'}
+                                                onClick={handleProductTypeClick}
                                             />
                                             <hr/> School Uniform
                                         </h4>
@@ -156,8 +294,8 @@ function Admin_Shops () {
                                                 value="2" 
                                                 name="productType"
                                                 id="shopProdCheckbox"
-                                                // checked={selectedProductType === '2'}
-                                                // onClick={handleProductTypeClick}
+                                                checked={selectedProductType === '2'}
+                                                onClick={handleProductTypeClick}
                                             />
                                             <hr/> Event T-shirt
                                         </h4>
@@ -168,8 +306,8 @@ function Admin_Shops () {
                                                 value="3" 
                                                 name="productType"
                                                 id="shopProdCheckbox"
-                                                // checked={selectedProductType === '3'}
-                                                // onClick={handleProductTypeClick}
+                                                checked={selectedProductType === '3'}
+                                                onClick={handleProductTypeClick}
                                             />
                                             <hr/> Department Shirt
                                         </h4>
@@ -180,8 +318,8 @@ function Admin_Shops () {
                                                 value="4" 
                                                 name="productType"
                                                 id="shopProdCheckbox"
-                                                // checked={selectedProductType === '4'}
-                                                // onClick={handleProductTypeClick}
+                                                checked={selectedProductType === '4'}
+                                                onClick={handleProductTypeClick}
                                             />
                                             <hr/> PE Uniform
                                         </h4>
@@ -192,8 +330,8 @@ function Admin_Shops () {
                                                 value="5" 
                                                 name="productType"
                                                 id="shopProdCheckbox"
-                                                // checked={selectedProductType === '5'}
-                                                // onClick={handleProductTypeClick}
+                                                checked={selectedProductType === '5'}
+                                                onClick={handleProductTypeClick}
                                             />
                                             <hr/> ID Sling
                                         </h4>
@@ -204,8 +342,8 @@ function Admin_Shops () {
                                                 value="6" 
                                                 name="productType"
                                                 id="shopProdCheckbox"
-                                                // checked={selectedProductType === '6'}
-                                                // onClick={handleProductTypeClick}
+                                                checked={selectedProductType === '6'}
+                                                onClick={handleProductTypeClick}
                                             />
                                             <hr/> Accessories
                                         </h4>
@@ -222,8 +360,8 @@ function Admin_Shops () {
                                                     className="form-check-input prod-cart-checkBox" 
                                                     type="radio" 
                                                     value="<100"
-                                                    // checked={selectedPriceRange === '<100'}
-                                                    // onClick={(e) => handlePriceRangeClick(e, '<100')}
+                                                    checked={selectedPriceRange === '<100'}
+                                                    onClick={(e) => handlePriceRangeClick(e, '<100')}
                                                 />
                                                 <hr/> Below ₱100
                                             </h4>
@@ -232,8 +370,8 @@ function Admin_Shops () {
                                                     className="form-check-input prod-cart-checkBox" 
                                                     type="radio" 
                                                     value="100-500"
-                                                    // checked={selectedPriceRange === '100-500'}
-                                                    // onClick={(e) => handlePriceRangeClick(e, '100-500')}
+                                                    checked={selectedPriceRange === '100-500'}
+                                                    onClick={(e) => handlePriceRangeClick(e, '100-500')}
                                                 />
                                                 <hr/> ₱100 - ₱500
                                             </h4>
@@ -242,8 +380,8 @@ function Admin_Shops () {
                                                     className="form-check-input prod-cart-checkBox" 
                                                     type="radio" 
                                                     value=">500"
-                                                    // checked={selectedPriceRange === '>500'}
-                                                    // onClick={(e) => handlePriceRangeClick(e, '>500')}
+                                                    checked={selectedPriceRange === '>500'}
+                                                    onClick={(e) => handlePriceRangeClick(e, '>500')}
                                                 />
                                                 <hr/> Above ₱500
                                             </h4>
@@ -251,7 +389,7 @@ function Admin_Shops () {
                                     </div>
 
 
-                                        {/* GENDER filter */}
+                                    {/* GENDER filter */}
                                     <div className="prod-gender-filter-container row">
                                         <div className="col-md-3 filter-gender-text">
                                             <h4 className="prodType-filter-title">Gender</h4>
@@ -265,8 +403,8 @@ function Admin_Shops () {
                                                     value="male" 
                                                     name="gender"
                                                     id="shopProdGenderMale"
-                                                    // defaultChecked={selectedGender === 'male'}
-                                                    // onClick={(e) => handleGenderClick(e, 'male')}
+                                                    defaultChecked={selectedGender === 'male'}
+                                                    onClick={(e) => handleGenderClick(e, 'male')}
                                                 />
                                                 <hr/> Male
                                             </h4>
@@ -277,8 +415,8 @@ function Admin_Shops () {
                                                     value="female" 
                                                     name="gender"
                                                     id="shopProdGenderFemale"
-                                                    // defaultChecked={selectedGender === 'female'}
-                                                    // onClick={(e) => handleGenderClick(e, 'female')}
+                                                    defaultChecked={selectedGender === 'female'}
+                                                    onClick={(e) => handleGenderClick(e, 'female')}
                                                 />
                                                 <hr/> Female
                                             </h4>
@@ -289,8 +427,8 @@ function Admin_Shops () {
                                                     value="unisex" 
                                                     name="gender"
                                                     id="shopProdGenderUnisex"
-                                                    // defaultChecked={selectedGender === 'unisex'}
-                                                    // onClick={(e) => handleGenderClick(e, 'unisex')}
+                                                    defaultChecked={selectedGender === 'unisex'}
+                                                    onClick={(e) => handleGenderClick(e, 'unisex')}
                                                 />
                                                 <hr/> Unisex
                                             </h4>
@@ -300,106 +438,88 @@ function Admin_Shops () {
                                 </div>
                             </div>
                             {/* END OF FILTER */}
-                            
 
                             {/* PRODUCTS CONTAINER */}
-                            <div className='adminShop-prods-container'>
+                                <div className='adminShop-prods-container'>
 
                                 {/* PRODUCT CARD */}
-                                <div className='col-md-12' 
-                                style={{ backgroundColor:'#004AAD', padding:'10px', borderRadius:'5px' }}>
+                                {filteredProducts.map(product => (
+                                <div key={product.productId} className='col-md-12' style={{ backgroundColor:'#004AAD', padding:'10px', borderRadius:'5px' }}>
                                     <div style={{ display:'flex', flexFlow:'column' }}>
                                         <div className='admin-viewProds-card'>
-                                            <img className='admin-viewProd-img' src={prodImg}/>
-                                            <h4 className='col-md-4 admin-prodName' style={{ display:'flex', flexFlow:'column' }}>Example Product Name
+                                            <img className='admin-viewProd-img' src={ `https://localhost:7017/${product.image}` }/>
+                                            <h4 className='col-md-4 admin-prodName' style={{ display:'flex', flexFlow:'column' }}>{product.productName}
                                                 <span className='admin-prodRating' style={{ color:'white', marginTop:'8px', display:'flex', alignItems:'center' }}>
                                                     <img style={{ marginRight:'5px', width:'100%', maxWidth:'12px' }} src={ prodRating } alt="product rating icon" />
                                                     No rating yet</span>
                                             </h4>
                                             <h4 className='col-md-3 admin-prodStocks'>Total Stocks:
-                                                <span className='totalStocks-adminProd'>5534</span>
+                                                <span className='totalStocks-adminProd'>{totalStock(product.sizes)}</span>
                                             </h4>
                                             <h4 className='col-md-3 admin-prodPrice'>Price:
-                                                <span className='price-adminProd'>123435</span>
+                                                <span className='price-adminProd'>₱{product.price}</span>
                                             </h4>
                                         </div>
                                         
                                         <div className='showMore-btn-container'>
                                                     {/* SHOW MORE BUTTON */}
-                                            <button className="admin-prodShowDetails-btn" type="button" data-bs-toggle="collapse" data-bs-target="#prodDetailsCollapse" aria-expanded="false" aria-controls="prodDetailsCollapse">
+                                            <button 
+                                                className="admin-prodShowDetails-btn" 
+                                                type="button" 
+                                                data-bs-toggle="collapse"  
+                                                data-bs-target={`#prodDetailsCollapse${product.productId}`}  
+                                                aria-expanded="false" 
+                                                aria-controls={`prodDetailsCollapse${product.productId}`}
+                                            >
                                                 Show More
                                             </button>
                                         </div>
                                     </div>
 
 
-                                    <div className="collapse" id="prodDetailsCollapse" 
-                                    style={{ marginRight:'18px' }}>
+                                    <div className="collapse" id={`prodDetailsCollapse${product.productId}`} style={{ marginRight:'18px' }}>
                                         {/* START OF CARD BODY */}
-                                        <div className="card card-body" 
-                                        style={{ display:'flex', justifyContent:'space-between', gap:'10px' }}>
+                                        <div className="card card-body" style={{ display:'flex', justifyContent:'space-between', gap:'10px' }}>
+                                            {/* PRODUCT ID */}
+                                            <h4 className='admin-prodDetails-labels' 
+                                            style={{ display:'flex', flexFlow:'row', gap:'10px', fontWeight:'600'}}>Product ID: 
+                                                <h4 className='admin-prodDetails-text'>{product.productId}</h4>
+                                            </h4>
 
-                                                {/* PRODUCT ID */}
-                                                <h4 className='admin-prodDetails-labels' 
-                                                style={{ display:'flex', flexFlow:'row', gap:'10px', fontWeight:'600'}}>Product ID: 
-                                                     <h4 className='admin-prodDetails-text'>12432423</h4>
-                                                </h4>
+                                            {/* DESCRIPTION */}
+                                            <h5 className='admin-prodDetails-labels' style={{ display:'flex', flexWrap:'wrap' }}>Description:
+                                                <span className='col-md-10 admin-prodDetails-text'>{product.description}</span>
+                                            </h5>
 
-                                                {/* DESCRIPTION */}
-                                                <h5 className='admin-prodDetails-labels' style={{ display:'flex', flexWrap:'wrap' }}>Description:
-                                                    <span className='col-md-10 admin-prodDetails-text'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-                                                    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
-                                                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-                                                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-                                                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span>
+                                            {/* DEPARTMENT */}
+                                            <h5 className='admin-prodDetails-labels'>Department:
+                                                <h5 className='admin-prodDetails-text'>{getDepartmentName(product.departmentId)}</h5>
+                                            </h5>
+
+                                            {/* TYPE */}
+                                            <h5 className='admin-prodDetails-labels'>Type:
+                                                <h5 className='admin-prodDetails-text'>{getProductTypeName(product.productTypeId)}</h5>
+                                            </h5>
+
+                                            {/* SIZES AVAILABLE */}
+                                            <h5 className='admin-prodDetails-labels'>Sizes Available:
+                                                <h5 className='admin-prodDetails-text'>
+                                                    {product.sizes.map((sizeObj, index) => (
+                                                        <span style={{ fontSize: '18px' }} key={index}>{sizeObj.size}{index !== product.sizes.length - 1 ? ', ' : ''}</span>
+                                                    ))}
                                                 </h5>
-
-                                                {/* DEPARTMENT */}
-                                                <h5 className='admin-prodDetails-labels'>Department:
-                                                     <h5 className='admin-prodDetails-text'>College of Computer Studies</h5>
-                                                </h5>
-
-                                                {/* TYPE */}
-                                                <h5 className='admin-prodDetails-labels'>Type:
-                                                    <h5 className='admin-prodDetails-text'>School Uniform</h5>
-                                                </h5>
-
-                                                {/* SIZES AVAILABLE */}
-                                                <h5 className='admin-prodDetails-labels'>Sizes Available:
-                                                    <h5 className='admin-prodDetails-text'>18, 20, XS, S, M, L, XL, 2XL</h5>
-                                                </h5>
+                                            </h5>
                                         </div>
-                                        {/* END OF CARD BODY */}
                                     </div>
                                 </div>
-                                {/* END OF PRODUCT CARD */}
-                                
+                                ))}
                             </div>
-                            {/* END OF PRODUCTS CONTAINER */}
-
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
-
-        {/* <div className='supplier-container'>
-            {shop.map((shops, index) => (
-                <Link key={index} className='link-to-seller' to={`/shop/${userId}/visit_shop/${shops.id}`}>
-                    <div className="supplier-card">
-                        <img src={ `https://localhost:7017/${shops.image}` } className="supplierCard-img"/>
-                        <div className='col-md-8 shop-card-details'>
-                            <h5 className="supplier-card-title">{shops.shopName}</h5>
-                            <h5 className='shop-rating-card'><img className="ratingIcon" src={ starIcon }/>No Rating Yet</h5>
-                            <h5 className='shop-rating-card'>{shops.address}</h5>
-                        </div>
-                    </div>
-                </Link>
-            ))}
-        </div>
     </div>
-            */}
 }
 
 export default Admin_Shops

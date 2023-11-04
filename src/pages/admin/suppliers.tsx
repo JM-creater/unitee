@@ -395,9 +395,6 @@ function Suppliers () {
             </div>
         </div>
     </div> */}
-
-  
-
     
 </div>
 }

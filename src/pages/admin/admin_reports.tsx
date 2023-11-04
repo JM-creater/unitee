@@ -1,7 +1,7 @@
 import './admin_reports.css'
 import totalOrdersIcon from "../../assets/images/icons/order-2.png"
 import salesIcon from "../../assets/images/icons/sales.png"
-import { Link } from "react-router-dom"
+//import { Link } from "react-router-dom"
 import {
     Chart as ChartJS,
     BarElement,

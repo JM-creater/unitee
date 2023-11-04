@@ -2,7 +2,6 @@ import './view_customers.css'
 import customerIcon from "../../assets/images/icons/male-student.png"
 import validIcon from "../../assets/images/icons/accept.png"
 import invalidIcon from "../../assets/images/icons/remove.png"
-import shopProf from "../../assets/images/imageprofile.jpeg"
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -121,14 +120,6 @@ function View_Customers () {
             toast.error('Network error or server not responding');
         }
     };
-
-    // const handlePasswordChange = (e) => {
-    //     setNewPassword(e.target.value);
-    // }
-
-    // const handleConfirmPasswordChange = (e) => {
-    //     setConfirmPassword(e.target.value);
-    // }
 
     // * Update Password
     const handleUpdatePassword = async (customerId) => {
@@ -304,7 +295,7 @@ function View_Customers () {
               <div className="modal-body">
                 {selectedCustomer && (
                     <div className='supplier-profile-container'>
-                        <img className='customer-profile-img' src={ shopProf } alt="supplier profile picture" />
+                        <img className='customer-profile-img' src={ `https://localhost:7017/${selectedCustomer.image}` } alt="supplier profile picture" />
                         <div className='supplier-text-info'>
                             <h1 style={{ marginBottom:'20px' }}>{selectedCustomer.firstName} {selectedCustomer.lastName}</h1>
                             <div className='supplier-info-container'>
