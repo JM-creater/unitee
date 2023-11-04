@@ -1,0 +1,40 @@
+.search-prod-main-container {
+    padding: 30px;
+    display: flex;
+    flex-flow: column;
+    height: 90vh;
+    align-items: start;
+}
+
+.sub-container {
+    display: flex;
+    gap: 40px;
+    flex-flow: row;
+    width: 95vw;
+    height: 100vh;
+}
+
+.search-container {
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    width: 100vw;
+    align-items: center;
+}
+
+.recommender-filter-container {
+    background-color: #f0f0f0;
+    width: 20vw;
+    border-radius: 20px;
+    height: 65vh;
+}
+
+.recommender-prod-container {
+    width: 75%;
+    height: 75vh;
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: flex-start; 
+    gap: 20px; 
+}

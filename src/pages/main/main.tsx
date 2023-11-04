@@ -5,6 +5,7 @@ import logo from "../../assets/images/unitee.png"
 import profIcon from "../../assets/images/icons/profile2.png"
 import logout from "../../assets/images/icons/logout-3.png"
 import homeIcon from "../../assets/images/icons/homeIcon.png"
+import searchIcon from "../../assets/images/icons/search.png"
 import carts from "../../assets/images/icons/cartIcon.png"
 import orders from "../../assets/images/icons/shopping-bag-4.png"
 import notification from "../../assets/images/icons/notifIcon.png"
@@ -122,6 +123,10 @@ function Main() {
                 <div className="col-md-6 header-button-container">
                     <Link className="customer-nav-link" to=''>
                         <img className="nav-icon" src={ homeIcon }/>
+                    </Link>
+
+                    <Link className="customer-nav-link" to='search_product'>
+                        <img className="nav-icon" src={ searchIcon }/>
                     </Link>
 
                     <div className="customer-nav-link">
