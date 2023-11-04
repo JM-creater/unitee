@@ -8,19 +8,9 @@ import usersIcon from "../../assets/images/icons/profile.png"
 import adminReportsIcon from "../../assets/images/icons/reports.png"
 import shopsIcon from "../../assets/images/icons/store-2.png"
 import logoutAdminIcon from "../../assets/images/icons/logout-4.png"
-//import { useState } from "react"
 
 
 function Admin_Main() {
-
-    // const [isLoading, setIsLoading] = useState(false);
-
-    // function handleLogout() {
-    //     setIsLoading(true);
-    //     setTimeout(() => {
-    //         setIsLoading(false);
-    //     }, 2000);
-    // }
 
     return <div className="admin-main-container">
         <header className="admin-header">

@@ -19,6 +19,11 @@ function Login() {
   const [Password, setPassword] = useState('');
   const navigate = useNavigate();
 
+  const generateRandomID = () => {
+    const id = Math.floor(10000000 + Math.random() * 90000000).toString();
+    localStorage.setItem('generatedSupplierID', id);
+  };
+
   const handleIDOrEmail = (value: string) => {
     setIDOrEmail(value);
   };
@@ -157,7 +162,7 @@ function Login() {
           </Link>
 
           <Link className="register-link" to="/register_supplier">
-            <button className="register-customer-btn"> Supplier</button>
+            <button className="register-customer-btn" onClick={generateRandomID}> Supplier</button>
           </Link>
         </div>
       </div>

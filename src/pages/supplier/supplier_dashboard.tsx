@@ -96,7 +96,6 @@ function Supplier (){
                     </>
                 ) : (
                     <div className="no-productsDashboard-message">
-                        {/* <i className="no-productsDashboard-icon fa fa-exclamation-circle"></i> */}
                         <img src={ noProdsImg }/>
                         <p>No products available</p>
                     </div>

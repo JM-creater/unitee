@@ -50,7 +50,8 @@
     height: 14rem;
     background-color: white;
     border-radius: 10px;
-    margin: -5px;
+    margin: 5px;
+    cursor: pointer;
 }
 
 .adminShop-card-details {

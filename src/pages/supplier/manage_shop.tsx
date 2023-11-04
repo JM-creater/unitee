@@ -6,73 +6,106 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import addProductEventEmitter from "../../helpers/AddProductEventEmitter";
 
 function Manage_Shop() {
-  interface Department {
-    departmentId: number;
-    department_Name: string;
-  }
+    interface Department {
+      departmentId: number;
+      department_Name: string;
+    }
 
-  interface ProductType {
-    productTypeId: number;
-    product_Type: string;
-  }
+    interface ProductType {
+      productTypeId: number;
+      product_Type: string;
+    }
 
-  interface SizeQuantity {
-    size: string;
-    quantity: string;
-  }
+    interface SizeQuantity {
+      size: string;
+      quantity: string;
+    }
 
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [products, setProducts] = useState([]);
+    const [departments, setDepartments] = useState<Department[]>([]);
+    const [productTypes, setProductTypes] = useState<ProductType[]>([]);
 
-  const [productName, setProductName] = useState("");
-  const [newName, setNewName] = useState("");
+    const [productName, setProductName] = useState("");
+    const [newName, setNewName] = useState("");
 
-  const [productDescription, setProductDescription] = useState("");
-  const [newDescription, setNewDescription] = useState("");
+    const [productDescription, setProductDescription] = useState("");
+    const [newDescription, setNewDescription] = useState("");
 
-  const [productPrice, setProductPrice] = useState("");
-  const [newPrice, setNewPrice] = useState("");
+    const [productPrice, setProductPrice] = useState("");
+    const [newPrice, setNewPrice] = useState("");
 
-  const [productCategory, setProductCategory] = useState("");
-  const [newCategory, setNewCategory] = useState("");
+    const [productCategory, setProductCategory] = useState("");
+    const [newCategory, setNewCategory] = useState("");
 
-  const [productTypeId, setSelectedProductType] = useState("");
-  const [newTypeId, setNewProductType] = useState("");
+    const [productTypeId, setSelectedProductType] = useState("");
+    const [newTypeId, setNewProductType] = useState("");
 
-  const [sizes, setSizes] = useState<SizeQuantity[]>([]);
-  const [Newsizes, setNewSizes] = useState([]);
+    const [sizes, setSizes] = useState<SizeQuantity[]>([]);
+    const [Newsizes, setNewSizes] = useState([]);
 
-  const [departmentId, setSelectedDepartment] = useState("");
-  const [newDepartmentId, setNewDepartment] = useState("");
+    const [, setSelectedDepartment] = useState("");
+    const [newDepartmentId, setNewDepartment] = useState("");
 
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [newSelectedImage, setNewSelectedImage] = useState<File | null>(null);
-  
-  const [NewisActive, setNewIsActive] = useState(); 
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [newSelectedImage, setNewSelectedImage] = useState<File | null>(null);
+    
+    const [NewisActive, setNewIsActive] = useState(); 
+
+    const [selectedDepartments, setSelectedDepartments] = useState([]);
+    const [newSelectedDepartments, setNewSelectedDepartments] = useState([]);
+
+    const { id } = useParams();
+    const inputRef = useRef<HTMLInputElement>(null);
 
 
-  const { id } = useParams();
-  const inputRef = useRef<HTMLInputElement>(null);
+    // * Department Change for Add
+    const handleDepartmentChange = (departmentId, isChecked) => {
+      if (isChecked) {
+        setSelectedDepartments([...newSelectedDepartments, departmentId]);
+      } else {
+        setSelectedDepartments(newSelectedDepartments.filter(id => id !== departmentId));
+      }
+    };
+
+    // * Department Change for Edit
+    const handleDepartmentChangeEdit = (departmentId, isChecked) => {
+      const newDepartments = isChecked
+        ? [...newSelectedDepartments, departmentId]
+        : newSelectedDepartments.filter(id => id !== departmentId);
+    
+      setNewSelectedDepartments(newDepartments);
+    };
+
+    const selectProductForEditing = (productItem) => {
+      setNewSelectedDepartments(productItem.departments.map(dept => dept.departmentId));
+    };
+
+    // * Reset Button
+    const HandleResetButton = () => {
+      setSelectedDepartment("");
+      setSelectedProductType("");
+      setSizes([]);
+
+      setProductName("");
+      setProductDescription("");
+      setProductPrice("");
+      setProductCategory("");
+
+      setSelectedImage(null);
+    }
   
     const handleImageClick = () => {
-        if (inputRef.current) {
-            inputRef.current.click();
-        }
+      if (inputRef.current) {
+          inputRef.current.click();
+      }
     };
 
     const handleCategoryChange = (e, gender) => {
-        if (productCategory === gender) {
-            setNewCategory('');
-            setProductCategory('');
-            e.target.checked = false; 
-        } else {
-            setNewCategory(gender);
-            setProductCategory(gender);
-        }
+      setProductCategory(productCategory === gender ? '' : gender);
     };
 
     const handleCategoryChange2 = (gender) => {
@@ -81,9 +114,9 @@ function Manage_Shop() {
       } else {
           setNewCategory(gender);
       }
-  };
+    };
 
-  // Upload Image
+  // * Upload Image for Add
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setSelectedImage(event.target.files[0]);
@@ -99,6 +132,7 @@ function Manage_Shop() {
     }
   };
 
+  // * Upload Image for Edit
   const handleFileChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setNewSelectedImage(event.target.files[0]);
@@ -114,31 +148,47 @@ function Manage_Shop() {
     }
   };
 
-  // Read All Departments
+  // * Get All Departments
   useEffect(() => {
-    axios
-      .get("https://localhost:7017/Department")
-      .then((res) => {
-        setDepartments(res.data);
-      })
-      .catch((err) => {
-        console.error(err);
+    const fetchDepartments = async () => {
+      try {
+        const response = await axios.get("https://localhost:7017/Department");
+        setDepartments(response.data);
+      } catch (error) {
+        console.error(error);
         toast.error("Error fetching departments");
-      });
+      }
+    }
+    fetchDepartments();
   }, []);
 
-  // Read All Product Types
+  // * Get All Product Types
   useEffect(() => {
-    axios
-      .get("https://localhost:7017/ProductType")
-      .then((res) => {
-        setProductTypes(res.data);
-      })
-      .catch((err) => {
-        console.error(err);
+    const fetchProductType = async () => {
+      try {
+        const response = await axios.get("https://localhost:7017/ProductType");
+        setProductTypes(response.data);
+      } catch (error) {
+        console.error(error);
         toast.error("Error fetching product types");
-      });
+      }
+    }
+    fetchProductType();
   }, []);
+
+  // * Get Product By Supplier Id
+  useEffect(() => {
+    const fetchProductSupplierId = async () => {
+      try {
+        const response = await axios.get(`https://localhost:7017/Product/bysupplier/${id}`);
+        setProducts(response.data);
+      } catch (error) {
+        console.error(error);
+        toast.error("Error fetching products");
+      }
+    }
+    fetchProductSupplierId();
+  }, [id]);
 
   const getProductTypeName = (productTypeId) => {
     const productType = productTypes.find((p) => p.productTypeId === productTypeId);
@@ -159,24 +209,30 @@ function Manage_Shop() {
     }
   }
 
-  //Handle Change Status
+  // * Handle Change Status
   function handleChangeStatus(active) {
     if (active == true) {
-    const userConfirmed = window.confirm('Do you want to Deactivate this product?');
-    if (userConfirmed) {
-      axios.put(`https://localhost:7017/Product/deactivate/${selectedProduct.productId}`)
-      window.location.reload();
-    } else { /* empty */ }
-  } else if (active == false){
-    const userConfirmed = window.confirm('Do you want to Activate this product?');
-    if (userConfirmed) {
-            axios.put(`https://localhost:7017/Product/activate/${selectedProduct.productId}`)
-            window.location.reload();
-          } else { /* empty */ }
-  }
+      const userConfirmed = window.confirm('Do you want to Deactivate this product?');
+
+      if (userConfirmed) {
+        axios.put(`https://localhost:7017/Product/deactivate/${selectedProduct.productId}`)
+        window.location.reload();
+
+      } else { /* empty */ }
+
+    } else if (active == false) {
+      const userConfirmed = window.confirm('Do you want to Activate this product?');
+
+      if (userConfirmed) {
+        axios.put(`https://localhost:7017/Product/activate/${selectedProduct.productId}`)
+        window.location.reload();
+
+      } else { /* empty */ }
+
+    }
   }
   
-  //Handle Change Button
+  // * Handle Change Button
   function handleChangeButton(active) {
     if ( active == true) {
       const button = document.getElementById('btnStatus');
@@ -193,7 +249,7 @@ function Manage_Shop() {
     }
   }
 
-  // Edit Item
+  // * Edit Item
   const handleEdit = () => {
     const selectedSizes = Newsizes.filter(({ size }) => size);
 
@@ -277,7 +333,7 @@ function Manage_Shop() {
       });
   };
 
-  // Add Item
+  // * Add Item
   const handleAddItem = () => {
     const selectedSizes = sizes.filter(({ size }) => size);
 
@@ -288,7 +344,6 @@ function Manage_Shop() {
     if (!productPrice || isNaN(Number(productPrice))) errorMessages.push("Valid Product Price is required");
     if (!productCategory) errorMessages.push("Product Category is required");
     if (!productTypeId) errorMessages.push("Product Type is required");
-    if (!departmentId) errorMessages.push("Department is required");
     if (!selectedImage) errorMessages.push("Image is required");
     if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
 
@@ -299,13 +354,15 @@ function Manage_Shop() {
 
     const formData = new FormData();
     formData.append("ProductTypeId", productTypeId);
-    formData.append("DepartmentId", departmentId);
     formData.append("ProductName", productName);
     formData.append("Description", productDescription);
     formData.append("Category", productCategory);
     formData.append("Price", productPrice);
     formData.append("Image", selectedImage as File);
     formData.append("SupplierId", id);
+    selectedDepartments.forEach(departmentId => {
+      formData.append('DepartmentIds', departmentId);
+    });
 
     axios
       .post("https://localhost:7017/Product/addproduct", formData, {
@@ -315,6 +372,7 @@ function Manage_Shop() {
       })
       .then(async (productResponse) => {
         if (productResponse.status === 200) {
+          addProductEventEmitter.emit("addProduct");
           toast.success("Successfully Added An Item");
 
           const sizeApiCalls = selectedSizes.map(({ size, quantity }) => {
@@ -336,6 +394,7 @@ function Manage_Shop() {
           });
 
           try {
+            addProductEventEmitter.emit("addProduct");
             await Promise.all(sizeApiCalls);
           } catch (error) {
             console.log(productResponse.data);
@@ -345,23 +404,18 @@ function Manage_Shop() {
           toast.error(productResponse.data.message);
         }
       })
-      .catch(() => {
-        toast.error("Network error or server not responding");
+      .catch((error) => {
+        if (error.response) {
+          toast.error(error.response.data.message);
+        } else if (error.request) {
+          toast.error("Network error or server not responding");
+        } else {
+          toast.error("Error", error.message);
+        }
       });
   };
 
-  useEffect(() => {
-    axios
-      .get(`https://localhost:7017/Product/bysupplier/${id}`)
-      .then((response) => {
-        setProducts(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error("Error fetching products");
-      });
-  }, [id]);
-
+  // * Total Stock Product
   const totalStock = (sizes) => {
     if (!sizes || sizes.length === 0) {
       return 0;
@@ -394,13 +448,13 @@ function Manage_Shop() {
                     setNewSizes(productItem.sizes); 
                     setNewPrice(productItem.price);
                     setNewCategory(productItem.category);
-                    setNewDepartment(productItem.departmentId);
                     setNewDescription(productItem.description);
                     setNewIsActive(productItem.isActive);
                     setNewName(productItem.productName);
                     setNewProductType(productItem.productTypeId);
                     setNewSelectedImage(productItem.image);
                     handleCategoryChange2(productItem.category);
+                    selectProductForEditing(productItem);
                     }}>
                       <div className="prod-shop-image-container">
                           <img className="supplier-shop-prod-image" src={ productItem.image ? `https://localhost:7017/${productItem.image}` : prodImage }/>
@@ -437,7 +491,7 @@ function Manage_Shop() {
             <div className="modal-basta-container">
               <span>You can add new products to your shop here</span>
               <div className="modal-btns-container">
-                <button type="button" className="cancel-btn-modal" data-bs-dismiss="modal">
+                <button type="button" className="cancel-btn-modal" data-bs-dismiss="modal" onClick={HandleResetButton}>
                   Cancel
                 </button>
                 <button type="button" className="save-prod-btn" onClick={handleAddItem}>
@@ -479,6 +533,7 @@ function Manage_Shop() {
                       name="prodName" 
                       placeholder="Enter product name"
                       id="prodName" 
+                      value={productName}
                       onChange={(e) => setProductName(e.target.value)} 
                       onKeyDown={handleKeyDown}
                     />
@@ -488,6 +543,7 @@ function Manage_Shop() {
                         className="form-control" 
                         aria-label="Product description" 
                         placeholder="Enter product description" 
+                        value={productDescription}
                         onChange={(e) => setProductDescription(e.target.value)} 
                         onKeyDown={handleKeyDown}
                     />
@@ -495,72 +551,73 @@ function Manage_Shop() {
                 <label className="prod-details-labels">Department</label>
                 {/* DEPARTMENT CHECKBOX */}
                 <div className="suppliers-department-checkbox">
-                  <select
-                    name="prodGender"
-                    id="prodGender"
-                    style={{ padding: "5px", fontSize: "12px", borderRadius: "10px", width: "18rem" }}
-                    onChange={(e) => setSelectedDepartment(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                  >
-                    <option value="" defaultChecked>Select a Department</option>
-                    {departments.map((department, index) => (
-                      <option key={index} value={department.departmentId}>
-                        {department.department_Name}
-                      </option>
-                    ))}
-                  </select>
+                  {departments.map((department, index) => (
+                    <label key={index}>
+                      <input
+                        type="checkbox"
+                        value={department.departmentId}
+                        checked={selectedDepartments.includes(department.departmentId)}
+                        onChange={(e) => handleDepartmentChange(department.departmentId, e.target.checked)}
+                      />
+                      {department.department_Name}
+                    </label>
+                  ))}
                 </div>
-                   {/* GENDER OPTIONS */}
-                    <label className="prod-details-labels">Gender</label>
-                    <div className="department-option">
-                        <input 
-                            type="radio" 
-                            value="Male" 
-                            name="gender"
-                            id="departmentCheck1"
-                            onChange={(e) => handleCategoryChange(e, 'Male')}
-                            onKeyDown={handleKeyDown}
-                        />
-                        <label className="departmentCheckLabel" htmlFor="departmentCheck1">
-                            Male
-                        </label>
-                    </div>
-                    <div className="department-option">
-                        <input 
-                            type="radio" 
-                            value="Female" 
-                            name="gender"
-                            id="departmentCheck2"
-                            onChange={(e) => handleCategoryChange(e, 'Female')}
-                            onKeyDown={handleKeyDown}
-                        />
-                        <label className="departmentCheckLabel" htmlFor="departmentCheck2">
-                            Female
-                        </label>
-                    </div>
-                    <div className="department-option">
-                        <input 
-                            type="radio" 
-                            value="Unisex" 
-                            name="gender"
-                            id="departmentCheck3"
-                            onChange={(e) => handleCategoryChange(e, 'Unisex')}
-                            onKeyDown={handleKeyDown}
-                        />
-                        <label className="departmentCheckLabel" htmlFor="departmentCheck3">
-                            Unisex
-                        </label>
-                    </div>
+                  {/* GENDER OPTIONS */}
+                  <label className="prod-details-labels">Gender</label>
+                  <div className="department-option">
+                      <input 
+                          type="radio" 
+                          value="Male" 
+                          name="gender"
+                          id="departmentCheck1"
+                          checked={productCategory === 'Male'}
+                          onChange={(e) => handleCategoryChange(e, 'Male')}
+                          onKeyDown={handleKeyDown}
+                      />
+                      <label className="departmentCheckLabel" htmlFor="departmentCheck1">
+                          Male
+                      </label>
+                  </div>
+                  <div className="department-option">
+                      <input 
+                          type="radio" 
+                          value="Female" 
+                          name="gender"
+                          id="departmentCheck2"
+                          checked={productCategory === 'Female'}
+                          onChange={(e) => handleCategoryChange(e, 'Female')}
+                          onKeyDown={handleKeyDown}
+                      />
+                      <label className="departmentCheckLabel" htmlFor="departmentCheck2">
+                          Female
+                      </label>
+                  </div>
+                  <div className="department-option">
+                      <input 
+                          type="radio" 
+                          value="Unisex" 
+                          name="gender"
+                          id="departmentCheck3"
+                          checked={productCategory === 'Unisex'}
+                          onChange={(e) => handleCategoryChange(e, 'Unisex')}
+                          onKeyDown={handleKeyDown}
+                      />
+                      <label className="departmentCheckLabel" htmlFor="departmentCheck3">
+                          Unisex
+                      </label>
+                  </div>
 
                 <label className="prod-details-labels">Product Type</label>
                 <select 
-                    name="prodGender" 
-                    id="prodGender" 
+                    name="prodType" 
+                    id="prodType" 
                     style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem' }}
+                    value={productTypeId}
                     onChange={(e) => setSelectedProductType(e.target.value)}
                     onKeyDown={handleKeyDown}
                 >
-                    <option value="" defaultChecked>Select Type of Product</option>
+                    <option value="" disabled selected hidden>Select Type of Product</option>
                     {productTypes.map((productType, index) => (
                         <option key={index} value={productType.productTypeId}>
                             {productType.product_Type}
@@ -575,6 +632,7 @@ function Manage_Shop() {
                   name="prodPrice" 
                   placeholder="Enter product price"
                   id="prodPrice" 
+                  value={productPrice}
                   onChange={(e) => setProductPrice(e.target.value)} 
                   onKeyDown={handleKeyDown}
                 />
@@ -608,6 +666,8 @@ function Manage_Shop() {
             </div>
         </div>
         </div>
+
+
 
         {/* EDIT PRODUCT INFO MODAL */}
         <div className="modal fade" id="editProductModal" tabIndex={-1} aria-labelledby="editProductModalLabel" aria-hidden="true">
@@ -675,20 +735,19 @@ function Manage_Shop() {
                     {/* DEPARTMENT CHECKBOX */}
                     <label className="prod-details-labels">Department</label>
                     <div className="suppliers-department-checkbox">
-                        <select 
-                            name="prodGender" 
-                            id="prodGender" 
-                            style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem' }}
-                            onChange={(e) => setNewDepartment(e.target.value)}
-                        >
-                            {departments.map((department, index) => (
-                                <option key={index} value={department.departmentId} selected={selectedProduct.departmentId === department.departmentId}>
-                                    {department.department_Name}
-                                </option>
-                            ))}
-                        </select>
+                    {departments.map((department, index) => (
+                      <label key={index}>
+                        <input
+                          type="checkbox"
+                          value={department.departmentId}
+                          checked={newSelectedDepartments.includes(department.departmentId)}
+                          onChange={(e) => handleDepartmentChangeEdit(department.departmentId, e.target.checked)}
+                        />
+                        {department.department_Name}
+                      </label>
+                    ))}
                     </div>
-
+                    
                     {/* GENDER OPTIONS */}
                     <label className="prod-details-labels">Gender</label>
                     <div className="department-option">

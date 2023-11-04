@@ -1,7 +1,7 @@
 import './register.css';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import logo from '../../src/assets/images/unitee.png';
 import 'react-toastify/dist/ReactToastify.css';
@@ -34,6 +34,14 @@ function Register() {
   const [cityPermit, setCityPermit] = useState(null);
   const [schoolPermit, setSchoolPermit] = useState(null);
   const navigate = useNavigate();
+
+    useEffect(() => {
+      const fetchedID = localStorage.getItem('generatedSupplierID');
+      if (fetchedID) {
+          setIDNumber(fetchedID);
+          localStorage.removeItem('generatedSupplierID');
+      }
+    }, []);
 
   const handleIDnumber = (value) => {
     if (/^[0-9]*$/.test(value)) {
@@ -225,12 +233,14 @@ function Register() {
                 justifyContent: 'center',
               }}
             >
+              <span style={{ paddingLeft: '70px' }}>This is your ID Number:</span>
               <input
                 className="col-md-5 input-register"
                 type="text"
                 placeholder="Store ID"
                 onChange={(e) => handleIDnumber(e.target.value)}
                 value={IDNumber}
+                disabled
               />
               <input
                 className="col-md-5 input-register"
