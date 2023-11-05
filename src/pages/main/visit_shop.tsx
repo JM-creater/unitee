@@ -451,7 +451,7 @@ function Visit_Shop () {
                 </div>
             </div>
         </div>
-        
+
         <div className="shop-content2-container">
             {filteredProduct.map(product => (
                 <div 
