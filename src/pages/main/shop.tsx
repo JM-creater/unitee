@@ -1,5 +1,5 @@
 import './shop.css'
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import shopPic1Carousel from "../../assets/images/carouselPic2.png"
 import shopPic2Carousel from  "../../assets/images/carouselPic1.png"
 import starIcon from "../../assets/images/icons/starRating.png"
@@ -13,9 +13,19 @@ function Shop() {
     const [averageRating, setAverageRating] = useState(0);
     const [shop, setShop] = useState([]);
     const [departmentId, setDepartmentId] = useState<number | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
     const { userId } = useParams();
+    const navigate = useNavigate();
     
+    const handleSearchInputChange = (event) => {
+        setSearchTerm(event.target.value);
+    };
+
+    const performSearch = () => {
+        navigate(`/shop/${userId}/search_product?search=${searchTerm}`);
+    };
     
+
     useEffect(() => {
         axios.get(`https://localhost:7017/Users/UserDepartment/${userId}`)
             .then(res => {
@@ -78,9 +88,27 @@ function Shop() {
                     <p className='shop-title2'>New Passion.</p>
                 </div> 
             </div>
-        <div className='col-md-10 shopLabel-text-container'>
-            <h2 className='visit-shop-text'>Shops for you to visit</h2>
-        </div>
+
+            <div className="search-container">
+                <span className="fa fa-search form-control-feedback search-icon"></span>
+                <input 
+                    className="col-md-4 Supplier-SearchBar"
+                    type="text"
+                    placeholder="Search Product"
+                    value={searchTerm}
+                    onChange={handleSearchInputChange}
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                            performSearch();
+                        }
+                    }}
+                />
+            </div>
+
+            <div className='col-md-10 shopLabel-text-container'>
+                <h2 className='visit-shop-text'>Shops for you to visit</h2>
+            </div>
+        
             <div className='supplier-container'>
             {shop.map((shops, index) => (
                 <Link key={index} className='link-to-seller' to={`/shop/${userId}/visit_shop/${shops.id}`}>
