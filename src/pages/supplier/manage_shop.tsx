@@ -48,7 +48,6 @@ function Manage_Shop() {
     const [Newsizes, setNewSizes] = useState([]);
 
     const [, setSelectedDepartment] = useState("");
-    const [newDepartmentId, setNewDepartment] = useState("");
 
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [newSelectedImage, setNewSelectedImage] = useState<File | null>(null);
@@ -65,9 +64,9 @@ function Manage_Shop() {
     // * Department Change for Add
     const handleDepartmentChange = (departmentId, isChecked) => {
       if (isChecked) {
-        setSelectedDepartments([...newSelectedDepartments, departmentId]);
+        setSelectedDepartments([...selectedDepartments, departmentId]);
       } else {
-        setSelectedDepartments(newSelectedDepartments.filter(id => id !== departmentId));
+        setSelectedDepartments(selectedDepartments.filter(id => id !== departmentId));
       }
     };
 
@@ -80,6 +79,7 @@ function Manage_Shop() {
       setNewSelectedDepartments(newDepartments);
     };
 
+    // * When Select Product it will show deparments are selected
     const selectProductForEditing = (productItem) => {
       setNewSelectedDepartments(productItem.departments.map(dept => dept.departmentId));
     };
@@ -210,30 +210,24 @@ function Manage_Shop() {
   }
 
   // * Handle Change Status
-  function handleChangeStatus(active) {
+  const handleChangeStatus = (active) => {
     if (active == true) {
       const userConfirmed = window.confirm('Do you want to Deactivate this product?');
-
       if (userConfirmed) {
         axios.put(`https://localhost:7017/Product/deactivate/${selectedProduct.productId}`)
         window.location.reload();
-
-      } else { /* empty */ }
-
+      } 
     } else if (active == false) {
       const userConfirmed = window.confirm('Do you want to Activate this product?');
-
       if (userConfirmed) {
         axios.put(`https://localhost:7017/Product/activate/${selectedProduct.productId}`)
         window.location.reload();
-
-      } else { /* empty */ }
-
+      } 
     }
   }
   
   // * Handle Change Button
-  function handleChangeButton(active) {
+  const handleChangeButton = (active) => {
     if ( active == true) {
       const button = document.getElementById('btnStatus');
           button.textContent='Deactivate';
@@ -250,88 +244,84 @@ function Manage_Shop() {
   }
 
   // * Edit Item
-  const handleEdit = () => {
-    const selectedSizes = Newsizes.filter(({ size }) => size);
+  const handleEdit = async () => {
+      const selectedSizes = Newsizes.filter(({ size }) => size);
+      const errorMessages = [];
 
-    console.log(
-      newCategory
-      ,newDepartmentId
-      ,newDescription
-      ,newName
-      ,newPrice
-      ,newSelectedImage
-      ,newTypeId
-      ,Newsizes
-      ,selectedProduct.productId
-      , selectedProduct.description
-    )
-    console.log(selectedProduct)
-    const errorMessages = [];
+      if (!newName) errorMessages.push("Product Name is required");
+      if (!newDescription) errorMessages.push("Product Description is required");
+      if (!newPrice || isNaN(Number(productPrice))) errorMessages.push("Valid Product Price is required");
+      if (!newCategory) errorMessages.push("Product Category is required");
+      if (!newTypeId) errorMessages.push("Product Type is required");
+      if (!newSelectedDepartments) errorMessages.push("Department is required");
+      if (!newSelectedImage) errorMessages.push("Image is required");
+      if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
 
-    if (!newName) errorMessages.push("Product Name is required");
-    if (!newDescription) errorMessages.push("Product Description is required");
-    if (!newPrice || isNaN(Number(productPrice))) errorMessages.push("Valid Product Price is required");
-    if (!newCategory) errorMessages.push("Product Category is required");
-    if (!newTypeId) errorMessages.push("Product Type is required");
-    if (!newDepartmentId) errorMessages.push("Department is required");
-    if (!newSelectedImage) errorMessages.push("Image is required");
-    if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
+      if (errorMessages.length > 0) {
+        errorMessages.forEach(message => toast.error(message));
+        return;
+      }
 
-    if (errorMessages.length > 0) {
-      errorMessages.forEach(message => toast.error(message));
-      return;
-    }
+      const formData = new FormData();
+      formData.append("ProductTypeId", newTypeId);
+      formData.append("ProductName", newName);
+      formData.append("Description", newDescription);
+      formData.append("Category", newCategory);
+      formData.append("Price", newPrice);
+      formData.append("Image", newSelectedImage as File);
+      formData.append("SupplierId", id);
+      newSelectedDepartments.forEach(departmentId => {
+        formData.append('DepartmentIds', departmentId);
+      });
 
-    const formData = new FormData();
-    formData.append("ProductTypeId", newTypeId);
-    formData.append("DepartmentId", newDepartmentId);
-    formData.append("ProductName", newName);
-    formData.append("Description", newDescription);
-    formData.append("Category", newCategory);
-    formData.append("Price", newPrice);
-    formData.append("Image", newSelectedImage as File);
-    formData.append("SupplierId", id);
+    try {
+        const productResponse = await axios.put(`https://localhost:7017/Product/${parseInt(selectedProduct.productId)}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
 
-    axios
-      .put(`https://localhost:7017/Product/${parseInt(selectedProduct.productId)}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then(async (productResponse) => {
         if (productResponse.status === 200) {
           toast.success("Successfully Updated An Item");
-
-          const sizeApiCalls = selectedSizes.map(({ size, quantity, id}) => {
-            const sizeFormData = new FormData();
-            sizeFormData.append("Size", size);
-            sizeFormData.append("Quantity", quantity);
-            console.log(id, size, quantity)
-            axios.put(
-              `https://localhost:7017/SizeQuantity/Update/${id}`,
-              sizeFormData,
-              {
-                headers: {
-                  "Content-Type": "multipart/form-data",
-                },
-              });
+          const productId = selectedProduct.productId;
+          const updateSizeApiCalls = [];
+          const createSizeApiCalls = [];
+            
+          selectedSizes.forEach(({ size, quantity, id }) => {
+              if (id) { 
+                  const sizeFormData = new FormData();
+                  sizeFormData.append("Size", size);
+                  sizeFormData.append("Quantity", quantity);
+                  sizeFormData.append("productId", productId);
+                  updateSizeApiCalls.push(axios.put(`https://localhost:7017/SizeQuantity/Update/${id}`, sizeFormData, {
+                      headers: {
+                          "Content-Type": "multipart/form-data",
+                      },
+                  }));
+              } else {  
+                  const sizeData = {
+                    size: size,
+                    productId: productId,
+                    quantity: quantity
+                };
+                  createSizeApiCalls.push(axios.post("https://localhost:7017/SizeQuantity/createsizequantity", sizeData, {
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                  }));
+              }
           });
-          window.location.reload();
 
-          try {
-            await Promise.all(sizeApiCalls);
-          } catch (error) {
-            console.log(productResponse.data);
-            toast.warning("Network error or server not responding while updating sizes");
-          }
+          await Promise.all([...updateSizeApiCalls, ...createSizeApiCalls]);
+          window.location.reload();
         } else {
           toast.error(productResponse.data.message);
         }
-      })
-      .catch(() => {
+      } catch (error) {
+        console.error(error);
         toast.error("Network error or server not responding");
-      });
-  };
+      }
+    };
 
   // * Add Item
   const handleAddItem = () => {
@@ -423,6 +413,23 @@ function Manage_Shop() {
     return sizes.reduce((acc, currentSize) => acc + Number(currentSize.quantity), 0);
   };
   
+  // * Delete Size and Quantity
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`https://localhost:7017/SizeQuantity/delete/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Error deleting the size quantity');
+      }
+
+      setNewSizes(Newsizes.filter(sizeQty => sizeQty.id !== id));
+    } catch (error) {
+      console.error('Failed to delete the size quantity:', error);
+    }
+  };
+
 
   return (
     <div className="manage-shop-main-container">
@@ -443,30 +450,31 @@ function Manage_Shop() {
           {products.length > 0 ? (
               products.map((productItem, index) => (
                   <div key={index} className="prod-card" data-bs-toggle="modal" data-bs-target="#editProductModal" 
-                  onClick={() => {
-                    setSelectedProduct(productItem); 
-                    setNewSizes(productItem.sizes); 
-                    setNewPrice(productItem.price);
-                    setNewCategory(productItem.category);
-                    setNewDescription(productItem.description);
-                    setNewIsActive(productItem.isActive);
-                    setNewName(productItem.productName);
-                    setNewProductType(productItem.productTypeId);
-                    setNewSelectedImage(productItem.image);
-                    handleCategoryChange2(productItem.category);
-                    selectProductForEditing(productItem);
-                    }}>
-                      <div className="prod-shop-image-container">
-                          <img className="supplier-shop-prod-image" src={ productItem.image ? `https://localhost:7017/${productItem.image}` : prodImage }/>
-                      </div>
-                      <div className="col-md-11 prod-shop-details">
-                          <span className="col-md-3 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{productItem.productName}</span>
-                          <span className="col-md-2 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{getProductTypeName(productItem.productTypeId)}</span>
-                          <span className="col-md-1 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{productItem.category}</span>
-                          <span className="col-md-1 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{totalStock(productItem.sizes)}</span>
-                          <span className="col-md-1 supplier-prod-details" style={{backgroundColor: productItem.isActive? 'green' : 'red', color: 'white'}}>{productItem.isActive ? 'Active' : 'Inactive'}</span>
-                          <h4 className="col-md-2 supplier-prod-price" style={{color: productItem.isActive? '' : 'black'}}>₱{productItem.price}</h4>
-                      </div>
+                    onClick={() => {
+                      setSelectedProduct(productItem); 
+                      setNewSizes(productItem.sizes); 
+                      setNewPrice(productItem.price);
+                      setNewCategory(productItem.category);
+                      setNewDescription(productItem.description);
+                      setNewIsActive(productItem.isActive);
+                      setNewName(productItem.productName);
+                      setNewProductType(productItem.productTypeId);
+                      setNewSelectedImage(productItem.image);
+                      handleCategoryChange2(productItem.category);
+                      selectProductForEditing(productItem);
+                    }}
+                  >
+                    <div className="prod-shop-image-container">
+                        <img className="supplier-shop-prod-image" src={ productItem.image ? `https://localhost:7017/${productItem.image}` : prodImage }/>
+                    </div>
+                    <div className="col-md-11 prod-shop-details">
+                        <span className="col-md-3 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{productItem.productName}</span>
+                        <span className="col-md-2 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{getProductTypeName(productItem.productTypeId)}</span>
+                        <span className="col-md-1 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{productItem.category}</span>
+                        <span className="col-md-1 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{totalStock(productItem.sizes)}</span>
+                        <span className="col-md-1 supplier-prod-details" style={{backgroundColor: productItem.isActive? 'green' : 'red', color: 'white'}}>{productItem.isActive ? 'Active' : 'Inactive'}</span>
+                        <h4 className="col-md-2 supplier-prod-price" style={{color: productItem.isActive? '' : 'black'}}>₱{productItem.price}</h4>
+                    </div>
                   </div>
               ))
           ) : (
@@ -806,7 +814,7 @@ function Manage_Shop() {
                         style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem' }}
                         onChange={(e) => setNewProductType(e.target.value)}
                     >
-                        <option value="0" selected>Select Type of Product</option>
+                        <option value="" disabled selected hidden>Select Type of Product</option>
                         {productTypes.map((productType, index) => (
                             <option key={index} value={productType.productTypeId} selected={selectedProduct.productTypeId === productType.productTypeId}>
                                 {productType.product_Type}
@@ -816,32 +824,46 @@ function Manage_Shop() {
 
                     {/* SIZES AVAILABLE CHECKBOX */}
                     <label className="prod-details-labels">Sizes Available</label>
-                <div className="suppliers-sizes-avail-checkbox">
-                  {Newsizes.map((sizeQty, index) => (
-                    <div key={index} className="supplier-size-avail-item">
-                      <input
-                        className="supplier-size-avail-checkbox"
-                        type="text"
-                        placeholder="Size"
-                        defaultValue={sizeQty.size}
-                        onChange={(e) => (sizeQty.size = e.target.value)}
-                      />
-                      <input
-                        className="supplier-size-avail-checkbox"
-                        type="text"
-                        placeholder="Quantity"
-                        defaultValue={sizeQty.quantity}
-                        onChange={(e) => (sizeQty.quantity = e.target.value)}
-                      />
-                      <span onClick={() => setNewSizes(Newsizes.filter((_, i) => i !== index))} style={{ cursor: "pointer", color: "red" }}>
-                        X
-                      </span>
+                    <div className="suppliers-sizes-avail-checkbox">
+                      {Newsizes.map((sizeQty, index) => (
+                        <div key={index} className="supplier-size-avail-item">
+                          <input
+                            className="supplier-size-avail-checkbox"
+                            type="text"
+                            placeholder="Size"
+                            defaultValue={sizeQty.size}
+                            onChange={(e) => {
+                              const newSizeQty = { ...sizeQty, size: e.target.value }; // Create a new object with the updated size
+                              setNewSizes(Newsizes.map((sq) => sq.id === sizeQty.id ? newSizeQty : sq)); // Update the state with the new size
+                            }}
+                          />
+                          <input
+                            className="supplier-size-avail-checkbox"
+                            type="text"
+                            placeholder="Quantity"
+                            defaultValue={sizeQty.quantity}
+                            onChange={(e) => {
+                              const newSizeQty = { ...sizeQty, quantity: e.target.value }; // Create a new object with the updated quantity
+                              setNewSizes(Newsizes.map((sq) => sq.id === sizeQty.id ? newSizeQty : sq)); // Update the state with the new quantity
+                            }}
+                          />
+                          <span onClick={() => handleDelete(sizeQty.id)} style={{ cursor: "pointer", color: "red" }}>
+                            X
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
                 <button className="addSizeBtn" onClick={addNewSizeInput2}>Add Size +</button>
                     <label className="prod-details-labels">Price</label>
-                    <input className="modal-input-box" type="text" name="prodPrice" id="prodPrice" placeholder="Enter product price" value={newPrice} onChange={(e) => setNewPrice(e.target.value)}/>
+                    <input 
+                      className="modal-input-box" 
+                      type="text" 
+                      name="prodPrice" 
+                      id="prodPrice" 
+                      placeholder="Enter product price" 
+                      value={newPrice} 
+                      onChange={(e) => setNewPrice(e.target.value)}
+                    />
                 </div>
             </div>    
             </div>
