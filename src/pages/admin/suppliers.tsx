@@ -37,7 +37,7 @@ function Suppliers () {
                 const response = await axios.get('https://localhost:7017/Users/getSuppliers');
                 setSupplier(response.data);
             } catch (error) {
-                toast.error('Network error or server not responding');
+                console.error('Network error or server not responding');
             }
         };
     
@@ -62,7 +62,7 @@ function Suppliers () {
                 const response = await axios.get('https://localhost:7017/Users/getSuppliers');
                 setSupplier(response.data);
             } catch (error) {
-                toast.error('Network error or server not responding');
+                console.error('Network error or server not responding');
             }
         };
     

@@ -1,13 +1,12 @@
 import './search_product.css'
 import MWSizing from "../../assets/images/MW SIZING.png"
 import UNISEX from "../../assets/images/UNISEX SIZING.png"
-import starIcon from "../../assets/images/icons/starRating.png"
 import cartIcon from "../../assets/images/icons/addToCart.png"
 import prodRatingModal from "../../assets/images/icons/starRating.png"
 import axios from 'axios'
 import { toast } from 'react-toastify';
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import cartEventEmitter from "../../helpers/EventEmitter"
 
 
@@ -18,12 +17,6 @@ function  Search_Product () {
         department_Name: string;
     }
 
-    interface Supplier {
-        id: number;
-        shopName: string;
-        image: string | null;
-    }
-
     const [ratings, setRatings] = useState(null);
     const [averageRating, setAverageRating] = useState(0);
     const [, setCart] = useState([]);
@@ -32,16 +25,44 @@ function  Search_Product () {
     const [selectedProductType, setSelectedProductType] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [suppliers, setSuppliers] = useState<Record<number, Supplier>>({});
     const [selectedGender, setSelectedGender] = useState('');
     const [selectedSize, setSelectedSize] = useState(null);
     const [quantity, setQuantity] = useState(0);
     const [newQuantity, setNewQuantity] = useState(0);
-    const [departmentId, setDepartmentId] = useState<number | null>(null);
-    const { userId, id: shopId } = useParams();
-    const supplier = suppliers[shopId];
+    const [searchTerm, setSearchTerm] = useState('');
+    const { userId } = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const search = searchParams.get('search');
 
-    // Get All departments
+    // * Handle to handle input changes
+    const handleSearchInputChange = (event) => {
+        setSearchTerm(event.target.value);
+    };
+
+    // * Handle to perform search
+    const performSearch = () => {
+        navigate(`/shop/${userId}/search_product?search=${searchTerm}`);
+    };
+
+    // * Fetch products based on search
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                if (search) {
+                    const response = await axios.get(`https://localhost:7017/Product/recommender?search=${search}`);
+                    setDisplayProduct(response.data);
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error('Network error or server not responding');
+            }
+        }
+        fetchProducts();
+    }, [search]);
+
+    // * Get All departments
     useEffect(() => {
         axios.get('https://localhost:7017/Department')
         .then(response => {
@@ -52,47 +73,13 @@ function  Search_Product () {
         })
     }, []);
 
-    //Get Department Name
+    // * Get Department Name
     const getDepartmentName = (departmentId: number) => {
         const department = departments.find(d => d.departmentId === departmentId);
         return department ? department.department_Name : 'Unknown Department';
     };
 
-    useEffect(() => {
-        axios.get(`https://localhost:7017/Users/UserDepartment/${userId}`)
-            .then(res => {
-                setDepartmentId(res.data.departmentId);
-            })
-            .catch(err => {
-                console.error(err);
-            });
-    }, [userId]);
-
-    // Get All Products
-    useEffect(() => {
-        if (!departmentId) return;
-        axios.get(`https://localhost:7017/Product/ByShop/${shopId}/ByDepartment/${departmentId}`)
-            .then(async res => {
-                setDisplayProduct(res.data);
-
-                // Fetch supplier data for each product
-                const supplierIds = res.data.map(product => product.supplierId);
-                const uniqueSupplierIds = [...new Set(supplierIds)];
-                const suppliersData = {};
-
-                for (const shopId of uniqueSupplierIds) {
-                    const response = await axios.get(`https://localhost:7017/Supplier/${shopId}`);
-                    suppliersData[shopId as number] = response.data;
-                }
-
-                setSuppliers(suppliersData);
-            })
-            .catch(err => {
-                console.error(err);
-            });
-    }, [shopId, departmentId]);
-
-    //Filter Products
+    // * Filter Products
     const filteredProduct = displayProduct.filter(product => 
         (
             selectedGender === '' ||
@@ -110,7 +97,7 @@ function  Search_Product () {
         )
     );
     
-    // Handle Product Type Filter
+    // * Handle Product Type Filter
     const handleProductTypeClick = (e) => {
         const value = e.target.value;
         if (selectedProductType === value) {
@@ -121,7 +108,7 @@ function  Search_Product () {
         }
     }
 
-    // Handle Gender Filter
+    // * Handle Gender Filter
     const handleGenderClick = (e, gender) => {
         if (selectedGender === gender) {
             setSelectedGender('');
@@ -140,7 +127,7 @@ function  Search_Product () {
         }
     }
     
-    // Add To Cart
+    // * Add To Cart
     const addToCart = () => {
         const CloseBtn = document.getElementById("btnClose");
         if (!selectedProduct) return;
@@ -178,7 +165,7 @@ function  Search_Product () {
         });
     };
 
-    // Update the Product Details Modal
+    // * Update the Product Details Modal
     useEffect(() => {
         const modal = document.getElementById('viewProdDetailsModal') 
         if (modal) {
@@ -191,7 +178,7 @@ function  Search_Product () {
     }, []);
 
 
-    // Handle the Selected Size
+    // * Handle the Selected Size
     const HandleSelectedSize = (event) => {
         const sizeId = parseInt(event.target.value, 10); 
         const selectedSize = selectedProduct.sizes.find(size => size.id === sizeId);
@@ -201,7 +188,7 @@ function  Search_Product () {
         }
     }
 
-    // Handle Close Button
+    // * Handle Close Button
     const HandleCloseButton = () => {
         setQuantity(0);
         setSelectedProduct(null);
@@ -209,7 +196,7 @@ function  Search_Product () {
         setSelectedSize(null);
     };
 
-    // Handle Minus Quantity
+    // * Handle Minus Quantity
     const HandleMinusQuantity = () => {
         const currentQuantity = quantity;
         if(currentQuantity > 0) {
@@ -217,7 +204,7 @@ function  Search_Product () {
         }
     };
 
-    // Handle Minus Quantity
+    // * Handle Minus Quantity
     const HandlePlusQuantity = () => {
         const currentQuantity = quantity;
         const UpdateQuantity = newQuantity;
@@ -229,6 +216,7 @@ function  Search_Product () {
         }
     };
 
+    // ! To Be Fixed
     useEffect(() => {
         axios.get(`https://localhost:7017/Rating/${userId}`)
             .then((response) => {
@@ -245,8 +233,19 @@ function  Search_Product () {
     return <div className="search-prod-main-container">
         <div className="search-container">
                 <span className="fa fa-search form-control-feedback search-icon"></span>
-                <input className="col-md-4 Supplier-SearchBar" type="text" placeholder="Search Product" />
-        </div>
+                <input 
+                    className="col-md-4 Supplier-SearchBar"
+                    type="text"
+                    placeholder="Search Product"
+                    value={searchTerm}
+                    onChange={handleSearchInputChange}
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                            performSearch();
+                        }
+                    }}
+                />
+            </div>
 
         <div className='sub-container'>
             <div className='recommender-filter-container'>
@@ -261,18 +260,6 @@ function  Search_Product () {
                             </div>
                             {/* check button product types */}
                             <div className="col-md-8 prod-type-checkbox">
-                                {/* <h4 className="type-filter-label">
-                                    <input 
-                                        className="form-check-input prod-cart-checkBox" 
-                                        type="radio" 
-                                        value="1" 
-                                        name="productType"
-                                        id="shopProdTypeAll"
-                                        checked={selectedProductType === '1'}
-                                        onChange={handleProductTypeChange}
-                                    />
-                                    <hr/> All
-                                </h4> */}
                                 <h4 className="type-filter-label">
                                     <input 
                                         className="form-check-input prod-cart-checkBox" 
