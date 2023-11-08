@@ -40,10 +40,10 @@ function Supplier_ViewProf () {
          }}>
             <div className="col-md-6 editProf-details-1">
                 <label className='profLabelEdit' htmlFor="profFirstName">Shop Name</label>
-                <input type="text" id='profFirstName' />
+                <input className="input-prof" type="text" id='profFirstName'></input>
 
                 <label className='profLabelEdit' htmlFor="profLastName">Address</label>
-                <input type="text" id='profLastName' />
+                <input className="input-prof" type="text" id='profLastName'></input>
 
                 <label className='profLabelEdit' htmlFor="profDepartment">Department</label>
                 <select name="departmentProf" id="profDepartment"
@@ -60,16 +60,16 @@ function Supplier_ViewProf () {
 
             <div className="col-md-6 editProf-details-2">
                 <label className='profLabelEdit' htmlFor="profEmail">Email</label>
-                <input type="email" id='profEmail' />
+                <input className="input-prof" type="email" id='profEmail'></input>
 
                 <label className='profLabelEdit' htmlFor="profPhone">Phone Number</label>
-                <input type="text" id='profPhone' />
+                <input className="input-prof" type="text" id='profPhone'></input>
 
                 <label className='profLabelEdit' htmlFor="editPass">Password</label>
-                <input type="password" name="" id="editPass" />
+                <input className="input-prof" type="password" name="" id="editPass"></input>
 
                 <label className='profLabelEdit' htmlFor="confirmPassEdit">Confirm Password</label>
-                <input type="password" name="" id="confirmPassEdit" />
+                <input className="input-prof" type="password" name="" id="confirmPassEdit"></input>
             </div>
         </div>
         <div className="saveChanges-btn-container">
