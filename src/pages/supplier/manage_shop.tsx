@@ -532,7 +532,7 @@ function Manage_Shop() {
                 </div>
 
                 <div className="col-md supplier-prod-details-modal">
-                    <h3 className="prod-details-titles">Product Details</h3>
+                    <h3 className="col-md-12 prod-details-titles">Product Details</h3>
 
                     <label className="prod-details-labels" htmlFor="prodName">Product Name</label>
                     <input 
@@ -662,7 +662,7 @@ function Manage_Shop() {
                         placeholder="Quantity"
                         onChange={(e) => (sizeQty.quantity = e.target.value)}
                       />
-                      <span onClick={() => setSizes(sizes.filter((_, i) => i !== index))} style={{ cursor: "pointer", color: "red" }}>
+                      <span className="close-btn-size" onClick={() => setSizes(sizes.filter((_, i) => i !== index))} style={{ cursor: "pointer", color: "red" }}>
                         X
                       </span>
                     </div>

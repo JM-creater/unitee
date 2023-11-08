@@ -102,12 +102,15 @@ function Supplier_Main (){
                     )}
 
                     <ul className="dropdown-menu" style={{ padding:'10px', width:'15rem' }}>
-                        <li className="drop-list">
-                            <a className="dropdown-item supplier-drop-item" style={{ fontSize:'15px' }}>
-                                <img className="drop-icon" src={ editprof }/>
-                                Manage Profile
-                            </a>
-                        </li>
+                        <Link to='supplier_viewProf'>
+                            <li className="drop-list">
+                                <a className="dropdown-item supplier-drop-item" style={{ fontSize:'15px' }}>
+                                    <img className="drop-icon" src={ editprof }/>
+                                    View Profile
+                                </a>
+                            </li>
+                        </Link>
+                        
                         <Link className="drop-link-item" to="/">
                             <li className="drop-list">
                                 <a className="dropdown-item supplier-drop-item" style={{ fontWeight:'600', fontSize:'15px' }}>

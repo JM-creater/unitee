@@ -7,6 +7,7 @@ import './admin_main.css'
 import usersIcon from "../../assets/images/icons/profile.png"
 import adminReportsIcon from "../../assets/images/icons/reports.png"
 import shopsIcon from "../../assets/images/icons/store-2.png"
+import viewProfIcon from "../../assets/images/icons/view.png"
 import logoutAdminIcon from "../../assets/images/icons/logout-4.png"
 
 
@@ -63,6 +64,11 @@ function Admin_Main() {
                 <Link className="admin-nav-link" to='admin_reports'>
                     <img className="admin-nav-icon" src={ adminReportsIcon }/>
                     <span className="admin-nav-text">Reports</span>
+                </Link>
+
+                <Link className="admin-nav-link" to='admin_viewProf'>
+                    <img className="admin-nav-icon" src={ viewProfIcon }/>
+                    <span className="admin-nav-text">View Profile</span>
                 </Link>
             </div>
         </header>

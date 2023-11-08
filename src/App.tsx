@@ -11,12 +11,14 @@ import Cart from './pages/main/cart'
 import Order_Tracking from './pages/main/order_tracking'
 import User_Profile from './pages/main/user_profile'
 import Visit_Shop from './pages/main/visit_shop'
+import ViewCustomer_Profile from './pages/main/viewCustomer_profile'
 //import Supplier from './pages/supplier/supplier_items'
 import Add_item from './pages/supplier/add_item'
 import Update_item from './pages/supplier/update_item'
 import Admin_Dashboard from './pages/admin/admin-dashboard'
 import Suppliers from './pages/admin/suppliers'
 import Add_supplier from './pages/admin/add_supplier'
+import Admin_viewProf from './pages/admin/admin_viewProf'
 import View_Customers from './pages/admin/view_customers'
 import Admin_Shops from './pages/admin/admin_shops'
 import Admin_Main from './pages/admin/admin_main'
@@ -30,6 +32,7 @@ import { ToastContainer } from 'react-toastify'
 import RegisterSupplier from './pages/register_supplier'
 import Manage_Shop from './pages/supplier/manage_shop'
 import Supplier_Main from './pages/supplier/supplier_main'
+import Supplier_ViewProf from './pages/supplier/supplier_viewProf'
 import Supplier from './pages/supplier/supplier_dashboard'
 import Reports from './pages/supplier/reports'
 import Forgot_Password from './pages/forgot_password'
@@ -67,6 +70,7 @@ function App() {
             <Route path='user_profile/:id' element={ <User_Profile/> }></Route>
             <Route path='notif' element={ <Notif/> }></Route>
             <Route path='order_tracking' element={ <Order_Tracking/> }></Route>
+            <Route path='viewCustomer_profile' element={ <ViewCustomer_Profile/> }/>
             <Route path='purchase_history' element={ <Purchase_History/> }></Route>
             <Route path='notif' element={ <Notif/> }></Route>
             {/* <Route path='/main/:id' element={ <Main/> }></Route>   */}
@@ -78,6 +82,7 @@ function App() {
             <Route path='suppliers' element={ <Suppliers/> }></Route>
             <Route path='view_customers' element={ <View_Customers/> }/>
             <Route path='admin_reports' element={ <Admin_Reports/> }/>
+            <Route path='admin_viewProf' element={ <Admin_viewProf/> }/>
             <Route path='admin_shops' element={ <Admin_Shops/> }/>
             <Route path='add_supplier' element={ <Add_supplier/> }/>
           </Route>
@@ -87,6 +92,7 @@ function App() {
             <Route index element={ <Supplier/> }/>
             <Route path='supplier_orders' element={ <Supplier_Order/> }/>
             <Route path='manage_shop' element={ <Manage_Shop/> }/>
+            <Route path='supplier_viewProf' element={ <Supplier_ViewProf/> }/>
             <Route path='reports' element={ <Reports/> }/>
           </Route>
 
