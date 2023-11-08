@@ -259,7 +259,11 @@
 
 .thumbnail-container {
     position: relative;
-    display: inline-block; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 30em;
+     
 }
 
 .overlay-icon {
@@ -270,4 +274,17 @@
     font-size: 30px; 
     color: white; 
     cursor: pointer;
+}
+
+.supplier-size-avail-item {
+    width: 41em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.close-btn-size {
+    font-size: 14px;
+    font-weight: 600;
 }

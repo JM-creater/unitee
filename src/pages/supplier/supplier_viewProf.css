@@ -1,0 +1,7 @@
+.viewProfile-supplier-main-container {
+    height: 92vh;
+    width: 85vw;
+    padding: 30px;
+    flex-wrap: wrap;
+    overflow: auto;
+}
