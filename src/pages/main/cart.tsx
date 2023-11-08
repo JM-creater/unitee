@@ -339,7 +339,6 @@ function Cart () {
                                     <div className="col-md-3 prodName-container">
                                       <Link to={`/shop/${userId}/visit_shop/${cartItem.supplierId}`} className="plain-link-shop">
                                         <h3 className="prod-name-cart">{item.product.productName}</h3>
-                                        <p>{item.product.description}</p>
                                       </Link>
                                     </div>
                                     
