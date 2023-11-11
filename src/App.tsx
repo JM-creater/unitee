@@ -70,7 +70,7 @@ function App() {
             <Route path='user_profile/:id' element={ <User_Profile/> }></Route>
             <Route path='notif' element={ <Notif/> }></Route>
             <Route path='order_tracking' element={ <Order_Tracking/> }></Route>
-            <Route path='viewCustomer_profile' element={ <ViewCustomer_Profile/> }/>
+            <Route path='viewCustomer_profile/:id' element={ <ViewCustomer_Profile/> }/>
             <Route path='purchase_history' element={ <Purchase_History/> }></Route>
             <Route path='notif' element={ <Notif/> }></Route>
             {/* <Route path='/main/:id' element={ <Main/> }></Route>   */}
@@ -92,7 +92,7 @@ function App() {
             <Route index element={ <Supplier/> }/>
             <Route path='supplier_orders' element={ <Supplier_Order/> }/>
             <Route path='manage_shop' element={ <Manage_Shop/> }/>
-            <Route path='supplier_viewProf' element={ <Supplier_ViewProf/> }/>
+            <Route path='supplier_viewProf/:id' element={ <Supplier_ViewProf/> }/>
             <Route path='reports' element={ <Reports/> }/>
           </Route>
 
