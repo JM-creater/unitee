@@ -44,6 +44,10 @@ function Cart () {
     const { userId } = useParams();
     const fileInputRef = useRef(null);
 
+    //For Delay
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    //Handle Reference Id
     const handleReferenceId = (value) => {
       if (/^[0-9]*$/.test(value)) {
         setReferenceId(value);
@@ -193,6 +197,10 @@ function Cart () {
           cartEventEmitter.emit("cartEmptied");
           notifEventEmitter.emit("notifAdded");
           orderEventEmitter.emit("notifNewOrderAdded");
+
+          await sleep(1000);
+          window.location.reload();
+
         } catch (error) {
           console.log("Error in placing order", error);
           toast.error(error.response.data);
@@ -412,11 +420,6 @@ function Cart () {
                         className="proof-payment-img" 
                         value={referenceId} 
                         onChange={(e) => handleReferenceId(e.target.value)} 
-                        onKeyDown={(e) => {
-                          if (e.key < '0' || e.key > '9') {
-                            e.preventDefault();
-                          }
-                        }}
                         maxLength={13}
                       />
                   </div>

@@ -6,9 +6,16 @@ import emailIcon from "../../assets/images/icons/mail-2.png"
 import phoneIcon from "../../assets/images/icons/smartphone-call.png"
 import './supplier_viewProf.css'
 import { useEffect, useState } from "react"
-import { useParams } from "react-router"
+import { useNavigate, useParams } from "react-router"
 import axios from "axios"
 import { toast } from "react-toastify"
+
+type ValidationErrors = {
+    shopName?: string;
+    address?: string;
+    email?: string;
+    phoneNumber?: string;
+  };
 
 function Supplier_ViewProf () {
 
@@ -20,7 +27,19 @@ function Supplier_ViewProf () {
     const [password, setPassword] = useState('');
     const {id} = useParams();
 
+    //For Delay
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+    //Handle for Keypress
+    const handlePhoneNumber = (value) => {
+        if (/^[0-9]*$/.test(value)) {
+          setPhoneNumber(value);
+        } else {
+          toast.error('Phone Number must contain only numbers.');
+        }
+      };
+
+    //Fetch User Data
     useEffect(() => {
         axios.get(`https://localhost:7017/Users/${id}`)
             .then(res => {
@@ -36,9 +55,48 @@ function Supplier_ViewProf () {
             });
     }, [id]);
 
-    const HandleUpdate = async () => {
-        console.log("test")
+    //Validation Trappings
+        const validateForm = (): ValidationErrors => {
+        const errors: ValidationErrors = {};
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+            
+        if (!shopName) {
+            errors.shopName = 'Shop Name is required.';
+            toast.error(errors.shopName);
+        }
+            
+        if (!address) {
+            errors.address = 'Address is required.';
+            toast.error(errors.address);
+        }
+            
+        if (!email) {
+            errors.email = 'Email is required';
+            toast.error(errors.email);
+        } else if (!regex.test(email)) {
+            errors.email = 'This is not a valid email format';
+            toast.error(errors.email);
+        }
+            
+        if (!phoneNumber) {
+            errors.phoneNumber = 'Phone Number is required.';
+            toast.error(errors.phoneNumber);
+        } else if (phoneNumber.length !== 11 || !/^\d+$/.test(phoneNumber)) {
+            errors.phoneNumber = 'Phone Number must be exactly 11 numeric characters.';
+            toast.error(errors.phoneNumber);
+        }
+            
+        return errors;
+        };
 
+    //Update Button Handler
+    const HandleUpdate = async (event: React.FormEvent) => {
+
+    event.preventDefault();
+    const errors: ValidationErrors = validateForm();
+
+    if (Object.keys(errors).length === 0)
+    {
         const formData = new FormData();
         formData.append("shopName", shopName);
         formData.append("address", address);
@@ -55,19 +113,24 @@ function Supplier_ViewProf () {
 
             if(productResponse.status == 200) 
             {
-                toast.success("Success");
+                    toast.success('Successfully Updated.');
+                    await sleep(1000);
+
+                    window.location.reload();
+            }
+            else
+            {
+                alert(productResponse.data);
             }
         }
         catch (error)
         {
             console.error(error);
-            toast.error("Network error or server not responding");
+            toast.error("Failed to Update. Please try again later.");
         }
-        finally
-        {
-            window.location.reload();
-        }
-    }
+    };
+
+}
 
 
     return <div className="viewProfile-customer-main-container">
@@ -116,7 +179,7 @@ function Supplier_ViewProf () {
                     
 
                     <label className='profLabelEdit' htmlFor="profPhone">Phone Number</label>
-                    <input className='input-prof' type="text" id='profPhone' value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)}></input>
+                    <input className='input-prof' type="text" id='profPhone' value={phoneNumber} onChange={(e) => handlePhoneNumber(e.target.value)} maxLength={11}></input>
 
                     <label className='profLabelEdit' htmlFor="editPass">Password</label>
                     <input className='input-prof' type="password" name="" id="editPass" value={password} disabled></input>
