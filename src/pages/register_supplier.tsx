@@ -1,10 +1,11 @@
 import './register.css';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import logo from '../../src/assets/images/unitee.png';
 import 'react-toastify/dist/ReactToastify.css';
+import registerUsersEventEmitter from '../helpers/RegisterUsersEmitter';
 
 type ValidationErrors = {
   IDNumber?: string;
@@ -33,6 +34,14 @@ function Register() {
   const [cityPermit, setCityPermit] = useState(null);
   const [schoolPermit, setSchoolPermit] = useState(null);
   const navigate = useNavigate();
+
+    useEffect(() => {
+      const fetchedID = localStorage.getItem('generatedSupplierID');
+      if (fetchedID) {
+          setIDNumber(fetchedID);
+          localStorage.removeItem('generatedSupplierID');
+      }
+    }, []);
 
   const handleIDnumber = (value) => {
     if (/^[0-9]*$/.test(value)) {
@@ -117,8 +126,10 @@ function Register() {
           formData
         );
         if (response.data) {
-          toast.success('Successfully registered.');
-          navigate('/');
+          registerUsersEventEmitter.emit("registerSupplier");
+          toast.success('Successfully registered.', {
+            onClose: () => navigate('/')
+          });
         } else {
           alert(response.data);
         }
@@ -222,12 +233,14 @@ function Register() {
                 justifyContent: 'center',
               }}
             >
+              <span style={{ paddingLeft: '70px' }}>This is your ID Number:</span>
               <input
                 className="col-md-5 input-register"
                 type="text"
                 placeholder="Store ID"
                 onChange={(e) => handleIDnumber(e.target.value)}
                 value={IDNumber}
+                disabled
               />
               <input
                 className="col-md-5 input-register"
@@ -273,7 +286,7 @@ function Register() {
                 value={confirmPassword}
               />
               <div className="col-md-5 profile-pic-register-container">
-                <span className="col-md-4 uploadImage-register-label">
+                <span className="col-md-5 uploadImage-register-label">
                   Profile Picture
                 </span>
                 <input type="file" onChange={handleImageProfile} />
@@ -283,20 +296,20 @@ function Register() {
                 <input type="file" onChange={handleImageBirChange} />
               </div>
               <div className="col-md-5 cityPermit-pic-register-container">
-                <span className="col-md-4 uploadImage-register-label">City Permit</span>
+                <span className="col-md-5 uploadImage-register-label">City Permit</span>
                 <input type="file" onChange={handleImageCityPermit} />
               </div>
               <div
                 className="col-md-10 schoolPermit-pic-register-container"
                 style={{ marginRight: '10px' }}
               >
-                <span className="col-md-1 uploadImage-register-label">
+                <span className="uploadImage-register-label" style={{ marginRight:'20px' }}>
                   School Permit
                 </span>
                 <input type="file" onChange={handleImageSchoolPermit} />
               </div>
               <div className="col-md-10 register-supplier-btn-container">
-                <button className="col-md-4 btn btn-lg btn-primary" type="submit">
+                <button className="col-md-4 btn btn-lg btn-primary" style={{ borderRadius:'20px' }} type="submit">
                   Register
                 </button>
               </div>

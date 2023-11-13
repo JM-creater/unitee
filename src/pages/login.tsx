@@ -4,6 +4,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import illustration from '../../src/assets/images/loginPic.png';
 import logo from '../../src/assets/images/unitee.png';
+import forgotPass from '../../src/assets/images/icons/forgot.png'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -18,6 +19,11 @@ function Login() {
   const [Password, setPassword] = useState('');
   const navigate = useNavigate();
 
+  const generateRandomID = () => {
+    const id = Math.floor(10000000 + Math.random() * 90000000).toString();
+    localStorage.setItem('generatedSupplierID', id);
+  };
+
   const handleIDOrEmail = (value: string) => {
     setIDOrEmail(value);
   };
@@ -25,6 +31,12 @@ function Login() {
   const handlePassword = (value: string) => {
     setPassword(value);
   };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  }
 
   // Login Account
   const handleLogin = () => {
@@ -76,7 +88,7 @@ function Login() {
               navigate(`/supplier_dashboard/${result.data.user.id}`, { state: { supplierData: result.data.user } });
               break;
             case 'Admin':
-              navigate(`/admin_main/${result.data.user.id}`, { state: { adminData: result.data.user } });
+              navigate(`/admin_dashboard/${result.data.user.id}`, { state: { adminData: result.data.user } });
               break;
             default:
               console.log('Unknown role');
@@ -118,6 +130,7 @@ function Login() {
           placeholder="ID Number or Email"
           value={IDOrEmail}
           onChange={(e) => handleIDOrEmail(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <input
           className="col-md-7 input-login"
@@ -125,7 +138,16 @@ function Login() {
           placeholder="Password"
           value={Password}
           onChange={(e) => handlePassword(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
+
+        <div className='col-md-7 forgot-pwd-container'>
+          <Link to="/forgot_password">
+            <button className='forgot-pwd-btn'>
+              <img className='forgot-pwd-icon' src={ forgotPass }/>
+              Forgot Password</button>
+          </Link>
+        </div>
 
         <button className="col-md-7 login-btn" onClick={() => handleLogin()}>
           Log In
@@ -140,7 +162,7 @@ function Login() {
           </Link>
 
           <Link className="register-link" to="/register_supplier">
-            <button className="register-customer-btn"> Supplier</button>
+            <button className="register-customer-btn" onClick={generateRandomID}> Supplier</button>
           </Link>
         </div>
       </div>

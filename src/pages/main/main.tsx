@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router"
+import { Outlet } from "react-router"
 import { Link } from "react-router-dom"
 import './main.css'
 import logo from "../../assets/images/unitee.png"
@@ -8,25 +8,28 @@ import homeIcon from "../../assets/images/icons/homeIcon.png"
 import carts from "../../assets/images/icons/cartIcon.png"
 import orders from "../../assets/images/icons/shopping-bag-4.png"
 import notification from "../../assets/images/icons/notifIcon.png"
-import { useEffect, useState } from "react"
+import chatCustomer from "../../assets/images/icons/chat.png"
+import { useCallback, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
 import cartEventEmitter from "../../helpers/EventEmitter"
 import notifEventEmitter from "../../helpers/NotifEventEmitter"
+import * as signalR from "@microsoft/signalr"
+import { toast } from "react-toastify"
+import navEmptyCartImg from "../../assets/images/icons/empty-cart.png"
 
 function Main() {
 
     interface Customer {
         image: string;
     }
-
+    
     const [customer, setCustomer] = useState<Customer | null>(null); 
     const [notifItem, setNotifItem] = useState([]);
     const [totalItems, setTotalItems] = useState<number | null>(null);
     const [cart, setCart] = useState([]);
-    const { userId,  } = useParams();
-    const navigate = useNavigate();
-
+    const { userId } = useParams();
+    
     useEffect(() => {
         axios.get(`https://localhost:7017/Users/${userId}`)
         .then(response => {
@@ -34,31 +37,9 @@ function Main() {
         })
         .catch(error => {
             console.error(error);
-        })
+        });
     }, [userId]);
-
-
-    useEffect(() => {
-        const updateNotification = () => {
-            axios.get(`https://localhost:7017/Notification/${userId}`)
-                .then(response => {
-                    setNotifItem(response.data);
-                })
-                .catch(error => {
-                    console.error(error);
-                })
-        };
-        
-        notifEventEmitter.on("notifAdded", updateNotification)
     
-        updateNotification();
-    
-        return () => {
-            notifEventEmitter.on("notifAdded", updateNotification)
-        };
-    }, [userId]);
-
-
     useEffect(() => {
         const updateCartCount = () => {
             axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
@@ -74,17 +55,86 @@ function Main() {
         cartEventEmitter.on("itemAddedToCart", updateCartCount);
         cartEventEmitter.on("cartEmptied", updateCartCount);
         cartEventEmitter.on("cartUpdated", updateCartCount);
-    
         updateCartCount();
     
         return () => {
-            cartEventEmitter.on("itemAddedToCart", updateCartCount);
-            cartEventEmitter.on("cartEmptied", updateCartCount);
-            cartEventEmitter.on("cartUpdated", updateCartCount);
+            cartEventEmitter.off("itemAddedToCart", updateCartCount);
+            cartEventEmitter.off("cartEmptied", updateCartCount);
+            cartEventEmitter.off("cartUpdated", updateCartCount);
         };
     }, [userId]);
-    
 
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+                try {
+                    const response = await axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
+                    setCart(response.data);
+                } catch (error) {
+                    console.error('Network error or server not responding');
+            }
+        };
+
+        const handleFocus = () => {
+        fetchData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [userId]); 
+    
+    const updateNotification = useCallback(() => {
+        axios.get(`https://localhost:7017/Notification/unread/${userId}`)
+        .then(response => {
+            setNotifItem(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }, [userId]);
+    
+    useEffect(() => {  
+        notifEventEmitter.on("notifAdded", updateNotification);
+        updateNotification();
+    
+        return () => {
+            notifEventEmitter.off("notifAdded", updateNotification);
+        };
+    }, [userId, updateNotification]);
+
+    const handleNotificationClick = () => {
+        axios.post(`https://localhost:7017/Notification/markRead/${userId}`)
+        .then(() => {
+            updateNotification();
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }
+
+    useEffect(() => {
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:7017/notificationHub", {
+                skipNegotiation: true,
+                transport: signalR.HttpTransportType.WebSockets
+            })
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+    
+        connection.start().then(() => {
+            //console.log("Connected!");
+        }).catch(err => console.error("SignalR Connection Error: ", err));
+    
+        connection.on("OrderStatusUpdated", (message) => {
+            toast.success(`New Notification: ${message}`);
+            updateNotification();
+        });
+    
+    }, [updateNotification]);
+    
 
     return <div className="main">
             <header className="header" style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
@@ -96,6 +146,14 @@ function Main() {
                     <Link className="customer-nav-link" to=''>
                         <img className="nav-icon" src={ homeIcon }/>
                     </Link>
+
+                    <Link className="customer-nav-link" to='chat'>
+                        <img className="nav-icon" src={ chatCustomer }/>
+                    </Link>
+
+                    {/* <Link className="customer-nav-link" to='search_product'>
+                        <img className="nav-icon" src={ searchIcon }/>
+                    </Link> */}
 
                     <div className="customer-nav-link">
                         <div className="cart-icon-container">
@@ -124,28 +182,27 @@ function Main() {
                                         ))
                                     ))
                                 ) : (
-                                    <div className="empty-cart-message">Your cart is empty.</div>
+                                    <div className="pop-up-empty-cart-message">
+                                        <img className="pop-up-empty-cart-img" src={ navEmptyCartImg }/>
+                                        Your cart is empty.</div>
                                 )}
                                 <div className="cart-dropdown-footer">
                                     <div className="itemsTotal">
                                         {totalItems && totalItems > 0 ? `${totalItems} Products In Cart` : 'No Products In Cart'}
                                     </div>
-                                    <div className="hoverButton">
+                                    {/* <div className="hoverButton">
                                         <button onClick={() => navigate('cart')}>Go to Cart</button>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>
                     </div>
 
-
-                    <Link className="customer-nav-link" to='notif'>
-                    <div className="notif-icon-container">
-                        <Link to='notif'>
-                            <img className="nav-icon" src={ notification } />
-                            {notifItem !== null && notifItem.length > 0 && <span className="notif-count">{notifItem.length}</span>}
-                        </Link>
-                    </div>
+                    <Link className="customer-nav-link" to='notif' onClick={handleNotificationClick}>
+                        <div className="notif-icon-container">
+                            <img className="nav-icon" src={notification} />
+                            {notifItem.length > 0 && <span className="notif-count">{notifItem.length}</span>}
+                        </div>
                     </Link>
                     
                     <div className="col-md-1 dropdown">
@@ -154,18 +211,18 @@ function Main() {
                             <img 
                                 className="imageProfile"
                                 src={`https://localhost:7017/${customer.image}`} 
-                                style={{ width:'100%', maxWidth:'35px', borderStyle:'solid', borderRadius:'50%', height: '35px' ,borderColor:'#D3D3D3' }} 
+                                style={{ width:'100%', maxWidth:'30px', borderStyle:'solid', borderRadius:'50%', maxHeight: '30px' ,borderColor:'#D3D3D3' }} 
                                 data-bs-toggle="dropdown" 
                                 aria-expanded="false" 
                             />
                         </>
                     ) : null}
                     <ul className="dropdown-menu dropdown-menu-light" style={{ width:'300px'}}>
-                        <Link className="customer-nav-droplink" to={`user_profile/${userId}`}>
+                        <Link className="customer-nav-droplink" to='viewCustomer_profile'>
                             <li><a className="dropdown-item">
                             <img className="dropdown-icon"  src={ profIcon } />VIEW PROFILE</a></li></Link>
 
-                        <Link className="customer-nav-droplink" to='orders'>
+                        <Link className="customer-nav-droplink" to='purchase_history'>
                             <li><a className="dropdown-item">
                             <img className="dropdown-icon" src={ orders } alt="" />PURCHASE HISTORY</a></li></Link>
 

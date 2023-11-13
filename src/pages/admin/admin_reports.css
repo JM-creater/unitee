@@ -1,0 +1,81 @@
+.admin-reports-main-container {
+    height: 92vh;
+    width: 85vw;
+    padding: 20px;
+    background-color: #F0F0F0;
+    display: flex;
+    flex-flow: column;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+.admin-reports-allOrders-card {
+    display: flex;
+    background-color: white;
+    flex-flow: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-radius: 5px;
+    width: 23rem;
+}
+
+.admin-reports-header {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.admin-reports-headerIcons {
+    width: 100%;
+    max-width: 55px;
+    height: 55px;
+}
+
+.admin-salesCards-container {
+    display: flex;
+    flex-flow: row;
+    gap: 8px;
+}
+
+.admin-sales-card {
+    display: flex;
+    flex-flow: row;
+    background-color: white;
+    height: 10rem;
+    padding: 15px;
+    width: 18rem;
+    align-items: center;
+    border-radius: 5px;
+    justify-content: space-between;
+}
+
+.admin-generate-report-btn {
+    background-color: #004AAD;
+    height: 3rem;
+    color: white;
+    padding: 8px;
+    border-radius: 20px;
+}
+
+.admin-generate-report-btn:hover {
+    background-color: #020654;
+}
+
+.header-adminSales-label {
+    font-weight: 600;
+}
+
+.orderList-admin-container {
+    margin-top: 60px;
+}
+
+.admin-listOrders-filter-container {
+    display: flex;
+    flex-flow: row;
+    gap: 50px;
+    margin-top: 15px;
+    justify-content: end;
+    margin-bottom: 15px;
+}

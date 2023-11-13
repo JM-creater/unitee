@@ -57,6 +57,7 @@
 
   .gender-text-register {
     font-size: 15px;
+    font-weight: 600;
   }
 
   .register-gender-radio {
@@ -83,6 +84,7 @@
 
   .uploadImage-register-label {
     font-size: 15px;
+    font-weight: 600;
   }
 
   .input-register {
@@ -102,6 +104,10 @@
   text-decoration: none;
 }
 
+.register-to-login:hover {
+  text-decoration: none;
+}
+
 .back-to-login-btn-container {
   display: flex;
   justify-content: center;
@@ -110,7 +116,7 @@
 .back-to-loginBTN {
   margin-top: 20px;
   padding: 5px;
-  border-radius: 5px;
+  border-radius: 20px;
   color: #020654;
   font-weight: 600;
   font-size: 15px;

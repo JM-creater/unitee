@@ -69,6 +69,7 @@
 }
 
 .supplier-nav-link:hover {
+    text-decoration: none;
     background-color: #020654;
 }
 
@@ -77,6 +78,7 @@
     max-width: 40px;
     border: solid #f0f0f0;
     border-radius: 50%;
+    cursor: pointer;
 }
 
 .Supplier-SearchBar {
@@ -92,7 +94,16 @@
 
 .drop-link-item {
     text-decoration: none;
-    color: #004AAD;
+    /* color: #004AAD; */
+}
+
+.drop-link-item:hover {
+    text-decoration: none;
+    /* color: #004AAD; */
+}
+
+.drop-icon {
+    text-decoration: none;
 }
 
 .drop-icon {
@@ -114,4 +125,18 @@
     display: flex;
     justify-content: start;
     align-items: center;
+}
+
+.notifOrder-count {
+    position: absolute; 
+    margin-left: 100px;
+    margin-top: 3px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 1px 3px 3px 2px;
+    font-size: 10px;
+    min-width: 15px; 
+    max-height: 15px;
+    text-align: center; 
 }

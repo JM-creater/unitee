@@ -1,5 +1,5 @@
 import './shop.css'
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import shopPic1Carousel from "../../assets/images/carouselPic2.png"
 import shopPic2Carousel from  "../../assets/images/carouselPic1.png"
 import starIcon from "../../assets/images/icons/starRating.png"
@@ -9,11 +9,23 @@ import axios from 'axios'
 
 function Shop() {
 
+    const [ratings, setRatings] = useState(null);
+    const [averageRating, setAverageRating] = useState(0);
     const [shop, setShop] = useState([]);
     const [departmentId, setDepartmentId] = useState<number | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
     const { userId } = useParams();
-
+    const navigate = useNavigate();
     
+    const handleSearchInputChange = (event) => {
+        setSearchTerm(event.target.value);
+    };
+
+    const performSearch = () => {
+        navigate(`/shop/${userId}/search_product?search=${searchTerm}`);
+    };
+    
+
     useEffect(() => {
         axios.get(`https://localhost:7017/Users/UserDepartment/${userId}`)
             .then(res => {
@@ -34,6 +46,21 @@ function Shop() {
                 console.error(err);
             });
     }, [departmentId]);
+
+    useEffect(() => {
+        axios.get(`https://localhost:7017/Rating/${userId}`)
+            .then((response) => {
+                setRatings(response.data);
+
+                // Calculate average rating
+                const totalValue = response.data.reduce((acc, cur) => acc + cur.value, 0);
+                const avg = response.data.length > 0 ? (totalValue / response.data.length) : 0;
+                setAverageRating(+avg.toFixed(1)); 
+            }).catch((error) => {
+                console.error(error);
+            });
+    }, [userId]);
+    
 
     return <div className='container shop-contianer'>
         <div className='content-container'>
@@ -61,17 +88,42 @@ function Shop() {
                     <p className='shop-title2'>New Passion.</p>
                 </div> 
             </div>
-        <div className='col-md-9 shopLabel-text-container'>
-            <h2 className='visit-shop-text'>Shops for you to visit</h2>
-        </div>
+
+            <div className="search-container">
+                <span className="fa fa-search form-control-feedback search-icon"></span>
+                <input 
+                    className="col-md-4 Supplier-SearchBar"
+                    type="text"
+                    placeholder="Search Product"
+                    value={searchTerm}
+                    onChange={handleSearchInputChange}
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                            performSearch();
+                        }
+                    }}
+                />
+            </div>
+
+            <div className='col-md-10 shopLabel-text-container'>
+                <h2 className='visit-shop-text'>Shops for you to visit</h2>
+            </div>
+        
             <div className='supplier-container'>
             {shop.map((shops, index) => (
                 <Link key={index} className='link-to-seller' to={`/shop/${userId}/visit_shop/${shops.id}`}>
                     <div className="supplier-card">
                         <img src={ `https://localhost:7017/${shops.image}` } className="supplierCard-img"/>
-                        <div className='col-md-5 shop-card-details'>
+                        <div className='col-md-8 shop-card-details'>
                             <h5 className="supplier-card-title">{shops.shopName}</h5>
-                            <h5 className='shop-rating-card'><img className="ratingIcon" src={ starIcon }/>No Rating Yet</h5>
+                            {ratings && (
+                                <>
+                                    <h5 className='shop-rating-card'>
+                                        <img className="ratingIcon" src={starIcon} alt="Star icon" />
+                                        {averageRating}/5
+                                    </h5>
+                                </>
+                            )}
                             <h5 className='shop-rating-card'>{shops.address}</h5>
                         </div>
                     </div>

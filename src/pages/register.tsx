@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import logo from '../../src/assets/images/unitee.png';
 import './register.css';
+import registerUsersEventEmitter from '../helpers/RegisterUsersEmitter';
 
 function Register() {
   type ValidationErrors = {
@@ -113,8 +114,10 @@ function Register() {
       try {
         const response = await axios.post('https://localhost:7017/Users/register', formData);
         if (response.data) {
-          toast.success('Successfully registered.');
-          navigate('/');
+          registerUsersEventEmitter.emit("registerCustomer");
+          toast.success('Successfully registered.', {
+            onClose: () => navigate('/')
+          });
         } else {
           toast.error(response.data);
           return;
@@ -240,7 +243,7 @@ function Register() {
                 value={departmentId}
                 onChange={(e) => setSelectedDepartment(e.target.value)}
               >
-                <option>Select Department*</option>
+                <option>Select Department</option>
                 {departments.map((department) => (
                   <option key={department.departmentId} value={department.departmentId}>
                     {department.department_Name}
@@ -323,7 +326,7 @@ function Register() {
               </div>
 
               <div className="col-md-5 profile-pic-register-container">
-                <span className="col-md-4 uploadImage-register-label">Profile Picture</span>
+                <span className="col-md-5 uploadImage-register-label">Profile Picture</span>
                 <input type="file" onChange={handleImage} />
               </div>
 
@@ -333,7 +336,7 @@ function Register() {
               </div>
 
               <div className="col-md-10 register-customer-btn-container">
-                <button className="col-md-4 btn btn-lg btn-primary" type="submit">
+                <button className="col-md-4 btn btn-lg btn-primary" style={{ borderRadius:'20px' }} type="submit">
                   Register
                 </button>
               </div>

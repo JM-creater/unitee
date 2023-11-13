@@ -140,6 +140,10 @@
     text-decoration: none;
 }
 
+.no-underline-link:hover {
+    text-decoration: none;
+}
+
 .no-pending-orders {
     display: flex;
     flex-direction: column;
@@ -147,4 +151,35 @@
     justify-content: center;
     height: 100px;
     margin-bottom: 15px;
+}
+
+.no-productsDashboard-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh; 
+    font-size: 24px; 
+    overflow: -moz-hidden-unscrollable;
+}
+
+.no-productsDashboard-icon {
+    font-size: 50px; 
+}
+
+.btn-dashboardProduct {
+    margin: 10px;
+}
+
+.generate-report-btn {
+    padding: 5px 8px 5px 8px;
+    border: solid 1px;
+    border-radius: 20px;
+    font-size: 15px;
+}
+
+.generate-report-btn:hover {
+    background-color: #020654;
+    color: white;
+    font-weight: 600;
 }

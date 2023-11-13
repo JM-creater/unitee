@@ -1,0 +1,159 @@
+.admin-shops-main-container {
+    height: 92vh;
+    width: 85vw;
+    padding: 20px;
+    background-color: #F0F0F0;
+    display: flex;
+    flex-flow: column;
+}
+
+.shopProfileImgCard {
+    width: 100%;
+    max-width: 10rem;
+    border-radius: 5px;
+}
+
+.admin-shops-header {
+    padding: 10px;
+    width: 82vw;
+    height: 5rem;
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.admin-shops-filter {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+}
+
+.shops-admin-container {
+    display: flex;
+    flex-flow: row;
+    max-width: 85vw;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    padding: 10px;
+}
+
+.admin-shop-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    flex-flow: row;
+    width: 31.5rem;
+    height: 14rem;
+    background-color: white;
+    border-radius: 10px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.adminShop-card-details {
+    margin-left: 15px;
+    justify-content: start;
+    display: flex;
+    align-items: start;
+    flex-flow: column;
+}
+
+/* VIEW PRODUCTS MODAL */
+.viewProds-modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.productList-modalBody {
+    display: flex;
+    flex-flow: row;
+    justify-content: start;
+    align-items: start;
+    gap: 20px;
+}
+
+.admin-viewProds-card {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    gap: 10px;
+    height: 4.7rem;
+}
+
+.admin-prodFilter-container {
+    border-top: solid 3px white;
+    padding: 15px;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #F0F0F0;
+    width: 20vw;
+    border-radius: 10px;
+}
+
+.adminShop-prods-container {
+    width: 80%;
+    height: 80vh;
+    display: flex;
+    overflow-y: auto;
+    flex-wrap: wrap;
+    scroll-behavior: smooth;
+    flex-flow: column;
+    justify-content: flex-start; 
+    gap: 20px;
+}
+
+.admin-viewProd-img {
+    width: 100%;
+    max-width: 7rem;
+    max-height: 7rem;
+    border-radius: 5px;
+    margin-top: 25px;
+}
+
+.admin-prodPrice, .admin-prodStocks {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    color: white;
+}
+
+.admin-prodName {
+    color: white;
+}
+
+.totalStocks-adminProd, .price-adminProd {
+    font-size: 18px;
+    margin-left: 8px;
+    color: white;
+}
+
+.admin-prodShowDetails-btn {
+    border: solid 1px white;
+    color: white;
+    padding: 3px;
+    border-radius: 5px;
+    width: fit-content;
+    margin-left: 82rem;
+}
+
+.admin-prodShowDetails-btn:hover {
+    font-weight: 600;
+    padding: 2px;
+    border: solid 2px white;
+}
+
+.admin-prodDetails-labels {
+    font-weight: 600;
+}
+
+.admin-prodDetails-text {
+    font-weight: 400;
+}

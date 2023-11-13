@@ -17,7 +17,7 @@
     max-width: 100px;
     border-radius: 50%;
     border: solid 5px white;
-    margin-left: 53px;
+    margin-left: 25px;
 }
 
 .shopDetails-container-shop {
@@ -275,6 +275,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.prodModal-add-to-cart-btn:hover {
+    background-color: #005AAD;
 }
 
 .prodModal-cart-icon {

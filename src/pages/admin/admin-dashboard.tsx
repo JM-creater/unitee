@@ -1,186 +1,179 @@
-//import { Link } from 'react-router-dom'
-import revenue from "../../assets/images/icons/growth.png"
-import supplier from "../../assets/images/icons/supplier.png"
-import user from "../../assets/images/icons/user.png"
-import orders from "../../assets/images/icons/ordersbox.png"
-import product2 from "../../assets/images/shop_products/product2.png"
-import profile from '../../assets/images/imageprofile.jpeg'
+// import { Link } from 'react-router-dom'
+// import supplier from "../../assets/images/icons/supplier.png"
+// import user from "../../assets/images/icons/user.png"
+import shopProf from "../../assets/images/imageprofile.jpeg"
+import prodIcon from "../../assets/images/icons/shirt.png"
+import supplierIcon from "../../assets/images/icons/supplier-2.png"
+import customerIcon from "../../assets/images/icons/male-student.png"
 import './admin-dashboard.css'
 import { useEffect, useState } from "react"
 import axios from "axios"
+import { toast } from "react-toastify"
+import validationEventEmitter from "../../helpers/ValidationEmitter"
+import registerUsersEventEmitter from "../../helpers/RegisterUsersEmitter"
 
 function Admin_Dashboard () {
 
   const [customer, setCustomer] = useState([]);
   const [supplierData, setSupplierData] = useState([]);
 
-  // Get All Customers
-  useEffect(() => {
-      axios.get('https://localhost:7017/Users/getCustomers')
-          .then(res => {
-              setCustomer(res.data);
-          })
-          .catch((err) => {console.error(err)
-      });
+    // * Get All Customers with Event Emitter 
+    useEffect(() => {
+      const validationRequest = async () => {
+          try {
+              const response = await axios.get('https://localhost:7017/Users/getCustomers');
+              setCustomer(response.data);
+          } catch (error) {
+              toast.error('Network error or server not responding');
+          }
+      };
+      const validationListener = () => {
+          validationRequest();
+      };
+
+      validationEventEmitter.on("validInvalid", validationListener);
+      registerUsersEventEmitter.on("registerCustomer", validationListener)
+      validationRequest();
+
+      return () => {
+          validationEventEmitter.off("validInvalid", validationListener);
+          registerUsersEventEmitter.off("registerCustomer", validationListener)
+      };
+    }, []);
+
+
+    // * Windows Event Listener Focus for Customer
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+                const response = await axios.get('https://localhost:7017/Users/getCustomers');
+                setCustomer(response.data);
+            } catch (error) {
+                toast.error('Network error or server not responding');
+            }
+        };
+
+        const handleFocus = () => {
+            fetchData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [])
+
+    // * Get All Suppliers with Event Emitter
+    useEffect(() => {
+      const fetchShops = async () => {
+          try {
+              const response = await axios.get('https://localhost:7017/Users/getSuppliers');
+              setSupplierData(response.data);
+          } catch (error) {
+              toast.error('Network error or server not responding');
+          }
+      };
+
+      const validationListener = () => {
+          fetchShops();
+      };
+
+      validationEventEmitter.on("validInvalid", validationListener);
+      registerUsersEventEmitter.on("registerSupplier", validationListener)
+      fetchShops();
+
+      return () => {
+          validationEventEmitter.off("validInvalid", validationListener);
+          registerUsersEventEmitter.off("registerSupplier", validationListener)
+      };
   }, []);
 
-  // Get All Suppliers
+  // * Windows Event Listener Focus for Supplier
   useEffect(() => {
-    axios.get('https://localhost:7017/Users/getSuppliers')
-        .then(res => {
-            setSupplierData(res.data);
-        })
-        .catch((err) => {console.error(err)
-    });
-}, []);
+      const fetchData = async () => {
+      try {
+              const response = await axios.get('https://localhost:7017/Users/getSuppliers');
+              setSupplierData(response.data);
+          } catch (error) {
+              toast.error('Network error or server not responding');
+          }
+      };
+
+      const handleFocus = () => {
+          fetchData();
+      };
+
+      window.addEventListener('focus', handleFocus);
+
+      return () => {
+          window.removeEventListener('focus', handleFocus);
+      };
+  }, [])
 
 
     return <div className='admin-dashboard-main-container'>
-        <h1 className='page-title'>Dashboard</h1>
-        <div className='card-container'>
-        <div className="card-dashboard-admin card" style={{ width:'20rem'}}>
-  <div className="dashboard-card card-body2">
-    <div className='rev-content'>
-    <h5 className="dashboard-card-title2">Revenue</h5>
-    <h3 className='dashboard-card-text2'>PHP 20000</h3>
-    </div>
-    <img className='dashboard-icon' src={ revenue } alt="" />
-  </div>
-</div>
+        {/* NEW */}
+        <div className="col-md-7">
+          <h3 style={{ marginBottom:'20px', color:'#020654', fontWeight:'600' }}>Dashboard</h3>
 
-<div className="card-dashboard-admin card" style={{ width:'20rem'}}>
-  <div className="dashboard-card card-body2">
-    <div className='pending-content'>
-    <h5 className="dashboard-card-title2">Pending Orders</h5>
-    <h3 className='dashboard-card-text2'>200</h3>
-    </div>
-    <img className='dashboard-icon' src={ orders } alt="" />
-  </div>
-</div>
+        <div className="dash-admin-container">
+          <div className="card-content-container">
+            <div className="col-md-9 dash-card">
 
+              {/* PRODUCT COUNT */}
+              <span>Products</span>
+              <h1 className="col-md-11 number-dash">0</h1>
+            </div>
+            <img className="dash-card-icon" src={ prodIcon }/>
+          </div>
+          
+          {/* SUPPLIER COUNT */}
+          <div className="card-content-container">
+            <div className="col-md-9 dash-card">
+              <span>Suppliers</span>
+              {supplierData.length > 0 && (
+              <h1 className="col-md-11 number-dash">{supplierData.length}</h1>
+              )}
+            </div>
+            <img className="dash-card-icon" src={ supplierIcon }/>
+          </div>
 
-<div className="card-dashboard-admin card" style={{ width:'20rem'}}>
-  <div className="dashboard-card card-body2">
-    <div className='customer-content'>
-    <h5 className="dashboard-card-title2">Customers</h5>
-    {customer.length > 0 && (
-      <h3 className='dashboard-card-text2'>{customer.length}</h3>
-    )}
-    </div>
-    <img className='dashboard-icon' src={ user } alt="" />
-  </div>
-</div>
-
-<div className="card-dashboard-admin card" style={{ width:'20rem'}}>
-  <div className="dashboard-card card-body2">
-    <div className='suppliers-content'>
-    <h5 className="dashboard-card-title2">Suppliers</h5>
-    {supplierData.length > 0 && (
-      <h3 className='dashboard-card-text2'>{supplierData.length}</h3>
-    )}
-    </div>
-    <img className='dashboard-icon' src={ supplier } alt="" />
-  </div>
-</div>
+          {/* CUSTOMER COUNT */}
+          <div className="card-content-container">
+            <div className="col-md-9 dash-card">
+              <span>Customers</span>
+              {customer.length > 0 && (
+              <h1 className="col-md-11 number-dash">{customer.length}</h1>
+              )}
+            </div>
+            <img className="dash-card-icon" src={ customerIcon } alt="" />
+          </div>
         </div>
 
-       <div className='col-md-12 home-container-2 row'>
-       <div className='col-md-9 best-sellers-container'>
-            <h1>Best Sellers</h1>
-        <div className='col-md-12 best-sellers-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-        <table className="best-sellers table table-hover align-middle caption-top table-xl">
-        <thead className='table-dark align-middle'>
-            <tr className='thead-row'>
-            <th className="cart-table-header" scope="col">Product</th>
-            <th className="cart-table-header" scope="col">Price</th>
-            <th className="cart-table-header" scope="col">Shop</th>
-            <th className="cart-table-header" scope="col">Total Sales</th>
-            </tr>
-        </thead>
-        <tbody className="table-group-divider">
-            <tr>
-            <th scope="row" data-bs-toggle="modal"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>PHP 1000</td>
-            <td>Example Shop</td>
-            <td>PHP 50000</td>
-            </tr>
-            <tr>
-            <th scope="row" data-bs-toggle="modal"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>PHP 1000</td>
-            <td>Example Shop</td>
-            <td>PHP 50000</td>
-            </tr>
-            <tr>
-            <th scope="row" data-bs-toggle="modal"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>PHP 1000</td>
-            <td>Example Shop</td>
-            <td>PHP 50000</td>
-            </tr>
-            <tr>
-            <th scope="row" data-bs-toggle="modal"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>PHP 1000</td>
-            <td>Example Shop</td>
-            <td>PHP 50000</td>
-            </tr>
-            <tr>
-            <th scope="row" data-bs-toggle="modal"><img className="prod-image-cart" src={ product2 }/>Product Name</th>
-            <td>PHP 1000</td>
-            <td>Example Shop</td>
-            <td>PHP 50000</td>
-            </tr>
-        </tbody>
-        </table>
+
+        <div className="top-selling-prods-container">
+          <h3 className="top-selling-prods-title">Top Selling Products</h3>
+          <div className="top-prods-container">
+            <img className="top-prod-img" src={''}/>
+            <span className="top-prod-name">Sample Product Name</span>
+            <span className="top-prod-price">123</span>
+          </div>
         </div>
         </div>
 
-        <div className='col-md-9 best-sellers-container'>
-            <h1>Top Selling Shops</h1>
-        <div className='col-md-12 best-sellers-table-wrapper table-responsive-sm' style={{ marginTop:'20px'}}>
-        <table className="best-sellers table table-hover align-middle caption-top table-xl">
-        <thead className='table-dark align-middle'>
-            <tr className='thead-row'>
-            <th className="cart-table-header" scope="col">Shop</th>
-            <th className="cart-table-header" scope="col">supplier ID</th>
-            <th className="cart-table-header" scope="col">Total no. of Orders</th>
-            <th className="cart-table-header" scope="col">Total Sales</th>
-            </tr>
-        </thead>
-        <tbody className="table-group-divider">
-            <tr>
-            <th scope="row" data-bs-toggle="modal"><img className="prod-image-cart" src={ profile }/>Example Shop Name</th>
-            <td>764288</td>
-            <td>299999</td>
-            <td>PHP 50000</td>
-            </tr>
-            <tr>
-            <th scope="row" data-bs-toggle="modal"><img className="prod-image-cart" src={ profile }/>Example Shop Name</th>
-            <td>764288</td>
-            <td>8789785</td>
-            <td>PHP 50000</td>
-            </tr>
-            <tr>
-            <th scope="row" data-bs-toggle="modal"><img className="prod-image-cart" src={ profile }/>Example Shop Name</th>
-            <td>764288</td>
-            <td>8789785</td>
-            <td>PHP 50000</td>
-            </tr>
-            <tr>
-            <th scope="row" data-bs-toggle="modal"><img className="prod-image-cart" src={ profile }/>Example Shop Name</th>
-            <td>764288</td>
-            <td>8789785</td>
-            <td>PHP 50000</td>
-            </tr>
-            <tr>
-            <th scope="row" data-bs-toggle="modal"><img className="prod-image-cart" src={ profile }/>Example Shop Name</th>
-            <td>764288</td>
-            <td>8789785</td>
-            <td>PHP 50000</td>
-            </tr>
-        </tbody>
-        </table>
+        {/* TOP SELLERS */}
+        <div className="col top-sellers-dash">
+          <h3 style={{ marginBottom:'20px' }}>Top Sellers</h3>
+          <div className="dash-top-sellers-container">
+            <img className="shop-profile-top-seller" src={ shopProf }/>
+            <div className="top-shop-details-container">
+              <span className="shop-name-dash">Sample Shop Name</span>
+              <span className="shop-total-sale-dash"></span>
+            </div>
+            <span className="shop-totalProds-sold">Total Sales: 0</span>
+          </div>
         </div>
-        </div>
-       </div>
     </div>
 }
 

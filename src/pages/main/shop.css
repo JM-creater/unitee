@@ -340,21 +340,20 @@
   } */
 
   .shopLabel-text-container {
-    margin-top: 30px;
-    margin-bottom: 10px;
+    margin: 30px 10px 20px 60px;
   }
 
   .supplierCard-img {
     width: 100%;
-    max-width: 150px;
-    height: 140px;
+    max-width: 100px;
+    height: 100px;
     border-radius: 5px;
   }
 
   .supplier-card {
     display: flex;
     justify-content: space-between;
-    align-items: start;
+    align-items: center;
     padding: 15px;
     flex-flow: row;
     width: 27rem;
@@ -368,12 +367,18 @@
     text-decoration: none;
   }
 
+  .link-to-seller:hover {
+    text-decoration: none;
+  }
+
   .supplier-card-title {
     font-size: 18px;
+    font-weight: 600;
     margin-bottom: 15px;
     overflow: hidden; 
-    text-overflow: ellipsis; 
-    white-space: nowrap;
+    text-overflow: ellipsis;
+    height: fit-content;
+    white-space: wrap;
   }
 
   .shop-rating-card {

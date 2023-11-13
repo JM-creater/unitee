@@ -7,6 +7,9 @@ import axios from "axios"
 import { Link, useParams } from "react-router-dom"
 import cartEventEmitter from "../../helpers/EventEmitter";
 import Modal from 'bootstrap/js/dist/modal';
+import notifEventEmitter from "../../helpers/NotifEventEmitter";
+import orderEventEmitter from "../../helpers/OrderEmitter";
+import emptyCartImg from "../../assets/images/icons/empty-cart.png"
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const showToast = (message: string, type: number) => {
@@ -41,6 +44,7 @@ function Cart () {
     const { userId } = useParams();
     const fileInputRef = useRef(null);
 
+    // * Handle Reference Id
     const handleReferenceId = (value) => {
       if (/^[0-9]*$/.test(value)) {
         setReferenceId(value);
@@ -49,22 +53,27 @@ function Cart () {
       }
     };
 
+  // * Get Cart
   useEffect(() => {
-      axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
-      .then(res => {
-          setCart(res.data);
-      })
-      .catch(error => {
+      const fetchCart = async () => {
+        try {
+          const response = await axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
+          setCart(response.data);
+        } catch (error) {
           console.error(error);
-      });
+        }
+      }
+      fetchCart();
   }, [userId]);
 
-    // Handle Image
+  
+
+    // * Handle Image
     const handleProofOfPaymentChange = (event) => {
       setProofOfPayment(event.target.files[0]);
     }
 
-    // Calculate the total amount
+    // * Calculate the total amount
     const calculateTotalAmount = () => {
       let count = 0;
       const amount = cart.reduce((sum, cartItem) => {
@@ -80,7 +89,7 @@ function Cart () {
       setTotalItemsChecked(count);
     };
 
-    // Handle Minus Quantity
+    // * Handle Minus Quantity
     const HandleMinusQuantity = (index, itemIndex) => {
       const updatedCart = [...cart];
       if (updatedCart[index].items[itemIndex].quantity > 0) {
@@ -90,7 +99,7 @@ function Cart () {
       calculateTotalAmount();
     }
 
-    // Handle Plus Quantity
+    // * Handle Plus Quantity
     const HandlePlusQuantity = (index, itemIndex) => {
       const updatedCart = [...cart];
       updatedCart[index].items[itemIndex].quantity += 1;
@@ -98,7 +107,7 @@ function Cart () {
       calculateTotalAmount();
     }
 
-    // Handle Shop Total Amount
+    // * Handle Shop Total Amount
     const handleShopCheckboxChange = (cartIndex) => {
       const updatedCart = [...cart];
       const shopChecked = (document.getElementById(`shopRadio-${updatedCart[cartIndex].supplierId}`) as HTMLInputElement).checked;
@@ -111,7 +120,7 @@ function Cart () {
       calculateTotalAmount();
     };
 
-    // Handle Individual Product Amount
+    // * Handle Individual Product Amount
     const handleProductCheckboxChange = (cartIndex) => {
       const allItemsChecked = cart[cartIndex].items.every(item => {
         return (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement).checked;
@@ -120,7 +129,7 @@ function Cart () {
       calculateTotalAmount();
     };
 
-    // Handle Order Place
+    // * Handle Order Place
     const HandleOrderPlace = async () => {
       const checkedCartItems = cart.flatMap(cartItem => {
         const shopChecked = (document.getElementById(`shopRadio-${cartItem.supplierId}`) as HTMLInputElement).checked;
@@ -143,8 +152,18 @@ function Cart () {
         return;
       }
 
+      if (!referenceId) {
+        toast.error("Reference ID is required.");
+        return;
+      }
+
       if (referenceId.length !== 13) {
         toast.error("Reference ID must be 13 characters in length to place an order.");
+        return;
+      }
+
+      if (!proofOfPayment) {
+        toast.error("Please upload Proof of Payment.");
         return;
       }
   
@@ -156,6 +175,10 @@ function Cart () {
         formData.append('referenceId', referenceId);
         formData.append('proofOfPayment', proofOfPayment);
 
+        cartItem.items.forEach((item, index) => {
+          formData.append(`CartItemIds[${index}]`, item.id.toString());
+        });
+        
         const orderItems = cartItem.items.map(item => {
           return {
               ProductId: item.product.id,
@@ -174,6 +197,8 @@ function Cart () {
           axios.delete(`https://localhost:7017/Cart/deleteCart/${cartItem.id}`)
           toast.success("Successfully Ordered");
           cartEventEmitter.emit("cartEmptied");
+          notifEventEmitter.emit("notifAdded");
+          orderEventEmitter.emit("notifNewOrderAdded");
         } catch (error) {
           console.log("Error in placing order", error);
           toast.error(error.response.data);
@@ -190,7 +215,7 @@ function Cart () {
       }
     };
     
-    // Delete Method for Cart
+    // * Delete Method for Cart
     const removeCartItem = async (cartId) => {
       try {
           await fetch(`https://localhost:7017/Cart/delete/${cartId}`, {
@@ -201,7 +226,7 @@ function Cart () {
       }
     };
 
-    // Handle for Deleting a Cart
+    // * Handle for Deleting a Cart
     const handleRemoveCart = async () => {
       const itemsToRemove = [];
       const shopsToRemove = [];
@@ -242,7 +267,7 @@ function Cart () {
       cartEventEmitter.emit("cartUpdated");
     };
 
-    // Handle Remove Cart Modal
+    // * Handle Remove Cart Modal
     const handleRemoveCartPrompt = () => {
       const anyProductChecked = cart.some(shop => {
           return shop.items.some(item => {
@@ -281,6 +306,7 @@ function Cart () {
           <div className="SHOPS-MAIN-CONTAINER">
             {cart.length === 0 ? (
                 <div className="empty-cart-message">
+                  <img className="empty-cart-img" src={ emptyCartImg }/>
                     Your cart is currently empty. Start shopping now!
                 </div>
             ) : (
@@ -319,7 +345,6 @@ function Cart () {
                                     <div className="col-md-3 prodName-container">
                                       <Link to={`/shop/${userId}/visit_shop/${cartItem.supplierId}`} className="plain-link-shop">
                                         <h3 className="prod-name-cart">{item.product.productName}</h3>
-                                        <p>{item.product.description}</p>
                                       </Link>
                                     </div>
                                     
@@ -341,7 +366,7 @@ function Cart () {
                                         </select>
                                     </div>
                                     {/* Quantity */}
-                                    <div className="col-md-2 qua-container">
+                                    <div className="qua-container">
                                         <button className="minus-quantity-btn" onClick={() => HandleMinusQuantity(index, itemIndex)}>
                                             -
                                         </button>
@@ -388,16 +413,17 @@ function Cart () {
                       <input type="file" ref={fileInputRef} className="proof-payment-img" accept="image/png, image/gif, image/jpeg" onChange={handleProofOfPaymentChange}/>
                       <h2 className="total-amount-text">Reference Id (GCash):</h2>
                       <input 
-                      type="text" 
-                      className="proof-payment-img" 
-                      value={referenceId} 
-                      onChange={(e) => handleReferenceId(e.target.value)} 
-                      onKeyPress={(e) => {
-                        if (e.key < '0' || e.key > '9') {
-                          e.preventDefault();
-                        }
-                      }}
-                      maxLength={13}
+                        type="text" 
+                        style={{ borderRadius:'5px' }}
+                        className="proof-payment-img" 
+                        value={referenceId} 
+                        onChange={(e) => handleReferenceId(e.target.value)} 
+                        onKeyDown={(e) => {
+                          if (e.key < '0' || e.key > '9') {
+                            e.preventDefault();
+                          }
+                        }}
+                        maxLength={13}
                       />
                   </div>
                   <div className="btn-container">

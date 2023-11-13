@@ -1,61 +1,122 @@
-import prodImage from "../../assets/images/shop_products/product2.png";
+import prodImage from "../../assets/images/shop_products/picture-2.png";
 import addIcon from "../../assets/images/icons/plus-4.png";
+import noProdsIcon from "../../assets/images/icons/empty-box.png"
 import "./manage_shop.css";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import addProductEventEmitter from "../../helpers/AddProductEventEmitter";
 
 function Manage_Shop() {
-  interface Department {
-    departmentId: number;
-    department_Name: string;
-  }
+    interface Department {
+      departmentId: number;
+      department_Name: string;
+    }
 
-  interface ProductType {
-    productTypeId: number;
-    product_Type: string;
-  }
+    interface ProductType {
+      productTypeId: number;
+      product_Type: string;
+    }
 
-  interface SizeQuantity {
-    size: string;
-    quantity: string;
-  }
-  
-  const navigate = useNavigate();
-  const [products, setProducts] = useState([]);
-  const [productName, setProductName] = useState("");
-  const [productDescription, setProductDescription] = useState("");
-  const [productPrice, setProductPrice] = useState("");
-  const [productCategory, setProductCategory] = useState("");
-  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
-  const [productTypeId, setSelectedProductType] = useState("");
-  const [sizes, setSizes] = useState<SizeQuantity[]>([]);
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [departmentId, setSelectedDepartment] = useState("");
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-    const [isActive, setIsActive] = useState(false); 
+    interface SizeQuantity {
+      size: string;
+      quantity: string;
+    }
+
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [products, setProducts] = useState([]);
+    const [departments, setDepartments] = useState<Department[]>([]);
+    const [productTypes, setProductTypes] = useState<ProductType[]>([]);
 
-  const { id } = useParams();
-  const inputRef = useRef<HTMLInputElement>(null);
+    const [productName, setProductName] = useState("");
+    const [newName, setNewName] = useState("");
 
+    const [productDescription, setProductDescription] = useState("");
+    const [newDescription, setNewDescription] = useState("");
+
+    const [productPrice, setProductPrice] = useState("");
+    const [newPrice, setNewPrice] = useState("");
+
+    const [productCategory, setProductCategory] = useState("");
+    const [newCategory, setNewCategory] = useState("");
+
+    const [productTypeId, setSelectedProductType] = useState("");
+    const [newTypeId, setNewProductType] = useState("");
+
+    const [sizes, setSizes] = useState<SizeQuantity[]>([]);
+    const [Newsizes, setNewSizes] = useState([]);
+
+    const [, setSelectedDepartment] = useState("");
+
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [newSelectedImage, setNewSelectedImage] = useState<File | null>(null);
+    
+    const [NewisActive, setNewIsActive] = useState(); 
+
+    const [selectedDepartments, setSelectedDepartments] = useState([]);
+    const [newSelectedDepartments, setNewSelectedDepartments] = useState([]);
+
+    const { id } = useParams();
+    const inputRef = useRef<HTMLInputElement>(null);
+
+
+    // * Department Change for Add
+    const handleDepartmentChange = (departmentId, isChecked) => {
+      if (isChecked) {
+        setSelectedDepartments([...selectedDepartments, departmentId]);
+      } else {
+        setSelectedDepartments(selectedDepartments.filter(id => id !== departmentId));
+      }
+    };
+
+    // * Department Change for Edit
+    const handleDepartmentChangeEdit = (departmentId, isChecked) => {
+      const newDepartments = isChecked
+        ? [...newSelectedDepartments, departmentId]
+        : newSelectedDepartments.filter(id => id !== departmentId);
+    
+      setNewSelectedDepartments(newDepartments);
+    };
+
+    // * When Select Product it will show deparments are selected
+    const selectProductForEditing = (productItem) => {
+      setNewSelectedDepartments(productItem.departments.map(dept => dept.departmentId));
+    };
+
+    // * Reset Button
+    const HandleResetButton = () => {
+      setSelectedDepartment("");
+      setSelectedProductType("");
+      setSizes([]);
+
+      setProductName("");
+      setProductDescription("");
+      setProductPrice("");
+      setProductCategory("");
+
+      setSelectedImage(null);
+    }
+  
     const handleImageClick = () => {
-        if (inputRef.current) {
-            inputRef.current.click();
-        }
+      if (inputRef.current) {
+          inputRef.current.click();
+      }
     };
 
     const handleCategoryChange = (e, gender) => {
-        if (productCategory === gender) {
-            setProductCategory('');
-            e.target.checked = false; 
-        } else {
-            setProductCategory(gender);
-        }
+      setProductCategory(productCategory === gender ? '' : gender);
     };
 
-  // Upload Image
+    const handleCategoryChange2 = (gender) => {
+      if (productCategory === gender) {
+          setNewCategory('');
+      } else {
+          setNewCategory(gender);
+      }
+    };
+
+  // * Upload Image for Add
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setSelectedImage(event.target.files[0]);
@@ -71,31 +132,63 @@ function Manage_Shop() {
     }
   };
 
-  // Read All Departments
+  // * Upload Image for Edit
+  const handleFileChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setNewSelectedImage(event.target.files[0]);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target && e.target.result) {
+          document
+            .getElementById("productImage2")!
+            .setAttribute("src", e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  };
+
+  // * Get All Departments
   useEffect(() => {
-    axios
-      .get("https://localhost:7017/Department")
-      .then((res) => {
-        setDepartments(res.data);
-      })
-      .catch((err) => {
-        console.error(err);
+    const fetchDepartments = async () => {
+      try {
+        const response = await axios.get("https://localhost:7017/Department");
+        setDepartments(response.data);
+      } catch (error) {
+        console.error(error);
         toast.error("Error fetching departments");
-      });
+      }
+    }
+    fetchDepartments();
   }, []);
 
-  // Read All Product Types
+  // * Get All Product Types
   useEffect(() => {
-    axios
-      .get("https://localhost:7017/ProductType")
-      .then((res) => {
-        setProductTypes(res.data);
-      })
-      .catch((err) => {
-        console.error(err);
+    const fetchProductType = async () => {
+      try {
+        const response = await axios.get("https://localhost:7017/ProductType");
+        setProductTypes(response.data);
+      } catch (error) {
+        console.error(error);
         toast.error("Error fetching product types");
-      });
+      }
+    }
+    fetchProductType();
   }, []);
+
+  // * Get Product By Supplier Id
+  useEffect(() => {
+    const fetchProductSupplierId = async () => {
+      try {
+        const response = await axios.get(`https://localhost:7017/Product/bysupplier/${id}`);
+        setProducts(response.data);
+      } catch (error) {
+        console.error(error);
+        toast.error("Error fetching products");
+      }
+    }
+    fetchProductSupplierId();
+  }, [id]);
 
   const getProductTypeName = (productTypeId) => {
     const productType = productTypes.find((p) => p.productTypeId === productTypeId);
@@ -106,61 +199,160 @@ function Manage_Shop() {
     setSizes([...sizes, { size: "", quantity: "" }]);
   };
 
-  // Add Item
+  const addNewSizeInput2 = () => {
+    setNewSizes([...Newsizes, { size: "", quantity: "" }]);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleAddItem();
+    }
+  }
+
+  // * Handle Change Status
+  const handleChangeStatus = (active) => {
+    if (active == true) {
+      const userConfirmed = window.confirm('Do you want to Deactivate this product?');
+      if (userConfirmed) {
+        axios.put(`https://localhost:7017/Product/deactivate/${selectedProduct.productId}`)
+        window.location.reload();
+      } 
+    } else if (active == false) {
+      const userConfirmed = window.confirm('Do you want to Activate this product?');
+      if (userConfirmed) {
+        axios.put(`https://localhost:7017/Product/activate/${selectedProduct.productId}`)
+        window.location.reload();
+      } 
+    }
+  }
+  
+  // * Handle Change Button
+  const handleChangeButton = (active) => {
+    if ( active == true) {
+      const button = document.getElementById('btnStatus');
+          button.textContent='Deactivate';
+          button.style.color = 'white';
+          button.style.backgroundColor = 'red';
+          button.style.borderColor = 'red';
+    } else if (active == false) {
+          const button = document.getElementById('btnStatus');
+          button.textContent='Activate';
+          button.style.backgroundColor = 'green';
+          button.style.borderColor = 'green';
+          button.style.color = 'white';
+    }
+  }
+
+  // * Edit Item
+  const handleEdit = async () => {
+      const selectedSizes = Newsizes.filter(({ size }) => size);
+      const errorMessages = [];
+
+      if (!newName) errorMessages.push("Product Name is required");
+      if (!newDescription) errorMessages.push("Product Description is required");
+      if (!newPrice || isNaN(Number(productPrice))) errorMessages.push("Valid Product Price is required");
+      if (!newCategory) errorMessages.push("Product Category is required");
+      if (!newTypeId) errorMessages.push("Product Type is required");
+      if (!newSelectedDepartments) errorMessages.push("Department is required");
+      if (!newSelectedImage) errorMessages.push("Image is required");
+      if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
+
+      if (errorMessages.length > 0) {
+        errorMessages.forEach(message => toast.error(message));
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("ProductTypeId", newTypeId);
+      formData.append("ProductName", newName);
+      formData.append("Description", newDescription);
+      formData.append("Category", newCategory);
+      formData.append("Price", newPrice);
+      formData.append("Image", newSelectedImage as File);
+      formData.append("SupplierId", id);
+      newSelectedDepartments.forEach(departmentId => {
+        formData.append('DepartmentIds', departmentId);
+      });
+
+    try {
+        const productResponse = await axios.put(`https://localhost:7017/Product/${parseInt(selectedProduct.productId)}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+
+        if (productResponse.status === 200) {
+          toast.success("Successfully Updated An Item");
+          const productId = selectedProduct.productId;
+          const updateSizeApiCalls = [];
+          const createSizeApiCalls = [];
+            
+          selectedSizes.forEach(({ size, quantity, id }) => {
+              if (id) { 
+                  const sizeFormData = new FormData();
+                  sizeFormData.append("Size", size);
+                  sizeFormData.append("Quantity", quantity);
+                  sizeFormData.append("productId", productId);
+                  updateSizeApiCalls.push(axios.put(`https://localhost:7017/SizeQuantity/Update/${id}`, sizeFormData, {
+                      headers: {
+                          "Content-Type": "multipart/form-data",
+                      },
+                  }));
+              } else {  
+                  const sizeData = {
+                    size: size,
+                    productId: productId,
+                    quantity: quantity
+                };
+                  createSizeApiCalls.push(axios.post("https://localhost:7017/SizeQuantity/createsizequantity", sizeData, {
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                  }));
+              }
+          });
+
+          await Promise.all([...updateSizeApiCalls, ...createSizeApiCalls]);
+          window.location.reload();
+        } else {
+          toast.error(productResponse.data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Network error or server not responding");
+      }
+    };
+
+  // * Add Item
   const handleAddItem = () => {
     const selectedSizes = sizes.filter(({ size }) => size);
 
-    // Validation for Product Name
-    if (!productName) {
-      toast.error("Product Name is required");
-      return;
-    }
+    const errorMessages = [];
 
-    // Validation for Product Description
-    if (!productDescription) {
-      toast.error("Product Description is required");
-      return;
-    }
+    if (!productName) errorMessages.push("Product Name is required");
+    if (!productDescription) errorMessages.push("Product Description is required");
+    if (!productPrice || isNaN(Number(productPrice))) errorMessages.push("Valid Product Price is required");
+    if (!productCategory) errorMessages.push("Product Category is required");
+    if (!productTypeId) errorMessages.push("Product Type is required");
+    if (!selectedImage) errorMessages.push("Image is required");
+    if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
 
-    // Validation for Product Price
-    if (!productPrice || isNaN(Number(productPrice))) {
-      toast.error("Valid Product Price is required");
-      return;
-    }
-
-    // Validation for Product Category
-    if (!productCategory) {
-      toast.error("Product Category is required");
-      return;
-    }
-
-    // Validation for Product Type
-    if (!productTypeId) {
-      toast.error("Product Type is required");
-      return;
-    }
-
-    // Validation for Department
-    if (!departmentId) {
-      toast.error("Department is required");
-      return;
-    }
-
-    // Validation for Selected Image
-    if (!selectedImage) {
-      toast.error("Image is required");
+    if (errorMessages.length > 0) {
+      errorMessages.forEach(message => toast.error(message));
       return;
     }
 
     const formData = new FormData();
     formData.append("ProductTypeId", productTypeId);
-    formData.append("DepartmentId", departmentId);
     formData.append("ProductName", productName);
     formData.append("Description", productDescription);
     formData.append("Category", productCategory);
     formData.append("Price", productPrice);
     formData.append("Image", selectedImage as File);
     formData.append("SupplierId", id);
+    selectedDepartments.forEach(departmentId => {
+      formData.append('DepartmentIds', departmentId);
+    });
 
     axios
       .post("https://localhost:7017/Product/addproduct", formData, {
@@ -170,14 +362,15 @@ function Manage_Shop() {
       })
       .then(async (productResponse) => {
         if (productResponse.status === 200) {
+          addProductEventEmitter.emit("addProduct");
           toast.success("Successfully Added An Item");
-          navigate(`/supplier_items/${id}`);
 
           const sizeApiCalls = selectedSizes.map(({ size, quantity }) => {
             const sizeFormData = new FormData();
             sizeFormData.append("size", size);
             sizeFormData.append("productId", productResponse.data);
             sizeFormData.append("quantity", quantity);
+            window.location.reload();
 
             return axios.post(
               "https://localhost:7017/SizeQuantity/createsizequantity",
@@ -191,6 +384,7 @@ function Manage_Shop() {
           });
 
           try {
+            addProductEventEmitter.emit("addProduct");
             await Promise.all(sizeApiCalls);
           } catch (error) {
             console.log(productResponse.data);
@@ -200,34 +394,47 @@ function Manage_Shop() {
           toast.error(productResponse.data.message);
         }
       })
-      .catch(() => {
-        toast.error("Network error or server not responding");
+      .catch((error) => {
+        if (error.response) {
+          toast.error(error.response.data.message);
+        } else if (error.request) {
+          toast.error("Network error or server not responding");
+        } else {
+          toast.error("Error", error.message);
+        }
       });
   };
 
-  useEffect(() => {
-    axios
-      .get(`https://localhost:7017/Product/bysupplier/${id}`)
-      .then((response) => {
-        setProducts(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error("Error fetching products");
-      });
-  }, [id]);
-
+  // * Total Stock Product
   const totalStock = (sizes) => {
     if (!sizes || sizes.length === 0) {
       return 0;
     }
     return sizes.reduce((acc, currentSize) => acc + Number(currentSize.quantity), 0);
   };
+  
+  // * Delete Size and Quantity
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`https://localhost:7017/SizeQuantity/delete/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Error deleting the size quantity');
+      }
+
+      setNewSizes(Newsizes.filter(sizeQty => sizeQty.id !== id));
+    } catch (error) {
+      console.error('Failed to delete the size quantity:', error);
+    }
+  };
+
 
   return (
     <div className="manage-shop-main-container">
       <div className="add-prod-btn-container">
-        <h1>Manage Shop</h1>
+      <h3 style={{ marginBottom:'20px', color:'#020654', fontWeight:'600' }}>Manage Shop</h3>
         <button
           className="supplier-add-prod-btn"
           data-bs-toggle="modal"
@@ -240,22 +447,44 @@ function Manage_Shop() {
       
         {/* PRODUCTS */}
         <div className="col-md-12 supplier-prods-container">
-        {products.map((productItem, index) => (
-            <div key={index} className="prod-card" data-bs-toggle="modal" data-bs-target="#editProductModal" onClick={() => setSelectedProduct(productItem)}>
-                <div className="prod-shop-image-container">
-                    <img className="supplier-shop-prod-image" src={ productItem.image ? `https://localhost:7017/${productItem.image}` : prodImage }/>
-                </div>
-                <div className="col-md-11 prod-shop-details">
-                    <span className="col-md-3 supplier-prod-details">{productItem.productName}</span>
-                    <span className="col-md-2 supplier-prod-details">{getProductTypeName(productItem.productTypeId)}</span>
-                    <span className="col-md-1 supplier-prod-details">{productItem.category}</span>
-                    <span className="col-md-1 supplier-prod-details">{totalStock(productItem.sizes)}</span>
-                    <span className="col-md-1 supplier-prod-details">{productItem.isActive ? 'Active' : 'Inactive'}</span>
-                    <h4 className="col-md-2 supplier-prod-price">₱{productItem.price}</h4>
-                </div>
-            </div>
-            ))}
+          {products.length > 0 ? (
+              products.map((productItem, index) => (
+                  <div key={index} className="prod-card" data-bs-toggle="modal" data-bs-target="#editProductModal" 
+                    onClick={() => {
+                      setSelectedProduct(productItem); 
+                      setNewSizes(productItem.sizes); 
+                      setNewPrice(productItem.price);
+                      setNewCategory(productItem.category);
+                      setNewDescription(productItem.description);
+                      setNewIsActive(productItem.isActive);
+                      setNewName(productItem.productName);
+                      setNewProductType(productItem.productTypeId);
+                      setNewSelectedImage(productItem.image);
+                      handleCategoryChange2(productItem.category);
+                      selectProductForEditing(productItem);
+                    }}
+                  >
+                    <div className="prod-shop-image-container">
+                        <img className="supplier-shop-prod-image" src={ productItem.image ? `https://localhost:7017/${productItem.image}` : prodImage }/>
+                    </div>
+                    <div className="col-md-11 prod-shop-details">
+                        <span className="col-md-3 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{productItem.productName}</span>
+                        <span className="col-md-2 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{getProductTypeName(productItem.productTypeId)}</span>
+                        <span className="col-md-1 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{productItem.category}</span>
+                        <span className="col-md-1 supplier-prod-details" style={{color: productItem.isActive? '' : 'black'}}>{totalStock(productItem.sizes)}</span>
+                        <span className="col-md-1 supplier-prod-details" style={{backgroundColor: productItem.isActive? 'green' : 'red', color: 'white'}}>{productItem.isActive ? 'Active' : 'Inactive'}</span>
+                        <h4 className="col-md-2 supplier-prod-price" style={{color: productItem.isActive? '' : 'black'}}>₱{productItem.price}</h4>
+                    </div>
+                  </div>
+              ))
+          ) : (
+              <div className="no-productsShop-message">
+                  <img src={ noProdsIcon } />
+                  <p>No products available</p>
+              </div>
+          )}
         </div>
+
         
       {/* ADD NEW PRODUCT - MODAL  */}
       <div className="modal fade" id="addProductModal" tabIndex={-1} aria-labelledby="addProductModalLabel" aria-hidden="true">
@@ -265,12 +494,12 @@ function Manage_Shop() {
               <h1 className="modal-title" id="exampleModalLabel">
                 Add New Product
               </h1>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => window.location.reload()}></button>
             </div>
             <div className="modal-basta-container">
               <span>You can add new products to your shop here</span>
               <div className="modal-btns-container">
-                <button type="button" className="cancel-btn-modal" data-bs-dismiss="modal">
+                <button type="button" className="cancel-btn-modal" data-bs-dismiss="modal" onClick={HandleResetButton}>
                   Cancel
                 </button>
                 <button type="button" className="save-prod-btn" onClick={handleAddItem}>
@@ -280,175 +509,141 @@ function Manage_Shop() {
             </div>
             <div className="modal-body" style={{ display: "flex", flexFlow: "row" }}>
               <div>
-                <div className="thumbnail-container">
-                  <h3 className="prod-info-titles">Thumbnail</h3>
-                  <img
+              <div className="thumbnail-container">
+                <h3 className="prod-info-titles">Product Image</h3>
+                <img
                     id="productImage"
                     alt="Upload Product"
                     className="supplier-modal-addprod-img"
                     src={selectedImage ? URL.createObjectURL(selectedImage) : prodImage}
                     onClick={handleImageClick}
-                  />
-                  <input
+                />
+                <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
+                <input
                     ref={inputRef}
                     type="file"
                     name="prodImage"
                     accept="image/*"
                     onChange={handleFileChange}
                     style={{ display: "none" }}
-                  />
-                </div>
-
-                {/* status */}
-                <div className="supplier-prod-status">
-                    <h3 className="prod-info-titles">Status</h3>
-                    <select 
-                        name="prodStatus" 
-                        id="prodStatus" 
-                        value={isActive ? "Active" : "Inactive"}
-                        style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem', marginTop:'5px' }}
-                        onChange={(e) => setIsActive(e.target.value === "Active")}
-                    >
-                            <option selected>Select a Status</option>
-                            <option value="Active">Activate</option>
-                            <option value="Inactive">Deactivate</option>
-                    </select>
-                </div>
+                    onKeyDown={handleKeyDown}
+                />
               </div>
+                </div>
 
                 <div className="col-md supplier-prod-details-modal">
-                    <h3 className="prod-details-titles">Product Details</h3>
+                    <h3 className="col-md-12 prod-details-titles">Product Details</h3>
 
                     <label className="prod-details-labels" htmlFor="prodName">Product Name</label>
-                    <input className="modal-input-box" type="text" name="prodName" id="prodName" onChange={(e) => setProductName(e.target.value)} />
+                    <input 
+                      className="modal-input-box" 
+                      type="text" 
+                      name="prodName" 
+                      placeholder="Enter product name"
+                      id="prodName" 
+                      value={productName}
+                      onChange={(e) => setProductName(e.target.value)} 
+                      onKeyDown={handleKeyDown}
+                    />
 
                     <label className="prodDescription-label">Description</label>
                     <textarea 
                         className="form-control" 
                         aria-label="Product description" 
                         placeholder="Enter product description" 
+                        value={productDescription}
                         onChange={(e) => setProductDescription(e.target.value)} 
+                        onKeyDown={handleKeyDown}
                     />
 
                 <label className="prod-details-labels">Department</label>
                 {/* DEPARTMENT CHECKBOX */}
                 <div className="suppliers-department-checkbox">
-                  <select
-                    name="prodGender"
-                    id="prodGender"
-                    style={{ padding: "5px", fontSize: "12px", borderRadius: "10px", width: "12rem" }}
-                    onChange={(e) => setSelectedDepartment(e.target.value)}
-                  >
-                    <option defaultChecked>Select a Department</option>
-                    {departments.map((department, index) => (
-                      <option key={index} value={department.departmentId}>
-                        {department.department_Name}
-                      </option>
-                    ))}
-                  </select>
+                  {departments.map((department, index) => (
+                    <label key={index}>
+                      <input
+                        type="checkbox"
+                        value={department.departmentId}
+                        checked={selectedDepartments.includes(department.departmentId)}
+                        onChange={(e) => handleDepartmentChange(department.departmentId, e.target.checked)}
+                      />
+                      {department.department_Name}
+                    </label>
+                  ))}
                 </div>
-                    <label className="prod-details-labels">Department</label>
-                    {/* DEPARTMENT CHECKBOX */}
-                    <div className="suppliers-department-checkbox">
-                        <select 
-                            name="prodGender" 
-                            id="prodGender" 
-                            style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem' }}
-                            onChange={(e) => setSelectedDepartment(e.target.value)}
-                        >
-                            <option defaultChecked>Select a Department</option>
-                            {departments.map((department, index) => (
-                                <option key={index} value={department.departmentId}>
-                                    {department.department_Name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* GENDER OPTIONS */}
-                    <label className="prod-details-labels">Gender</label>
-                    <div className="department-option">
-                        <input 
-                            className="form-check-input" 
-                            type="radio" 
-                            value="Male" 
-                            name="gender"
-                            id="departmentCheck1"
-                            defaultChecked={productCategory === 'Male'}
-                            onClick={(e) => handleCategoryChange(e, 'Male')}
-                        />
-                        <label 
-                            className="departmentCheckLabel" 
-                            htmlFor="departmentCheck1"
-                        >
-                            Male
-                        </label>
-                    </div>
-                    <div className="department-option">
-                        <input 
-                            className="form-check-input" 
-                            type="radio" 
-                            value="Female" 
-                            name="gender"
-                            id="departmentCheck2"
-                            defaultChecked={productCategory === 'Female'}
-                            onClick={(e) => handleCategoryChange(e, 'Female')}
-                        />
-                        <label 
-                            className="departmentCheckLabel" 
-                            htmlFor="departmentCheck2"
-                        >
-                            Female
-                        </label>
-                    </div>
-                    <div className="department-option">
-                        <input 
-                            className="form-check-input" 
-                            type="radio" 
-                            value="Unisex" 
-                            name="gender"
-                            id="departmentCheck3"
-                            defaultChecked={productCategory === 'Unisex'}
-                            onClick={(e) => handleCategoryChange(e, 'Unisex')}
-                        />
-                        <label 
-                            className="departmentCheckLabel" 
-                            htmlFor="departmentCheck3"
-                        >
-                            Unisex
-                        </label>
-                    </div>
+                  {/* GENDER OPTIONS */}
+                  <label className="prod-details-labels">Gender</label>
+                  <div className="department-option">
+                      <input 
+                          type="radio" 
+                          value="Male" 
+                          name="gender"
+                          id="departmentCheck1"
+                          checked={productCategory === 'Male'}
+                          onChange={(e) => handleCategoryChange(e, 'Male')}
+                          onKeyDown={handleKeyDown}
+                      />
+                      <label className="departmentCheckLabel" htmlFor="departmentCheck1">
+                          Male
+                      </label>
+                  </div>
+                  <div className="department-option">
+                      <input 
+                          type="radio" 
+                          value="Female" 
+                          name="gender"
+                          id="departmentCheck2"
+                          checked={productCategory === 'Female'}
+                          onChange={(e) => handleCategoryChange(e, 'Female')}
+                          onKeyDown={handleKeyDown}
+                      />
+                      <label className="departmentCheckLabel" htmlFor="departmentCheck2">
+                          Female
+                      </label>
+                  </div>
+                  <div className="department-option">
+                      <input 
+                          type="radio" 
+                          value="Unisex" 
+                          name="gender"
+                          id="departmentCheck3"
+                          checked={productCategory === 'Unisex'}
+                          onChange={(e) => handleCategoryChange(e, 'Unisex')}
+                          onKeyDown={handleKeyDown}
+                      />
+                      <label className="departmentCheckLabel" htmlFor="departmentCheck3">
+                          Unisex
+                      </label>
+                  </div>
 
                 <label className="prod-details-labels">Product Type</label>
-                <select
-                  name="prodGender"
-                  id="prodGender"
-                  style={{ padding: "5px", fontSize: "12px", borderRadius: "10px", width: "12rem" }}
-                  onChange={(e) => setSelectedProductType(e.target.value)}
+                <select 
+                    name="prodType" 
+                    id="prodType" 
+                    style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem' }}
+                    value={productTypeId}
+                    onChange={(e) => setSelectedProductType(e.target.value)}
+                    onKeyDown={handleKeyDown}
                 >
-                  <option value="0" selected>
-                    Select Type of Product
-                  </option>
-                  {productTypes.map((productType, index) => (
-                    <option key={index} value={productType.productTypeId}>
-                      {productType.product_Type}
-                    </option>
-                  ))}
+                    <option value="" disabled selected hidden>Select Type of Product</option>
+                    {productTypes.map((productType, index) => (
+                        <option key={index} value={productType.productTypeId}>
+                            {productType.product_Type}
+                        </option>
+                    ))}
                 </select>
-                    <label className="prod-details-labels">Product Type</label>
-                    <select 
-                        name="prodGender" 
-                        id="prodGender" 
-                        style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem' }}
-                        onChange={(e) => setSelectedProductType(e.target.value)}
-                    >
-                        <option value="0" selected>Select Type of Product</option>
-                        {productTypes.map((productType, index) => (
-                            <option key={index} value={productType.productTypeId}>
-                                {productType.product_Type}
-                            </option>
-                        ))}
-                    </select>
+
+                <label className="prod-details-labels">Price</label>
+                <input 
+                  className="modal-input-box" 
+                  type="text" 
+                  name="prodPrice" 
+                  placeholder="Enter product price"
+                  id="prodPrice" 
+                  value={productPrice}
+                  onChange={(e) => setProductPrice(e.target.value)} 
+                  onKeyDown={handleKeyDown}
+                />
 
                 {/* SIZES AVAILABLE CHECKBOX */}
                 <label className="prod-details-labels">Sizes Available</label>
@@ -467,89 +662,149 @@ function Manage_Shop() {
                         placeholder="Quantity"
                         onChange={(e) => (sizeQty.quantity = e.target.value)}
                       />
-                      <span onClick={() => setSizes(sizes.filter((_, i) => i !== index))} style={{ cursor: "pointer", color: "red" }}>
+                      <span className="close-btn-size" onClick={() => setSizes(sizes.filter((_, i) => i !== index))} style={{ cursor: "pointer", color: "red" }}>
                         X
                       </span>
                     </div>
                   ))}
                 </div>
-                <button onClick={addNewSizeInput}>Add Size +</button>
+                <button className="addSizeBtn" onClick={addNewSizeInput}>Add Size +</button>
               </div>
-              <div>
-                <label className="prod-details-labels">Price</label>
-                <input className="modal-input-box" type="text" name="prodPrice" id="prodPrice" onChange={(e) => setProductPrice(e.target.value)} />
-              </div>
-                
             </div>    
             </div>
         </div>
         </div>
 
-            {/* EDIT PRODUCT INFO MODAL */}
+
+
+        {/* EDIT PRODUCT INFO MODAL */}
         <div className="modal fade" id="editProductModal" tabIndex={-1} aria-labelledby="editProductModalLabel" aria-hidden="true">
             <div className="modal-dialog modal-fullscreen">
-            {selectedProduct && (
-            <div className="modal-content" style={{ padding:'15px', height:'100vh' }}>
+            {selectedProduct &&  (
+            <div className="modal-content" style={{ padding:'15px', height:'100vh' }} onLoad={() => handleChangeButton(NewisActive)}>
             <div className="prod-header">
                 <h1 className="modal-title" id="exampleModalLabel">Edit Product</h1>
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => window.location.reload()}></button>
             </div>
             <div className="modal-basta-container">
                 <span>You can edit product details here</span>
                 <div className="modal-btns-container">
-                    <button type="button" className="cancel-btn-modal" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" className="save-prod-btn">Save</button>
+                    <button type="button" className="cancel-btn-modal" onClick={() => handleChangeStatus(NewisActive)} id="btnStatus"></button>
+                    <button type="button" className="cancel-btn-modal" data-bs-dismiss="modal" onClick={() => window.location.reload()}>Cancel</button>
+                    <button type="button" className="save-prod-btn" onClick={handleEdit}>Save</button>
                 </div>
             </div>
             <div className="modal-body" style={{ display:'flex', flexFlow:'row' }}>
                 <div>
                     <div className="thumbnail-container">
                         <h3 className="prod-info-titles">Product Image</h3>
-                        <img className="supplier-modal-addprod-img" src={`https://localhost:7017/${selectedProduct.image}`} />
-                        <input type="file" name="prodImage" accept="image/*" />
+                        <img
+                          id="productImage2"
+                          alt="Upload Product"
+                          className="supplier-modal-addprod-img"
+                          src={newSelectedImage?`https://localhost:7017/${newSelectedImage}`: prodImage}  
+                          onClick={handleImageClick}
+                        />
+                        <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
+                        <input
+                          ref={inputRef}
+                          type="file"
+                          name="prodImage"
+                          accept="image/*"
+                          onChange={handleFileChange2}
+                          style={{ display: "none" }}
+                        />
                     </div>
-
-                    {/* status */}
-                    <div className="supplier-prod-status">
-                        <h3 className="prod-info-titles">Status</h3>
-                        <select name="prodStatus" id="prodStatus" style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem', marginTop:'5px' }}>
-                            <option value="0" selected>Set Status</option>
-                            <option value="1">Activate</option>
-                            <option value="2">Deactivate</option>
-                        </select>
-                    </div>
-                </div>
+              </div>
 
                 <div className="col-md supplier-prod-details-modal">
                     <h3 className="prod-details-titles">Product Details</h3>
 
-                    <label className="prod-details-labels" htmlFor="prodName">{selectedProduct.productName}</label>
-                    <input className="modal-input-box" type="text" name="prodName" id="prodName" />
+                    <label className="prod-details-labels" htmlFor="prodName">Product Name</label>
+                    <input 
+                    className="modal-input-box" 
+                    type="text" 
+                    name="prodName" 
+                    id="prodName" 
+                    placeholder="Enter product name" 
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    />
 
                     <label className="prodDescription-label">Description</label>
                     <textarea 
                         className="form-control" 
                         aria-label="Product description" 
                         placeholder="Enter product description" 
-                        onChange={(e) => setProductDescription(e.target.value)} 
+                        value={newDescription}
+                        onChange={(e) => setNewDescription(e.target.value)}
                     />
 
-                    <label className="prod-details-labels">Department</label>
                     {/* DEPARTMENT CHECKBOX */}
+                    <label className="prod-details-labels">Department</label>
                     <div className="suppliers-department-checkbox">
-                        <select 
-                            name="prodGender" 
-                            id="prodGender" 
-                            style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem' }}
-                            onChange={(e) => setSelectedDepartment(e.target.value)}
+                    {departments.map((department, index) => (
+                      <label key={index}>
+                        <input
+                          type="checkbox"
+                          value={department.departmentId}
+                          checked={newSelectedDepartments.includes(department.departmentId)}
+                          onChange={(e) => handleDepartmentChangeEdit(department.departmentId, e.target.checked)}
+                        />
+                        {department.department_Name}
+                      </label>
+                    ))}
+                    </div>
+                    
+                    {/* GENDER OPTIONS */}
+                    <label className="prod-details-labels">Gender</label>
+                    <div className="department-option">
+                        <input 
+                            type="radio" 
+                            value="Male" 
+                            name="gender"
+                            id="departmentCheck1"
+                            checked={newCategory === 'Male'}
+                            onChange={(e) => handleCategoryChange(e, 'Male')}
+                        />
+                        <label 
+                            className="departmentCheckLabel" 
+                            htmlFor="departmentCheck1"
                         >
-                            <option defaultChecked>Select a Department</option>
-                            {departments.map((department, index) => (
-                                <option key={index} value={department.departmentId}>
-                                    {department.department_Name}
-                                </option>
-                            ))}
-                        </select>
+                            Male
+                        </label>
+                    </div>
+                    <div className="department-option">
+                        <input 
+                            type="radio" 
+                            value="Female" 
+                            name="gender"
+                            id="departmentCheck2"
+                            checked={newCategory === 'Female'}
+                            onChange={(e) => handleCategoryChange(e, 'Female')}
+                        />
+                        <label 
+                            className="departmentCheckLabel" 
+                            htmlFor="departmentCheck2"
+                        >
+                            Female
+                        </label>
+                    </div>
+                    <div className="department-option">
+                        <input 
+                            type="radio" 
+                            value="Unisex" 
+                            name="gender"
+                            id="departmentCheck3"
+                            checked={newCategory === 'Unisex'}
+                            onChange={(e) => handleCategoryChange(e, 'Unisex')}
+                        />
+                        <label 
+                            className="departmentCheckLabel" 
+                            htmlFor="departmentCheck3"
+                        >
+                            Unisex
+                        </label>
                     </div>
 
                     <label className="prod-details-labels">Product Type</label>
@@ -557,66 +812,65 @@ function Manage_Shop() {
                         name="prodGender" 
                         id="prodGender" 
                         style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem' }}
-                        onChange={(e) => setSelectedProductType(e.target.value)}
+                        onChange={(e) => setNewProductType(e.target.value)}
                     >
-                        <option value="0" selected>Select Type of Product</option>
+                        <option value="" disabled selected hidden>Select Type of Product</option>
                         {productTypes.map((productType, index) => (
-                            <option key={index} value={productType.productTypeId}>
+                            <option key={index} value={productType.productTypeId} selected={selectedProduct.productTypeId === productType.productTypeId}>
                                 {productType.product_Type}
                             </option>
                         ))}
                     </select>
 
-                    {/* GENDER OPTIONS */}
-                    <label className="prod-details-labels">Gender</label>
-                    <select name="prodGender" id="prodGender" style={{ padding:'5px', fontSize:'12px', borderRadius:'10px', width:'18rem' }}>
-                        <option value="0" selected>Select a gender</option>
-                        <option value="1">Male</option>
-                        <option value="2">Female</option>
-                        <option value="3">Unisex</option>
-                    </select>
-
                     {/* SIZES AVAILABLE CHECKBOX */}
                     <label className="prod-details-labels">Sizes Available</label>
                     <div className="suppliers-sizes-avail-checkbox">
-                    <div className="suppliers-sizes-avail-checkbox">
-                        {sizes.map((sizeObj, index) => (
-                            <div className="sizes-option" key={index}>
-                                <input 
-                                    className="form-control" 
-                                    type="text" 
-                                    value={sizeObj.size}
-                                    id="sizeCheck1"
-                                    placeholder="Enter size (e.g., S, M, L...)"
-                                    onChange={(e) => {
-                                        const newSize = e.target.value;
-                                        setSizes(sizes.map((s, i) => i === index ? { ...s, size: newSize } : s));
-                                    }}
-                                />
-                                <input 
-                                    className="form-control" 
-                                    type="number" 
-                                    name="prodSize" 
-                                    id="prodSize" 
-                                    placeholder="Enter quantity"
-                                    onChange={(e) => {
-                                        const newQuantity = e.target.value;
-                                        setSizes(sizes.map((s, i) => i === index ? { ...s, quantity: newQuantity } : s));
-                                    }}
-                                />
-                            </div>
-                        ))}
-                        <button className="addSizeBtn" onClick={addNewSizeInput}>Add Another Size</button>
+                      {Newsizes.map((sizeQty, index) => (
+                        <div key={index} className="supplier-size-avail-item">
+                          <input
+                            className="supplier-size-avail-checkbox"
+                            type="text"
+                            placeholder="Size"
+                            defaultValue={sizeQty.size}
+                            onChange={(e) => {
+                              const newSizeQty = { ...sizeQty, size: e.target.value }; // Create a new object with the updated size
+                              setNewSizes(Newsizes.map((sq) => sq.id === sizeQty.id ? newSizeQty : sq)); // Update the state with the new size
+                            }}
+                          />
+                          <input
+                            className="supplier-size-avail-checkbox"
+                            type="text"
+                            placeholder="Quantity"
+                            defaultValue={sizeQty.quantity}
+                            onChange={(e) => {
+                              const newSizeQty = { ...sizeQty, quantity: e.target.value }; // Create a new object with the updated quantity
+                              setNewSizes(Newsizes.map((sq) => sq.id === sizeQty.id ? newSizeQty : sq)); // Update the state with the new quantity
+                            }}
+                          />
+                          <span onClick={() => handleDelete(sizeQty.id)} style={{ cursor: "pointer", color: "red" }}>
+                            X
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                    </div>
+                <button className="addSizeBtn" onClick={addNewSizeInput2}>Add Size +</button>
                     <label className="prod-details-labels">Price</label>
-                    <input className="modal-input-box" type="text" name="prodPrice" id="prodPrice" />
+                    <input 
+                      className="modal-input-box" 
+                      type="text" 
+                      name="prodPrice" 
+                      id="prodPrice" 
+                      placeholder="Enter product price" 
+                      value={newPrice} 
+                      onChange={(e) => setNewPrice(e.target.value)}
+                    />
                 </div>
             </div>    
             </div>
             )}
         </div>
         </div>
+
       </div>
   );
 }

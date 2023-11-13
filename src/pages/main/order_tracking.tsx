@@ -11,25 +11,25 @@ function Order_Tracking () {
             <div className="col-3 order-nav-pills-container">
             {/* <h1 className='customer-orderPage-title'>Order List</h1> */}
                 <nav id="orders-navbar" className="orders-nav-container flex-column">
-                    <div className='col-md-10 pill-container'>
+                    <div className='col-md-12 pill-container'>
                         <a className="orders-nav-link" href="#pending-orders">
                             <img src={ pendingIcon } className='nav-pills-icon'/>
                         PENDING</a>
                     </div>
 
-                    <div className='col-md-10 pill-container'>
+                    <div className='col-md-12 pill-container'>
                         <a className="orders-nav-link" href="#approved-orders">
                             <img src={ approvedIcon } className='nav-pills-icon'/>
                         APPROVED</a>
                     </div>
 
-                    <div className='col-md-10 pill-container'>
+                    <div className='col-md-12 pill-container'>
                         <a className="orders-nav-link" href="#canceled-orders">
                             <img src={ cancelledIcon } className='nav-pills-icon'/>
                         CANCELLED</a>
                     </div>
 
-                    <div className='col-md-10 pill-container'>
+                    <div className='col-md-12 pill-container'>
                         <a className="orders-nav-link" href="#claimed-orders">
                             <img src={ claimedIcon } className='nav-pills-icon'/>
                         CLAIMED</a>

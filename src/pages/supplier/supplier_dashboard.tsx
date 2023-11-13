@@ -2,7 +2,7 @@ import './supplier_dashboard.css'
 import totalSalesIcon from "../../assets/images/icons/dollar.png"
 import totalOrdersIcon from "../../assets/images/icons/checkout.png"
 import totalProducts from "../../assets/images/icons/products.png"
-import topProd from "../../assets/images/shop_products/college-uniform.jpg"
+import noProdsImg from "../../assets/images/icons/empty-box.png"
 import noOder from "../../assets/images/icons/no-order.png"
 import { useEffect, useState } from 'react'
 import axios from 'axios'
@@ -12,10 +12,17 @@ import { Link } from 'react-router-dom'
 function Supplier (){
 
     const Status = {
-        Pending: 'Pending'
+        OrderPlaced: 'OrderPlaced',
+        Pending: 'Pending',
+        Approved: 'Approved',
+        ForPickUp: 'ForPickUp',
+        Completed: 'Completed',
+        Canceled: 'Canceled',
+        Denied: 'Denied'
     }
 
     const [orders, setOrders] = useState([]);
+    const [products, setProducts] = useState([]);
     const { id } = useParams();
 
     useEffect(() => {
@@ -28,23 +35,22 @@ function Supplier (){
             })
     }, [id]);
 
-    const calculateTotalProducts = (orders) => {
-        const uniqueProductIds = new Set();
-        if (orders && Array.isArray(orders)) {
-            orders.forEach((order) => {
-                order.cart.items.forEach((item) => {
-                    uniqueProductIds.add(item.product.productId);
-                });
-            });
-        }
-        return uniqueProductIds.size;
-    }
-    
+    useEffect(() => {
+        axios.get(`https://localhost:7017/Product/ByShopProduct/${id}`)
+            .then(response => {
+                setProducts(response.data);
+            })
+            .catch(error => {
+                console.error(error);
+            })
+    }, [id])
+
+
     return (
         <div className='orders-supplier-main-container'>    
         <div className='col-md-7'>
         <h3 style={{ marginBottom:'20px', color:'#020654', fontWeight:'600' }}>Dashboard</h3>
-        {orders && (
+        
             <div  className='dash-supplier-container'>
                 <div className='card-content-container'>
                     <div className='col-md-9 dash-card'>
@@ -54,44 +60,49 @@ function Supplier (){
                     <img className='dash-card-icon' src={ totalSalesIcon } alt="Total Sales Icon"/>
                 </div>
                 <div className='card-content-container'>
+                {orders && (
                     <div className='col-md-9 dash-card'>
                         <span>Total Orders</span>
                         <h1 className='col-md-11 number-dash'>{orders ? orders.length : 0}</h1>
                     </div>
+                )}
                     <img className='dash-card-icon' src={ totalOrdersIcon } alt="Total Orders Icon"/>
                 </div>
                 <div className='card-content-container'>
-                    <div className='col-md-9 dash-card'>
-                        <span>Total Products</span>
-                        <h1 className='col-md-11 number-dash'>{calculateTotalProducts(orders)}</h1>
-                    </div>
+                    {products && (
+                        <div className='col-md-9 dash-card'>
+                            <span>Total Products</span>
+                            <h1 className='col-md-11 number-dash'>{products.length}</h1>
+                        </div>
+                    )}
                     <img className='dash-card-icon' src={ totalProducts } alt="Total Products Icon"/>
                 </div>
             </div>
-            )}
 
-        
-
-        <div className='top-selling-prods-container'>
-            <h3 className='top-selling-prods-title'>Top Selling Products</h3>
-            <div className='top-prods-container'>
-                <img className='top-prod-img' src={ topProd } />
-                <span className='top-prod-name'>No Product Yet</span>
-                <span className='top-prod-price'>₱0</span>
+            <div className='top-selling-prods-container'>
+                <h3 className='top-selling-prods-title'>Recently Added Products</h3>
+                {products.length > 0 ? ( 
+                    <>
+                        {products.slice(0, 3).map((productItem, index) => (
+                            <div  key={index}  className='top-prods-container'>
+                                <img className='top-prod-img' src={ `https://localhost:7017/${productItem.image}` } />
+                                <span className='top-prod-name'>{productItem.productName}</span>
+                                <span className='top-prod-price'>₱{productItem.price}</span>
+                            </div>
+                        ))}
+                        <Link to={`/supplier_dashboard/${id}/manage_shop`} className="no-underline-link">
+                            <button className='btn-dashboardProduct'>See More</button>
+                        </Link>
+                    </>
+                ) : (
+                    <div className="no-productsDashboard-message">
+                        <img src={ noProdsImg }/>
+                        <p>No products available</p>
+                    </div>
+                )}
             </div>
 
-            <div className='top-prods-container'>
-                <img className='top-prod-img' src={ topProd } />
-                <span className='top-prod-name'>No Product Yet</span>
-                <span className='top-prod-price'>₱0</span>
-            </div>
 
-            <div className='top-prods-container'>
-                <img className='top-prod-img' src={ topProd } />
-                <span className='top-prod-name'>No Product Yet</span>
-                <span className='top-prod-price'>₱0</span>
-            </div>
-        </div>
         </div>
             <div className='col pending-orders-dash'>
                 <h3 style={{ marginBottom: '20px' }}>Pending Orders</h3>
