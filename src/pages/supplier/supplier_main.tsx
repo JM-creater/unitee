@@ -107,7 +107,7 @@ function Supplier_Main (){
                     )}
 
                     <ul className="dropdown-menu" style={{ padding:'10px', width:'15rem' }}>
-                        <Link className="drop-link-item" to='supplier_viewProf'>
+                        <Link to={`supplier_viewProf/${id}`}>
                             <li className="drop-list">
                                 <a className="dropdown-item supplier-drop-item" style={{ fontSize:'15px' }}>
                                     <img className="drop-icon" src={ editprof }/>
