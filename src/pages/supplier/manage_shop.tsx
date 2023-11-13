@@ -60,6 +60,9 @@ function Manage_Shop() {
     const { id } = useParams();
     const inputRef = useRef<HTMLInputElement>(null);
 
+    //For Delay
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 
     // * Department Change for Add
     const handleDepartmentChange = (departmentId, isChecked) => {
@@ -282,7 +285,6 @@ function Manage_Shop() {
         });
 
         if (productResponse.status === 200) {
-          toast.success("Successfully Updated An Item");
           const productId = selectedProduct.productId;
           const updateSizeApiCalls = [];
           const createSizeApiCalls = [];
@@ -313,7 +315,9 @@ function Manage_Shop() {
           });
 
           await Promise.all([...updateSizeApiCalls, ...createSizeApiCalls]);
-          window.location.reload();
+          toast.success("Successfully Updated An Item");
+          await sleep(1000);
+          window.location.reload()
         } else {
           toast.error(productResponse.data.message);
         }
@@ -363,14 +367,12 @@ function Manage_Shop() {
       .then(async (productResponse) => {
         if (productResponse.status === 200) {
           addProductEventEmitter.emit("addProduct");
-          toast.success("Successfully Added An Item");
 
           const sizeApiCalls = selectedSizes.map(({ size, quantity }) => {
             const sizeFormData = new FormData();
             sizeFormData.append("size", size);
             sizeFormData.append("productId", productResponse.data);
             sizeFormData.append("quantity", quantity);
-            window.location.reload();
 
             return axios.post(
               "https://localhost:7017/SizeQuantity/createsizequantity",
@@ -386,6 +388,10 @@ function Manage_Shop() {
           try {
             addProductEventEmitter.emit("addProduct");
             await Promise.all(sizeApiCalls);
+            toast.success("Successfully Added An Item");
+
+            await sleep(2000);
+            window.location.reload()
           } catch (error) {
             console.log(productResponse.data);
             toast.warning("Network error or server not responding while adding sizes");

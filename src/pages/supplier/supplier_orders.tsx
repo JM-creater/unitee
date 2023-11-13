@@ -40,6 +40,10 @@ function Supplier_Orders () {
     const [productTypes, setProductTypes] = useState([]);
     const [selectedOrders, setSelectedOrders] = useState(null);
     const [singleApproval, setSingleApproval] = useState(false);
+
+    //For Delay
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
     const [statusCounts, setStatusCounts] = useState({
       Pending: 0,
       Approved: 0,
@@ -108,7 +112,7 @@ function Supplier_Orders () {
         return; 
       }
       axios.put(`https://localhost:7017/Order/approvedOrder/${orderId}`)
-        .then(response => {
+        .then(async response => {
           if (singleApproval) {
             const updatedOrder = orders.find(order => order.Id === response.data.Id);
             if (updatedOrder) {
@@ -126,6 +130,9 @@ function Supplier_Orders () {
           toast.success("Order approved successfully");
           notifEventEmitter.emit("notifAdded")
           CloseBtn.click();
+          
+          await sleep(1000);
+          window.location.reload()
         })
         .catch(error => {
             console.error(error);
@@ -141,7 +148,7 @@ function Supplier_Orders () {
         return; 
       }
       axios.put(`https://localhost:7017/Order/deniedOrder/${orderId}`)
-        .then(response => {
+        .then(async response => {
             const updatedOrder = orders.find(order => order.Id === response.data.Id);
             if (updatedOrder) {
                 Object.assign(updatedOrder, response.data);
@@ -149,6 +156,9 @@ function Supplier_Orders () {
             toast.success("Order denied successfully");
             notifEventEmitter.emit("notifAdded")
             CloseBtn.click();
+
+            await sleep(1000);
+            window.location.reload()
         })
         .catch(error => {
             console.error(error);
@@ -164,7 +174,7 @@ function Supplier_Orders () {
         return; 
       }
       axios.put(`https://localhost:7017/Order/forPickUp/${orderId}`)
-        .then(response => {
+        .then(async response => {
           const updatedOrder = orders.find(order => order.Id === response.data.Id);
             if (updatedOrder) {
                 Object.assign(updatedOrder, response.data);
@@ -172,6 +182,9 @@ function Supplier_Orders () {
             toast.success("For pick up order success");
             notifEventEmitter.emit("notifAdded")
             CloseBtn.click();
+
+            await sleep(1000);
+            window.location.reload()
         })
         .catch(error => {
           console.error(error);
@@ -187,7 +200,7 @@ function Supplier_Orders () {
         return; 
       }
       axios.put(`https://localhost:7017/Order/orderCompleted/${orderId}`)
-        .then(response => {
+        .then(async response => {
           const updatedOrder = orders.find(order => order.Id === response.data.Id);
             if (updatedOrder) {
                 Object.assign(updatedOrder, response.data);
@@ -195,6 +208,9 @@ function Supplier_Orders () {
             toast.success("Order completed success");
             notifEventEmitter.emit("notifAdded")
             CloseBtn.click();
+
+            await sleep(1000);
+            window.location.reload()
         })
         .catch(error => {
           console.error(error);
