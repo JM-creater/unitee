@@ -5,10 +5,10 @@ import logo from "../../assets/images/unitee.png"
 import profIcon from "../../assets/images/icons/profile2.png"
 import logout from "../../assets/images/icons/logout-3.png"
 import homeIcon from "../../assets/images/icons/homeIcon.png"
-//import searchIcon from "../../assets/images/icons/search.png"
 import carts from "../../assets/images/icons/cartIcon.png"
 import orders from "../../assets/images/icons/shopping-bag-4.png"
 import notification from "../../assets/images/icons/notifIcon.png"
+import chatCustomer from "../../assets/images/icons/chat.png"
 import { useCallback, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
@@ -63,6 +63,28 @@ function Main() {
             cartEventEmitter.off("cartUpdated", updateCartCount);
         };
     }, [userId]);
+
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+                try {
+                    const response = await axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
+                    setCart(response.data);
+                } catch (error) {
+                    console.error('Network error or server not responding');
+            }
+        };
+
+        const handleFocus = () => {
+        fetchData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [userId]); 
     
     const updateNotification = useCallback(() => {
         axios.get(`https://localhost:7017/Notification/unread/${userId}`)
@@ -123,6 +145,10 @@ function Main() {
                 <div className="col-md-6 header-button-container">
                     <Link className="customer-nav-link" to=''>
                         <img className="nav-icon" src={ homeIcon }/>
+                    </Link>
+
+                    <Link className="customer-nav-link" to='chat'>
+                        <img className="nav-icon" src={ chatCustomer }/>
                     </Link>
 
                     {/* <Link className="customer-nav-link" to='search_product'>
@@ -192,7 +218,7 @@ function Main() {
                         </>
                     ) : null}
                     <ul className="dropdown-menu dropdown-menu-light" style={{ width:'300px'}}>
-                        <Link className="customer-nav-droplink" to={`viewCustomer_profile/${userId}`}>
+                        <Link className="customer-nav-droplink" to='viewCustomer_profile'>
                             <li><a className="dropdown-item">
                             <img className="dropdown-icon"  src={ profIcon } />VIEW PROFILE</a></li></Link>
 

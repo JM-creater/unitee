@@ -2,7 +2,6 @@ import './suppliers.css'
 import supplierIcon from "../../assets/images/icons/supplier-2.png"
 import validIcon from "../../assets/images/icons/accept.png"
 import invalidIcon from "../../assets/images/icons/remove.png"
-//import shopProf from "../../assets/images/imageprofile.jpeg"
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
@@ -10,8 +9,6 @@ import validationEventEmitter from '../../helpers/ValidationEmitter'
 import registerUsersEventEmitter from '../../helpers/RegisterUsersEmitter'
 
 function Suppliers () {
-
-    // https://localhost:7017/Supplier/updatePassword/
 
     const [supplier, setSupplier] = useState([]);
     const [selectedSupplier, setSelectedSupplier] = useState(null);

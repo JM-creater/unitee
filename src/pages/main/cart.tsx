@@ -44,6 +44,7 @@ function Cart () {
     const { userId } = useParams();
     const fileInputRef = useRef(null);
 
+    // * Handle Reference Id
     const handleReferenceId = (value) => {
       if (/^[0-9]*$/.test(value)) {
         setReferenceId(value);
@@ -52,22 +53,27 @@ function Cart () {
       }
     };
 
+  // * Get Cart
   useEffect(() => {
-      axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
-      .then(res => {
-          setCart(res.data);
-      })
-      .catch(error => {
+      const fetchCart = async () => {
+        try {
+          const response = await axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
+          setCart(response.data);
+        } catch (error) {
           console.error(error);
-      });
+        }
+      }
+      fetchCart();
   }, [userId]);
 
-    // Handle Image
+  
+
+    // * Handle Image
     const handleProofOfPaymentChange = (event) => {
       setProofOfPayment(event.target.files[0]);
     }
 
-    // Calculate the total amount
+    // * Calculate the total amount
     const calculateTotalAmount = () => {
       let count = 0;
       const amount = cart.reduce((sum, cartItem) => {
@@ -83,7 +89,7 @@ function Cart () {
       setTotalItemsChecked(count);
     };
 
-    // Handle Minus Quantity
+    // * Handle Minus Quantity
     const HandleMinusQuantity = (index, itemIndex) => {
       const updatedCart = [...cart];
       if (updatedCart[index].items[itemIndex].quantity > 0) {
@@ -93,7 +99,7 @@ function Cart () {
       calculateTotalAmount();
     }
 
-    // Handle Plus Quantity
+    // * Handle Plus Quantity
     const HandlePlusQuantity = (index, itemIndex) => {
       const updatedCart = [...cart];
       updatedCart[index].items[itemIndex].quantity += 1;
@@ -101,7 +107,7 @@ function Cart () {
       calculateTotalAmount();
     }
 
-    // Handle Shop Total Amount
+    // * Handle Shop Total Amount
     const handleShopCheckboxChange = (cartIndex) => {
       const updatedCart = [...cart];
       const shopChecked = (document.getElementById(`shopRadio-${updatedCart[cartIndex].supplierId}`) as HTMLInputElement).checked;
@@ -114,7 +120,7 @@ function Cart () {
       calculateTotalAmount();
     };
 
-    // Handle Individual Product Amount
+    // * Handle Individual Product Amount
     const handleProductCheckboxChange = (cartIndex) => {
       const allItemsChecked = cart[cartIndex].items.every(item => {
         return (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement).checked;
@@ -123,7 +129,7 @@ function Cart () {
       calculateTotalAmount();
     };
 
-    // Handle Order Place
+    // * Handle Order Place
     const HandleOrderPlace = async () => {
       const checkedCartItems = cart.flatMap(cartItem => {
         const shopChecked = (document.getElementById(`shopRadio-${cartItem.supplierId}`) as HTMLInputElement).checked;
@@ -209,7 +215,7 @@ function Cart () {
       }
     };
     
-    // Delete Method for Cart
+    // * Delete Method for Cart
     const removeCartItem = async (cartId) => {
       try {
           await fetch(`https://localhost:7017/Cart/delete/${cartId}`, {
@@ -220,7 +226,7 @@ function Cart () {
       }
     };
 
-    // Handle for Deleting a Cart
+    // * Handle for Deleting a Cart
     const handleRemoveCart = async () => {
       const itemsToRemove = [];
       const shopsToRemove = [];
@@ -261,7 +267,7 @@ function Cart () {
       cartEventEmitter.emit("cartUpdated");
     };
 
-    // Handle Remove Cart Modal
+    // * Handle Remove Cart Modal
     const handleRemoveCartPrompt = () => {
       const anyProductChecked = cart.some(shop => {
           return shop.items.some(item => {

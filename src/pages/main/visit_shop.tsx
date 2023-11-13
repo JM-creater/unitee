@@ -40,41 +40,46 @@ function Visit_Shop () {
     const { userId, id: shopId } = useParams();
     const supplier = suppliers[shopId];
 
-    // Get All departments
+    // * Get All departments
     useEffect(() => {
-        axios.get('https://localhost:7017/Department')
-        .then(response => {
-            setDepartments(response.data);
-        })
-        .catch(error => {
-            console.log(error);
-        })
+        const fetchDepartments = async () => {
+            try {
+                const response = await axios.get('https://localhost:7017/Department');
+                setDepartments(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        fetchDepartments();
     }, []);
 
-    //Get Department Name
+    // * Get Department Name
     const getDepartmentName = (departmentId: number) => {
         const department = departments.find(d => d.departmentId === departmentId);
         return department ? department.department_Name : 'Unknown Department';
     };
 
+    // * Get User Department
     useEffect(() => {
-        axios.get(`https://localhost:7017/Users/UserDepartment/${userId}`)
-            .then(res => {
-                setDepartmentId(res.data.departmentId);
-            })
-            .catch(err => {
-                console.error(err);
-            });
+        const fetchDepartment = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Users/UserDepartment/${userId}`);
+                setDepartmentId(response.data.departmentId)
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchDepartment();
     }, [userId]);
 
-    // Get All Products
+    // * Get All Products
     useEffect(() => {
         if (!departmentId) return;
         axios.get(`https://localhost:7017/Product/ByShop/${shopId}/ByDepartment/${departmentId}`)
             .then(async res => {
                 setDisplayProduct(res.data);
 
-                // Fetch supplier data for each product
+                // * Fetch supplier data for each product
                 const supplierIds = res.data.map(product => product.supplierId);
                 const uniqueSupplierIds = [...new Set(supplierIds)];
                 const suppliersData = {};
@@ -91,7 +96,7 @@ function Visit_Shop () {
             });
     }, [shopId, departmentId]);
 
-    //Filter Products
+    // * Filter Products
     const filteredProduct = displayProduct.filter(product => 
         (
             selectedGender === '' ||
@@ -109,7 +114,7 @@ function Visit_Shop () {
         )
     );
     
-    // Handle Product Type Filter
+    // * Handle Product Type Filter
     const handleProductTypeClick = (e) => {
         const value = e.target.value;
         if (selectedProductType === value) {
@@ -120,7 +125,7 @@ function Visit_Shop () {
         }
     }
 
-    // Handle Gender Filter
+    // * Handle Gender Filter
     const handleGenderClick = (e, gender) => {
         if (selectedGender === gender) {
             setSelectedGender('');
@@ -130,6 +135,7 @@ function Visit_Shop () {
         }
     }
 
+    // * Handle Price Range
     const handlePriceRangeClick = (e, priceRange) => {
         if (selectedPriceRange === priceRange) {
             setSelectedPriceRange('');
@@ -139,7 +145,7 @@ function Visit_Shop () {
         }
     }
     
-    // Add To Cart
+    // * Add To Cart
     const addToCart = () => {
         const CloseBtn = document.getElementById("btnClose");
         if (!selectedProduct) return;
@@ -177,7 +183,7 @@ function Visit_Shop () {
         });
     };
 
-    // Update the Product Details Modal
+    // * Update the Product Details Modal
     useEffect(() => {
         const modal = document.getElementById('viewProdDetailsModal') 
         if (modal) {
@@ -190,7 +196,7 @@ function Visit_Shop () {
     }, []);
 
 
-    // Handle the Selected Size
+    // * Handle the Selected Size
     const HandleSelectedSize = (event) => {
         const sizeId = parseInt(event.target.value, 10); 
         const selectedSize = selectedProduct.sizes.find(size => size.id === sizeId);
@@ -200,7 +206,7 @@ function Visit_Shop () {
         }
     }
 
-    // Handle Close Button
+    // * Handle Close Button
     const HandleCloseButton = () => {
         setQuantity(0);
         setSelectedProduct(null);
@@ -208,7 +214,7 @@ function Visit_Shop () {
         setSelectedSize(null);
     };
 
-    // Handle Minus Quantity
+    // * Handle Minus Quantity
     const HandleMinusQuantity = () => {
         const currentQuantity = quantity;
         if(currentQuantity > 0) {
@@ -216,7 +222,7 @@ function Visit_Shop () {
         }
     };
 
-    // Handle Minus Quantity
+    // * Handle Minus Quantity
     const HandlePlusQuantity = () => {
         const currentQuantity = quantity;
         const UpdateQuantity = newQuantity;
@@ -228,6 +234,7 @@ function Visit_Shop () {
         }
     };
 
+    // ! To be fixed: Get Rating
     useEffect(() => {
         axios.get(`https://localhost:7017/Rating/${userId}`)
             .then((response) => {
@@ -275,18 +282,6 @@ function Visit_Shop () {
                         </div>
                         {/* check button product types */}
                         <div className="col-md-8 prod-type-checkbox">
-                            {/* <h4 className="type-filter-label">
-                                <input 
-                                    className="form-check-input prod-cart-checkBox" 
-                                    type="radio" 
-                                    value="1" 
-                                    name="productType"
-                                    id="shopProdTypeAll"
-                                    checked={selectedProductType === '1'}
-                                    onChange={handleProductTypeChange}
-                                />
-                                <hr/> All
-                            </h4> */}
                             <h4 className="type-filter-label">
                                 <input 
                                     className="form-check-input prod-cart-checkBox" 
@@ -536,7 +531,6 @@ function Visit_Shop () {
                                 <h1 className="prodModal-Price">₱{selectedProduct.price}</h1>
                                 <div className="prodModal-SizeGuide">
                                     <h5 className="prodModal-text">
-                                        {/* <img className="sizeIcon-container" src={ sizeIcon }/> */}
                                         <button 
                                             data-bs-toggle="modal"
                                             data-bs-target="#viewSizeGuideModal"
@@ -563,8 +557,8 @@ function Visit_Shop () {
                                             Select Size
                                         </option>
                                         {selectedProduct.sizes && selectedProduct.sizes.map((size, index) => (
-                                            <option key={`${size}-${index}`} value={size.id}>
-                                                {size.size}
+                                            <option key={`${size}-${index}`} value={size.id} disabled={size.quantity === 0}>
+                                                {size.size} {size.quantity === 0 ? '(Sold Out)' : ''}
                                             </option>
                                         ))}
                                     </select>

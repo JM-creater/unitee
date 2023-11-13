@@ -30,6 +30,47 @@ function Purchase_History () {
     const [ratingSupplier, setRatingSupplier] = useState(null);
     const { userId } = useParams();
 
+    // * Add to cart from purchase history 
+    const addPurchaseToCart = () => {
+        const closeBtn = document.getElementById("btnClose");
+        if (!selectedPurchases || !selectedPurchases.cart || !Array.isArray(selectedPurchases.cart.items) || selectedPurchases.cart.items.length === 0) {
+            toast.error("No purchases selected");
+            return;
+        }
+    
+        selectedPurchases.cart.items.forEach(item => {
+            if (!item.productId || !item.sizeQuantity || !item.sizeQuantity.size || !item.sizeQuantity.quantity) {
+                toast.error("Invalid purchase item data");
+                return;
+        }
+    
+            const cartAddRequest = {
+                userId: userId,
+                productId: item.productId,
+                size: item.sizeQuantity.size,
+                quantity: item.quantity
+            };
+    
+            axios.post('https://localhost:7017/Cart/add', cartAddRequest)
+                .then(() => {
+                    toast.success("Item added to cart");
+                    closeBtn.click();
+                    window.location.reload();
+                })
+                .catch(error => {
+                    toast.error(error.message);
+                });
+            });
+            axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
+            .then(updatedCartResponse => {
+                setPurchases(updatedCartResponse.data);
+            })
+            .catch(error => {
+                toast.error(error.message);
+            });
+    };
+    
+    // * Handle Product Rating 
     const handleRatingProduct = async (productId, supplierId) => {
         const closeBtn = document.getElementById("btnClose");
         
@@ -48,7 +89,9 @@ function Purchase_History () {
         try {
             const response = await fetch('https://localhost:7017/Rating/rate-product', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json' 
+                },
                 body: JSON.stringify(request)
             });
 
@@ -65,6 +108,7 @@ function Purchase_History () {
         }
     };
 
+    // * Handle Supplier Rating
     const handleRatingSupplier = async (productId, supplierId) => {
         const closeBtn = document.getElementById("btnClose");
         
@@ -83,7 +127,9 @@ function Purchase_History () {
         try {
             const response = await fetch('https://localhost:7017/Rating/rate-product', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json' 
+                },
                 body: JSON.stringify(request)
             });
 
@@ -100,6 +146,7 @@ function Purchase_History () {
         }
     };
 
+    // * Handle Both Supplier and Rating Handle
     const handleBothRatings = async (items) => {
         if (!items || items.length === 0) {
             alert('No items to rate.');
@@ -111,17 +158,8 @@ function Purchase_History () {
             handleRatingSupplier(item.product.productId, item.product.supplierId);
         });
     };
-    
 
-    useEffect(() => {
-        if (localStorage.getItem('productRatingSubmitted') === 'true') {
-            setRatingProduct(null);
-        }
-        if (localStorage.getItem('supplierRatingSubmitted') === 'true') {
-            setRatingSupplier(null);
-        }
-    }, []);
-
+    // * Get Order By User Id
     useEffect(() => {
         axios.get(`https://localhost:7017/Order/${userId}`)
             .then(response => {
@@ -132,7 +170,7 @@ function Purchase_History () {
             })
     }, [userId]);
 
-    //Read All Product Types
+    // * Get All Product Types
     useEffect(() => {
         axios.get('https://localhost:7017/ProductType')
             .then(res => {
@@ -143,12 +181,13 @@ function Purchase_History () {
             });
     }, []);
     
-    // Get Product Type Name
+    // * Get Product Type Name
     const getProductTypeName = (productTypeId) => {
         const productType = productTypes.find(p => p.productTypeId === productTypeId);
         return productType ? productType.product_Type : 'Unknown Type';
     };
 
+    // * Format Date
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
@@ -159,12 +198,13 @@ function Purchase_History () {
         return `${month}/${day}/${year} ${hours}:${minutes}`;
     };
 
-    const handleCLose = () => {
-        const closeBtn = document.getElementById("btnClose");
-        closeBtn.click();
-    }
+    // * Handle Close
+    // const handleCLose = () => {
+    //     const closeBtn = document.getElementById("btnClose");
+    //     closeBtn.click();
+    // }
 
-    // Update the Product Details Modal
+    // * Update the Product Details Modal
     useEffect(() => {
         const modal = document.getElementById('viewProdDetailsModal') 
         if (modal) {
@@ -176,6 +216,7 @@ function Purchase_History () {
         }
     }, []);
 
+    // * Close Button
     const HandleCloseButton = () => {
         setRatingProduct(0);
         setRatingSupplier(0);
@@ -382,18 +423,18 @@ function Purchase_History () {
                 )}
                 </div>
                 <div className="modal-footer">
-                {selectedPurchases && (
-                    <>
-                        <Link to={`/shop/${userId}/visit_shop/${selectedPurchases.cart.supplier.id}`}>
-                            <button className="proceed-Btn" onClick={handleCLose}>
-                                Buy Again
+                    {selectedPurchases && (
+                        <>
+                            <Link to={`/shop/${userId}/cart`}>
+                                <button className="proceed-Btn" onClick={addPurchaseToCart}>
+                                    Buy Again
+                                </button>
+                            </Link>
+                            <button className="proceed-Btn" style={{ background: '#FFAA00' }} onClick={() => handleBothRatings(selectedPurchases.cart.items)}>
+                                Submit
                             </button>
-                        </Link>
-                        <button className="proceed-Btn" style={{ background: '#FFAA00' }} onClick={() => handleBothRatings(selectedPurchases.cart.items)}>
-                            Submit
-                        </button>
-                    </>
-                )}
+                        </>
+                    )}
                 </div>
             </div>
         </div>

@@ -78,6 +78,7 @@
     max-width: 40px;
     border: solid #f0f0f0;
     border-radius: 50%;
+    cursor: pointer;
 }
 
 .Supplier-SearchBar {
@@ -93,7 +94,16 @@
 
 .drop-link-item {
     text-decoration: none;
-    color: #004AAD;
+    /* color: #004AAD; */
+}
+
+.drop-link-item:hover {
+    text-decoration: none;
+    /* color: #004AAD; */
+}
+
+.drop-icon {
+    text-decoration: none;
 }
 
 .drop-icon {

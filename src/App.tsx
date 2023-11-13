@@ -36,6 +36,8 @@ import Supplier_ViewProf from './pages/supplier/supplier_viewProf'
 import Supplier from './pages/supplier/supplier_dashboard'
 import Reports from './pages/supplier/reports'
 import Forgot_Password from './pages/forgot_password'
+import Supplier_Chat from './pages/supplier/supplier_chat'
+import Chat from './pages/main/chat'
 // import Unauthorized_Error from './pages/common/unauthorized_error'
 // import Internal_Error from './pages/common/internal_error'
 // import Bad_Request from './pages/common/bad_request'
@@ -73,6 +75,7 @@ function App() {
             <Route path='viewCustomer_profile' element={ <ViewCustomer_Profile/> }/>
             <Route path='purchase_history' element={ <Purchase_History/> }></Route>
             <Route path='notif' element={ <Notif/> }></Route>
+            <Route path='chat' element={ <Chat/> } />
             {/* <Route path='/main/:id' element={ <Main/> }></Route>   */}
           </Route>
           
@@ -94,6 +97,7 @@ function App() {
             <Route path='manage_shop' element={ <Manage_Shop/> }/>
             <Route path='supplier_viewProf' element={ <Supplier_ViewProf/> }/>
             <Route path='reports' element={ <Reports/> }/>
+            <Route path='supplier_chat' element={ <Supplier_Chat/> } />
           </Route>
 
           <Route path='/update_item/:id/:productId' element={ <Update_item/> }></Route>
@@ -102,7 +106,7 @@ function App() {
 
           <Route path='/add_item/:id' element={ <Add_item/> }></Route>
 
-          {/* ERROR WEBPAGES        */}
+          {/* ERROR WEBPAGES */}
           <Route path='*' element={ <NotFound/> }/>
           {/* <Route path='*' element={ <Unauthorized_Error/> }/> */}
           {/* <Route path='*' element={ <Internal_Error/> }/> */}

@@ -252,3 +252,18 @@ body {
     padding: 15px;
     border-radius: 10px;
 }
+
+.view-receipt-btn {
+    margin-left: 30px;
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.view-receipt-btn:hover {
+    background-color: #0056b3; 
+}

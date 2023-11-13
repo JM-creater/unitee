@@ -8,6 +8,7 @@ import supplierReportsIcon from "../../assets/images/icons/reports.png"
 import shopIcon from "../../assets/images/icons/store-2.png"
 import editprof from "../../assets/images/icons/user-avatar.png"
 import logoutIcon from "../../assets/images/icons/logout-4.png"
+import chatSupplier from "../../assets/images/icons/chat.png"
 import { useCallback, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
@@ -80,6 +81,10 @@ function Supplier_Main (){
                         <img className="supplier-nav-icon" src={ supplierReportsIcon }/>
                         <span className="supplier-nav-text">Reports</span>
                     </Link>
+                    <Link to='supplier_chat' className="supplier-nav-link">
+                        <img className="supplier-nav-icon" src={ chatSupplier }/>
+                        <span className="supplier-nav-text">Chat</span>
+                    </Link>
                 </div>
             </header>
             <div style={{ minHeight: '100%' }}>
@@ -102,7 +107,7 @@ function Supplier_Main (){
                     )}
 
                     <ul className="dropdown-menu" style={{ padding:'10px', width:'15rem' }}>
-                        <Link to='supplier_viewProf'>
+                        <Link className="drop-link-item" to='supplier_viewProf'>
                             <li className="drop-list">
                                 <a className="dropdown-item supplier-drop-item" style={{ fontSize:'15px' }}>
                                     <img className="drop-icon" src={ editprof }/>
@@ -120,7 +125,6 @@ function Supplier_Main (){
                             </li>   
                         </Link>
                     </ul>
-      
                 </div>
                 <Outlet/>
             </div>
