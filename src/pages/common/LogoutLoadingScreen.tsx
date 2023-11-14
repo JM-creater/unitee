@@ -4,7 +4,7 @@ import SuccessfulGif from '../../assets/images/icons/successfulLogin.svg'
 import logo from "../../assets/images/unitee.png"
 import { useEffect, useState } from 'react';
 
-function LoadingScreen(){
+function LogoutLoadingScreen(){
 
     const [showSuccess, setShowSuccess] = useState(false);
 
@@ -28,16 +28,16 @@ function LoadingScreen(){
             {!showSuccess ? (
                 <>
                     <img className='loading-bar' src={LoadingGif} />
-                    <p className='loading-message-logginIn'>Logging in...</p>
+                    <p className='loading-message-logginIn'>Logging Out...</p>
                 </>
             ) : (
                 <>
                     <img className='gif-size' src={SuccessfulGif} />
-                    <p className='loading-message-successful'>Successfully Logged In</p>
+                    <p className='loading-message-successful'>Successfully Logged Out</p>
                 </>
             )}
         </div>
     )
 }
 
-export default LoadingScreen
+export default LogoutLoadingScreen

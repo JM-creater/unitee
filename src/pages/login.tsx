@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import './login.css';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import illustration from '../../src/assets/images/loginPic.png';
 import logo from '../../src/assets/images/unitee.png';
@@ -8,6 +8,7 @@ import forgotPass from '../../src/assets/images/icons/forgot.png'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import LoadingScreen from './common/LoadingScreen';
+import LogoutLoadingScreen from './common/LogoutLoadingScreen';
 
 type ValidationErrors = {
   IDOrEmail?: string;
@@ -87,15 +88,18 @@ function Login() {
         if (result.status === 200) {
           switch (result.data.role) {
             case 'Customer':
-              toast.success("Successfully Logged In");
+              setIsLoading(true);
+              await sleep(10000);
               navigate(`/shop/${result.data.user.id}`, { state: { userData: result.data.user } });
               break;
             case 'Supplier':
-              toast.success("Successfully Logged In");
+              setIsLoading(true);
+              await sleep(10000);
               navigate(`/supplier_dashboard/${result.data.user.id}`, { state: { supplierData: result.data.user } });
               break;
             case 'Admin':
-              toast.success("Successfully Logged In");
+              setIsLoading(true);
+              await sleep(10000);
               navigate(`/admin_dashboard/${result.data.user.id}`, { state: { adminData: result.data.user } });
               break;
             default:
@@ -124,7 +128,10 @@ function Login() {
   return (
     <>
       {isLoading ? (
-        <LoadingScreen/>
+        <React.Fragment>
+          <LoadingScreen />
+          <LogoutLoadingScreen />
+        </React.Fragment>
       ) : (
         <div className="col-md-12 main-container row">
         <div className="col-md-7 login-1-container">

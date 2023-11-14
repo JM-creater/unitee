@@ -397,3 +397,20 @@
     max-width: 12px;
     margin-right: 5px;
   }
+
+  .mainloading-screen {
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: white;
+}
+
+  .mainloading-screen img {
+    width: 150px;
+    height: auto;
+    margin-bottom: 20px; 
+  }
+

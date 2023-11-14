@@ -8,7 +8,7 @@ import customerIcon from "../../assets/images/icons/male-student.png"
 import './admin-dashboard.css'
 import { useEffect, useState } from "react"
 import axios from "axios"
-import { toast } from "react-toastify"
+//import { toast } from "react-toastify"
 import validationEventEmitter from "../../helpers/ValidationEmitter"
 import registerUsersEventEmitter from "../../helpers/RegisterUsersEmitter"
 
@@ -24,7 +24,7 @@ function Admin_Dashboard () {
               const response = await axios.get('https://localhost:7017/Users/getCustomers');
               setCustomer(response.data);
           } catch (error) {
-              toast.error('Network error or server not responding');
+              console.error('Network error or server not responding');
           }
       };
       const validationListener = () => {
@@ -49,7 +49,7 @@ function Admin_Dashboard () {
                 const response = await axios.get('https://localhost:7017/Users/getCustomers');
                 setCustomer(response.data);
             } catch (error) {
-                toast.error('Network error or server not responding');
+                console.error('Network error or server not responding');
             }
         };
 
@@ -71,7 +71,7 @@ function Admin_Dashboard () {
               const response = await axios.get('https://localhost:7017/Users/getSuppliers');
               setSupplierData(response.data);
           } catch (error) {
-              toast.error('Network error or server not responding');
+              console.error('Network error or server not responding');
           }
       };
 
@@ -96,7 +96,7 @@ function Admin_Dashboard () {
               const response = await axios.get('https://localhost:7017/Users/getSuppliers');
               setSupplierData(response.data);
           } catch (error) {
-              toast.error('Network error or server not responding');
+              console.error('Network error or server not responding');
           }
       };
 

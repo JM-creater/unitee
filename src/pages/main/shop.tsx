@@ -6,7 +6,7 @@ import starIcon from "../../assets/images/icons/starRating.png"
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import LoadingScreen from '../common/LoadingScreen'
+import LoadingGif from '../../assets/images/icons/loadingscreen.svg'
 
 function Shop() {
 
@@ -29,23 +29,32 @@ function Shop() {
         navigate(`/shop/${userId}/search_product?search=${searchTerm}`);
     };
     
-
     useEffect(() => {
+        let isMounted = true;
+        setIsLoading(true);
+    
         axios.get(`https://localhost:7017/Users/UserDepartment/${userId}`)
-            .then(res => {
-                setDepartmentId(res.data.departmentId);
+            .then(async res => {
+                if (isMounted) {
+                    setDepartmentId(res.data.departmentId);
+                    await sleep(50);
+                    setIsLoading(false);
+                }
             })
             .catch(err => {
                 console.error(err);
+                setIsLoading(false);
             });
+    
+        return () => {
+            isMounted = false;
+        };
     }, [userId]);
 
     useEffect(() => {
         if (!departmentId) return;
         axios.get(`https://localhost:7017/Users/getSuppliersProduct/${departmentId}`)
             .then(async res => {
-                await sleep(2000);
-                setIsLoading(false);
                 setShop(res.data);
             })
             .catch(err => {
@@ -53,11 +62,11 @@ function Shop() {
             });
     }, [departmentId]);
 
+    // ! To be fixed
     useEffect(() => {
         axios.get(`https://localhost:7017/Rating/${userId}`)
             .then((response) => {
                 setRatings(response.data);
-
                 // Calculate average rating
                 const totalValue = response.data.reduce((acc, cur) => acc + cur.value, 0);
                 const avg = response.data.length > 0 ? (totalValue / response.data.length) : 0;
@@ -66,12 +75,14 @@ function Shop() {
                 console.error(error);
             });
     }, [userId]);
-    
+
 
     return (
     <>
         {isLoading ? (
-            <LoadingScreen/>
+            <div className="mainloading-screen">
+                <img className='mainloading-bar' src={LoadingGif} alt="loading..." />
+            </div>
         ) : ( 
             <div className='container shop-contianer'>
             <div className='content-container'>
@@ -145,7 +156,6 @@ function Shop() {
         </div>
         )}
     </>
-    
     )
 }
 
