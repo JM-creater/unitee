@@ -13,6 +13,9 @@ import {
 } from 'chart.js';
 
 import { Bar, Pie } from 'react-chartjs-2';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 ChartJS.register(
     BarElement,
@@ -24,6 +27,37 @@ ChartJS.register(
 )
 
 function Admin_Reports () {
+
+    const [orders, setOrders] = useState([]);
+    const [shops, setShops] = useState([]);
+
+    
+
+    useEffect(() => {
+        const fetchOrcders = async () => {
+            try {
+                const res = await axios.get('https://localhost:7017/Order');
+                    setOrders(res.data);
+            } catch (error) {
+                console.error(error)
+                toast.error("Error fetching orders.");
+            }
+        }
+        fetchOrcders();
+    }, []);
+
+    useEffect(() => {
+        const fetchShops = async () => {
+            try {
+                const res = await axios.get('https://localhost:7017/Users');
+                    setShops(res.data);
+            } catch (error) {
+                console.error(error)
+                toast.error("Error fetching orders.");
+            }
+        }
+        fetchShops();
+    }, []);
 
     // BAR GRAPH
     const salesData = {
@@ -60,6 +94,8 @@ function Admin_Reports () {
         ]
     }
 
+    console.log(orders)
+
     // END OF BAR GRAPH``
 
     // PIE CHART CHART
@@ -85,7 +121,7 @@ function Admin_Reports () {
             <div className='admin-reports-allOrders-card'>
                 <div className='col-md-9'>
                     <h5 className='header-adminSales-label'>Total Orders</h5>
-                    <h3>53485</h3>
+                    <h3>{orders? orders.length : 0}</h3>
                   
                     <ul className="nav nav-pills"
                     style={{
@@ -203,10 +239,13 @@ function Admin_Reports () {
                     <select style={{ padding: '10px', border: '2px solid white' }}
                      name="order-status-filter-admin" id="statusOrderFilter">
                         <option value="pending">Select an order status</option>
-                        <option value="pending">Pending</option>
-                        <option value="pending">Approved</option>
-                        <option value="pending">Canceled</option>
-                        <option value="pending">Claimed</option>
+                        <option value="1">Order Placed</option>
+                        <option value="2">Pending</option>
+                        <option value="3">Approved</option>
+                        <option value="4">For Pick Up</option>
+                        <option value="5">Completed</option>
+                        <option value="6">Canceled</option>
+                        <option value="7">Denied</option>
                     </select>
                 </div>
 
@@ -214,11 +253,12 @@ function Admin_Reports () {
                     <label style={{ marginRight:'10px' }} htmlFor="supplierFilter">Shop</label>
                     <select style={{ padding: '10px', border: '2px solid white' }}
                      name="order-status-filter-admin" id="supplierFilter">
-                        <option value="pending">Select a shop</option>
-                        <option value="pending">Shop 1</option>
-                        <option value="pending">Shop 2</option>
-                        <option value="pending">Shop 3</option>
-                        <option value="pending">Shop 4</option>
+                        <option value="0" disabled>Select a shop</option>
+                        {shops.map((shop) => 
+                            shop.role === 2 ? (
+                                <option key={shop.id}>{shop.shopName}</option>
+                            ) : null
+                        )}
                     </select>
                 </div>
             </div>
@@ -237,22 +277,22 @@ function Admin_Reports () {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                    </tr>
-                    <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                    </tr>
+                {orders.map((ord) => 
+                        <tr>
+                        <th scope="row">{ord.id}</th>
+                        <td>{ord.cart.supplier.shopName}</td>
+                        <td>{ord.user.firstName} {ord.user.lastName}</td>
+                        <td>{ord.cart.items[0].quantity}</td>
+                        <td>{ord.total}</td>
+                        <td>{ord.status == 1? 'Order Placed' : 
+                        ord.status == 2? 'Pending' : 
+                        ord.status == 3? 'Approved' : 
+                        ord.status == 4? 'For Pick Up' : 
+                        ord.status == 5? 'Completed' : 
+                        ord.status == 6? 'Canceled' : 
+                        ord.status == 7? 'Denied' :  'Unavailble' }</td>
+                        </tr>
+                    )}
                 </tbody>
                 </table>
         </div>
