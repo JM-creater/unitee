@@ -111,7 +111,6 @@ function View_Customers () {
                 setCustomerIsValid(newValidationStatus);
                 setCustomerIsValid(newIsActive);
                 validationEventEmitter.emit("validInvalid");
-                window.location.reload();
                 toast.success("Successfully Updated the Password");
             } else {
                 toast.error(response.data.message);

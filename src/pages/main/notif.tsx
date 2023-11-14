@@ -430,8 +430,13 @@ function Notif() {
                           alt="Order Shipped Icon"
                           style={{ width: '60px', height: '60px', marginLeft: '70px' }}
                         />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
+                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>
+                          Order<br />Pending
+                        </p>
                       </div>
+                      <p style={{ fontSize: '12px' }}>
+                        <span>{formatDate(notificationItem.order.dateUpdated)}</span>
+                      </p>
                     </li>
                     <li className={approved ? "active step0" : "step0"}>
                       <div className="icon-content">
@@ -547,6 +552,9 @@ function Notif() {
                         />
                         <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
                       </div>
+                      <p style={{ fontSize: '12px' }}>
+                        <span>{formatDate(notificationItem.order.dateUpdated)}</span>
+                      </p>
                     </li>
                     <li className={pickup ? "active step0" : "step0"}>
                       <div className="icon-content">
@@ -663,6 +671,9 @@ function Notif() {
                         />
                         <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
                       </div>
+                      <p style={{ fontSize: '12px' }}>
+                        <span>{formatDate(notificationItem.order.dateUpdated)}</span>
+                      </p>
                     </li>
                     <li className={completed ? "active step0" : "step0"}>
                       <div className="icon-content">
@@ -789,6 +800,9 @@ function Notif() {
                         />
                         <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
                       </div>
+                      <p style={{ fontSize: '12px' }}>
+                        <span>{formatDate(notificationItem.dateCreated)}</span>
+                      </p>
                     </li>
                   </ul>
                 </div>

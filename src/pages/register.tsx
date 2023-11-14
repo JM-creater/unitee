@@ -36,6 +36,9 @@ function Register() {
   const [studyLoad, setStudyLoad] = useState(null);
   const navigate = useNavigate();
 
+  // * For Delay
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
   const handleIDnumber = (value) => {
     if (/^[0-9]*$/.test(value)) {
       setIDNumber(value);
@@ -118,6 +121,7 @@ function Register() {
           toast.success('Successfully registered.', {
             onClose: () => navigate('/')
           });
+          await sleep(1000);
         } else {
           toast.error(response.data);
           return;

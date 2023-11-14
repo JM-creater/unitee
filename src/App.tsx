@@ -72,7 +72,7 @@ function App() {
             <Route path='user_profile/:id' element={ <User_Profile/> }></Route>
             <Route path='notif' element={ <Notif/> }></Route>
             <Route path='order_tracking' element={ <Order_Tracking/> }></Route>
-            <Route path='viewCustomer_profile/:id' element={ <ViewCustomer_Profile/> }/>
+            <Route path='viewCustomer_profile' element={ <ViewCustomer_Profile/> }/>
             <Route path='purchase_history' element={ <Purchase_History/> }></Route>
             <Route path='notif' element={ <Notif/> }></Route>
             <Route path='chat' element={ <Chat/> } />

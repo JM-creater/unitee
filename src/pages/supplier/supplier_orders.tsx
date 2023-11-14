@@ -19,7 +19,7 @@ const StatusMapping = {
 
 function Supplier_Orders () {
 
-    // Payment Type and Status
+    // * Payment Type and Status
     const PaymentType = {
       EMoney: 'E-Money',
       Cash: 'Cash'
@@ -41,7 +41,7 @@ function Supplier_Orders () {
     const [selectedOrders, setSelectedOrders] = useState(null);
     const [singleApproval, setSingleApproval] = useState(false);
 
-    //For Delay
+    // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
     const [statusCounts, setStatusCounts] = useState({
@@ -70,43 +70,47 @@ function Supplier_Orders () {
         })
     }, [id])
 
-    //Read All Departments
+    // * Get All Departments
     useEffect(() => {
-      axios.get('https://localhost:7017/Department')
-        .then(res => {
-            setDepartments(res.data);
-        })
-        .catch(error => {
-          console.error(error)
-        });
+      const fetchDepartments = async () => {
+        try {
+          const response = await axios.get("https://localhost:7017/Department");
+          setDepartments(response.data);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      fetchDepartments();
     }, []);
 
-    // Get Department Names
+    // * Get Department Names
     const getDepartmentName = (departmentId) => {
         const department = departments.find(d => d.departmentId === departmentId);
         return department ? department.department_Name : 'Unknown Department';
     };
 
-    //Read All Product Types
+    // * Get All Product Types
     useEffect(() => {
-      axios.get('https://localhost:7017/ProductType')
-        .then(res => {
-            setProductTypes(res.data);
-        })
-        .catch(error => {
-          console.error(error)
-        });
+      const fetchProductTypes = async () => {
+        try {
+          const response = await axios.get('https://localhost:7017/ProductType');
+          setProductTypes(response.data);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      fetchProductTypes();
     }, []);
     
-    // Get Product Type Name
+    // * Get Product Type Name
     const getProductTypeName = (productTypeId) => {
         const productType = productTypes.find(p => p.productTypeId === productTypeId);
         return productType ? productType.product_Type : 'Unknown Type';
     };
 
-    // Handle Approved Orders
+    // * Handle Approved Orders
     const HandleApprovedOrders = (orderId) => {
-      const CloseBtn = document.getElementById("btnClose");
+      //const CloseBtn = document.getElementById("btnClose");
       if (!singleApproval) {
         toast.error("Please check the Single Approval checkbox before approving.");
         return; 
@@ -129,10 +133,10 @@ function Supplier_Orders () {
           }
           toast.success("Order approved successfully");
           notifEventEmitter.emit("notifAdded")
-          CloseBtn.click();
+          //CloseBtn.click();
           
           await sleep(1000);
-          window.location.reload()
+          window.location.reload();
         })
         .catch(error => {
             console.error(error);
@@ -140,7 +144,7 @@ function Supplier_Orders () {
         });
     }
 
-    // Handle Denied Orders
+    // * Handle Denied Orders
     const HandleDeniedOrders = (orderId) => {
       const CloseBtn = document.getElementById("btnClose");
       if (!singleApproval) {
@@ -158,7 +162,7 @@ function Supplier_Orders () {
             CloseBtn.click();
 
             await sleep(1000);
-            window.location.reload()
+            window.location.reload();
         })
         .catch(error => {
             console.error(error);
@@ -166,7 +170,7 @@ function Supplier_Orders () {
         });
     }
 
-    // Handle Pick Up Orders
+    // * Handle Pick Up Orders
     const HandleForPickUpOrders = (orderId) => {
       const CloseBtn = document.getElementById("btnClose");
       if (!singleApproval) {
@@ -184,7 +188,7 @@ function Supplier_Orders () {
             CloseBtn.click();
 
             await sleep(1000);
-            window.location.reload()
+            window.location.reload();
         })
         .catch(error => {
           console.error(error);
@@ -192,7 +196,7 @@ function Supplier_Orders () {
         });
     }
 
-    // Handle Completed Orders
+    // * Handle Completed Orders
     const HandleOrderCompleted = (orderId) => {
       const CloseBtn = document.getElementById("btnClose");
       if (!singleApproval) {
@@ -210,7 +214,7 @@ function Supplier_Orders () {
             CloseBtn.click();
 
             await sleep(1000);
-            window.location.reload()
+            window.location.reload();
         })
         .catch(error => {
           console.error(error);
@@ -218,6 +222,7 @@ function Supplier_Orders () {
         });
     }
 
+    // * Format Date
     const formatDate = (dateString) => {
       const date = new Date(dateString);
       const day = String(date.getDate()).padStart(2, '0');
@@ -227,7 +232,8 @@ function Supplier_Orders () {
       const minutes = String(date.getMinutes()).padStart(2, '0');
       return `${month}/${day}/${year} ${hours}:${minutes}`;
     };
-  
+    
+    // * Update Notification
     const updateNotification = useCallback(() => {
       axios.get(`https://localhost:7017/Notification/supplierUnread/${id}`)
         .then(response => {
@@ -245,6 +251,7 @@ function Supplier_Orders () {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
   
+    // * Fetch New Order Notification
     useEffect(() => {
       orderEventEmitter.on("notifNewOrderAdded", updateNotification);
       updateNotification();

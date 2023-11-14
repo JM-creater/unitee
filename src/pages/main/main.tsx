@@ -30,16 +30,20 @@ function Main() {
     const [cart, setCart] = useState([]);
     const { userId } = useParams();
     
+    // * Fetch Users
     useEffect(() => {
-        axios.get(`https://localhost:7017/Users/${userId}`)
-        .then(response => {
-            setCustomer(response.data);
-        })
-        .catch(error => {
-            console.error(error);
-        });
+        const fetchUsers = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Users/${userId}`)
+                setCustomer(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchUsers();
     }, [userId]);
     
+    // * Fetch Updated Cart
     useEffect(() => {
         const updateCartCount = () => {
             axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
@@ -76,7 +80,7 @@ function Main() {
         };
 
         const handleFocus = () => {
-        fetchData();
+            fetchData();
         };
 
         window.addEventListener('focus', handleFocus);
@@ -86,35 +90,67 @@ function Main() {
         };
     }, [userId]); 
     
+    // * Unread Notification
     const updateNotification = useCallback(() => {
-        axios.get(`https://localhost:7017/Notification/unread/${userId}`)
-        .then(response => {
-            setNotifItem(response.data);
-        })
-        .catch(error => {
-            console.error(error);
-        });
+        const fetchNotification = async () => {
+            try {   
+                const response = await axios.get(`https://localhost:7017/Notification/unread/${userId}`);
+                setNotifItem(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchNotification();
     }, [userId]);
     
     useEffect(() => {  
-        notifEventEmitter.on("notifAdded", updateNotification);
-        updateNotification();
+        const validListener = () => {
+            updateNotification();
+        }
+
+        notifEventEmitter.on("notifAdded", validListener);
     
         return () => {
-            notifEventEmitter.off("notifAdded", updateNotification);
+            notifEventEmitter.off("notifAdded", validListener);
         };
     }, [userId, updateNotification]);
 
-    const handleNotificationClick = () => {
-        axios.post(`https://localhost:7017/Notification/markRead/${userId}`)
-        .then(() => {
-            updateNotification();
-        })
-        .catch(error => {
-            console.error(error);
-        });
-    }
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+                const response = await axios.get(`https://localhost:7017/Notification/unread/${userId}`);
+                setNotifItem(response.data);
+            } catch (error) {
+                console.error('Network error or server not responding');
+            }
+        };
+    
+        const handleFocus = () => {
+            fetchData();
+        };
+    
+        window.addEventListener('focus', handleFocus);
+    
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [userId]);
 
+    // * Mark as Read in Notification
+    const handleNotificationClick = () => {
+        const fetchNotificationClick = async () => {
+            try {
+                await axios.post(`https://localhost:7017/Notification/markRead/${userId}`);
+                updateNotification();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchNotificationClick();
+    };
+
+    // * Notification Hub in SignalR
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("https://localhost:7017/notificationHub", {

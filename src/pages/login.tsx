@@ -7,6 +7,7 @@ import logo from '../../src/assets/images/unitee.png';
 import forgotPass from '../../src/assets/images/icons/forgot.png'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import LoadingScreen from './common/LoadingScreen';
 
 type ValidationErrors = {
   IDOrEmail?: string;
@@ -17,8 +18,13 @@ function Login() {
   
   const [IDOrEmail, setIDOrEmail] = useState('');
   const [Password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  // * For Delay
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  // * Generate Random Id for Supplier
   const generateRandomID = () => {
     const id = Math.floor(10000000 + Math.random() * 90000000).toString();
     localStorage.setItem('generatedSupplierID', id);
@@ -38,7 +44,7 @@ function Login() {
     }
   }
 
-  // Login Account
+  // * Login Account
   const handleLogin = () => {
     const errors: ValidationErrors = {};
 
@@ -76,18 +82,20 @@ function Login() {
     const url = 'https://localhost:7017/Users/login';
     axios
       .post(url, data)
-      .then((result) => {
+      .then(async(result) => {
         
         if (result.status === 200) {
-          toast.success('Successfully Logged In');
           switch (result.data.role) {
             case 'Customer':
+              toast.success("Successfully Logged In");
               navigate(`/shop/${result.data.user.id}`, { state: { userData: result.data.user } });
               break;
             case 'Supplier':
+              toast.success("Successfully Logged In");
               navigate(`/supplier_dashboard/${result.data.user.id}`, { state: { supplierData: result.data.user } });
               break;
             case 'Admin':
+              toast.success("Successfully Logged In");
               navigate(`/admin_dashboard/${result.data.user.id}`, { state: { adminData: result.data.user } });
               break;
             default:
@@ -95,8 +103,7 @@ function Login() {
               break;
           }
         } else {
-          
-          alert(result.data.message);
+          toast.error(result.data.message);
         }
       })
       .catch((error) => {
@@ -115,58 +122,64 @@ function Login() {
   };
 
   return (
-    <div className="col-md-12 main-container row">
-      <div className="col-md-7 login-1-container">
-        <img className="web-logo" src={logo} alt="" />
-        <h3 className="text">Find clothes that suits you and your course.</h3>
-        <img className="stud-img" src={illustration} alt="" />
-      </div>
-      <div className="col-md-5 login-2-container">
-        <h1 className="login-title">Login</h1>
-        <h4 className="login-text">Enter your valid credentials for logging in</h4>
-        <input
-          className="col-md-7 input-login"
-          type="text"
-          placeholder="ID Number or Email"
-          value={IDOrEmail}
-          onChange={(e) => handleIDOrEmail(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <input
-          className="col-md-7 input-login"
-          type="password"
-          placeholder="Password"
-          value={Password}
-          onChange={(e) => handlePassword(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-
-        <div className='col-md-7 forgot-pwd-container'>
-          <Link to="/forgot_password">
-            <button className='forgot-pwd-btn'>
-              <img className='forgot-pwd-icon' src={ forgotPass }/>
-              Forgot Password</button>
-          </Link>
+    <>
+      {isLoading ? (
+        <LoadingScreen/>
+      ) : (
+        <div className="col-md-12 main-container row">
+        <div className="col-md-7 login-1-container">
+          <img className="web-logo" src={logo} alt="" />
+          <h3 className="text">Find clothes that suits you and your course.</h3>
+          <img className="stud-img" src={illustration} alt="" />
         </div>
+        <div className="col-md-5 login-2-container">
+          <h1 className="login-title">Login</h1>
+          <h4 className="login-text">Enter your valid credentials for logging in</h4>
+          <input
+            className="col-md-7 input-login"
+            type="text"
+            placeholder="ID Number or Email"
+            value={IDOrEmail}
+            onChange={(e) => handleIDOrEmail(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <input
+            className="col-md-7 input-login"
+            type="password"
+            placeholder="Password"
+            value={Password}
+            onChange={(e) => handlePassword(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
 
-        <button className="col-md-7 login-btn" onClick={() => handleLogin()}>
-          Log In
-        </button>
+          <div className='col-md-7 forgot-pwd-container'>
+            <Link to="/forgot_password">
+              <button className='forgot-pwd-btn'>
+                <img className='forgot-pwd-icon' src={ forgotPass }/>
+                Forgot Password</button>
+            </Link>
+          </div>
 
-        <h3 className="register-text">Don't have an account?</h3>
-        <h5> Register as:</h5>
+          <button className="col-md-7 login-btn" onClick={() => handleLogin()}>
+            Log In
+          </button>
 
-        <div className="register-btn-container">
-          <Link className="register-link" to="/register">
-            <button className="register-customer-btn">Customer</button>
-          </Link>
+          <h3 className="register-text">Don't have an account?</h3>
+          <h5> Register as:</h5>
 
-          <Link className="register-link" to="/register_supplier">
-            <button className="register-customer-btn" onClick={generateRandomID}> Supplier</button>
-          </Link>
+          <div className="register-btn-container">
+            <Link className="register-link" to="/register">
+              <button className="register-customer-btn">Customer</button>
+            </Link>
+
+            <Link className="register-link" to="/register_supplier">
+              <button className="register-customer-btn" onClick={generateRandomID}> Supplier</button>
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+      )}
+    </>
   );
 }
 

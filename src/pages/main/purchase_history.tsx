@@ -30,6 +30,9 @@ function Purchase_History () {
     const [ratingSupplier, setRatingSupplier] = useState(null);
     const { userId } = useParams();
 
+    // * For Delay
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
     // * Add to cart from purchase history 
     const addPurchaseToCart = () => {
         const closeBtn = document.getElementById("btnClose");
@@ -52,9 +55,11 @@ function Purchase_History () {
             };
     
             axios.post('https://localhost:7017/Cart/add', cartAddRequest)
-                .then(() => {
+                .then(async () => {
                     toast.success("Item added to cart");
                     closeBtn.click();
+
+                    await sleep(1000);
                     window.location.reload();
                 })
                 .catch(error => {
@@ -75,7 +80,7 @@ function Purchase_History () {
         const closeBtn = document.getElementById("btnClose");
         
         if (ratingProduct === null) {
-            alert('Please select a rating before submitting.');
+            toast.error('Please select a rating before submitting.');
             return;
         }
 
@@ -136,6 +141,9 @@ function Purchase_History () {
             if (response.ok) {
                 toast.success('Rating submitted successfully.');
                 closeBtn.click();
+
+                await sleep(1000);
+                window.location.reload();
             } else {
                 const data = await response.json();
                 toast.error(`Error: ${data}`);
@@ -236,10 +244,10 @@ function Purchase_History () {
                     <button className="col-md-3 btn btn-outline-primary" type="submit">Search</button>
                 </div>
 
-                <div className='col-md-3 date-container'>
+                {/* <div className='col-md-3 date-container'>
                     <span style={{ fontWeight:'500', fontSize:'15px', paddingRight:'5px' }}>Sort by date:</span>
                     <input className='date-input' type="date" />
-                </div>
+                </div> */}
             </div>
         </div>
         
@@ -267,7 +275,7 @@ function Purchase_History () {
                                     <td>{purchaseItem.cart.supplier.shopName}</td>
                                     <td>{purchaseItem.cart.items.length}</td>
                                     <td>{purchaseItem.total}</td>
-                                    <td></td>
+                                    <td>0</td>
                                 </tr>
                             </tbody>
                         ))
@@ -291,7 +299,7 @@ function Purchase_History () {
             <div className="orders-modal-content modal-content" style={{ backgroundColor:'#fff' }}>
                 <div className="modal-header">
                     <h3 className='modal-order-title'>Order Details</h3>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose"></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" ></button>
                 </div>
                 <div className='col-md-12 row' style={{ display:'flex', justifyContent:'space-between', padding:'15px' }}>
                 {selectedPurchases && (

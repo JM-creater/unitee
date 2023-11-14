@@ -45,9 +45,9 @@ function Cart () {
     const fileInputRef = useRef(null);
 
     //For Delay
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    //const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-    //Handle Reference Id
+    // * Handle Reference Id
     const handleReferenceId = (value) => {
       if (/^[0-9]*$/.test(value)) {
         setReferenceId(value);
@@ -65,11 +65,41 @@ function Cart () {
         } catch (error) {
           console.error(error);
         }
-      }
+      };
+
+      const validationListener = () => {
+        fetchCart();
+      };
+
+      orderEventEmitter.on("orderCartEmptied", validationListener);
       fetchCart();
+
+      return () => {
+        orderEventEmitter.off("orderCartEmptied", validationListener);
+      };
   }, [userId]);
 
-  
+  // * Windows Event Listener Focus
+  useEffect(() => {
+    const fetchData = async () => {
+    try {
+          const response = await axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
+          setCart(response.data);
+        } catch (error) {
+          toast.error('Network error or server not responding');
+        }
+    };
+
+    const handleFocus = () => {
+      fetchData();
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+        window.removeEventListener('focus', handleFocus);
+    };
+  }, [userId]);
 
     // * Handle Image
     const handleProofOfPaymentChange = (event) => {
@@ -202,10 +232,7 @@ function Cart () {
           cartEventEmitter.emit("cartEmptied");
           notifEventEmitter.emit("notifAdded");
           orderEventEmitter.emit("notifNewOrderAdded");
-
-          await sleep(1000);
-          window.location.reload();
-
+          orderEventEmitter.emit("orderCartEmptied");
         } catch (error) {
           console.log("Error in placing order", error);
           toast.error(error.response.data);
@@ -285,7 +312,7 @@ function Cart () {
       if (!anyProductChecked) {
           toast.error("Please select a product");
       } else {
-        // Existing logic to show modal
+        // * Existing logic to show modal
         const modalElement = document.getElementById('removeCartConfirmationModal');
         const bootstrapModal = new Modal(modalElement);
         bootstrapModal.show();
@@ -449,7 +476,7 @@ function Cart () {
                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div className="modal-body">
-                    Are you sure you want to remove the selected items from the cart?
+                    <h5>Are you sure you want to remove the selected items from the cart?</h5>
                 </div>
                 <div className="modal-footer">
                     <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

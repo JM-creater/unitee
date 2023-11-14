@@ -1,12 +1,9 @@
-import profileImg from "../../assets/images/imageprofile.jpeg"
 import editProfIcon from "../../assets/images/icons/editing.png"
-import genderIcon from "../../assets/images/icons/gender-fluid.png"
-import departmentIcon from "../../assets/images/icons/department.png"
 import emailIcon from "../../assets/images/icons/mail-2.png"
 import phoneIcon from "../../assets/images/icons/smartphone-call.png"
 import './supplier_viewProf.css'
 import { useEffect, useState } from "react"
-import { useNavigate, useParams } from "react-router"
+import { useParams } from "react-router"
 import axios from "axios"
 import { toast } from "react-toastify"
 
@@ -15,31 +12,42 @@ type ValidationErrors = {
     address?: string;
     email?: string;
     phoneNumber?: string;
-  };
+};
+
+type SupplierProfileType = {
+    firstName: string;
+    lastName: string;
+    shopName: string;
+    email: string;
+    phoneNumber: string;
+    password: string;
+    gender: string;
+    image: string;
+};
 
 function Supplier_ViewProf () {
 
-    const [UserProfile, setUserProfile] = useState([]);
+    const [UserProfile, setUserProfile] = useState<SupplierProfileType | null>(null);
     const [shopName, setShopName] = useState('');
     const [address, setAddress] = useState('');
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [password, setPassword] = useState('');
+    //const [password, setPassword] = useState('');
     const {id} = useParams();
 
-    //For Delay
+    // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-    //Handle for Keypress
+    // * Handle for Keypress
     const handlePhoneNumber = (value) => {
         if (/^[0-9]*$/.test(value)) {
-          setPhoneNumber(value);
+            setPhoneNumber(value);
         } else {
-          toast.error('Phone Number must contain only numbers.');
+            toast.error('Phone Number must contain only numbers.');
         }
-      };
+    };
 
-    //Fetch User Data
+    // * Fetch User Data
     useEffect(() => {
         axios.get(`https://localhost:7017/Users/${id}`)
             .then(res => {
@@ -48,14 +56,14 @@ function Supplier_ViewProf () {
                 setAddress(res.data.address)
                 setEmail(res.data.email)
                 setPhoneNumber(res.data.phoneNumber)
-                setPassword(res.data.password)
+                //setPassword(res.data.password)
             })
             .catch(err => {
                 console.error(err);
             });
     }, [id]);
 
-    //Validation Trappings
+    // * Validation Trappings
         const validateForm = (): ValidationErrors => {
         const errors: ValidationErrors = {};
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -89,48 +97,40 @@ function Supplier_ViewProf () {
         return errors;
         };
 
-    //Update Button Handler
+    // * Update Button Handler
     const HandleUpdate = async (event: React.FormEvent) => {
 
-    event.preventDefault();
-    const errors: ValidationErrors = validateForm();
+        event.preventDefault();
+        const errors: ValidationErrors = validateForm();
 
-    if (Object.keys(errors).length === 0)
-    {
-        const formData = new FormData();
-        formData.append("shopName", shopName);
-        formData.append("address", address);
-        formData.append("email", email);
-        formData.append("phoneNumber", phoneNumber);
+        if (Object.keys(errors).length === 0) {
+            const formData = new FormData();
+            formData.append("shopName", shopName);
+            formData.append("address", address);
+            formData.append("email", email);
+            formData.append("phoneNumber", phoneNumber);
 
-        try 
-        {
-            const productResponse = await axios.put(`https://localhost:7017/Users/updateSupplier/${id}`, formData, {
-                headers: {
-                    "Content-Type": "application/json-patch+json",
-                  },
-            });
+            try {
+                const productResponse = await axios.put(`https://localhost:7017/Users/updateSupplier/${id}`, formData, {
+                    headers: {
+                        "Content-Type": "application/json-patch+json",
+                    },
+                });
 
-            if(productResponse.status == 200) 
-            {
+                if(productResponse.status == 200) {
                     toast.success('Successfully Updated.');
                     await sleep(1000);
 
                     window.location.reload();
-            }
-            else
-            {
-                alert(productResponse.data);
+                } else {
+                    alert(productResponse.data);
+                }
+            } catch (error) {
+                console.error(error);
+                toast.error("Failed to Update. Please try again later.");
             }
         }
-        catch (error)
-        {
-            console.error(error);
-            toast.error("Failed to Update. Please try again later.");
-        }
-    };
-
-}
+    }
 
 
     return <div className="viewProfile-customer-main-container">
@@ -153,17 +153,9 @@ function Supplier_ViewProf () {
         </div>
 
         {/* EDIT COLLAPSE */}
-        <div className="collapse" id="editProfCollapse"
-        style={{ 
-            padding: '40px'
-         }}>
+        <div className="collapse" id="editProfCollapse" style={{ padding: '40px' }}>
             <h1>Edit Profile Information</h1>
-            <div className="card card-body"
-            style={{ 
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-evenly'
-             }}>
+            <div className="card card-body" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
                 <div className="editProf-details-1">
                     <label className='profLabelEdit' htmlFor="profFirstName">Shop Name</label>
                     <input className='input-prof' type="text" id='profFirstName' value={shopName} onChange={(e) => setShopName(e.target.value)}></input>
@@ -182,7 +174,7 @@ function Supplier_ViewProf () {
                     <input className='input-prof' type="text" id='profPhone' value={phoneNumber} onChange={(e) => handlePhoneNumber(e.target.value)} maxLength={11}></input>
 
                     <label className='profLabelEdit' htmlFor="editPass">Password</label>
-                    <input className='input-prof' type="password" name="" id="editPass" value={password} disabled></input>
+                    <input className='input-prof' type="password" name="" id="editPass" disabled></input>
                 </div>
             </div>
             <div className="saveChanges-btn-container">
