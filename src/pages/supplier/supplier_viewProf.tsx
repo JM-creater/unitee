@@ -2,7 +2,7 @@ import editProfIcon from "../../assets/images/icons/editing.png"
 import emailIcon from "../../assets/images/icons/mail-2.png"
 import phoneIcon from "../../assets/images/icons/smartphone-call.png"
 import './supplier_viewProf.css'
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useParams } from "react-router"
 import axios from "axios"
 import { toast } from "react-toastify"
@@ -135,13 +135,17 @@ function Supplier_ViewProf () {
 
     return <div className="viewProfile-customer-main-container">
         <div className="profile-details-container">
-            <div className="user-details-viewProfile">
-                <img className='profileImg' src={ `https://localhost:7017/${UserProfile.image}` } alt="" />
-                <div className="username-id-container">
-                    <h1 className='acc-name'>{UserProfile.shopName}</h1>
-                    <p className='id-number-profile'>#{id}</p>
+            {UserProfile && (
+                <div className="user-details-viewProfile">
+                        <React.Fragment>
+                            <img className='profileImg' src={ `https://localhost:7017/${UserProfile.image}` } alt="" />
+                        </React.Fragment>
+                    <div className="username-id-container">
+                        <h1 className='acc-name'>{UserProfile.shopName}</h1>
+                        <p className='id-number-profile'>#{id}</p>
+                    </div>
                 </div>
-            </div>
+            )}
             <button className="editProf-btn" type="button" 
             data-bs-toggle="collapse" 
             data-bs-target="#editProfCollapse" 
@@ -196,11 +200,12 @@ function Supplier_ViewProf () {
                         <img className='aboutIcons' src={ phoneIcon } alt="" />
                         Phone Number</h5>
                 </div>
-
-                <div>
-                    <h5 className='about-details-prof'>{UserProfile.email}</h5>
-                    <h5 className='about-details-prof'>{UserProfile.phoneNumber}</h5>
-                </div>
+                {UserProfile && (
+                    <div>
+                        <h5 className='about-details-prof'>{UserProfile.email}</h5>
+                        <h5 className='about-details-prof'>{UserProfile.phoneNumber}</h5>
+                    </div>
+                )}
             </div>
         </div>
     </div>

@@ -231,25 +231,25 @@ function Suppliers () {
         <table className="table table-hover">
     <thead className='table-dark'>
         <tr>
-        <th scope="col">Store ID</th>
-            <th scope="col">Shop</th>
-            <th scope="col">Email</th>
-            <th scope="col">Phone Number</th>
-            <th scope="col">Address</th>
-            <th scope="col">Status</th>
-            <th scope="col">Validation</th>
+            <th scope="col">Store ID</th>
+            <th className='text-center' scope="col">Shop</th>
+            <th className='text-center' scope="col">Email</th>
+            <th className='text-center' scope="col">Phone Number</th>
+            <th className='text-center' scope="col">Address</th>
+            <th className='text-center' scope="col">Status</th>
+            <th className='text-center' scope="col">Validation</th>
         </tr>
     </thead>
     <tbody>
         {filteredSuppliers.map(supplierItem => (
             <tr key={supplierItem.id}>
             <th scope="row" data-bs-toggle="modal" data-bs-target="#supplierInfoModal" onClick={() => setSelectedSupplier(supplierItem)}>{supplierItem.id}</th>
-            <td data-bs-toggle="modal" data-bs-target="#supplierInfoModal" onClick={() => setSelectedSupplier(supplierItem)}>{supplierItem.shopName}</td>
-            <td data-bs-toggle="modal" data-bs-target="#supplierInfoModal" onClick={() => setSelectedSupplier(supplierItem)}>{supplierItem.email}</td>
-            <td data-bs-toggle="modal" data-bs-target="#supplierInfoModal" onClick={() => setSelectedSupplier(supplierItem)}>{supplierItem.phoneNumber}</td>
-            <td data-bs-toggle="modal" data-bs-target="#supplierInfoModal" onClick={() => setSelectedSupplier(supplierItem)}>{supplierItem.address}</td>
-            <td data-bs-toggle="modal" data-bs-target="#supplierInfoModal" onClick={() => setSelectedSupplier(supplierItem)}>{supplierItem.isActive ? "Active" : "Not Active"}</td>
-            <td>
+            <td className='text-center' data-bs-toggle="modal" data-bs-target="#supplierInfoModal" onClick={() => setSelectedSupplier(supplierItem)}>{supplierItem.shopName}</td>
+            <td className='text-center' data-bs-toggle="modal" data-bs-target="#supplierInfoModal" onClick={() => setSelectedSupplier(supplierItem)}>{supplierItem.email}</td>
+            <td className='text-center' data-bs-toggle="modal" data-bs-target="#supplierInfoModal" onClick={() => setSelectedSupplier(supplierItem)}>{supplierItem.phoneNumber}</td>
+            <td className='text-center' data-bs-toggle="modal" data-bs-target="#supplierInfoModal" onClick={() => setSelectedSupplier(supplierItem)}>{supplierItem.address}</td>
+            <td className='text-center' data-bs-toggle="modal" data-bs-target="#supplierInfoModal" onClick={() => setSelectedSupplier(supplierItem)}>{supplierItem.isActive ? "Active" : "Not Active"}</td>
+            <td className='text-center'>
                 <button 
                     className={`validation-btn-supp btn btn-sm ${supplierItem.isValidate ? 'btn-success' : 'btn-danger'}`}
                     onClick={() => handleValidation(supplierItem.id, supplierItem.isValidate, supplierItem.isActive)}

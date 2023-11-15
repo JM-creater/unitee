@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import notifEventEmitter from "../../helpers/NotifEventEmitter";
 import orderEventEmitter from "../../helpers/OrderEmitter";
+import cartEventEmitter from "../../helpers/EventEmitter";
 
 // eslint-disable-next-line react-refresh/only-export-components
 const StatusMapping = {
@@ -40,9 +41,7 @@ function Supplier_Orders () {
     const [productTypes, setProductTypes] = useState([]);
     const [selectedOrders, setSelectedOrders] = useState(null);
     const [singleApproval, setSingleApproval] = useState(false);
-
-    // * For Delay
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const { id } = useParams();
 
     const [statusCounts, setStatusCounts] = useState({
       Pending: 0,
@@ -58,17 +57,60 @@ function Supplier_Orders () {
       { key: 'Completed', href: '#supplier-completed-order' },
       { key: 'Canceled', href: '#supplier-canceled-order' },
     ];
-    const { id } = useParams();
 
+    // * For Delay
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    // * Handle Close Button s
+    const handleCloseButton = async () => {
+      await sleep(50);
+      window.location.reload();
+    };
+
+    // * Get Order By Supplier from Customer
     useEffect(() => {
-      axios.get(`https://localhost:7017/Order/BySupplier/${id}`)
-        .then(response => {
+      const fetchOrders = async () => {
+        try {
+          const response = await axios.get(`https://localhost:7017/Order/BySupplier/${id}`);
           setOrders(response.data);
-        })
-        .catch(error => {
+        } catch (error) {
           console.error(error);
-        })
+        }
+      };
+
+      const validationListener = () => {
+        fetchOrders();
+      }
+
+      cartEventEmitter.on("itemAddedToCart", validationListener);
+      validationListener();
+
+      return () => {
+        cartEventEmitter.off("itemAddedToCart", validationListener);
+      };
     }, [id])
+
+    // * Windows Event Listener Focus
+    useEffect(() => {
+      const fetchData = async () => {
+      try {
+              const response = await axios.get(`https://localhost:7017/Order/BySupplier/${id}`);
+              setOrders(response.data);
+          } catch (error) {
+              toast.error('Network error or server not responding');
+          }
+      };
+  
+      const handleFocus = () => {
+          fetchData();
+      };
+  
+      window.addEventListener('focus', handleFocus);
+  
+      return () => {
+          window.removeEventListener('focus', handleFocus);
+      };
+  }, [id])
 
     // * Get All Departments
     useEffect(() => {
@@ -298,21 +340,21 @@ function Supplier_Orders () {
                   <thead className='table align-middle'>
                       <tr className='thead-row'>
                           <th scope="col">Date</th>
-                          <th scope="col">Order No.</th>
-                          <th scope="col">Number of Items</th>
-                          <th scope="col">Total Amount</th>
-                          <th scope="col">Status</th>
+                          <th className="text-center" scope="col">Order No.</th>
+                          <th className="text-center" scope="col">Number of Items</th>
+                          <th className="text-center" scope="col">Total Amount</th>
+                          <th className="text-center" scope="col">Status</th>
                       </tr>
                   </thead>
                   {orders.length > 0 ? (
                     orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).map((orderItem, index) => (
                       <tbody key={index} className="table-group-divider">
                         <tr data-bs-toggle="modal" data-bs-target="#pendingOrderModal" onClick={() => setSelectedOrders(orderItem)}>
-                          <th scope="row">{formatDate(orderItem.dateCreated)}</th>
-                          <td>{orderItem.orderNumber}</td>
-                          <td>{orderItem.cart.items.length}</td>
-                          <td>₱{orderItem.total}</td>
-                          <td>{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                          <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
+                          <td className="text-center">{orderItem.orderNumber}</td>
+                          <td className="text-center">{orderItem.cart.items.length}</td>
+                          <td className="text-center">₱{orderItem.total}</td>
+                          <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                         </tr>
                       </tbody>
                     ))
@@ -336,21 +378,21 @@ function Supplier_Orders () {
                     <thead className='table align-middle'>
                         <tr className='thead-row'>
                             <th scope="col">Date</th>
-                            <th scope="col">Order No.</th>
-                            <th scope="col">Number of Items</th>
-                            <th scope="col">Total Amount</th>
-                            <th scope="col">Status</th>
+                            <th className="text-center" scope="col">Order No.</th>
+                            <th className="text-center" scope="col">Number of Items</th>
+                            <th className="text-center" scope="col">Total Amount</th>
+                            <th className="text-center" scope="col">Status</th>
                         </tr>
                     </thead>
                     {orders.length > 0 ? (
                       orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Approved).map((orderItem, index) => (
                         <tbody key={index} className="table-group-divider">
                           <tr data-bs-toggle="modal" data-bs-target="#approvedOrderModal" onClick={() => setSelectedOrders(orderItem)}>
-                            <th scope="row">{formatDate(orderItem.dateCreated)}</th>
-                            <td>{orderItem.orderNumber}</td>
-                            <td>{orderItem.cart.items.length}</td>
-                            <td>₱{orderItem.total}</td>
-                            <td>{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                            <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
+                            <td className="text-center">{orderItem.orderNumber}</td>
+                            <td className="text-center">{orderItem.cart.items.length}</td>
+                            <td className="text-center">₱{orderItem.total}</td>
+                            <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                           </tr>
                         </tbody>
                       ))
@@ -374,21 +416,21 @@ function Supplier_Orders () {
                     <thead className='table align-middle'>
                         <tr className='thead-row'>
                         <th scope="col">Date</th>
-                        <th scope="col">Order No.</th>
-                        <th scope="col">Number of Items</th>
-                        <th scope="col">Total Amount</th>
-                        <th scope="col">Status</th>
+                        <th className="text-center" scope="col">Order No.</th>
+                        <th className="text-center" scope="col">Number of Items</th>
+                        <th className="text-center" scope="col">Total Amount</th>
+                        <th className="text-center" scope="col">Status</th>
                         </tr>
                     </thead>
                     {orders.length > 0 ? (
                       orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.ForPickUp).map((orderItem, index) => (
                         <tbody key={index} className="table-group-divider">
                           <tr data-bs-toggle="modal" data-bs-target="#forPickUpOrderModal" onClick={() => setSelectedOrders(orderItem)}>
-                            <th scope="row">{formatDate(orderItem.dateCreated)}</th>
-                            <td>{orderItem.orderNumber}</td>
-                            <td>{orderItem.cart.items.length}</td>
-                            <td>₱{orderItem.total}</td>
-                            <td>{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                            <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
+                            <td className="text-center">{orderItem.orderNumber}</td>
+                            <td className="text-center">{orderItem.cart.items.length}</td>
+                            <td className="text-center">₱{orderItem.total}</td>
+                            <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                           </tr>
                         </tbody>
                       ))
@@ -412,21 +454,21 @@ function Supplier_Orders () {
                     <thead className='table align-middle'>
                         <tr className='thead-row'>
                         <th scope="col">Date</th>
-                        <th scope="col">Order No.</th>
-                        <th scope="col">Number of Items</th>
-                        <th scope="col">Total Amount</th>
-                        <th scope="col">Status</th>
+                        <th className="text-center" scope="col">Order No.</th>
+                        <th className="text-center" scope="col">Number of Items</th>
+                        <th className="text-center" scope="col">Total Amount</th>
+                        <th className="text-center" scope="col">Status</th>
                         </tr>
                     </thead>
                     {orders.length > 0 ? (
                       orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Completed).map((orderItem, index) => (
                         <tbody key={index} className="table-group-divider">
                           <tr data-bs-toggle="modal" data-bs-target="#orderCompletedOrderModal" onClick={() => setSelectedOrders(orderItem)}>
-                            <th scope="row">{formatDate(orderItem.dateCreated)}</th>
-                            <td>{orderItem.orderNumber}</td>
-                            <td>{orderItem.cart.items.length}</td>
-                            <td>₱{orderItem.total}</td>
-                            <td>{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                            <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
+                            <td className="text-center">{orderItem.orderNumber}</td>
+                            <td className="text-center">{orderItem.cart.items.length}</td>
+                            <td className="text-center">₱{orderItem.total}</td>
+                            <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                           </tr>
                         </tbody>
                       ))
@@ -450,21 +492,21 @@ function Supplier_Orders () {
                     <thead className='table align-middle'>
                         <tr className='thead-row'>
                         <th scope="col">Date</th>
-                        <th scope="col">Order No.</th>
-                        <th scope="col">Number of Items</th>
-                        <th scope="col">Total Amount</th>
-                        <th scope="col">Status</th>
+                        <th className="text-center" scope="col">Order No.</th>
+                        <th className="text-center" scope="col">Number of Items</th>
+                        <th className="text-center" scope="col">Total Amount</th>
+                        <th className="text-center" scope="col">Status</th>
                         </tr>
                     </thead>
                     {orders.length > 0 ? (
                       orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Canceled).map((orderItem, index) => (
                         <tbody key={index} className="table-group-divider">
                           <tr data-bs-toggle="modal" data-bs-target="#forPickUpOrderModal" onClick={() => setSelectedOrders(orderItem)}>
-                            <th scope="row">{formatDate(orderItem.dateCreated)}</th>
-                            <td>{orderItem.orderNumber}</td>
-                            <td>{orderItem.cart.items.length}</td>
-                            <td>₱{orderItem.total}</td>
-                            <td>{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                            <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
+                            <td className="text-center">{orderItem.orderNumber}</td>
+                            <td className="text-center">{orderItem.cart.items.length}</td>
+                            <td className="text-center">₱{orderItem.total}</td>
+                            <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                           </tr>
                         </tbody>
                       ))
@@ -500,7 +542,7 @@ function Supplier_Orders () {
                       Single Approval
                     </label>
                     <h1 className="modal-title" id="exampleModalLabel">Pending Order</h1>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose"></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
                 </div>
                 <div className="modal-basta-container">
                     <span>Check pending order details</span>
@@ -547,7 +589,7 @@ function Supplier_Orders () {
                                         <span className="modal-label">Payment Type</span>
                                     </div>
                                     <div className="modal-details-info">
-                                      <span className="modal-info">{selectedOrders.dateCreated}</span>
+                                      <span className="modal-info">{formatDate(selectedOrders.dateCreated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
                                       <span className="modal-info">{selectedOrders.cart.items.length}</span>
                                       <span className="modal-info">₱{selectedOrders.total}</span>
@@ -618,7 +660,7 @@ function Supplier_Orders () {
                       Single Approval
                     </label>
                     <h1 className="modal-title" id="exampleModalLabel">Approved Order</h1>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose"></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
                 </div>
                 <div className="modal-basta-container">
                     <span>Check approved order details</span>
@@ -664,7 +706,7 @@ function Supplier_Orders () {
                                         <span className="modal-label">Payment Type</span>
                                     </div>
                                     <div className="modal-details-info">
-                                      <span className="modal-info">{selectedOrders.dateCreated}</span>
+                                      <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
                                       <span className="modal-info">{selectedOrders.cart.items.length}</span>
                                       <span className="modal-info">₱{selectedOrders.total}</span>
@@ -735,7 +777,7 @@ function Supplier_Orders () {
                       Single Approval
                     </label>
                     <h1 className="modal-title" id="exampleModalLabel">For Pick Up Orders</h1>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose"></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
                 </div>
                 <div className="modal-basta-container">
                     <span>Check for pick up orders details</span>
@@ -781,7 +823,7 @@ function Supplier_Orders () {
                                         <span className="modal-label">Payment Type</span>
                                     </div>
                                     <div className="modal-details-info">
-                                      <span className="modal-info">{selectedOrders.dateCreated}</span>
+                                      <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
                                       <span className="modal-info">{selectedOrders.cart.items.length}</span>
                                       <span className="modal-info">₱{selectedOrders.total}</span>
@@ -842,7 +884,7 @@ function Supplier_Orders () {
             <div className="modal-content" style={{ padding:'20px' }}>
                 <div className="pending-header">
                     <h1 className="modal-title" id="exampleModalLabel">Completed Orders</h1>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose"></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
                 </div>
                 <div className="modal-basta-container">
                     <span>Check for pick up orders details</span>
@@ -885,7 +927,7 @@ function Supplier_Orders () {
                                         <span className="modal-label">Payment Type</span>
                                     </div>
                                     <div className="modal-details-info">
-                                      <span className="modal-info">{selectedOrders.dateCreated}</span>
+                                      <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
                                       <span className="modal-info">{selectedOrders.cart.items.length}</span>
                                       <span className="modal-info">₱{selectedOrders.total}</span>

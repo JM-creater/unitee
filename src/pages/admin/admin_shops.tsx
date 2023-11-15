@@ -20,6 +20,9 @@ function Admin_Shops () {
     const [selectedProductType, setSelectedProductType] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
     
+    // * For Delay
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
     // * Get All Departments
     useEffect(() => {
         const fetchDepartments = async () => {
@@ -113,10 +116,12 @@ function Admin_Shops () {
     }
 
     // * Handle Reset Button
-    const HandleResetButton = () => {
+    const HandleResetButton = async () => {
         setSelectedProductType('');
         setSelectedPriceRange('');
         setSelectedGender('');
+        await sleep(20);
+        window.location.reload();
     }
 
     // * Compute all stocks

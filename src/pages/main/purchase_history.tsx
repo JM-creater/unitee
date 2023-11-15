@@ -169,24 +169,28 @@ function Purchase_History () {
 
     // * Get Order By User Id
     useEffect(() => {
-        axios.get(`https://localhost:7017/Order/${userId}`)
-            .then(response => {
+        const fetchOrders = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Order/${userId}`);
                 setPurchases(response.data);
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error(error);
-            })
+            }
+        }
+        fetchOrders();
     }, [userId]);
 
     // * Get All Product Types
     useEffect(() => {
-        axios.get('https://localhost:7017/ProductType')
-            .then(res => {
-                setProductTypes(res.data);
-            })
-            .catch(error => {
-                console.error(error)
-            });
+        const fetchProductTypes = async () => {
+            try {
+                const response = await axios.get('https://localhost:7017/ProductType');
+                setProductTypes(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchProductTypes();
     }, []);
     
     // * Get Product Type Name
@@ -233,7 +237,7 @@ function Purchase_History () {
         productStars.forEach(star => {
             (star as HTMLInputElement).checked = false;
         });
-    }
+    };
 
     return <div className="purchase-history-main-container">
         <div className='col-md-12 purchase-title-container'>
@@ -258,24 +262,24 @@ function Purchase_History () {
                     <thead className='table-dark align-middle'>
                         <tr className='thead-row'>
                             <th scope="col">Date</th>
-                            <th scope="col">Order No.</th>
-                            <th scope="col">Shop</th>
-                            <th scope="col">Number of Items</th>
-                            <th scope="col">Total Amount</th>
-                            <th scope="col">Rating</th>
+                            <th className="text-center" scope="col">Order No.</th>
+                            <th className="text-center" scope="col">Shop</th>
+                            <th className="text-center" scope="col">Number of Items</th>
+                            <th className="text-center" scope="col">Total Amount</th>
+                            <th className="text-center" scope="col">Rating</th>
                         </tr>
                     </thead>
                     {purchases.length > 0 ? (
                         purchases.filter(purchase => Status[Object.keys(Status)[purchase.status - 1]] === Status.Completed ||
                             Status[Object.keys(Status)[purchase.status - 1]] === Status.Canceled).map((purchaseItem, index) => (
                             <tbody key={index} className="table-group-divider">
-                                <tr data-bs-toggle="modal" data-bs-target="#purchaseHistoryModal" onClick={() => setSelectedPurchases(purchaseItem)}>
+                                <tr className='align-middle' data-bs-toggle="modal" data-bs-target="#purchaseHistoryModal" onClick={() => setSelectedPurchases(purchaseItem)}>
                                     <th scope="row">{formatDate(purchaseItem.dateCreated)}</th>
-                                    <td>{purchaseItem.orderNumber}</td>
-                                    <td>{purchaseItem.cart.supplier.shopName}</td>
-                                    <td>{purchaseItem.cart.items.length}</td>
-                                    <td>{purchaseItem.total}</td>
-                                    <td>0</td>
+                                    <td className="text-center">{purchaseItem.orderNumber}</td>
+                                    <td className="text-center">{purchaseItem.cart.supplier.shopName}</td>
+                                    <td className="text-center">{purchaseItem.cart.items.length}</td>
+                                    <td className="text-center">{purchaseItem.total}</td>
+                                    <td className="text-center">0</td>
                                 </tr>
                             </tbody>
                         ))
@@ -344,30 +348,30 @@ function Purchase_History () {
                             </div>
                         </div>
 
-                        <div className='item-details-container'>
+                        <div className='col-md-8 item-details-container'>
                         <h3>Item Details:</h3>
                         <div className='order-table-wrapper table-responsive-sm'>
-                            <table className="col-md-12 table table-hover align-middle caption-bot table-xl">
+                            <table className="table table-hover align-middle caption-bot table-xl">
                                 <caption>end of list</caption>
                                 <thead className='table-dark align-middle'>
                                     <tr className='thead-row'>
                                     <th className="order-table-header" scope="col">Product Name</th>
-                                    <th className="order-table-header" scope="col">Product Type</th>
-                                    <th className="order-table-header" scope="col">Gender</th>
-                                    <th className="order-table-header" scope="col">Size</th>
-                                    <th className="order-table-header" scope="col">Quantity</th>
-                                    <th className="order-table-header" scope="col">Price</th>
+                                    <th className="order-table-header text-center" scope="col">Product Type</th>
+                                    <th className="order-table-header text-center" scope="col">Gender</th>
+                                    <th className="order-table-header text-center" scope="col">Size</th>
+                                    <th className="order-table-header text-center" scope="col">Quantity</th>
+                                    <th className="order-table-header text-center" scope="col">Price</th>
                                     </tr>
                                 </thead>
                                 <tbody className="table-group-divider">
                                     {selectedPurchases.cart.items.map(item => (
                                         <tr key={item.id}>
-                                            <th scope="row" data-bs-toggle="modal" data-bs-target="#cartProductModal"><img className="prod-image-cart" src={ `https://localhost:7017/${item.product.image}` }/>{item.product.productName}</th>
-                                            <td>{getProductTypeName(item.product.productTypeId)}</td>
-                                            <td>{item.product.category}</td>
-                                            <td>{item.sizeQuantity.size}</td>
-                                            <td>{item.quantity}</td>
-                                            <td>{item.product.price}</td>
+                                            <th scope="row" data-bs-toggle="modal" data-bs-target="#cartProductModal">{item.product.productName}</th>
+                                            <td className='text-center'>{getProductTypeName(item.product.productTypeId)}</td>
+                                            <td className='text-center'>{item.product.category}</td>
+                                            <td className='text-center'>{item.sizeQuantity.size}</td>
+                                            <td className='text-center'>{item.quantity}</td>
+                                            <td className='text-center'>{item.product.price}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -423,7 +427,6 @@ function Purchase_History () {
                                 );
                             })}
                         </div>
-
 
                         </div>
                     </div>

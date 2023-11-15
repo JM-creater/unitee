@@ -247,28 +247,28 @@ function View_Customers () {
   <thead className='table-dark'>
       <tr>
       <th scope="col">Customer ID</th>
-          <th scope="col">First Name</th>
-          <th scope="col">Last Name</th>
-          <th scope="col">Gender</th>
-          <th scope="col">Department</th>
-          <th scope="col">Email</th>
-          <th scope="col">Phone Number</th>
-          <th scope="col">Status</th>
-          <th scope="col">Validation</th>
+          <th className='text-center' scope="col">First Name</th>
+          <th className='text-center' scope="col">Last Name</th>
+          <th className='text-center' scope="col">Gender</th>
+          <th className='text-center' scope="col">Department</th>
+          <th className='text-center' scope="col">Email</th>
+          <th className='text-center' scope="col">Phone Number</th>
+          <th className='text-center' scope="col">Status</th>
+          <th className='text-center' scope="col">Validation</th>
       </tr>
   </thead>
   <tbody>
     {filteredCustomers.map(customerItem => (
         <tr key={customerItem.id}>
             <th scope="row" data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{customerItem.id}</th>
-            <td data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{customerItem.firstName}</td>
-            <td data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{customerItem.lastName}</td>
-            <td data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{customerItem.gender}</td>
-            <td data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{getDepartmentName(customerItem.departmentId)}</td>
-            <td data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{customerItem.email}</td>
-            <td data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{customerItem.phoneNumber}</td>
-            <td data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{customerItem.isActive ? "Active" : "Not Active"}</td>
-            <td>
+            <td className='text-center' data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{customerItem.firstName}</td>
+            <td className='text-center' data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{customerItem.lastName}</td>
+            <td className='text-center' data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{customerItem.gender}</td>
+            <td className='text-center' data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{getDepartmentName(customerItem.departmentId)}</td>
+            <td className='text-center' data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{customerItem.email}</td>
+            <td className='text-center' data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{customerItem.phoneNumber}</td>
+            <td className='text-center' data-bs-toggle="modal" data-bs-target="#customerInfoModal" onClick={() => setSelectedCustomer(customerItem)}>{customerItem.isActive ? "Active" : "Not Active"}</td>
+            <td className='text-center'>
                 <button 
                     className={`validation-btn-supp btn btn-sm ${customerItem.isValidate ? 'btn-success' : 'btn-danger'}`}
                     onClick={() => handleValidation(customerItem.id, customerItem.isValidate, customerItem.isActive)}
