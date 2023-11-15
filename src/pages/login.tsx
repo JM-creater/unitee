@@ -50,6 +50,12 @@ function Login() {
     }
   }, [toggleModal]);
 
+  // * Close Modal
+  const closeModal = () => {
+    const modal = document.getElementById("IDNumberModal");
+  modal.style.display = "none";
+  }
+
   // * Copy ID Number 
   const copyToClipboard = (text) => {
     const copyClip = document.createElement("textarea");
@@ -200,12 +206,12 @@ function Login() {
             Log In
           </button>
 
-          <div className={`modal fade ${isModalOpen ? 'show' : ''}`} id="IDNumberModal" tabIndex={-1} style={{ display: isModalOpen ? 'block' : 'none' }} aria-labelledby="removeCartConfirmationModalLabel" aria-hidden="true">
+          <div className={`modal ${isModalOpen ? 'show' : ''}`} id="IDNumberModal" tabIndex={-1} style={{ display: isModalOpen ? 'block' : 'none' }}>
             <div className="modal-dialog modal-dialog-centered">
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title" id="IDNumberModal">Please copy your ID #:</h5>
-                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  <h5 className="modal-title" id="IDNumberModalLabel">Please copy your ID #:</h5>
+                  <button type="button" className="btn-close" aria-label="Close" onClick={closeModal}></button>
                 </div>
                 <div className="modal-body">
                   <h5>Your Supplier ID: {supplierID}</h5>
@@ -217,8 +223,8 @@ function Login() {
                   </span>
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-success" data-bs-dismiss="modal">Proceed</button>
-                  <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="button" className="btn btn-success" onClick={closeModal}>Proceed</button>
+                  <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancel</button>
                 </div>
               </div>
             </div>
