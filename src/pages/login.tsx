@@ -162,7 +162,7 @@ function Login() {
   };
 
   return (
-    <>
+    <React.Fragment>
       {isLoading ? (
         <React.Fragment>
           <LoadingScreen />
@@ -245,7 +245,7 @@ function Login() {
         </div>
       </div>
       )}
-    </>
+    </React.Fragment>
   )
 }
 

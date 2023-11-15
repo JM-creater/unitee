@@ -1,5 +1,5 @@
-import { Outlet, useNavigate } from "react-router"
-import { Link } from "react-router-dom"
+import { Outlet } from "react-router"
+import { Link, useNavigate } from "react-router-dom"
 import './main.css'
 import logo from "../../assets/images/unitee.png"
 import profIcon from "../../assets/images/icons/profile2.png"
@@ -32,20 +32,21 @@ function Main() {
     const [totalItems, setTotalItems] = useState<number | null>(null);
     const [cart, setCart] = useState([]);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const { userId } = useParams();
     const navigate = useNavigate();
-    
+
     // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-    // * Handle Logouts
-    const HandleLogout = async () => {
+    const HandleLogoutModal = async () => {
         setIsLoggingOut(true);
+        setShowLogoutModal(!showLogoutModal);
         await sleep(10000);
-        navigate('/')
-    }
+        navigate('/');
+    };
 
-    // // * Notification Sound
+    // * Notification Sound
     // const playNotificationSound = () => {
     //     const sound = new Audio(NotificationSound);
     //     sound.play();
@@ -195,7 +196,7 @@ function Main() {
     }, [updateNotification]);
 
     return (
-        <>
+        <React.Fragment>
             {isLoggingOut ? (
                 <React.Fragment>
                     <LogoutLoadingScreen/>
@@ -268,7 +269,7 @@ function Main() {
                         
                         <div className="col-md-1 dropdown">
                         {customer ? (
-                            <>
+                            <React.Fragment>
                                 <img 
                                     className="imageProfile"
                                     src={`https://localhost:7017/${customer.image}`} 
@@ -276,7 +277,7 @@ function Main() {
                                     data-bs-toggle="dropdown" 
                                     aria-expanded="false" 
                                 />
-                            </>
+                            </React.Fragment>
                         ) : null}
                         <ul className="dropdown-menu dropdown-menu-light" style={{ width:'300px'}}>
                             <Link className="customer-nav-droplink" to='viewCustomer_profile'>
@@ -298,17 +299,29 @@ function Main() {
                             
                             <div className="logout-container">
                                 <li>
-                                    <a className="dropdown-item" onClick={HandleLogout}>
+                                    <button className="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal">
                                         <span className="nav-btn" style={{ color:'#FFAA00' }}>
                                             <img className="dropdown-icon" src={ logout } />
                                             LOGOUT
                                         </span>
-                                    </a>
+                                    </button>
                                 </li>
                             </div>
-                            
                         </ul>
                         </div> 
+                        <div className='modal fade' id="logoutModal" tabIndex={1} aria-labelledby="logoutModalLabel" aria-hidden={!showLogoutModal}>
+                            <div className="modal-dialog modal-dialog-centered">
+                                <div className="modal-content">
+                                    <div className="logout-confirmation-modalBody">
+                                        <h3>Are you sure you want to logout?</h3>
+                                        <div className="col-md-12 logout-btn-container">
+                                            <button className="logout-btn" data-bs-dismiss="modal" onClick={HandleLogoutModal}>Log Out</button>
+                                            <button className="cancel-logout-btn" data-bs-dismiss="modal">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </header>
                 <div style={{ minHeight: '100%' }}>
@@ -316,7 +329,7 @@ function Main() {
                 </div>
             </div>
             )}
-        </>
+        </React.Fragment>
     )
 }
 

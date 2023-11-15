@@ -4,7 +4,7 @@ import shopPic1Carousel from "../../assets/images/carouselPic2.png"
 import shopPic2Carousel from  "../../assets/images/carouselPic1.png"
 import starIcon from "../../assets/images/icons/starRating.png"
 import 'react-toastify/dist/ReactToastify.css';
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import LoadingGif from '../../assets/images/icons/loadingscreen.svg'
 
@@ -77,7 +77,7 @@ function Shop() {
     }, [userId]);
 
     return (
-    <>
+    <React.Fragment>
         {isLoading ? (
             <div className="mainloading-screen">
                 <img className='mainloading-bar' src={LoadingGif} alt="loading..." />
@@ -154,7 +154,7 @@ function Shop() {
             </div>
         </div>
         )}
-    </>
+    </React.Fragment>
     )
 }
 

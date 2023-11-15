@@ -44,7 +44,7 @@ function Cart () {
     const { userId } = useParams();
     const fileInputRef = useRef(null);
 
-    //For Delay
+    // * For Delay
     //const sleep = ms => new Promise(r => setTimeout(r, ms));
 
     // * Handle Reference Id
