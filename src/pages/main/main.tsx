@@ -18,6 +18,7 @@ import * as signalR from "@microsoft/signalr"
 import { toast } from "react-toastify"
 import navEmptyCartImg from "../../assets/images/icons/empty-cart.png"
 import LogoutLoadingScreen from "../common/LogoutLoadingScreen"
+//import NotificationSound from "../../assets/sound/notificationsound.mp3"
 import React from "react"
 
 function Main() {
@@ -33,15 +34,22 @@ function Main() {
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const { userId } = useParams();
     const navigate = useNavigate();
-
+    
+    // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+    // * Handle Logouts
     const HandleLogout = async () => {
         setIsLoggingOut(true);
         await sleep(10000);
         navigate('/')
     }
 
+    // // * Notification Sound
+    // const playNotificationSound = () => {
+    //     const sound = new Audio(NotificationSound);
+    //     sound.play();
+    // };
     
     // * Fetch Users
     useEffect(() => {
@@ -94,6 +102,7 @@ function Main() {
 
         const handleFocus = () => {
             fetchData();
+            
         };
 
         window.addEventListener('focus', handleFocus);
@@ -141,6 +150,7 @@ function Main() {
     
         const handleFocus = () => {
             fetchData();
+            //playNotificationSound();
         };
     
         window.addEventListener('focus', handleFocus);
@@ -285,15 +295,17 @@ function Main() {
                                     </a>
                                 </li>
                             </Link>
-
-                            <li>
-                                <a className="dropdown-item" onClick={HandleLogout}>
-                                    <span className="nav-btn" style={{ color:'#FFAA00' }}>
-                                        <img className="dropdown-icon" src={ logout } />
-                                        LOGOUT
-                                    </span>
-                                </a>
-                            </li>
+                            
+                            <div className="logout-container">
+                                <li>
+                                    <a className="dropdown-item" onClick={HandleLogout}>
+                                        <span className="nav-btn" style={{ color:'#FFAA00' }}>
+                                            <img className="dropdown-icon" src={ logout } />
+                                            LOGOUT
+                                        </span>
+                                    </a>
+                                </li>
+                            </div>
                             
                         </ul>
                         </div> 

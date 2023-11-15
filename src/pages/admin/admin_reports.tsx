@@ -30,11 +30,9 @@ function Admin_Reports () {
 
     const [orders, setOrders] = useState([]);
     const [shops, setShops] = useState([]);
-
     
-
     useEffect(() => {
-        const fetchOrcders = async () => {
+        const fetchOrders = async () => {
             try {
                 const res = await axios.get('https://localhost:7017/Order');
                     setOrders(res.data);
@@ -43,7 +41,7 @@ function Admin_Reports () {
                 toast.error("Error fetching orders.");
             }
         }
-        fetchOrcders();
+        fetchOrders();
     }, []);
 
     useEffect(() => {

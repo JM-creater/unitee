@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import './login.css';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import illustration from '../../src/assets/images/loginPic.png';
 import logo from '../../src/assets/images/unitee.png';
@@ -8,7 +8,8 @@ import forgotPass from '../../src/assets/images/icons/forgot.png'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import LoadingScreen from './common/LoadingScreen';
-import LogoutLoadingScreen from './common/LogoutLoadingScreen';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCopy  } from "@fortawesome/free-solid-svg-icons";
 
 type ValidationErrors = {
   IDOrEmail?: string;
@@ -20,6 +21,8 @@ function Login() {
   const [IDOrEmail, setIDOrEmail] = useState('');
   const [Password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [supplierID, setSupplierID] = useState('');
   const navigate = useNavigate();
 
   // * For Delay
@@ -31,6 +34,33 @@ function Login() {
     localStorage.setItem('generatedSupplierID', id);
   };
 
+  // * Toggle the Modal
+  const toggleModal = useCallback(() => {
+    setIsModalOpen(prevState => !prevState);
+  }, []);
+
+  // * Show the modal
+  useEffect(() => {
+    const fetchedID = localStorage.getItem('generatedSupplierID');
+    const shouldShowModal = localStorage.getItem('showSupplierIDModal');
+    if (shouldShowModal === 'true') {
+      setSupplierID(fetchedID);
+      toggleModal();
+      localStorage.removeItem('showSupplierIDModal');
+    }
+  }, [toggleModal]);
+
+  // * Copy ID Number 
+  const copyToClipboard = (text) => {
+    const copyClip = document.createElement("textarea");
+    copyClip.value = text;
+    document.body.appendChild(copyClip);
+    copyClip.select();
+    document.execCommand("copy");
+    document.body.removeChild(copyClip);
+    toast.success("Copied to clipboard: " + text);
+  }
+  
   const handleIDOrEmail = (value: string) => {
     setIDOrEmail(value);
   };
@@ -130,7 +160,6 @@ function Login() {
       {isLoading ? (
         <React.Fragment>
           <LoadingScreen />
-          <LogoutLoadingScreen />
         </React.Fragment>
       ) : (
         <div className="col-md-12 main-container row">
@@ -171,6 +200,30 @@ function Login() {
             Log In
           </button>
 
+          <div className={`modal fade ${isModalOpen ? 'show' : ''}`} id="IDNumberModal" tabIndex={-1} style={{ display: isModalOpen ? 'block' : 'none' }} aria-labelledby="removeCartConfirmationModalLabel" aria-hidden="true">
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title" id="IDNumberModal">Please copy your ID #:</h5>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div className="modal-body">
+                  <h5>Your Supplier ID: {supplierID}</h5>
+                  <span
+                    className="copy-icon"
+                    onClick={() => copyToClipboard(supplierID)}
+                  >
+                    <FontAwesomeIcon icon={faCopy} />
+                  </span>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-success" data-bs-dismiss="modal">Proceed</button>
+                  <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <h3 className="register-text">Don't have an account?</h3>
           <h5> Register as:</h5>
 
@@ -187,7 +240,7 @@ function Login() {
       </div>
       )}
     </>
-  );
+  )
 }
 
 export default Login;

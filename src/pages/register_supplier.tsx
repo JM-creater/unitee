@@ -35,13 +35,14 @@ function Register() {
   const [schoolPermit, setSchoolPermit] = useState(null);
   const navigate = useNavigate();
 
-    useEffect(() => {
-      const fetchedID = localStorage.getItem('generatedSupplierID');
-      if (fetchedID) {
-          setIDNumber(fetchedID);
-          localStorage.removeItem('generatedSupplierID');
-      }
-    }, []);
+  // * Get the Generated ID number for Supplier
+  useEffect(() => {
+    const fetchedID = localStorage.getItem('generatedSupplierID');
+    if (fetchedID) {
+        setIDNumber(fetchedID);
+        localStorage.removeItem('generatedSupplierID');
+    }
+  }, []);
 
   const handleIDnumber = (value) => {
     if (/^[0-9]*$/.test(value)) {
@@ -130,6 +131,8 @@ function Register() {
           toast.success('Successfully registered.', {
             onClose: () => navigate('/')
           });
+          localStorage.setItem('showSupplierIDModal', 'true');
+          localStorage.setItem('generatedSupplierID', IDNumber);
         } else {
           alert(response.data);
         }
