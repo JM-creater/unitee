@@ -34,8 +34,6 @@ body {
     margin: 8px;
 }
 
-
-
 .top {
     padding-top: 40px;
     padding-left: 13% !important;
@@ -69,7 +67,7 @@ body {
 #progressbar li:before {
     width: 40px;
     height: 40px;
-    line-height: 45px;
+    line-height: 40px; 
     display: block;
     font-size: 20px;
     background: #C5CAE9;
@@ -85,9 +83,10 @@ body {
     height: 12px;
     background: #C5CAE9;
     position: absolute;
-    left: 0;
+    left: -115px;
     top: 16px;
     z-index: -1;
+    transition: background-color 0.3s; 
 }
 
 #progressbar li:last-child:after {

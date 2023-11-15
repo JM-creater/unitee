@@ -22,8 +22,9 @@ function Notif() {
 
   const [orders, setOrders] = useState([]);
   const [notification, setNotification] = useState([]);
-  const { userId } = useParams();
   const [showAllNotifications, setShowAllNotifications] = useState(false);
+  const [selectedOrderReceipt, setSelectedOrderReceipt] = useState(null);
+  const { userId } = useParams();
 
   // * Show More / Less Notification
   const toggleShowAll = () => {
@@ -598,7 +599,7 @@ function Notif() {
               >
                 Cancel Order
               </button>
-              <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal">View Order Receipt</button>
+              <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal" onClick={() => setSelectedOrderReceipt(notificationItem)}>View Order Receipt</button>
               </div>
             </div>
             );
@@ -716,7 +717,7 @@ function Notif() {
               >
                 Show more
               </a> */}
-              <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal">View Order Receipt</button>
+              <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal" onClick={() => setSelectedOrderReceipt(notificationItem)}>View Order Receipt</button>
               </div>
             </div>
             );
@@ -801,7 +802,7 @@ function Notif() {
                         <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
                       </div>
                       <p style={{ fontSize: '12px' }}>
-                        <span>{formatDate(notificationItem.dateCreated)}</span>
+                        <span>{formatDate(notificationItem.order.dateUpdated)}</span>
                       </p>
                     </li>
                   </ul>
@@ -959,14 +960,14 @@ function Notif() {
     {/* RECEIPT MODAL  */}
     <div className="modal fade" id="viewReceiptModal" tabIndex={-1} aria-labelledby="viewReceiptModalLabel" aria-hidden="true">
       <div className="modal-dialog modal-dialog-centered modal-xl">
-        {notification.map((notificationItem, index) => (
-            <div key={index} className="modal-content" id={`receipt-content-${notificationItem.order.orderNumber}`}>
+        {selectedOrderReceipt && (
+            <div className="modal-content" id={`receipt-content-${selectedOrderReceipt.order.orderNumber}`}>
             <div className="modal-body" style={{ padding:'30px' }}>
               <div className='modal-receipt-header'>
                 {/* HEADER */}
                 <div className='order-num-receipt-header-container'>
                   <h2 className="modal-title" id="exampleModalLabel">Order Receipt</h2>
-                  <h2 className='receipt-num-header'>#{notificationItem.order.orderNumber}</h2>
+                  <h2 className='receipt-num-header'>#{selectedOrderReceipt.order.orderNumber}</h2>
                 </div>
                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
@@ -985,10 +986,10 @@ function Notif() {
                       </div>
   
                       <div className='notif-order-details-2'>
-                        <span>{notificationItem.order.user.id}</span>
-                        <span>{notificationItem.order.user.firstName}</span>
-                        <span>{notificationItem.order.user.lastName}</span>
-                        <span>{notificationItem.order.referenceId}</span>
+                        <span>{selectedOrderReceipt.order.user.id}</span>
+                        <span>{selectedOrderReceipt.order.user.firstName}</span>
+                        <span>{selectedOrderReceipt.order.user.lastName}</span>
+                        <span>{selectedOrderReceipt.order.referenceId}</span>
                       </div>
                     </div>
                   </div>
@@ -1004,9 +1005,9 @@ function Notif() {
                       </div>
   
                       <div className='notif-order-details-2'>
-                        <span>{notificationItem.order.orderNumber}</span>
-                        <span>{notificationItem.order.cart.items.length}</span>
-                        <span>{notificationItem.order.cart.supplier.shopName}</span>
+                        <span>{selectedOrderReceipt.order.orderNumber}</span>
+                        <span>{selectedOrderReceipt.order.cart.items.length}</span>
+                        <span>{selectedOrderReceipt.order.cart.supplier.shopName}</span>
                       </div>
                     </div>
                   </div>
@@ -1017,7 +1018,7 @@ function Notif() {
                       <h4 className='totalAmount-receipt'>Total Amount</h4>
                     </div>
                     <div className='total-amount-receipt'>
-                      <h4 className='receipt-amount'>₱{notificationItem.order.total}</h4>
+                      <h4 className='receipt-amount'>₱{selectedOrderReceipt.order.total}</h4>
                     </div>
                   </div>
                 </div> 
@@ -1034,7 +1035,7 @@ function Notif() {
                       </tr>
                     </thead>
                     <tbody>
-                      {notificationItem.order.cart.items.map((item, index) => ( 
+                      {selectedOrderReceipt.order.cart.items.map((item, index) => ( 
                         <tr key={index}>
                           <th scope="row">{item.product.productName}</th>
                           <td>{item.quantity}</td>
@@ -1050,10 +1051,10 @@ function Notif() {
             </div>
             <div className="modal-footer">
               <button type="button" className="close-receipt-btn" data-bs-dismiss="modal">Close</button>
-              <button type="button" className="save-receipt-btn" onClick={() => downloadReceipt(notificationItem.order.orderNumber)}>Download</button>
+              <button type="button" className="save-receipt-btn" onClick={() => downloadReceipt(selectedOrderReceipt.order.orderNumber)}>Download</button>
             </div>
           </div>
-        ))}
+        )}
       </div>
     </div>
 

@@ -1,7 +1,7 @@
 import './admin_reports.css'
 import totalOrdersIcon from "../../assets/images/icons/order-2.png"
 import salesIcon from "../../assets/images/icons/sales.png"
-//import { Link } from "react-router-dom"
+
 import {
     Chart as ChartJS,
     BarElement,
@@ -92,8 +92,6 @@ function Admin_Reports () {
         ]
     }
 
-    console.log(orders)
-
     // END OF BAR GRAPH``
 
     // PIE CHART CHART
@@ -120,16 +118,19 @@ function Admin_Reports () {
                 <div className='col-md-9'>
                     <h5 className='header-adminSales-label'>Total Orders</h5>
                     <h3>{orders? orders.length : 0}</h3>
-                  
                     <ul className="nav nav-pills"
                     style={{
                         display:'flex',
                         justifyContent:'center',
                         borderRadius:'20px',
                         border:'solid 1px black' }}>
-                        <a className="nav-link view-allOrders-btn-admin" 
-                        href="#orderListAdmin" 
-                        id="navbar-ordersList">View all orders</a>
+                        <a 
+                            className="nav-link view-allOrders-btn-admin" 
+                            href="#orderListAdmin" 
+                            id="navbar-ordersList"
+                        >
+                            View all orders
+                        </a>
                     </ul>
 
                 </div>
@@ -205,7 +206,7 @@ function Admin_Reports () {
                 borderRadius: '10px',
                 padding: '20px',
                 width:'500px'
-             }}>
+            }}>
                 <div
                     style={{ 
                         width: '300px',
@@ -215,9 +216,7 @@ function Admin_Reports () {
                     <Pie
                         data = { ordersData }
                         options= { options }>
-
                     </Pie>
-
                 </div>
             </div>
         </div>
@@ -234,9 +233,8 @@ function Admin_Reports () {
                 <h4>Sort by</h4>
                 <div>
                     <label style={{ marginRight:'10px' }} htmlFor="statusOrderFilter">Order Status: </label>
-                    <select style={{ padding: '10px', border: '2px solid white' }}
-                     name="order-status-filter-admin" id="statusOrderFilter">
-                        <option value="pending">Select an order status</option>
+                    <select style={{ padding: '10px', border: '2px solid white' }} name="order-status-filter-admin" id="statusOrderFilter">
+                        <option value="" disabled hidden selected>Select an order status</option>
                         <option value="1">Order Placed</option>
                         <option value="2">Pending</option>
                         <option value="3">Approved</option>
@@ -249,9 +247,8 @@ function Admin_Reports () {
 
                 <div>
                     <label style={{ marginRight:'10px' }} htmlFor="supplierFilter">Shop</label>
-                    <select style={{ padding: '10px', border: '2px solid white' }}
-                     name="order-status-filter-admin" id="supplierFilter">
-                        <option value="0" disabled>Select a shop</option>
+                    <select style={{ padding: '10px', border: '2px solid white' }} name="order-status-filter-admin" id="supplierFilter">
+                        <option value="" disabled hidden selected>Select a shop</option>
                         {shops.map((shop) => 
                             shop.role === 2 ? (
                                 <option key={shop.id}>{shop.shopName}</option>
@@ -261,9 +258,8 @@ function Admin_Reports () {
                 </div>
             </div>
 
-
-                {/* TABLE */}
-                <table className="table">
+            {/* TABLE */}
+            <table className="table">
                 <thead>
                     <tr>
                     <th scope="col">Order No.</th>
@@ -275,28 +271,29 @@ function Admin_Reports () {
                     </tr>
                 </thead>
                 <tbody>
-                {orders.map((ord) => 
-                        <tr>
-                        <th scope="row">{ord.id}</th>
-                        <td>{ord.cart.supplier.shopName}</td>
-                        <td>{ord.user.firstName} {ord.user.lastName}</td>
-                        <td>{ord.cart.items[0].quantity}</td>
-                        <td>{ord.total}</td>
-                        <td>{ord.status == 1? 'Order Placed' : 
-                        ord.status == 2? 'Pending' : 
-                        ord.status == 3? 'Approved' : 
-                        ord.status == 4? 'For Pick Up' : 
-                        ord.status == 5? 'Completed' : 
-                        ord.status == 6? 'Canceled' : 
-                        ord.status == 7? 'Denied' :  'Unavailble' }</td>
+                    {orders.map((ord) => 
+                        <tr key={ord.id}>
+                            <th scope="row">{ord.orderNumber}</th>
+                            <td>{ord.cart.supplier.shopName}</td>
+                            <td>{ord.user.firstName} {ord.user.lastName}</td>
+                            <td>{ord.cart.items[0].quantity}</td>
+                            <td>{ord.total}</td>
+                            <td>
+                                {
+                                    ord.status == 1? 'Order Placed' : 
+                                    ord.status == 2? 'Pending' : 
+                                    ord.status == 3? 'Approved' : 
+                                    ord.status == 4? 'For Pick Up' : 
+                                    ord.status == 5? 'Completed' : 
+                                    ord.status == 6? 'Canceled' : 
+                                    ord.status == 7? 'Denied' :  'Unavailble' 
+                                }
+                            </td>
                         </tr>
                     )}
                 </tbody>
-                </table>
+            </table>
         </div>
-
-        
-        
     </div>
 }
 
