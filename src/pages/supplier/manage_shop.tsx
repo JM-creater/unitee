@@ -51,6 +51,12 @@ function Manage_Shop() {
 
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [newSelectedImage, setNewSelectedImage] = useState<File | null>(null);
+
+    const [selectedFrontImage, setSelectedFrontImage] = useState<File | null>(null);
+
+    const [selectedSideImage, setSelectedSideImage] = useState<File | null>(null);
+
+    const [selectedBackImage, setSelectedBackImage] = useState<File | null>(null);
     
     const [NewisActive, setNewIsActive] = useState(); 
 
@@ -59,10 +65,12 @@ function Manage_Shop() {
 
     const { id } = useParams();
     const inputRef = useRef<HTMLInputElement>(null);
+    const frontImageRef = useRef<HTMLInputElement>(null);
+    const sideImageRef = useRef<HTMLInputElement>(null);
+    const backImageRef = useRef<HTMLInputElement>(null);
 
-    //For Delay
+    // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
-
 
     // * Department Change for Add
     const handleDepartmentChange = (departmentId, isChecked) => {
@@ -99,41 +107,114 @@ function Manage_Shop() {
       setProductCategory("");
 
       setSelectedImage(null);
-    }
-  
+      setSelectedFrontImage(null);
+      setSelectedSideImage(null);
+      setSelectedBackImage(null);
+    };
+    
+    // * Image Click
     const handleImageClick = () => {
       if (inputRef.current) {
-          inputRef.current.click();
+        inputRef.current.click();
       }
     };
 
+    // * Front Image Click
+    const handleFrontClick = () => {
+      if (frontImageRef.current) {
+        frontImageRef.current.click();
+      }
+    }
+
+    const handleSideClick = () => {
+      if (sideImageRef.current) {
+        sideImageRef.current.click();
+      }
+    }
+
+    const handleBackClick = () => {
+      if (backImageRef.current) {
+        backImageRef.current.click();
+      }
+    }
+
+    // * Category Change for Add
     const handleCategoryChange = (e, gender) => {
       setProductCategory(productCategory === gender ? '' : gender);
     };
 
+    // * Category Change for Edit
     const handleCategoryChange2 = (gender) => {
       if (productCategory === gender) {
-          setNewCategory('');
+        setNewCategory('');
       } else {
-          setNewCategory(gender);
+        setNewCategory(gender);
       }
     };
 
-  // * Upload Image for Add
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      setSelectedImage(event.target.files[0]);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target && e.target.result) {
-          document
-            .getElementById("productImage")!
-            .setAttribute("src", e.target.result as string);
-        }
-      };
-      reader.readAsDataURL(event.target.files[0]);
-    }
-  };
+    // * Upload Main Image for Add
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.files && event.target.files.length > 0) {
+        setSelectedImage(event.target.files[0]);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target && e.target.result) {
+            document
+              .getElementById("productImage")!
+              .setAttribute("src", e.target.result as string);
+          }
+        };
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    };
+
+    // * Upload Front Image for Add
+    const handleFrontImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.files && event.target.files.length > 0) {
+        setSelectedFrontImage(event.target.files[0]);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target && e.target.result) {
+            document
+              .getElementById("productFrontImage")!
+              .setAttribute("src", e.target.result as string);
+          }
+        };
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    };
+
+    // * Upload Side Image for Add
+    const handleSideImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.files && event.target.files.length > 0) {
+        setSelectedSideImage(event.target.files[0]);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target && e.target.result) {
+            document
+              .getElementById("productSideImage")!
+              .setAttribute("src", e.target.result as string);
+          }
+        };
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    };
+
+    // * Upload Back Image for Add
+    const handleBackImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.files && event.target.files.length > 0) {
+        setSelectedBackImage(event.target.files[0]);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target && e.target.result) {
+            document
+              .getElementById("productBackImage")!
+              .setAttribute("src", e.target.result as string);
+          }
+        };
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    };
 
   // * Upload Image for Edit
   const handleFileChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,7 +240,7 @@ function Manage_Shop() {
         setDepartments(response.data);
       } catch (error) {
         console.error(error);
-        toast.error("Error fetching departments");
+        console.error("Error fetching departments");
       }
     }
     fetchDepartments();
@@ -173,7 +254,7 @@ function Manage_Shop() {
         setProductTypes(response.data);
       } catch (error) {
         console.error(error);
-        toast.error("Error fetching product types");
+        console.error("Error fetching product types");
       }
     }
     fetchProductType();
@@ -187,12 +268,13 @@ function Manage_Shop() {
         setProducts(response.data);
       } catch (error) {
         console.error(error);
-        toast.error("Error fetching products");
+        console.error("Error fetching products");
       }
     }
     fetchProductSupplierId();
   }, [id]);
 
+  // * Get Product Type Name
   const getProductTypeName = (productTypeId) => {
     const productType = productTypes.find((p) => p.productTypeId === productTypeId);
     return productType ? productType.product_Type : "Unknown Type";
@@ -210,7 +292,7 @@ function Manage_Shop() {
     if (e.key === 'Enter') {
       handleAddItem();
     }
-  }
+  };
 
   // * Handle Change Status
   const handleChangeStatus = (active) => {
@@ -227,7 +309,7 @@ function Manage_Shop() {
         window.location.reload();
       } 
     }
-  }
+  };
   
   // * Handle Change Button
   const handleChangeButton = (active) => {
@@ -244,7 +326,7 @@ function Manage_Shop() {
           button.style.borderColor = 'green';
           button.style.color = 'white';
     }
-  }
+  };
 
   // * Edit Item
   const handleEdit = async () => {
@@ -339,6 +421,9 @@ function Manage_Shop() {
     if (!productCategory) errorMessages.push("Product Category is required");
     if (!productTypeId) errorMessages.push("Product Type is required");
     if (!selectedImage) errorMessages.push("Image is required");
+    if (!selectedFrontImage) errorMessages.push("Front Image is required");
+    if (!selectedSideImage) errorMessages.push("Side Image is required");
+    if (!selectedBackImage) errorMessages.push("Back Image is required");
     if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
 
     if (errorMessages.length > 0) {
@@ -353,6 +438,9 @@ function Manage_Shop() {
     formData.append("Category", productCategory);
     formData.append("Price", productPrice);
     formData.append("Image", selectedImage as File);
+    formData.append("FrontViewImage", selectedFrontImage as File);
+    formData.append("SideViewImage", selectedSideImage as File);
+    formData.append("BackViewImage", selectedBackImage as File);
     formData.append("SupplierId", id);
     selectedDepartments.forEach(departmentId => {
       formData.append('DepartmentIds', departmentId);
@@ -514,28 +602,92 @@ function Manage_Shop() {
               </div>
             </div>
             <div className="modal-body" style={{ display: "flex", flexFlow: "row" }}>
+
               <div>
-              <div className="thumbnail-container">
-                <h3 className="prod-info-titles">Product Image</h3>
-                <img
-                    id="productImage"
-                    alt="Upload Product"
-                    className="supplier-modal-addprod-img"
-                    src={selectedImage ? URL.createObjectURL(selectedImage) : prodImage}
-                    onClick={handleImageClick}
-                />
-                <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
-                <input
-                    ref={inputRef}
-                    type="file"
-                    name="prodImage"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    style={{ display: "none" }}
-                    onKeyDown={handleKeyDown}
-                />
-              </div>
+                <div className="thumbnail-container">
+                  <h3 className="prod-info-titles">Product Image</h3>
+                  <img
+                      id="productImage"
+                      alt="Upload Product"
+                      className="supplier-modal-addprod-img"
+                      src={selectedImage ? URL.createObjectURL(selectedImage) : prodImage}
+                      onClick={handleImageClick}
+                  />
+                  <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
+                  <input
+                      ref={inputRef}
+                      type="file"
+                      name="prodImage"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      style={{ display: "none" }}
+                      onKeyDown={handleKeyDown}
+                  />
                 </div>
+
+                <div className="thumbnail-container">
+                  <h3 className="prod-info-titles">Front Image</h3>
+                  <img
+                      id="productFrontImage"
+                      alt="Upload Product"
+                      className="supplier-modal-addprod-img"
+                      src={selectedFrontImage ? URL.createObjectURL(selectedFrontImage) : prodImage}
+                      onClick={handleFrontClick}
+                  />
+                  <i className="overlay-icon fa fa-cloud-upload" onClick={handleFrontClick}></i> 
+                  <input
+                      ref={frontImageRef}
+                      type="file"
+                      name="prodImage"
+                      accept="image/*"
+                      onChange={handleFrontImageChange}
+                      style={{ display: "none" }}
+                      onKeyDown={handleKeyDown}
+                  />
+                </div>
+
+                <div className="thumbnail-container">
+                  <h3 className="prod-info-titles">Side Image</h3>
+                  <img
+                      id="productSideImage"
+                      alt="Upload Product"
+                      className="supplier-modal-addprod-img"
+                      src={selectedSideImage ? URL.createObjectURL(selectedSideImage) : prodImage}
+                      onClick={handleSideClick}
+                  />
+                  <i className="overlay-icon fa fa-cloud-upload" onClick={handleSideClick}></i> 
+                  <input
+                      ref={sideImageRef}
+                      type="file"
+                      name="prodImage"
+                      accept="image/*"
+                      onChange={handleSideImageChange}
+                      style={{ display: "none" }}
+                      onKeyDown={handleKeyDown}
+                  />
+                </div>
+
+                <div className="thumbnail-container">
+                  <h3 className="prod-info-titles">Back Image</h3>
+                  <img
+                      id="productBackImage"
+                      alt="Upload Product"
+                      className="supplier-modal-addprod-img"
+                      src={selectedBackImage ? URL.createObjectURL(selectedBackImage) : prodImage}
+                      onClick={handleBackClick}
+                  />
+                  <i className="overlay-icon fa fa-cloud-upload" onClick={handleBackClick}></i> 
+                  <input
+                      ref={backImageRef}
+                      type="file"
+                      name="prodImage"
+                      accept="image/*"
+                      onChange={handleBackImageChange}
+                      style={{ display: "none" }}
+                      onKeyDown={handleKeyDown}
+                  />
+                </div>
+              </div>
 
                 <div className="col-md supplier-prod-details-modal">
                     <h3 className="col-md-12 prod-details-titles">Product Details</h3>
@@ -839,8 +991,8 @@ function Manage_Shop() {
                             placeholder="Size"
                             defaultValue={sizeQty.size}
                             onChange={(e) => {
-                              const newSizeQty = { ...sizeQty, size: e.target.value }; // Create a new object with the updated size
-                              setNewSizes(Newsizes.map((sq) => sq.id === sizeQty.id ? newSizeQty : sq)); // Update the state with the new size
+                              const newSizeQty = { ...sizeQty, size: e.target.value }; 
+                              setNewSizes(Newsizes.map((sq) => sq.id === sizeQty.id ? newSizeQty : sq));
                             }}
                           />
                           <input
@@ -849,8 +1001,8 @@ function Manage_Shop() {
                             placeholder="Quantity"
                             defaultValue={sizeQty.quantity}
                             onChange={(e) => {
-                              const newSizeQty = { ...sizeQty, quantity: e.target.value }; // Create a new object with the updated quantity
-                              setNewSizes(Newsizes.map((sq) => sq.id === sizeQty.id ? newSizeQty : sq)); // Update the state with the new quantity
+                              const newSizeQty = { ...sizeQty, quantity: e.target.value }; 
+                              setNewSizes(Newsizes.map((sq) => sq.id === sizeQty.id ? newSizeQty : sq)); 
                             }}
                           />
                           <span onClick={() => handleDelete(sizeQty.id)} style={{ cursor: "pointer", color: "red" }}>

@@ -9,6 +9,8 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import "./visit_shop.css"
 import cartEventEmitter from "../../helpers/EventEmitter"
+import React from "react"
+import ReactImageMagnify from 'react-image-magnify';
 
 function Visit_Shop () {
 
@@ -37,6 +39,7 @@ function Visit_Shop () {
     const [quantity, setQuantity] = useState(0);
     const [newQuantity, setNewQuantity] = useState(0);
     const [departmentId, setDepartmentId] = useState<number | null>(null);
+    const [mainImage, setMainImage] = useState(null);
     const { userId, id: shopId } = useParams();
     const supplier = suppliers[shopId];
 
@@ -254,10 +257,10 @@ function Visit_Shop () {
             <div className="col-md-10 shopDetails-container-shop">
                 <div>
                     {supplier ? (
-                        <>
+                        <React.Fragment>
                             <img className="shop-img" src={`https://localhost:7017/${supplier.image}`} />
                             <h3 className="visitShop-Name">{supplier.shopName}</h3>
-                        </>
+                        </React.Fragment>
                     ) : (
                         <p>Loading supplier details...</p>
                     )}
@@ -481,31 +484,40 @@ function Visit_Shop () {
                     </div>
                         <div className="modal-body viewProd-modalBody">
                         {selectedProduct && (
-                        <>
+                        <React.Fragment>
                             <div className="product-div-left">
                                 <div className="img-container">
-                                    <img 
-                                        className="prodModal-Image" 
-                                        src={`https://localhost:7017/${selectedProduct.image}`} 
-                                    />
+                                    <ReactImageMagnify {...{
+                                        smallImage: {
+                                            alt: 'Wristwatch by Ted Baker London',
+                                            isFluidWidth: true,
+                                            src: `https://localhost:7017/${mainImage || selectedProduct.image}`
+                                        },
+                                        largeImage: {
+                                            src: `https://localhost:7017/${mainImage || selectedProduct.image}`,
+                                            width: 1200,
+                                            height: 1800
+                                        },
+                                        enlargedImagePosition: 'over'
+                                    }} />
                                 </div>
                                 <div className="hover-container">
-                                    <div>
+                                    <div onMouseOver={() => setMainImage(selectedProduct.frontViewImage)}>
                                         <img 
                                             className="small-image" 
-                                            src={`https://localhost:7017/${selectedProduct.image}`} 
+                                            src={`https://localhost:7017/${selectedProduct.frontViewImage}`} 
                                         />
                                     </div>
-                                    <div>
+                                    <div onMouseOver={() => setMainImage(selectedProduct.sideViewImage)}>
                                         <img 
                                             className="small-image" 
-                                            src={`https://localhost:7017/${selectedProduct.image}`} 
+                                            src={`https://localhost:7017/${selectedProduct.sideViewImage}`} 
                                         />
                                     </div>
-                                    <div>
+                                    <div onMouseOver={() => setMainImage(selectedProduct.backViewImage)}>
                                         <img 
                                             className="small-image" 
-                                            src={`https://localhost:7017/${selectedProduct.image}`}
+                                            src={`https://localhost:7017/${selectedProduct.backViewImage}`}
                                         />
                                     </div>
                                 </div>
@@ -590,7 +602,7 @@ function Visit_Shop () {
                                     Add to Cart
                                 </button>
                             </div>
-                        </>
+                        </React.Fragment>
                         )}
                     </div>
                 </div>

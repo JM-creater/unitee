@@ -17,8 +17,8 @@ function  Search_Product () {
         department_Name: string;
     }
 
-    const [ratings, setRatings] = useState(null);
-    const [averageRating, setAverageRating] = useState(0);
+    //const [ratings, setRatings] = useState(null);
+    //const [averageRating, setAverageRating] = useState(0);
     const [, setCart] = useState([]);
     const [displayProduct, setDisplayProduct] = useState([]);
     const [departments, setDepartments] = useState<Department[]>([]);
@@ -217,18 +217,18 @@ function  Search_Product () {
     };
 
     // ! To Be Fixed
-    useEffect(() => {
-        axios.get(`https://localhost:7017/Rating/${userId}`)
-            .then((response) => {
-                setRatings(response.data);
+    // useEffect(() => {
+    //     axios.get(`https://localhost:7017/Rating/${userId}`)
+    //         .then((response) => {
+    //             setRatings(response.data);
 
-                const totalValue = response.data.reduce((acc, cur) => acc + cur.value, 0);
-                const avg = response.data.length > 0 ? (totalValue / response.data.length) : 0;
-                setAverageRating(+avg.toFixed(1)); 
-            }).catch((error) => {
-                console.error(error);
-            });
-    }, [userId]);
+    //             const totalValue = response.data.reduce((acc, cur) => acc + cur.value, 0);
+    //             const avg = response.data.length > 0 ? (totalValue / response.data.length) : 0;
+    //             setAverageRating(+avg.toFixed(1)); 
+    //         }).catch((error) => {
+    //             console.error(error);
+    //         });
+    // }, [userId]);
 
     return <div className="search-prod-main-container">
         <div className="search-container">
@@ -490,14 +490,14 @@ function  Search_Product () {
                                 <div className="col-md-5 prodModal-details-container">
                                     <h2 className="col-md-12 prodModal-Name">{selectedProduct.productName}</h2>
 
-                                    {ratings && (
+                                    {/* {ratings && ( */}
                                         <>
                                             <h5 className="prodModal-text">
                                                 <img className="prodModalRating-icon" src={ prodRatingModal }/>
-                                                {averageRating}/5
+                                                0
                                             </h5>
                                         </>
-                                    )}
+                                    {/* )} */}
 
                                     <h5 className="prodModal-text">
                                         {getDepartmentName(selectedProduct.departmentId)}

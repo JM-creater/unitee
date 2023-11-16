@@ -86,7 +86,7 @@ function Cart () {
           const response = await axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
           setCart(response.data);
         } catch (error) {
-          toast.error('Network error or server not responding');
+          console.error('Network error or server not responding');
         }
     };
 

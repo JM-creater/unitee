@@ -21,14 +21,19 @@ function Shop() {
     
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+    // * Handle Search Input
     const handleSearchInputChange = (event) => {
         setSearchTerm(event.target.value);
     };
 
+    // * Navigate Search
     const performSearch = () => {
         navigate(`/shop/${userId}/search_product?search=${searchTerm}`);
     };
+
     
+    
+    // * Get User Department
     useEffect(() => {
         setIsLoading(true);
         axios.get(`https://localhost:7017/Users/UserDepartment/${userId}`)
@@ -43,6 +48,7 @@ function Shop() {
             });
     }, [userId]);
 
+    // * Get Products By Supplier 
     useEffect(() => {
         if (!departmentId) return;
         axios.get(`https://localhost:7017/Users/getSuppliersProduct/${departmentId}`)
