@@ -25,6 +25,7 @@
     align-items: center;
     flex-flow: row;
     margin-bottom: 10px;
+    cursor: pointer;
 }
 
 .supplier-shop-prod-image {

@@ -498,8 +498,10 @@ function Visit_Shop () {
                                             width: 1200,
                                             height: 1800
                                         },
-                                        enlargedImagePosition: 'over'
-                                    }} />
+                                        // enlargedImagePosition: 'over'
+                                    }} 
+                                    style={{ zIndex: 9999 }}
+                                    />
                                 </div>
                                 <div className="hover-container">
                                     <div onMouseOver={() => setMainImage(selectedProduct.frontViewImage)}>
