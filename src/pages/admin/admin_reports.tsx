@@ -30,7 +30,18 @@ function Admin_Reports () {
 
     const [orders, setOrders] = useState([]);
     const [shops, setShops] = useState([]);
-    
+    const [selectedShop, setSelectedShop] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState('');
+
+    // * Filtered By Status, Departments
+    const filteredOrders = orders.filter((ord) => {
+        const matchesStatus = selectedStatus === 'All' || (ord.status == parseInt(selectedStatus));
+        const matchesShop = selectedShop === 'All' || ord.cart.supplier.id === parseInt(selectedShop);
+
+        return matchesStatus && matchesShop;
+    });
+
+    //Fetch Data of All Orders
     useEffect(() => {
         const fetchOrders = async () => {
             try {
@@ -44,6 +55,7 @@ function Admin_Reports () {
         fetchOrders();
     }, []);
 
+    //Fetch Data of All Shops
     useEffect(() => {
         const fetchShops = async () => {
             try {
@@ -233,8 +245,9 @@ function Admin_Reports () {
                 <h4>Sort by</h4>
                 <div>
                     <label style={{ marginRight:'10px' }} htmlFor="statusOrderFilter">Order Status: </label>
-                    <select style={{ padding: '10px', border: '2px solid white' }} name="order-status-filter-admin" id="statusOrderFilter">
+                    <select style={{ padding: '10px', border: '2px solid white' }} name="order-status-filter-admin" id="statusOrderFilter" onChange={(e) => setSelectedStatus(e.target.value)}>
                         <option value="" disabled hidden selected>Select an order status</option>
+                        <option value="All" selected>All</option>
                         <option value="1">Order Placed</option>
                         <option value="2">Pending</option>
                         <option value="3">Approved</option>
@@ -247,11 +260,12 @@ function Admin_Reports () {
 
                 <div>
                     <label style={{ marginRight:'10px' }} htmlFor="supplierFilter">Shop</label>
-                    <select style={{ padding: '10px', border: '2px solid white' }} name="order-status-filter-admin" id="supplierFilter">
+                    <select style={{ padding: '10px', border: '2px solid white' }} name="order-status-filter-admin" id="supplierFilter" onChange={(e) => setSelectedShop(e.target.value)}>
                         <option value="" disabled hidden selected>Select a shop</option>
+                        <option value="All" selected>All</option>
                         {shops.map((shop) => 
                             shop.role === 2 ? (
-                                <option key={shop.id}>{shop.shopName}</option>
+                                <option value={shop.id}>{shop.shopName}</option>
                             ) : null
                         )}
                     </select>
@@ -271,7 +285,7 @@ function Admin_Reports () {
                     </tr>
                 </thead>
                 <tbody>
-                    {orders.map((ord) => 
+                    {filteredOrders.map((ord) => 
                         <tr key={ord.id}>
                             <th scope="row">{ord.orderNumber}</th>
                             <td>{ord.cart.supplier.shopName}</td>

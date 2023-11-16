@@ -133,7 +133,7 @@ function Supplier_ViewProf () {
     }
 
 
-    return <div className="viewProfile-customer-main-container">
+    return <div className="viewProfile-supplier-main-container">
         <div className="profile-details-container">
             {UserProfile && (
                 <div className="user-details-viewProfile">
