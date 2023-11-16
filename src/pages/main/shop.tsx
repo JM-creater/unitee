@@ -10,8 +10,8 @@ import LoadingGif from '../../assets/images/icons/loadingscreen.svg'
 
 function Shop() {
 
-    const [ratings, setRatings] = useState(null);
-    const [averageRating, setAverageRating] = useState(0);
+    //const [ratings, setRatings] = useState(null);
+    //const [averageRating, setAverageRating] = useState(0);
     const [shop, setShop] = useState([]);
     const [departmentId, setDepartmentId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -30,25 +30,17 @@ function Shop() {
     };
     
     useEffect(() => {
-        let isMounted = true;
         setIsLoading(true);
-    
         axios.get(`https://localhost:7017/Users/UserDepartment/${userId}`)
             .then(async res => {
-                if (isMounted) {
-                    setDepartmentId(res.data.departmentId);
-                    await sleep(50);
-                    setIsLoading(false);
-                }
+                setDepartmentId(res.data.departmentId);
+                await sleep(50);
+                setIsLoading(false);
             })
             .catch(err => {
                 console.error(err);
                 setIsLoading(false);
             });
-    
-        return () => {
-            isMounted = false;
-        };
     }, [userId]);
 
     useEffect(() => {
@@ -63,18 +55,18 @@ function Shop() {
     }, [departmentId]);
 
     // ! To be fixed
-    useEffect(() => {
-        axios.get(`https://localhost:7017/Rating/${userId}`)
-            .then((response) => {
-                setRatings(response.data);
+    // useEffect(() => {
+    //     axios.get(`https://localhost:7017/Rating/${userId}`)
+    //         .then((response) => {
+    //             setRatings(response.data);
                 // Calculate average rating
-                const totalValue = response.data.reduce((acc, cur) => acc + cur.value, 0);
-                const avg = response.data.length > 0 ? (totalValue / response.data.length) : 0;
-                setAverageRating(+avg.toFixed(1)); 
-            }).catch((error) => {
-                console.error(error);
-            });
-    }, [userId]);
+    //             const totalValue = response.data.reduce((acc, cur) => acc + cur.value, 0);
+    //             const avg = response.data.length > 0 ? (totalValue / response.data.length) : 0;
+    //             setAverageRating(+avg.toFixed(1)); 
+    //         }).catch((error) => {
+    //             console.error(error);
+    //         });
+    // }, [userId]);
 
     return (
     <React.Fragment>
@@ -137,14 +129,14 @@ function Shop() {
                             <img src={ `https://localhost:7017/${shops.image}` } className="supplierCard-img"/>
                             <div className='col-md-8 shop-card-details'>
                                 <h5 className="supplier-card-title">{shops.shopName}</h5>
-                                {ratings && (
-                                    <>
+                                {/* {ratings && ( */}
+                                    <React.Fragment>
                                         <h5 className='shop-rating-card'>
                                             <img className="ratingIcon" src={starIcon} alt="Star icon" />
-                                            {averageRating}/5
+                                            0
                                         </h5>
-                                    </>
-                                )}
+                                    </React.Fragment>
+                                {/* )} */}
                                 <h5 className='shop-rating-card'>{shops.address}</h5>
                             </div>
                         </div>

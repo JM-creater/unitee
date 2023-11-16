@@ -153,7 +153,7 @@ function Cart () {
       calculateTotalAmount();
     };
 
-    // * Handle Individual Product Amount
+    // * Handle Individual Product Total Amount
     const handleProductCheckboxChange = (cartIndex) => {
       const allItemsChecked = cart[cartIndex].items.every(item => {
         return (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement).checked;
@@ -199,6 +199,8 @@ function Cart () {
         toast.error("Please upload Proof of Payment.");
         return;
       }
+
+      const success = true;
   
       for (const cartItem of checkedCartItems) {
         const formData = new FormData();
@@ -229,24 +231,31 @@ function Cart () {
           });
           axios.delete(`https://localhost:7017/Cart/deleteCart/${cartItem.id}`)
           toast.success("Successfully Ordered");
-          cartEventEmitter.emit("cartEmptied");
-          notifEventEmitter.emit("notifAdded");
-          orderEventEmitter.emit("notifNewOrderAdded");
-          orderEventEmitter.emit("orderCartEmptied");
         } catch (error) {
-          console.log("Error in placing order", error);
-          toast.error(error.response.data);
+          if(error.response && error.response.status === 400) {
+            toast.error(error.response.data.message);
+          } else {
+            console.log("Error in placing order");
+          }
         }
       }
-      const updatedCart = cart.filter(cItem => !checkedCartItems.includes(cItem));
-      setCart(updatedCart);
-      setTotalAmount(0);
-      setTotalItemsChecked(0);
-      setReferenceId("");
-      setProofOfPayment(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+
+      if (success) {
+        const updatedCart = cart.filter(cItem => !checkedCartItems.includes(cItem));
+        setCart(updatedCart);
+        setTotalAmount(0);
+        setTotalItemsChecked(0);
+        setReferenceId("");
+        setProofOfPayment(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        cartEventEmitter.emit("cartEmptied");
+        notifEventEmitter.emit("notifAdded");
+        orderEventEmitter.emit("notifNewOrderAdded");
+        orderEventEmitter.emit("orderCartEmptied");
       }
+      
     };
     
     // * Delete Method for Cart

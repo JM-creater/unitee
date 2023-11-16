@@ -9,7 +9,7 @@ import registerUsersEventEmitter from '../helpers/RegisterUsersEmitter';
 
 type ValidationErrors = {
   IDNumber?: string;
-  shopname?: string;
+  shopName?: string;
   address?: string;
   email?: string;
   phoneNumber?: string;
@@ -22,8 +22,9 @@ type ValidationErrors = {
 };
 
 function Register() {
+
   const [IDNumber, setIDNumber] = useState('');
-  const [shopname, setShopName] = useState('');
+  const [shopName, setShopName] = useState('');
   const [address, setAddress] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -100,7 +101,7 @@ function Register() {
       setSchoolPermit(e.target.files[0]);
   };
 
-  // Handle Register
+  // * Handle Register Supplier
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -110,7 +111,7 @@ function Register() {
       const formData = new FormData();
 
       formData.append('Id', IDNumber);
-      formData.append('ShopName', shopname);
+      formData.append('ShopName', shopName);
       formData.append('Address', address);
       formData.append('Email', email);
       formData.append('PhoneNumber', phoneNumber);
@@ -120,7 +121,6 @@ function Register() {
       formData.append('CityPermit', cityPermit);
       formData.append('SchoolPermit', schoolPermit);
 
-      
       try {
         const response = await axios.post(
           'https://localhost:7017/Supplier/registerSupplier',
@@ -134,11 +134,14 @@ function Register() {
           localStorage.setItem('showSupplierIDModal', 'true');
           localStorage.setItem('generatedSupplierID', IDNumber);
         } else {
-          alert(response.data);
+          toast.error(response.data);
         }
-      } catch (err) {
-        console.error(err);
-        toast.error('Failed to register. Please try again later.');
+      } catch (error) {
+        if (error.response && error.response.status === 400) {
+          toast.error(error.response.data.message); 
+        } else {
+          toast.error('An error occurred. Please try again later.');
+        }
       }
     }
   };
@@ -155,9 +158,9 @@ function Register() {
       toast.error(errors.IDNumber);
     }
 
-    if (!shopname) {
-      errors.shopname = 'Shop Name is required.';
-      toast.error(errors.shopname);
+    if (!shopName) {
+      errors.shopName = 'Shop Name is required.';
+      toast.error(errors.shopName);
     }
 
     if (!address) {
@@ -220,6 +223,54 @@ function Register() {
     return errors;
   };
 
+  // useEffect(() => {
+  //   const fetchCountries = async () => {
+  //     try {
+  //       const headers = {
+  //         'X-CSCAPI-KEY': 'API_KEY',
+  //       };
+
+  //       const response = await axios.get('https://api.countrystatecity.in/v1/countries', {
+  //         headers: headers,
+  //       });
+        
+  //       setCountries(response.data);
+  //       console.log(response.data);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  //   fetchCountries();
+  // }, []);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const headers = new Headers();
+  //     headers.append("X-CSCAPI-KEY", "API_KEY");
+
+  //     const requestOptions = {
+  //       method: 'GET',
+  //       headers: headers,
+  //       redirect: 'follow',
+  //     };
+
+  //     try {
+  //       const response = await fetch("https://api.countrystatecity.in/v1/countries", requestOptions);
+
+  //       if (!response.ok) {
+  //         throw new Error(`HTTP error! Status: ${response.status}`);
+  //       }
+
+  //       const result = await response.text();
+  //       console.log(result);
+  //     } catch (error) {
+  //       console.error('Error:', error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="col-md-12 registerCustomer-main-container">
@@ -250,7 +301,7 @@ function Register() {
                 type="text"
                 placeholder="Shop Name"
                 onChange={(e) => handleShopName(e.target.value)}
-                value={shopname}
+                value={shopName}
               />
               <input
                 className="col-md-5 input-register"

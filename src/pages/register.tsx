@@ -95,6 +95,7 @@ function Register() {
     setStudyLoad(e.target.files[0]);
   };
 
+  // * Handle register customer
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -126,13 +127,17 @@ function Register() {
           toast.error(response.data);
           return;
         }
-      } catch (err) {
-        console.error(err);
-        toast.error('Failed to register. Please try again later.');
+      } catch (error) {
+        if (error.response && error.response.status === 400) {
+          toast.error(error.response.data.message); 
+        } else {
+          toast.error('An error occurred. Please try again later.');
+        }
       }
     }
   };
 
+  // * Validate Form
   const validateForm = () => {
     const errors: ValidationErrors = {};
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
