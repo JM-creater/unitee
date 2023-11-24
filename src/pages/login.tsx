@@ -19,7 +19,7 @@ type ValidationErrors = {
 function Login() {
   
   const [IDOrEmail, setIDOrEmail] = useState('');
-  //const [resetEmail, setResetEmail] = useState('');
+  const [resetEmail, setResetEmail] = useState('');
   const [Password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,9 +29,9 @@ function Login() {
   // * For Delay
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-  // const handleCloseButton = () => {
-  //   setResetEmail('');
-  // }
+  const handleCloseButton = () => {
+    setResetEmail('');
+  }
 
   // * Generate Random Id for Supplier
   const generateRandomID = () => {
@@ -72,9 +72,9 @@ function Login() {
     toast.success("Copied to clipboard: " + text);
   }
   
-  // const handleResetPassword = (value: string) => {
-  //   setResetEmail(value);
-  // }
+  const handleResetPassword = (value: string) => {
+    setResetEmail(value);
+  }
 
   const handleIDOrEmail = (value: string) => {
     setIDOrEmail(value);
@@ -179,13 +179,13 @@ function Login() {
   // * Handle Reset Password with Email
   const HandleResetPassword = async () => {
     try {
-      const response = await fetch('https://localhost:7017/Users/forgot-password?email=' + IDOrEmail, {
+      const response = await fetch('https://localhost:7017/Users/forgot-password?email=' + resetEmail, {
         method: 'POST',
       });
       const data = await response.json();
       if (response.ok) {
         toast.success("Please check your email");
-        //setResetEmail('');
+        setResetEmail('');
       } else {
         console.error("Error in password reset", data);
       }
@@ -283,6 +283,7 @@ function Login() {
                   data-bs-dismiss="modal" 
                   aria-label="Close"
                   id="btnClose"
+                  onClick={handleCloseButton}
                 >
                 </button>
               </div>
@@ -293,8 +294,8 @@ function Login() {
                   className="col-md-12 input-email"
                   type="text"
                   placeholder="ID Number or Email"
-                  value={IDOrEmail}
-                  onChange={(e) => handleIDOrEmail(e.target.value)}
+                  value={resetEmail}
+                  onChange={(e) => handleResetPassword(e.target.value)}
                   onKeyDown={handleKeyDownForgotPassword}
                 />
                 <div className="col-md-12 logout-btn-container">

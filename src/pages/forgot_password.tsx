@@ -3,7 +3,7 @@ import studentImg from '../../src/assets/images/forgot-pass-student-img.png'
 import submitIcon from "../../src/assets/images/icons/arrow.png"
 import backIcon from "../../src/assets/images/icons/back-2.png"
 import uniteeLogo from "../../src/assets/images/unitee.png"
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import React from 'react'
@@ -16,7 +16,6 @@ function Forgot_Password () {
     const [resetToken, setResetToken] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-    const { id } = useParams();
     const location = useLocation();
 
     // * For Delay
@@ -34,6 +33,8 @@ function Forgot_Password () {
             return;
         }
 
+        setIsLoading(true);
+        
         try {
             const response = await fetch('https://localhost:7017/Users/reset-password', {
                 method: 'POST',
@@ -46,8 +47,7 @@ function Forgot_Password () {
             if (response.ok) {
                 toast.success("Successfully updated the password");
                 await sleep(10000);
-                setIsLoading(true);
-                navigate(`/shop/${id}`);
+                navigate('/');
             } else {
                 toast.error("Failed to update the password");
             }

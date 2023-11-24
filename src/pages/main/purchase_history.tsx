@@ -29,6 +29,7 @@ function Purchase_History () {
     const [selectedPurchases, setSelectedPurchases] = useState(null);
     const [ratingProduct, setRatingProduct] = useState(0);
     const [ratingSupplier, setRatingSupplier] = useState(0);
+    const [ratedPurchases, setRatedPurchases] = useState(new Set());
     const { userId } = useParams();
 
     // * For Delay
@@ -77,7 +78,7 @@ function Purchase_History () {
     };
     
     // * Handle Submit Rating
-    const HandleSubmitRatings = async (productId, supplierId, productRating, supplierRating) => {
+    const HandleSubmitRatings = async (purchaseId, productId, supplierId, productRating, supplierRating) => {
         if (productRating < 1 || productRating > 5 || supplierRating < 1 || supplierRating > 5) {
             toast.error("Invalid ratings. Please select a rating between 1 and 5.");
             return;
@@ -99,16 +100,31 @@ function Purchase_History () {
                 SupplierId: supplierId,
                 Value: supplierRating
             });
+
+            // * Add the purchaseId to the ratedPurchases set
+            setRatedPurchases(prevRatedPurchases => {
+                const updatedRatedPurchases = new Set(prevRatedPurchases.add(purchaseId));
+                localStorage.setItem('ratedPurchases', JSON.stringify(Array.from(updatedRatedPurchases)));
+                return updatedRatedPurchases;
+            });
             
             submitRatingEventEmitter.emit("SubmitRating");
             toast.success("Ratings submitted successfully");
             setRatingProduct(0);
             setRatingSupplier(0);
+            await sleep(200);
+            window.location.reload();
         } catch (error) {
             console.error("Error submitting ratings:", error);
             toast.error("Error submitting ratings");
         }
     };
+
+    // * Load rated purchases from local storage
+    useEffect(() => {
+        const storedRatedPurchases = JSON.parse(localStorage.getItem('ratedPurchases')) || [];
+        setRatedPurchases(new Set(storedRatedPurchases));
+    }, []);
 
     // * Get Order By User Id
     useEffect(() => {
@@ -202,7 +218,7 @@ function Purchase_History () {
                     </thead>
                     {purchases.length > 0 ? (
                         purchases.filter(purchase => Status[Object.keys(Status)[purchase.status - 1]] === Status.Completed ||
-                            Status[Object.keys(Status)[purchase.status - 1]] === Status.Canceled).map((purchaseItem, index) => (
+                            Status[Object.keys(Status)[purchase.status - 1]] === Status.Completed).map((purchaseItem, index) => (
                             <tbody key={index} className="table-group-divider">
                                 <tr className='align-middle' data-bs-toggle="modal" data-bs-target="#purchaseHistoryModal" onClick={() => setSelectedPurchases(purchaseItem)}>
                                     <th scope="row">{formatDate(purchaseItem.dateCreated)}</th>
@@ -307,48 +323,65 @@ function Purchase_History () {
                                 </tbody>
                             </table>
                         </div>
+                        {!ratedPurchases.has(selectedPurchases.id) && (
+                            <div>
+                                {/* Product Rating */}
+                                <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Product Rating:</h3>
+                                <div className="rating-group">
+                                    {[...Array(5)].map((_, i) => {
+                                        const ratingValue = i + 1;
+                                        return (
+                                            <span className="rating-option" key={ratingValue}>
+                                                <input 
+                                                    type="radio" 
+                                                    id={`product-rating-${ratingValue}`} 
+                                                    name="product-rating" 
+                                                    value={ratingValue} 
+                                                    checked={ratingProduct === ratingValue} 
+                                                    onChange={(e) => setRatingProduct(parseInt(e.target.value))}
+                                                />
+                                                <label htmlFor={`product-rating-${ratingValue}`}>{ratingValue}</label>
+                                            </span>
+                                        );
+                                    })}
+                                </div>
 
-                        {/* Product Rating */}
-                        <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Product Rating:</h3>
-                        <div className="rating-group">
-                            {[...Array(5)].map((_, i) => {
-                                const ratingValue = i + 1;
-                                return (
-                                    <span className="rating-option" key={ratingValue}>
-                                        <input 
-                                            type="radio" 
-                                            id={`product-rating-${ratingValue}`} 
-                                            name="product-rating" 
-                                            value={ratingValue} 
-                                            checked={ratingProduct === ratingValue} 
-                                            onChange={(e) => setRatingProduct(parseInt(e.target.value))}
-                                        />
-                                        <label htmlFor={`product-rating-${ratingValue}`}>{ratingValue}</label>
-                                    </span>
-                                );
-                            })}
-                        </div>
+                                {/* Supplier Rating */}
+                                <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Supplier Rating:</h3>
+                                <div className="rating-group">
+                                    {[...Array(5)].map((_, i) => {
+                                        const supplierValue = i + 1;
+                                        return (
+                                            <span className="rating-option" key={supplierValue}>
+                                                <input 
+                                                    type="radio" 
+                                                    id={`supplier-rating-${supplierValue}`} 
+                                                    name="supplier-rating" 
+                                                    value={supplierValue} 
+                                                    checked={ratingSupplier === supplierValue} 
+                                                    onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
+                                                />
+                                                <label htmlFor={`supplier-rating-${supplierValue}`}>{supplierValue}</label>
+                                            </span>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}    
 
-                        {/* Supplier Rating */}
-                        <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Supplier Rating:</h3>
-                        <div className="rating-group">
-                            {[...Array(5)].map((_, i) => {
-                                const supplierValue = i + 1;
-                                return (
-                                    <span className="rating-option" key={supplierValue}>
-                                        <input 
-                                            type="radio" 
-                                            id={`supplier-rating-${supplierValue}`} 
-                                            name="supplier-rating" 
-                                            value={supplierValue} 
-                                            checked={ratingSupplier === supplierValue} 
-                                            onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
-                                        />
-                                        <label htmlFor={`supplier-rating-${supplierValue}`}>{supplierValue}</label>
-                                    </span>
-                                );
-                            })}
-                        </div>
+                        {!ratedPurchases.has(selectedPurchases.id) && (
+                            <React.Fragment>
+                                <button 
+                                    className="proceed-Btn" 
+                                    style={{ background: '#FFAA00' }}
+                                    onClick={() => HandleSubmitRatings(selectedPurchases.id, selectedPurchases.cart.items[0].product.productId, 
+                                                                selectedPurchases.cart.items[0].product.supplierId, 
+                                                                ratingProduct, 
+                                                                ratingSupplier)}>
+                                    Submit
+                                </button>
+                            </React.Fragment>
+                        )}
 
                         </div>
                     </div>
@@ -356,24 +389,11 @@ function Purchase_History () {
                 )}
                 </div>
                 <div className="modal-footer">
-                    {selectedPurchases && (
-                        <React.Fragment>
-                            <Link to={`/shop/${userId}/cart`}>
-                                <button className="proceed-Btn" onClick={addPurchaseToCart}>
-                                    Buy Again
-                                </button>
-                            </Link>
-                            <button 
-                                className="proceed-Btn" 
-                                style={{ background: '#FFAA00' }}
-                                onClick={() => HandleSubmitRatings(selectedPurchases.cart.items[0].product.productId, 
-                                                            selectedPurchases.cart.items[0].product.supplierId, 
-                                                            ratingProduct, 
-                                                            ratingSupplier)}>
-                                Submit
-                            </button>
-                        </React.Fragment>
-                    )}
+                    <Link to={`/shop/${userId}/cart`}>
+                        <button className="proceed-Btn" onClick={addPurchaseToCart}>
+                            Buy Again
+                        </button>
+                    </Link>
                 </div>
             </div>
         </div>

@@ -605,7 +605,7 @@ function Manage_Shop() {
 
               <div>
                 <div className="thumbnail-container">
-                  <h3 className="prod-info-titles">Product Image</h3>
+                  <h3 className="prod-info-titles">Main Image</h3>
                   <img
                       id="productImage"
                       alt="Upload Product"
