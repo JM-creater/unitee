@@ -520,7 +520,7 @@ function Supplier_Orders () {
                     {orders.length > 0 ? (
                       orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Canceled).map((orderItem, index) => (
                         <tbody key={index} className="table-group-divider">
-                          <tr data-bs-toggle="modal" data-bs-target="#forPickUpOrderModal" onClick={() => setSelectedOrders(orderItem)}>
+                          <tr data-bs-toggle="modal" data-bs-target="#canceledOrderModal" onClick={() => setSelectedOrders(orderItem)}>
                             <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
                             <td className="text-center">{orderItem.orderNumber}</td>
                             <td className="text-center">
@@ -1003,7 +1003,111 @@ function Supplier_Orders () {
                     )}
             </div>
         </div>
-    </div>                              
+    </div>   
+
+
+    <div className="modal fade" id="canceledOrderModal" tabIndex={-1} aria-labelledby="canceledOrderModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-fullscreen">
+            <div className="modal-content" style={{ padding:'20px' }}>
+                <div className="pending-header">
+                    <h1 className="modal-title" id="exampleModalLabel">Completed Orders</h1>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
+                </div>
+                <div className="modal-basta-container">
+                    <span>Check for pick up orders details</span>
+                </div>
+                    {selectedOrders && (
+                      <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
+                        {/* CUSTOMER DETAILS */}
+                        <div>
+                            <div className="order-details-customer">
+                                <h3 className="order-details-subtitle">Customer</h3>
+                                <div className="customer-details-container">
+                                    <div className="modal-details-label">
+                                        <span className="modal-label">ID Number</span>
+                                        <span className="modal-label">First Name</span>
+                                        <span className="modal-label">Last Name</span>
+                                        <span className="modal-label">Department</span>
+                                        <span className="modal-label">Gender</span>
+                                    </div>
+                                    <div className="modal-details-info">
+                                        <span className="modal-info">{selectedOrders.user.id}</span>
+                                        <span className="modal-info">{selectedOrders.user.firstName}</span>
+                                        <span className="modal-info">{selectedOrders.user.lastName}</span>
+                                        <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
+                                        <span className="modal-info">{selectedOrders.user.gender}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ORDER DETAILS */}
+                            <div className="modal-order-details-container">
+                                <h3 className="order-details-subtitle">Order Details</h3>
+                                <div className="order-details-container">
+                                    <div className="modal-details-label">
+                                        <span className="modal-label">Date</span>
+                                        <span className="modal-label">Order Number</span>
+                                        <span className="modal-label">Number of Items</span>
+                                        <span className="modal-label">Total Amount</span>
+                                        <span className="modal-label">Proof of Payment</span>
+                                        <span className="modal-label">Reference No.</span>
+                                        <span className="modal-label">Payment Type</span>
+                                    </div>
+                                    <div className="modal-details-info">
+                                      <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
+                                      <span className="modal-info">{selectedOrders.orderNumber}</span>
+                                      <span className="modal-info">{selectedOrders.cart.items.length}</span>
+                                      <span className="modal-info">₱{selectedOrders.total}</span>
+                                      <a 
+                                        className="modal-info" 
+                                        rel="noopener noreferrer" 
+                                        target="_blank" 
+                                        href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
+                                      >
+                                        {selectedOrders.proofOfPayment.split('\\').pop()}
+                                      </a>
+                                      <span className="modal-info">{selectedOrders.referenceId}</span>
+                                      <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* ITEM LIST */}
+                        <div className="modal-item-list">
+                          <h3 className="order-details-subtitle">Item List</h3>
+                          <div className="modal-item-list-table-wrapper">
+                            <table className="table">
+                              <thead className="table-primary">
+                                  <tr>
+                                  <th scope="col">Product Name</th>
+                                  <th scope="col">Product Type</th>
+                                  <th scope="col">Gender</th>
+                                  <th scope="col">Size</th>
+                                  <th scope="col">Quantity</th>
+                                  <th scope="col">Price</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                              {selectedOrders && Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Completed && (
+                                <tr>
+                                  <th scope="row">{selectedOrders.cart.items[0].product.productName}</th>
+                                  <td>{getProductTypeName(selectedOrders.cart.items[0].product.productTypeId)}</td>
+                                  <td>{selectedOrders.cart.items[0].product.category}</td>
+                                  <td>{selectedOrders.cart.items[0].sizeQuantity.size}</td>
+                                  <td>{selectedOrders.cart.items[0].quantity}</td>
+                                  <td>{selectedOrders.cart.items[0].product.price}</td>
+                                </tr>
+                              )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                    </div>
+                    )}
+            </div>
+        </div>
+    </div>   
 
 </div>
 }

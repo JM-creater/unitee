@@ -151,7 +151,7 @@ function Visit_Shop () {
                 const suppliersData = {};
 
                 for (const shopId of uniqueSupplierIds) {
-                    const response = await axios.get(`https://localhost:7017/Supplier/${shopId}`);
+                    const response = await axios.get(`https://localhost:7017/Users/supplierId/${shopId}`);
                     suppliersData[shopId as number] = response.data;
                 }
 
@@ -177,7 +177,7 @@ function Visit_Shop () {
                 const suppliersData = {};
 
                 for (const shopId of uniqueSupplierIds) {
-                    const response = await axios.get(`https://localhost:7017/Supplier/${shopId}`);
+                    const response = await axios.get(`https://localhost:7017/Users/supplierId/${shopId}`);
                     suppliersData[shopId as number] = response.data;
                 }
 
