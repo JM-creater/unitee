@@ -138,3 +138,22 @@
 .forgot-pwd-btn:hover {
     font-weight: 600;
 }
+
+.input-email {
+    font-size: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.forgotpwd-message {
+    margin-bottom: 25px;
+}
+
+.reset-btn {
+    width: 15rem;
+    border: solid 1px black;
+    padding: 10px;
+    border-radius: 10px;
+    margin-left: 80px;
+}

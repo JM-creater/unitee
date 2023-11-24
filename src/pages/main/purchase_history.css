@@ -19,6 +19,20 @@
     flex-flow: column;
 }
 
+.rating-option {
+  align-items: center;
+}
+
+.rating-option input[type="radio"] {
+  margin-right: 4px;
+}
+
+.rating-group {
+  display: flex;
+  justify-content: flex-start; 
+  gap: 10px; 
+}
+
 .rating {
     display: flex;
     flex-direction: row-reverse;

@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useParams } from 'react-router'
 import { Link } from 'react-router-dom'
+import React from 'react'
 
 function Supplier (){
 
@@ -82,7 +83,7 @@ function Supplier (){
             <div className='top-selling-prods-container'>
                 <h3 className='top-selling-prods-title'>Recently Added Products</h3>
                 {products.length > 0 ? ( 
-                    <>
+                    <React.Fragment>
                         {products.slice(0, 3).map((productItem, index) => (
                             <div  key={index}  className='top-prods-container'>
                                 <img className='top-prod-img' src={ `https://localhost:7017/${productItem.image}` } />
@@ -93,7 +94,7 @@ function Supplier (){
                         <Link to={`/supplier_dashboard/${id}/manage_shop`} className="no-underline-link">
                             <button className='btn-dashboardProduct'>See More</button>
                         </Link>
-                    </>
+                    </React.Fragment>
                 ) : (
                     <div className="no-productsDashboard-message">
                         <img src={ noProdsImg }/>
@@ -104,30 +105,34 @@ function Supplier (){
 
 
         </div>
-            <div className='col pending-orders-dash'>
-                <h3 style={{ marginBottom: '20px' }}>Pending Orders</h3>
-                {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).length > 0 ? (
+        <div className='col pending-orders-dash'>
+            <h3 style={{ marginBottom: '20px' }}>Pending Orders</h3>
+            {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).length > 0 ? (
                     <Link to={`/supplier_dashboard/${id}/supplier_orders`} className='no-underline-link'>
                         {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).map((orderItem, orderIndex) => (
-                            orderItem.cart.items.map((item, itemIndex) => (
-                                <div key={`${orderIndex}-${itemIndex}`} className='dash-pending-ords-container'>
-                                    <img className='cust-profile-pendOrder' src={`https://localhost:7017/${item.product.image}`} alt="Product"/>
-                                    <div className='cust-details-container'>
-                                        <span className='cust-name-dash'>{orderItem.user.firstName}</span>
-                                        <span className='cust-name-dash total'>₱{orderItem.total}</span>
-                                    </div>
-                                    <span className='cust-order-num-dash'>{orderItem.orderNumber}</span>
+                            <div key={orderIndex} className='dash-pending-ords-container'>
+                                {orderItem.cart.items.length > 0 && (
+                                    <img className='cust-profile-pendOrder' 
+                                        src={`https://localhost:7017/${orderItem.cart.items[0].product.image}`} 
+                                        alt="Product" />
+                                )}
+                                <div className='cust-details-container'>
+                                    <span className='cust-name-dash'>{orderItem.user.firstName}</span>
+                                    <span className='cust-name-dash total'>₱{orderItem.total}</span>
                                 </div>
-                            ))
+                                <span className='cust-order-num-dash'>{orderItem.orderNumber}</span>
+                            </div>
                         ))}
                     </Link>
                 ) : (
-                    <div className='no-pending-orders'>
-                        <img src={noOder} alt="No Pending Orders Icon"  style={{ width: '100px', height: '100px' }} />
-                        <p>No pending orders available</p>
-                    </div>
-                )}
-            </div>
+                <div className='no-pending-orders'>
+                    <img src={noOder} alt="No Pending Orders Icon" style={{ width: '100px', height: '100px' }} />
+                    <p>No pending orders available</p>
+                </div>
+            )}
+        </div>
+
+
         </div>
     )
 }

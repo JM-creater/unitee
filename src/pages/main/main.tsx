@@ -226,35 +226,36 @@ function Main() {
                                 
                                 <div className="cart-dropdown">
                                     {cart.length > 0 ? (
-                                        cart.map((cartObj) => (
-                                            cartObj.items.map((item, itemIndex) => (
-                                                <Link to={`visit_shop/${cartObj.supplierId}`} key={itemIndex}>
-                                                    <div className="cart-dropdown-item">
-                                                        <img 
-                                                            className="dropdown-image"
-                                                            src={`https://localhost:7017/${item.product.image}`}  
-                                                            alt={item.product.productName} 
-                                                            width="50" 
-                                                            height="50"
-                                                        />
-                                                        <span className="dropdown-productName">{item.product.productName}</span>
-                                                        <span className="dropdown-price">₱{item.product.price}</span>
-                                                    </div>
-                                                </Link>
-                                            ))
-                                        ))
+                                        cart.reduce((acc, cartObj, cartIndex) => {
+                                            if (acc.length < 5) {
+                                                acc.push(...cartObj.items.slice(0, 5 - acc.length).map((item, itemIndex) => (
+                                                    <Link to={`visit_shop/${cartObj.supplierId}`} key={`cart-item-${cartIndex}-${itemIndex}`}>
+                                                        <div className="cart-dropdown-item">
+                                                            <img 
+                                                                className="dropdown-image"
+                                                                src={`https://localhost:7017/${item.product.image}`}  
+                                                                alt={item.product.productName} 
+                                                                width="50" 
+                                                                height="50"
+                                                            />
+                                                            <span className="dropdown-productName">{item.product.productName}</span>
+                                                            <span className="dropdown-price">₱{item.product.price}</span>
+                                                        </div>
+                                                    </Link>
+                                                )));
+                                            }
+                                            return acc;
+                                        }, [])
                                     ) : (
                                         <div className="pop-up-empty-cart-message">
-                                            <img className="pop-up-empty-cart-img" src={ navEmptyCartImg }/>
-                                            Your cart is empty.</div>
+                                            <img className="pop-up-empty-cart-img" src={ navEmptyCartImg } alt="Empty Cart"/>
+                                            Your cart is empty.
+                                        </div>
                                     )}
                                     <div className="cart-dropdown-footer">
                                         <div className="itemsTotal">
                                             {totalItems && totalItems > 0 ? `${totalItems} Products In Cart` : 'No Products In Cart'}
                                         </div>
-                                        {/* <div className="hoverButton">
-                                            <button onClick={() => navigate('cart')}>Go to Cart</button>
-                                        </div> */}
                                     </div>
                                 </div>
                             </div>

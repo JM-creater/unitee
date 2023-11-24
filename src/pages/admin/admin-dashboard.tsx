@@ -38,7 +38,6 @@ function Admin_Dashboard () {
       };
     }, []);
 
-
     // * Windows Event Listener Focus for Customer
     useEffect(() => {
         const fetchData = async () => {
@@ -131,8 +130,10 @@ function Admin_Dashboard () {
           <div className="card-content-container">
             <div className="col-md-9 dash-card">
               <span>Products</span>
-              {products.length > 0 && (
+              {products.length > 0 ? (
                 <h1 className="col-md-11 number-dash">{products.length}</h1>
+              ) : (
+                <h1 className="col-md-11 number-dash">0</h1>
               )}
             </div>
             <img className="dash-card-icon" src={ prodIcon }/>
@@ -142,8 +143,10 @@ function Admin_Dashboard () {
           <div className="card-content-container">
             <div className="col-md-9 dash-card">
               <span>Suppliers</span>
-              {supplierData.length > 0 && (
+              {supplierData.length > 0 ? (
                 <h1 className="col-md-11 number-dash">{supplierData.length}</h1>
+              ) : (
+                <h1 className="col-md-11 number-dash">0</h1>
               )}
             </div>
             <img className="dash-card-icon" src={ supplierIcon }/>
@@ -153,14 +156,15 @@ function Admin_Dashboard () {
           <div className="card-content-container">
             <div className="col-md-9 dash-card">
               <span>Customers</span>
-              {customer.length > 0 && (
+              {customer.length > 0 ? (
                 <h1 className="col-md-11 number-dash">{customer.length}</h1>
+              ) : (
+                <h1 className="col-md-11 number-dash">0</h1>
               )}
             </div>
             <img className="dash-card-icon" src={ customerIcon } alt="" />
           </div>
         </div>
-
 
         <div className="top-selling-prods-container">
           <h3 className="top-selling-prods-title">Top Selling Products</h3>

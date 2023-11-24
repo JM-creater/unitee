@@ -111,7 +111,7 @@ function Supplier_ViewProf () {
             formData.append("phoneNumber", phoneNumber);
 
             try {
-                const productResponse = await axios.put(`https://localhost:7017/Users/updateSupplier/${id}`, formData, {
+                const productResponse = await axios.put(`https://localhost:7017/Users/updateProfileSupplier/${id}`, formData, {
                     headers: {
                         "Content-Type": "application/json-patch+json",
                     },
@@ -177,8 +177,8 @@ function Supplier_ViewProf () {
                     <label className='profLabelEdit' htmlFor="profPhone">Phone Number</label>
                     <input className='input-prof' type="text" id='profPhone' value={phoneNumber} onChange={(e) => handlePhoneNumber(e.target.value)} maxLength={11}></input>
 
-                    <label className='profLabelEdit' htmlFor="editPass">Password</label>
-                    <input className='input-prof' type="password" name="" id="editPass" disabled></input>
+                    {/* <label className='profLabelEdit' htmlFor="editPass">Password</label>
+                    <input className='input-prof' type="password" name="" id="editPass" disabled></input> */}
                 </div>
             </div>
             <div className="saveChanges-btn-container">

@@ -72,7 +72,7 @@ function Suppliers () {
         return () => {
             window.removeEventListener('focus', handleFocus);
         };
-    }, [])
+    }, []);
 
     // * Get All Departments
     useEffect(() => {
@@ -134,7 +134,7 @@ function Suppliers () {
 
         if (newPassword === confirmPassword) {
             try {
-                const response = await axios.put(`https://localhost:7017/Supplier/updatePassword/${supplierId}`, { Password: newPassword }, {
+                const response = await axios.put(`https://localhost:7017/Users/updateSupplierPassword/${supplierId}`, { Password: newPassword }, {
                     headers: {
                         'Content-Type': 'application/json'
                     }

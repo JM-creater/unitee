@@ -19,6 +19,7 @@ type ValidationErrors = {
 function Login() {
   
   const [IDOrEmail, setIDOrEmail] = useState('');
+  //const [resetEmail, setResetEmail] = useState('');
   const [Password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,6 +28,10 @@ function Login() {
 
   // * For Delay
   const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  // const handleCloseButton = () => {
+  //   setResetEmail('');
+  // }
 
   // * Generate Random Id for Supplier
   const generateRandomID = () => {
@@ -67,6 +72,10 @@ function Login() {
     toast.success("Copied to clipboard: " + text);
   }
   
+  // const handleResetPassword = (value: string) => {
+  //   setResetEmail(value);
+  // }
+
   const handleIDOrEmail = (value: string) => {
     setIDOrEmail(value);
   };
@@ -78,6 +87,12 @@ function Login() {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleLogin();
+    }
+  }
+
+  const handleKeyDownForgotPassword = (e) => {
+    if (e.key === 'Enter') {
+      HandleResetPassword();
     }
   }
 
@@ -161,6 +176,24 @@ function Login() {
       });
   };
 
+  // * Handle Reset Password with Email
+  const HandleResetPassword = async () => {
+    try {
+      const response = await fetch('https://localhost:7017/Users/forgot-password?email=' + IDOrEmail, {
+        method: 'POST',
+      });
+      const data = await response.json();
+      if (response.ok) {
+        toast.success("Please check your email");
+        //setResetEmail('');
+      } else {
+        console.error("Error in password reset", data);
+      }
+    } catch (error) {
+      console.error("Error in sending password reset email", error);
+    }
+  };
+
   return (
     <React.Fragment>
       {isLoading ? (
@@ -195,11 +228,9 @@ function Login() {
           />
 
           <div className='col-md-7 forgot-pwd-container'>
-            <Link to="/forgot_password">
-              <button className='forgot-pwd-btn'>
+              <button className='forgot-pwd-btn' data-bs-toggle="modal" data-bs-target="#logoutModal">
                 <img className='forgot-pwd-icon' src={ forgotPass }/>
                 Forgot Password</button>
-            </Link>
           </div>
 
           <button className="col-md-7 login-btn" onClick={() => handleLogin()}>
@@ -224,7 +255,6 @@ function Login() {
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-success" onClick={closeModal}>Proceed</button>
-                  <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancel</button>
                 </div>
               </div>
             </div>
@@ -236,13 +266,44 @@ function Login() {
           <div className="register-btn-container">
             <Link className="register-link" to="/register">
               <button className="register-customer-btn">Customer</button>
-            </Link>
+            </Link> 
 
             <Link className="register-link" to="/register_supplier">
               <button className="register-customer-btn" onClick={generateRandomID}> Supplier</button>
             </Link>
           </div>
         </div>
+        <div className='modal fade' id="logoutModal" tabIndex={1} aria-labelledby="logoutModalLabel" >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="col-md-12 close-btn-container">
+                <button 
+                  type="button" 
+                  className="btn-close"
+                  data-bs-dismiss="modal" 
+                  aria-label="Close"
+                  id="btnClose"
+                >
+                </button>
+              </div>
+              <div className="logout-confirmation-modalBody">
+                <h3 className='forgotpwd-message'>Please input your valid email</h3>
+                
+                <input
+                  className="col-md-12 input-email"
+                  type="text"
+                  placeholder="ID Number or Email"
+                  value={IDOrEmail}
+                  onChange={(e) => handleIDOrEmail(e.target.value)}
+                  onKeyDown={handleKeyDownForgotPassword}
+                />
+                <div className="col-md-12 logout-btn-container">
+                  <button className="reset-btn" data-bs-dismiss="modal" onClick={HandleResetPassword}>Reset Password</button>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
       </div>
       )}
     </React.Fragment>

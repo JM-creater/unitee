@@ -36,6 +36,35 @@ function Register() {
   const [schoolPermit, setSchoolPermit] = useState(null);
   const navigate = useNavigate();
 
+  // * Get Countries for Registering
+  useEffect(() => {
+    const fetchData = async () => {
+      const headers = new Headers();
+      headers.append("X-CSCAPI-KEY", "R0ljcVpYMHhyWGM4UUl4MmE1VGhVVFhlSWUxd0laeW5ESFpwdU44Mw==");
+
+      const requestOptions = {
+        method: 'GET',
+        headers: headers,
+        redirect: 'follow' as RequestRedirect,
+      };
+
+      try {
+        const response = await fetch("https://api.countrystatecity.in/v1/countries", requestOptions);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.text();
+        console.log(result);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   // * Get the Generated ID number for Supplier
   useEffect(() => {
     const fetchedID = localStorage.getItem('generatedSupplierID');
@@ -123,7 +152,7 @@ function Register() {
 
       try {
         const response = await axios.post(
-          'https://localhost:7017/Supplier/registerSupplier',
+          'https://localhost:7017/Users/registerSupplier',
           formData
         );
         if (response.data) {
@@ -222,54 +251,6 @@ function Register() {
 
     return errors;
   };
-
-  // useEffect(() => {
-  //   const fetchCountries = async () => {
-  //     try {
-  //       const headers = {
-  //         'X-CSCAPI-KEY': 'API_KEY',
-  //       };
-
-  //       const response = await axios.get('https://api.countrystatecity.in/v1/countries', {
-  //         headers: headers,
-  //       });
-        
-  //       setCountries(response.data);
-  //       console.log(response.data);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }
-  //   fetchCountries();
-  // }, []);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const headers = new Headers();
-  //     headers.append("X-CSCAPI-KEY", "API_KEY");
-
-  //     const requestOptions = {
-  //       method: 'GET',
-  //       headers: headers,
-  //       redirect: 'follow',
-  //     };
-
-  //     try {
-  //       const response = await fetch("https://api.countrystatecity.in/v1/countries", requestOptions);
-
-  //       if (!response.ok) {
-  //         throw new Error(`HTTP error! Status: ${response.status}`);
-  //       }
-
-  //       const result = await response.text();
-  //       console.log(result);
-  //     } catch (error) {
-  //       console.error('Error:', error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
 
   return (
     <form onSubmit={handleSubmit}>
