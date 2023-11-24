@@ -134,7 +134,7 @@ function View_Customers () {
 
         if (newPassword === confirmPassword) {
             try {
-                const response = await axios.put(`https://localhost:7017/Supplier/updatePassword/${customerId}`, { Password: newPassword }, {
+                const response = await axios.put(`https://localhost:7017/Users/updateCustomerPassword/${customerId}`, { Password: newPassword }, {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -363,7 +363,7 @@ function View_Customers () {
                                         name="changePass" 
                                         id="changePass"
                                         value={confirmPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
                                     />
 
                                     <div className='saveChanges-btn-container'>

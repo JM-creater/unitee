@@ -10,7 +10,6 @@ import { useParams } from 'react-router-dom'
 import "./visit_shop.css"
 import cartEventEmitter from "../../helpers/EventEmitter"
 import React from "react"
-import ReactImageMagnify from 'react-image-magnify';
 
 function Visit_Shop () {
 
@@ -25,8 +24,6 @@ function Visit_Shop () {
         image: string | null;
     }
 
-    // const [ratings, setRatings] = useState(null);
-    // const [averageRating, setAverageRating] = useState(0);
     const [, setCart] = useState([]);
     const [displayProduct, setDisplayProduct] = useState([]);
     const [departments, setDepartments] = useState<Department[]>([]);
@@ -39,9 +36,74 @@ function Visit_Shop () {
     const [quantity, setQuantity] = useState(0);
     const [newQuantity, setNewQuantity] = useState(0);
     const [departmentId, setDepartmentId] = useState<number | null>(null);
-    const [mainImage, setMainImage] = useState(null);
+    const [averageRatingSupplier, setAverageRatingSupplier] = useState(null);
+    const [, setProductData] = useState([]);
+    const [productAverageRating ,setProductAverageRating] = useState({}); 
+    const [, setMainImage] = useState(null);
     const { userId, id: shopId } = useParams();
     const supplier = suppliers[shopId];
+
+    // * Get the Average Rating for Supplier
+    useEffect(() => {
+        const fetchAverageRatingSupplier = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Rating/average-supplier-rating/${shopId}`);
+                setAverageRatingSupplier(response.data.averageRating);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchAverageRatingSupplier();
+    }, [shopId]);
+
+    // * Get the Average Rating for Product
+    useEffect(() => {
+        if (!departmentId) return;
+        const fetchProductDataAndRatings = async () => {
+            try {
+                const productResponse = await axios.get(`https://localhost:7017/Product/ByShop/${shopId}/ByDepartment/${departmentId}`);
+                setProductData(productResponse.data);
+
+                const ratingsPromises = productResponse.data.map(async product => {
+                    const response = await axios.get(`https://localhost:7017/Rating/average-product-rating/${product.productId}`);
+                    return { productId: product.productId, averageRating: response.data.averageRating };
+                });
+
+                const ratings = await Promise.all(ratingsPromises);
+                const ratingsMap = ratings.reduce((acc, curr) => {
+                    acc[curr.productId] = curr.averageRating;
+                    return acc;
+                }, {});
+
+                setProductAverageRating(ratingsMap);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchProductDataAndRatings();
+    }, [shopId, departmentId]);
+
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+                const response = await axios.get(`https://localhost:7017/Rating/average-supplier-rating/${shopId}`);
+                setAverageRatingSupplier(response.data.averageRating);
+            } catch (error) {
+                console.error('Network error or server not responding');
+            }
+        };
+    
+        const handleFocus = () => {
+            fetchData();
+        };
+    
+        window.addEventListener('focus', handleFocus);
+    
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [shopId]);
 
     // * Get All departments
     useEffect(() => {
@@ -67,7 +129,7 @@ function Visit_Shop () {
         const fetchDepartment = async () => {
             try {
                 const response = await axios.get(`https://localhost:7017/Users/UserDepartment/${userId}`);
-                setDepartmentId(response.data.departmentId)
+                setDepartmentId(response.data.departmentId);
             } catch (error) {
                 console.error(error);
             }
@@ -78,6 +140,7 @@ function Visit_Shop () {
     // * Get All Products
     useEffect(() => {
         if (!departmentId) return;
+
         axios.get(`https://localhost:7017/Product/ByShop/${shopId}/ByDepartment/${departmentId}`)
             .then(async res => {
                 setDisplayProduct(res.data);
@@ -97,6 +160,42 @@ function Visit_Shop () {
             .catch(err => {
                 console.error(err);
             });
+    }, [shopId, departmentId]);
+
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!departmentId) return;
+
+            try {
+                const response = await axios.get(`https://localhost:7017/Product/ByShop/${shopId}/ByDepartment/${departmentId}`);
+                setDisplayProduct(response.data);
+
+                // * Fetch supplier data for each product
+                const supplierIds = response.data.map(product => product.supplierId);
+                const uniqueSupplierIds = [...new Set(supplierIds)];
+                const suppliersData = {};
+
+                for (const shopId of uniqueSupplierIds) {
+                    const response = await axios.get(`https://localhost:7017/Supplier/${shopId}`);
+                    suppliersData[shopId as number] = response.data;
+                }
+
+                setSuppliers(suppliersData);
+            } catch (error) {
+                console.error('Network error or server not responding');
+            }
+        };
+    
+        const handleFocus = () => {
+            fetchData();
+        };
+    
+        window.addEventListener('focus', handleFocus);
+    
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
     }, [shopId, departmentId]);
 
     // * Filter Products
@@ -181,8 +280,8 @@ function Visit_Shop () {
         .then(updatedCartResponse => {
             setCart(updatedCartResponse.data);
         })
-        .catch(error => {
-            toast.error(error);
+        .catch(() => {
+            toast.error("Error adding item to cart. Please try again.");
         });
     };
 
@@ -197,7 +296,6 @@ function Visit_Shop () {
             };
         }
     }, []);
-
 
     // * Handle the Selected Size
     const HandleSelectedSize = (event) => {
@@ -237,21 +335,6 @@ function Visit_Shop () {
         }
     };
 
-    // ! To be fixed: Get Rating
-    // useEffect(() => {
-    //     axios.get(`https://localhost:7017/Rating/${userId}`)
-    //         .then((response) => {
-    //             setRatings(response.data);
-
-    //             const totalValue = response.data.reduce((acc, cur) => acc + cur.value, 0);
-    //             const avg = response.data.length > 0 ? (totalValue / response.data.length) : 0;
-    //             setAverageRating(+avg.toFixed(1)); 
-    //         }).catch((error) => {
-    //             console.error(error);
-    //         });
-    // }, [userId]);
-
-
     return <div className="shop-main-container">
         <div className="shop-content1-container">
             <div className="col-md-10 shopDetails-container-shop">
@@ -266,13 +349,8 @@ function Visit_Shop () {
                     )}
                 </div>
 
-                {/* {ratings && (
-                    <> */}
-                        <h5 className="visitShop-rating">
-                        <img className="ratingIcon" src={ starIcon }/>0</h5>
-                    {/* </>
-                )}
-                 */}
+                <h5 className="visitShop-rating">
+                <img className="ratingIcon" src={ starIcon }/>{averageRatingSupplier}</h5>
                 
                 {/* Filter */}
                 <div className="prodFilter-container">
@@ -487,20 +565,9 @@ function Visit_Shop () {
                         <React.Fragment>
                             <div className="product-div-left">
                                 <div className="img-container">
-                                    <ReactImageMagnify {...{
-                                        smallImage: {
-                                            alt: 'Wristwatch by Ted Baker London',
-                                            isFluidWidth: true,
-                                            src: `https://localhost:7017/${mainImage || selectedProduct.image}`
-                                        },
-                                        largeImage: {
-                                            src: `https://localhost:7017/${mainImage || selectedProduct.image}`,
-                                            width: 1200,
-                                            height: 1800
-                                        },
-                                        // enlargedImagePosition: 'over'
-                                    }} 
-                                    style={{ zIndex: 9999 }}
+                                    <img 
+                                        className="prodModal-Image" 
+                                        src={`https://localhost:7017/${selectedProduct.image}`} 
                                     />
                                 </div>
                                 <div className="hover-container">
@@ -527,14 +594,10 @@ function Visit_Shop () {
                             <div className="col-md-5 prodModal-details-container">
                                 <h2 className="col-md-12 prodModal-Name">{selectedProduct.productName}</h2>
 
-                                {/* {ratings && (
-                                    <> */}
-                                        <h5 className="prodModal-text">
-                                            <img className="prodModalRating-icon" src={ prodRatingModal }/>
-                                            0
-                                        </h5>
-                                    {/* </>
-                                )} */}
+                                <h5 className="prodModal-text">
+                                    <img className="prodModalRating-icon" src={ prodRatingModal }/>
+                                    {productAverageRating[selectedProduct.productId] || 0}
+                                </h5>
 
                                 <h5 className="prodModal-text">
                                     {getDepartmentName(selectedProduct.departmentId)}

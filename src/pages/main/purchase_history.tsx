@@ -1,10 +1,11 @@
 import './purchase_history.css'
-//import product2 from "../../assets/images/shop_products/product2.png"
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios';
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import React from 'react';
+import submitRatingEventEmitter from '../../helpers/SubmitRatingEventEmitter';
 
 function Purchase_History () {
 
@@ -26,8 +27,8 @@ function Purchase_History () {
     const [purchases, setPurchases] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [selectedPurchases, setSelectedPurchases] = useState(null);
-    const [ratingProduct, setRatingProduct] = useState(null);
-    const [ratingSupplier, setRatingSupplier] = useState(null);
+    const [ratingProduct, setRatingProduct] = useState(0);
+    const [ratingSupplier, setRatingSupplier] = useState(0);
     const { userId } = useParams();
 
     // * For Delay
@@ -75,96 +76,38 @@ function Purchase_History () {
             });
     };
     
-    // * Handle Product Rating 
-    const handleRatingProduct = async (productId, supplierId) => {
-        const closeBtn = document.getElementById("btnClose");
-        
-        if (ratingProduct === null) {
-            toast.error('Please select a rating before submitting.');
-            return;
-        }
-
-        const request = {
-            UserId: userId,
-            ProductId: productId,
-            SupplierId: supplierId,
-            Value: ratingProduct
-        };
-
-        try {
-            const response = await fetch('https://localhost:7017/Rating/rate-product', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json' 
-                },
-                body: JSON.stringify(request)
-            });
-
-            if (response.ok) {
-                toast.success('Rating submitted successfully.');
-                closeBtn.click();
-            } else {
-                const data = await response.json();
-                toast.error(`Error: ${data}`);
-            }
-
-        } catch (error) {
-            console.error('Error submitting rating:', error);
-        }
-    };
-
-    // * Handle Supplier Rating
-    const handleRatingSupplier = async (productId, supplierId) => {
-        const closeBtn = document.getElementById("btnClose");
-        
-        if (ratingSupplier === null) {
-            alert('Please select a rating before submitting.');
-            return;
-        }
-
-        const request = {
-            UserId: userId,
-            ProductId: productId,
-            SupplierId: supplierId,
-            Value: ratingSupplier
-        };
-
-        try {
-            const response = await fetch('https://localhost:7017/Rating/rate-product', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json' 
-                },
-                body: JSON.stringify(request)
-            });
-
-            if (response.ok) {
-                toast.success('Rating submitted successfully.');
-                closeBtn.click();
-
-                await sleep(1000);
-                window.location.reload();
-            } else {
-                const data = await response.json();
-                toast.error(`Error: ${data}`);
-            }
-
-        } catch (error) {
-            console.error('Error submitting rating:', error);
-        }
-    };
-
-    // * Handle Both Supplier and Rating Handle
-    const handleBothRatings = async (items) => {
-        if (!items || items.length === 0) {
-            alert('No items to rate.');
+    // * Handle Submit Rating
+    const HandleSubmitRatings = async (productId, supplierId, productRating, supplierRating) => {
+        if (productRating < 1 || productRating > 5 || supplierRating < 1 || supplierRating > 5) {
+            toast.error("Invalid ratings. Please select a rating between 1 and 5.");
             return;
         }
     
-        items.forEach((item) => {
-            handleRatingProduct(item.product.productId, item.product.supplierId);
-            handleRatingSupplier(item.product.productId, item.product.supplierId);
-        });
+        try {
+            // * Submit product rating
+            await axios.post('https://localhost:7017/Rating/rate-product', {
+                UserId: userId,
+                ProductId: productId,
+                SupplierId: supplierId,
+                Value: productRating
+            });
+    
+            // * Submit supplier rating
+            await axios.post('https://localhost:7017/Rating/rate-supplier', {
+                UserId: userId,
+                ProductId: productId,
+                SupplierId: supplierId,
+                Value: supplierRating
+            });
+            
+            submitRatingEventEmitter.emit("SubmitRating");
+            toast.success("Ratings submitted successfully");
+            setRatingProduct(0);
+            setRatingSupplier(0);
+        } catch (error) {
+            console.error("Error submitting ratings:", error);
+            toast.error("Error submitting ratings");
+        }
     };
 
     // * Get Order By User Id
@@ -210,12 +153,6 @@ function Purchase_History () {
         return `${month}/${day}/${year} ${hours}:${minutes}`;
     };
 
-    // * Handle Close
-    // const handleCLose = () => {
-    //     const closeBtn = document.getElementById("btnClose");
-    //     closeBtn.click();
-    // }
-
     // * Update the Product Details Modal
     useEffect(() => {
         const modal = document.getElementById('viewProdDetailsModal') 
@@ -247,11 +184,6 @@ function Purchase_History () {
                     <input className="form-control me-2" type="search" placeholder="Search by Order No." aria-label="Search"/>
                     <button className="col-md-3 btn btn-outline-primary" type="submit">Search</button>
                 </div>
-
-                {/* <div className='col-md-3 date-container'>
-                    <span style={{ fontWeight:'500', fontSize:'15px', paddingRight:'5px' }}>Sort by date:</span>
-                    <input className='date-input' type="date" />
-                </div> */}
             </div>
         </div>
         
@@ -266,7 +198,6 @@ function Purchase_History () {
                             <th className="text-center" scope="col">Shop</th>
                             <th className="text-center" scope="col">Number of Items</th>
                             <th className="text-center" scope="col">Total Amount</th>
-                            <th className="text-center" scope="col">Rating</th>
                         </tr>
                     </thead>
                     {purchases.length > 0 ? (
@@ -279,7 +210,6 @@ function Purchase_History () {
                                     <td className="text-center">{purchaseItem.cart.supplier.shopName}</td>
                                     <td className="text-center">{purchaseItem.cart.items.length}</td>
                                     <td className="text-center">{purchaseItem.total}</td>
-                                    <td className="text-center">0</td>
                                 </tr>
                             </tbody>
                         ))
@@ -355,75 +285,67 @@ function Purchase_History () {
                                 <caption>end of list</caption>
                                 <thead className='table-dark align-middle'>
                                     <tr className='thead-row'>
-                                    <th className="order-table-header" scope="col">Product Name</th>
-                                    <th className="order-table-header text-center" scope="col">Product Type</th>
-                                    <th className="order-table-header text-center" scope="col">Gender</th>
-                                    <th className="order-table-header text-center" scope="col">Size</th>
-                                    <th className="order-table-header text-center" scope="col">Quantity</th>
-                                    <th className="order-table-header text-center" scope="col">Price</th>
+                                        <th className="order-table-header" scope="col">Product Name</th>
+                                        <th className="order-table-header text-center" scope="col">Product Type</th>
+                                        <th className="order-table-header text-center" scope="col">Gender</th>
+                                        <th className="order-table-header text-center" scope="col">Size</th>
+                                        <th className="order-table-header text-center" scope="col">Quantity</th>
+                                        <th className="order-table-header text-center" scope="col">Price</th>
                                     </tr>
                                 </thead>
                                 <tbody className="table-group-divider">
-                                    {selectedPurchases.cart.items.map(item => (
-                                        <tr key={item.id}>
-                                            <th scope="row" data-bs-toggle="modal" data-bs-target="#cartProductModal">{item.product.productName}</th>
-                                            <td className='text-center'>{getProductTypeName(item.product.productTypeId)}</td>
-                                            <td className='text-center'>{item.product.category}</td>
-                                            <td className='text-center'>{item.sizeQuantity.size}</td>
-                                            <td className='text-center'>{item.quantity}</td>
-                                            <td className='text-center'>{item.product.price}</td>
-                                        </tr>
-                                    ))}
+                                {selectedPurchases && Status[Object.keys(Status)[selectedPurchases.status - 1]] === Status.Completed && (
+                                    <tr>
+                                        <th scope="row">{selectedPurchases.cart.items[0].product.productName}</th>
+                                        <td className='text-center'>{getProductTypeName(selectedPurchases.cart.items[0].product.productTypeId)}</td>
+                                        <td className='text-center'>{selectedPurchases.cart.items[0].product.category}</td>
+                                        <td className='text-center'>{selectedPurchases.cart.items[0].sizeQuantity.size}</td>
+                                        <td className='text-center'>{selectedPurchases.cart.items[0].quantity}</td>
+                                        <td className='text-center'>{selectedPurchases.cart.items[0].product.price}</td>
+                                    </tr>
+                                )}
                                 </tbody>
                             </table>
                         </div>
-                        
+
                         {/* Product Rating */}
                         <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Product Rating:</h3>
-                        <div className="rating" style={{ display:'flex', justifyContent:'start' }}>
+                        <div className="rating-group">
                             {[...Array(5)].map((_, i) => {
                                 const ratingValue = i + 1;
                                 return (
-                                    <Fragment key={ratingValue}>
+                                    <span className="rating-option" key={ratingValue}>
                                         <input 
                                             type="radio" 
-                                            id={`product-star-${ratingValue}`} 
-                                            name="product-star-radio" 
+                                            id={`product-rating-${ratingValue}`} 
+                                            name="product-rating" 
                                             value={ratingValue} 
                                             checked={ratingProduct === ratingValue} 
                                             onChange={(e) => setRatingProduct(parseInt(e.target.value))}
                                         />
-                                        <label htmlFor={`product-star-${ratingValue}`}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                                <path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path>
-                                            </svg>
-                                        </label>
-                                    </Fragment>
+                                        <label htmlFor={`product-rating-${ratingValue}`}>{ratingValue}</label>
+                                    </span>
                                 );
                             })}
                         </div>
 
                         {/* Supplier Rating */}
                         <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Supplier Rating:</h3>
-                        <div className="rating" style={{ display:'flex', justifyContent:'start' }}>
+                        <div className="rating-group">
                             {[...Array(5)].map((_, i) => {
                                 const supplierValue = i + 1;
                                 return (
-                                    <Fragment key={supplierValue}>
+                                    <span className="rating-option" key={supplierValue}>
                                         <input 
                                             type="radio" 
-                                            id={`supplier-star-${supplierValue}`} 
-                                            name="supplier-star-radio" 
+                                            id={`supplier-rating-${supplierValue}`} 
+                                            name="supplier-rating" 
                                             value={supplierValue} 
                                             checked={ratingSupplier === supplierValue} 
                                             onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
                                         />
-                                        <label htmlFor={`supplier-star-${supplierValue}`}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                                <path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path>
-                                            </svg>
-                                        </label>
-                                    </Fragment>
+                                        <label htmlFor={`supplier-rating-${supplierValue}`}>{supplierValue}</label>
+                                    </span>
                                 );
                             })}
                         </div>
@@ -435,16 +357,22 @@ function Purchase_History () {
                 </div>
                 <div className="modal-footer">
                     {selectedPurchases && (
-                        <>
+                        <React.Fragment>
                             <Link to={`/shop/${userId}/cart`}>
                                 <button className="proceed-Btn" onClick={addPurchaseToCart}>
                                     Buy Again
                                 </button>
                             </Link>
-                            <button className="proceed-Btn" style={{ background: '#FFAA00' }} onClick={() => handleBothRatings(selectedPurchases.cart.items)}>
+                            <button 
+                                className="proceed-Btn" 
+                                style={{ background: '#FFAA00' }}
+                                onClick={() => HandleSubmitRatings(selectedPurchases.cart.items[0].product.productId, 
+                                                            selectedPurchases.cart.items[0].product.supplierId, 
+                                                            ratingProduct, 
+                                                            ratingSupplier)}>
                                 Submit
                             </button>
-                        </>
+                        </React.Fragment>
                     )}
                 </div>
             </div>

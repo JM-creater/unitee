@@ -45,7 +45,7 @@ function ViewCustomer_Profile () {
     const [departmentId, setDepartmentId] = useState('');
     const [departments, setDepartments] = useState([]);
     const [gender, setGender] = useState('');
-    const [isDisabled, setIsDisabled] = useState(false);
+    //const [isDisabled, setIsDisabled] = useState(false);
     const {userId} = useParams();
 
     // * For Delay
@@ -55,9 +55,9 @@ function ViewCustomer_Profile () {
       setDepartmentId(e.target.value); 
     };
 
-    const toggleInput = () => {
-      setIsDisabled(!isDisabled);
-    }
+    // const toggleInput = () => {
+    //   setIsDisabled(!isDisabled);
+    // }
 
     // * Handle Phone Number
     const handlePhoneNumber = (value) => {
@@ -163,7 +163,7 @@ function ViewCustomer_Profile () {
       formData.append("phoneNumber", phoneNumber);
 
       try {
-          const productResponse = await axios.put(`https://localhost:7017/Users/updateCustomer/${userId}`, formData, {
+          const productResponse = await axios.put(`https://localhost:7017/Users/updateProfileCustomer/${userId}`, formData, {
               headers: {
                   "Content-Type": "application/json-patch+json",
                 },
@@ -251,7 +251,7 @@ function ViewCustomer_Profile () {
                     <label className='profLabelEdit' htmlFor="profPhone">Phone Number</label>
                     <input className='input-prof' type="text" id='profPhone' value={phoneNumber} onChange={(e) => handlePhoneNumber(e.target.value)} maxLength={11}></input>
 
-                    <label className='profLabelEdit' htmlFor="editPass">Password</label>
+                    {/* <label className='profLabelEdit' htmlFor="editPass">Password</label>
                     <button onClick={toggleInput}>
                       {isDisabled ? 'Hide Input Password' : 'Show Input Password'}
                     </button>
@@ -262,7 +262,7 @@ function ViewCustomer_Profile () {
                         <label className='profLabelEdit' htmlFor="editPass">Confirm Password</label>
                         <input className='input-prof' type="password" name="" id="editPass"></input>
                       </>
-                    )}
+                    )} */}
                     
                 </div>
             </div>

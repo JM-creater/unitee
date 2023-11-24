@@ -10,12 +10,12 @@ import LoadingGif from '../../assets/images/icons/loadingscreen.svg'
 
 function Shop() {
 
-    //const [ratings, setRatings] = useState(null);
-    //const [averageRating, setAverageRating] = useState(0);
     const [shop, setShop] = useState([]);
     const [departmentId, setDepartmentId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const [averageRatingSupplier, setAverageRatingSupplier] = useState({});
+    const [, setProductData] = useState([]);
     const { userId } = useParams();
     const navigate = useNavigate();
     
@@ -31,7 +31,67 @@ function Shop() {
         navigate(`/shop/${userId}/search_product?search=${searchTerm}`);
     };
 
+    // * Get the Average Rating for Product
+    useEffect(() => {
+        if (!departmentId) return;
     
+        const fetchAverageRatingSupplier = async () => {
+            try {
+                const supplierResponse = await axios.get(`https://localhost:7017/Users/getSuppliersProduct/${departmentId}`);
+                setProductData(supplierResponse.data);
+    
+                const ratingsPromises = supplierResponse.data.map(supplier => 
+                    axios.get(`https://localhost:7017/Rating/average-supplier-rating/${supplier.id}`)
+                );
+    
+                const ratingsResponses = await Promise.all(ratingsPromises);
+                const ratingsMap = ratingsResponses.reduce((acc, response, index) => {
+                    acc[supplierResponse.data[index].id] = response.data.averageRating;
+                    return acc;
+                }, {});
+    
+                setAverageRatingSupplier(ratingsMap);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+    
+        fetchAverageRatingSupplier();
+    }, [departmentId]);
+
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+                const supplierResponse = await axios.get(`https://localhost:7017/Users/getSuppliersProduct/${departmentId}`);
+                setProductData(supplierResponse.data);
+
+                const ratingsPromises = supplierResponse.data.map(supplier => 
+                    axios.get(`https://localhost:7017/Rating/average-supplier-rating/${supplier.id}`)
+                );
+
+                const ratingsResponses = await Promise.all(ratingsPromises);
+                const ratingsMap = ratingsResponses.reduce((acc, response, index) => {
+                    acc[supplierResponse.data[index].id] = response.data.averageRating;
+                    return acc;
+                }, {});
+
+                setAverageRatingSupplier(ratingsMap);
+            } catch (error) {
+                console.error('Network error or server not responding');
+            }
+        };
+    
+        const handleFocus = () => {
+            fetchData();
+        };
+    
+        window.addEventListener('focus', handleFocus);
+    
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [departmentId]);
     
     // * Get User Department
     useEffect(() => {
@@ -60,19 +120,6 @@ function Shop() {
             });
     }, [departmentId]);
 
-    // ! To be fixed
-    // useEffect(() => {
-    //     axios.get(`https://localhost:7017/Rating/${userId}`)
-    //         .then((response) => {
-    //             setRatings(response.data);
-                // Calculate average rating
-    //             const totalValue = response.data.reduce((acc, cur) => acc + cur.value, 0);
-    //             const avg = response.data.length > 0 ? (totalValue / response.data.length) : 0;
-    //             setAverageRating(+avg.toFixed(1)); 
-    //         }).catch((error) => {
-    //             console.error(error);
-    //         });
-    // }, [userId]);
 
     return (
     <React.Fragment>
@@ -135,14 +182,12 @@ function Shop() {
                             <img src={ `https://localhost:7017/${shops.image}` } className="supplierCard-img"/>
                             <div className='col-md-8 shop-card-details'>
                                 <h5 className="supplier-card-title">{shops.shopName}</h5>
-                                {/* {ratings && ( */}
                                     <React.Fragment>
                                         <h5 className='shop-rating-card'>
                                             <img className="ratingIcon" src={starIcon} alt="Star icon" />
-                                            0
+                                            {averageRatingSupplier[shops.id] ? averageRatingSupplier[shops.id] : '0'}
                                         </h5>
                                     </React.Fragment>
-                                {/* )} */}
                                 <h5 className='shop-rating-card'>{shops.address}</h5>
                             </div>
                         </div>
