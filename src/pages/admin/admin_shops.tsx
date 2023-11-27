@@ -498,7 +498,8 @@ function Admin_Shops () {
                                         <div className='admin-viewProds-card'>
                                             <img className='admin-viewProd-img' src={ `https://localhost:7017/${product.image}` }/>
                                             <h4 className='col-md-4 admin-prodName' style={{ display:'flex', flexFlow:'column' }}>{product.productName}
-                                                <span className='admin-prodRating' style={{ color:'white', marginTop:'8px', display:'flex', alignItems:'center' }}></span>
+                                                <span className='admin-prodRating' style={{ color:'white', marginTop:'8px', display:'flex', alignItems:'center' }}>
+
                                                     <img style={{ marginRight:'5px', width:'100%', maxWidth:'12px' }} src={ prodRating } alt="product rating icon" />
                                                     {averageRatingProduct && averageRatingProduct[product.productId] ? averageRatingProduct[product.productId].toFixed(1) : "No rating yet"}
                                                 </span>
