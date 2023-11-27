@@ -56,6 +56,28 @@ function Visit_Shop () {
         fetchAverageRatingSupplier();
     }, [shopId]);
 
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+                const response = await axios.get(`https://localhost:7017/Rating/average-supplier-rating/${shopId}`);
+                setAverageRatingSupplier(response.data.averageRating);
+            } catch (error) {
+                console.error('Network error or server not responding');
+            }
+        };
+    
+        const handleFocus = () => {
+            fetchData();
+        };
+    
+        window.addEventListener('focus', handleFocus);
+    
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [shopId]);
+
     // * Get the Average Rating for Product
     useEffect(() => {
         if (!departmentId) return;
@@ -82,28 +104,6 @@ function Visit_Shop () {
         };
         fetchProductDataAndRatings();
     }, [shopId, departmentId]);
-
-    // * Windows Event Listener Focus
-    useEffect(() => {
-        const fetchData = async () => {
-        try {
-                const response = await axios.get(`https://localhost:7017/Rating/average-supplier-rating/${shopId}`);
-                setAverageRatingSupplier(response.data.averageRating);
-            } catch (error) {
-                console.error('Network error or server not responding');
-            }
-        };
-    
-        const handleFocus = () => {
-            fetchData();
-        };
-    
-        window.addEventListener('focus', handleFocus);
-    
-        return () => {
-            window.removeEventListener('focus', handleFocus);
-        };
-    }, [shopId]);
 
     // * Get All departments
     useEffect(() => {
@@ -151,7 +151,7 @@ function Visit_Shop () {
                 const suppliersData = {};
 
                 for (const shopId of uniqueSupplierIds) {
-                    const response = await axios.get(`https://localhost:7017/Users/supplierId/${shopId}`);
+                    const response = await axios.get(`https://localhost:7017/Users/getSupplierId/${shopId}`);
                     suppliersData[shopId as number] = response.data;
                 }
 
@@ -177,7 +177,7 @@ function Visit_Shop () {
                 const suppliersData = {};
 
                 for (const shopId of uniqueSupplierIds) {
-                    const response = await axios.get(`https://localhost:7017/Users/supplierId/${shopId}`);
+                    const response = await axios.get(`https://localhost:7017/Users/getSupplierId/${shopId}`);
                     suppliersData[shopId as number] = response.data;
                 }
 
