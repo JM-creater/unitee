@@ -19,7 +19,9 @@ function Admin_Shops () {
     const [selectedGender, setSelectedGender] = useState('');
     const [selectedProductType, setSelectedProductType] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
-    
+    const [averageRatingSupplier, setAverageRatingSupplier] = useState(null);
+    const [averageRatingProduct, setAverageRatingProduct] = useState(null);
+
     // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -206,6 +208,56 @@ function Admin_Shops () {
         };
     }, []);
 
+    // * Get Average Rating for Supplier
+    useEffect(() => {
+        const fetchShops = async () => {
+            try {
+                const response = await axios.get('https://localhost:7017/Users/getSuppliers');
+                const suppliers = response.data;
+                setShop(suppliers);
+    
+                const ratingsPromises = suppliers.map(supplier => 
+                    axios.get(`https://localhost:7017/Rating/average-supplier-rating/${supplier.id}`)
+                );
+    
+                const ratingsResponses = await Promise.all(ratingsPromises);
+                const ratingsMap = ratingsResponses.reduce((acc, curr, index) => {
+                    acc[suppliers[index].id] = curr.data.averageRating;
+                    return acc;
+                }, {});
+    
+                setAverageRatingSupplier(ratingsMap);
+            } catch (error) {
+                console.error('Network error or server not responding:', error);
+            }
+        };
+        fetchShops();
+    }, []);
+
+    // * Get Average Rating for Product
+    useEffect(() => {
+        const fetchShops = async () => {
+            try {
+                const response = await axios.get('https://localhost:7017/Users/getSuppliers');
+                const suppliers = response.data;
+                setShop(suppliers);
+    
+                const productRatingsMap = {};
+    
+                for (const supplier of suppliers) {
+                    for (const product of supplier.products) {
+                        const ratingResponse = await axios.get(`https://localhost:7017/Rating/average-product-rating/${product.productId}`);
+                        productRatingsMap[product.productId] = ratingResponse.data.averageRating;
+                    }
+                }
+    
+                setAverageRatingProduct(productRatingsMap);
+            } catch (error) {
+                console.error('Network error or server not responding:', error);
+            }
+        };
+        fetchShops();
+    }, []);
 
     return <div className="admin-shops-main-container">
         <div className='admin-shops-header'>
@@ -240,7 +292,11 @@ function Admin_Shops () {
                     <img className='shopProfileImgCard' src={ `https://localhost:7017/${shopItem.image}` } />
                     <div className='col-md-8 adminShop-card-details'>
                         <h5 className="supplier-card-title">{shopItem.shopName}</h5>
-                        <h5 className='shop-rating-card'><img className="ratingIcon" src={ starIcon }/>No Rating Yet</h5>
+                        <h5 className='shop-rating-card'>
+                            <img className="ratingIcon" src={starIcon} />
+                            {averageRatingSupplier && averageRatingSupplier[shopItem.id] ?
+                                averageRatingSupplier[shopItem.id].toFixed(1) : "No rating yet"}
+                        </h5>
                         <h5 className='shop-rating-card'>{shopItem.address}</h5>
                     </div>
                 </div>
@@ -268,18 +324,6 @@ function Admin_Shops () {
                                     </div>
                                     {/* check button product types */}
                                     <div className="col-md-8 prod-type-checkbox">
-                                        {/* <h4 className="type-filter-label">
-                                            <input 
-                                                className="form-check-input prod-cart-checkBox" 
-                                                type="radio" 
-                                                value="1" 
-                                                name="productType"
-                                                id="shopProdTypeAll"
-                                                checked={selectedProductType === '1'}
-                                                onChange={handleProductTypeChange}
-                                            />
-                                            <hr/> All
-                                        </h4> */}
                                         <h4 className="type-filter-label">
                                             <input 
                                                 className="form-check-input prod-cart-checkBox" 
@@ -454,9 +498,10 @@ function Admin_Shops () {
                                         <div className='admin-viewProds-card'>
                                             <img className='admin-viewProd-img' src={ `https://localhost:7017/${product.image}` }/>
                                             <h4 className='col-md-4 admin-prodName' style={{ display:'flex', flexFlow:'column' }}>{product.productName}
-                                                <span className='admin-prodRating' style={{ color:'white', marginTop:'8px', display:'flex', alignItems:'center' }}>
+                                                <span className='admin-prodRating' style={{ color:'white', marginTop:'8px', display:'flex', alignItems:'center' }}></span>
                                                     <img style={{ marginRight:'5px', width:'100%', maxWidth:'12px' }} src={ prodRating } alt="product rating icon" />
-                                                    No rating yet</span>
+                                                    {averageRatingProduct && averageRatingProduct[product.productId] ? averageRatingProduct[product.productId].toFixed(1) : "No rating yet"}
+                                                </span>
                                             </h4>
                                             <h4 className='col-md-3 admin-prodStocks'>Total Stocks:
                                                 <span className='totalStocks-adminProd'>{totalStock(product.sizes)}</span>

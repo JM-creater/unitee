@@ -1,7 +1,5 @@
 import './supplier_dashboard.css'
 import totalSalesIcon from "../../assets/images/icons/dollar.png"
-// import { useEffect, useState } from 'react';
-// import { useParams } from 'react-router';
 import {
     Chart as ChartJS,
     BarElement,
@@ -12,6 +10,9 @@ import {
 } from 'chart.js';
 
 import { Bar } from 'react-chartjs-2';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router';
+import axios from 'axios';
 
 ChartJS.register(
     BarElement,
@@ -21,7 +22,24 @@ ChartJS.register(
     Legend
 )
 
-function Supplier (){
+
+function Supplier () {
+
+    const [topSellingProducts, setTopSellingProducts] = useState([]);
+    const { id } = useParams();
+
+    useEffect(() => {
+        const fetchTopSellingProducts = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Product/top-selling-by-shop/${id}`);
+                setTopSellingProducts(response.data);
+            } catch (error) {
+                console.error('Error fetching data: ', error);
+            }
+        }
+        fetchTopSellingProducts();
+    }, [id]);
+
     // BAR GRAPH
     const data = {
         labels: ['January', 'February', 'March'],
@@ -60,8 +78,6 @@ function Supplier (){
     const options = {
 
     }
-    
-    // END OF BAR GRAPH``
 
     return (
         <div className='orders-supplier-main-container'>    
@@ -71,21 +87,21 @@ function Supplier (){
                     <div className='card-content-container'>
                         <div className='col-md-9 dash-card'>
                             <span>Weekly Sales</span>
-                            <h1 className='col-md-11 number-dash'></h1>
+                            <h1 className='col-md-11 number-dash'>0</h1>
                         </div>
                         <img className='dash-card-icon' src={ totalSalesIcon } alt="Total Sales Icon"/>
                     </div>
                     <div className='card-content-container'>
                         <div className='col-md-9 dash-card'>
                             <span>Monthly Sales</span>
-                            <h1 className='col-md-11 number-dash'></h1>
+                            <h1 className='col-md-11 number-dash'>0</h1>
                         </div>
                         <img className='dash-card-icon' src={ totalSalesIcon } alt="Total Orders Icon"/>
                     </div>
                     <div className='card-content-container'>
                         <div className='col-md-9 dash-card'>
                             <span>Yearly Sales</span>
-                            <h1 className='col-md-11 number-dash'></h1>
+                            <h1 className='col-md-11 number-dash'>0</h1>
                         </div>
                         <img className='dash-card-icon' src={ totalSalesIcon } alt="Total Products Icon"/>
                     </div>
@@ -102,7 +118,7 @@ function Supplier (){
                     <h1 style={{ color:'#020654' }}>Sales Review</h1>
                     <span>Your average sales for the past 
                         <span className='num-months-chartReview'> number of months </span>
-                            is <span className='total-sales-chartReview'> $100000</span>
+                            is <span className='total-sales-chartReview'>0</span>
                     </span>
                     <Bar
                         style={{ marginTop:'15px' }}
@@ -120,28 +136,18 @@ function Supplier (){
 
             </div>
             <div className='top-selling-prods-container'>
-                    <h3 className='top-selling-prods-title'>Top Selling Products</h3>
-                    <div className='top-prods-container'>
-                        <span className='top-prod-name'>No Product Yet</span>
+            <h3 className='top-selling-prods-title'>Top Selling Products</h3>
+            {topSellingProducts.length > 0 ? 
+                topSellingProducts.slice(0, 5).map(product => (
+                    <div key={product.productId} className='top-prods-container'>
+                        <img className='top-prod-img' src={`https://localhost:7017/${product.image}`} alt={product.productName} />
+                        <span className='top-prod-name'>{product.productName}</span>
+                        <span className='top-prod-price'>₱{product.price}</span>
                     </div>
-                    {/* <div className='top-prods-container'>
-                        <img className='top-prod-img' src={ topProd } />
-                        <span className='top-prod-name'>No Product Yet</span>
-                        <span className='top-prod-price'>₱0</span>
-                    </div>
-
-                    <div className='top-prods-container'>
-                        <img className='top-prod-img' src={ topProd } />
-                        <span className='top-prod-name'>No Product Yet</span>
-                        <span className='top-prod-price'>₱0</span>
-                    </div>
-
-                    <div className='top-prods-container'>
-                        <img className='top-prod-img' src={ topProd } />
-                        <span className='top-prod-name'>No Product Yet</span>
-                        <span className='top-prod-price'>₱0</span>
-                    </div> */}
-                </div>         
+                )) 
+                : <span>No Top Selling Products Found</span>
+            }
+        </div>    
         </div>
     )
 }

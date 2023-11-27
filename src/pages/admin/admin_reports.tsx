@@ -207,7 +207,7 @@ function Admin_Reports () {
                     {/* WEEKLY */}
                     <div className='col-md-9'>
                         <h5 className='header-adminSales-label'>Weekly Sales</h5>
-                        <h3>4533</h3>
+                        <h3>0</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
                 </div>
@@ -216,7 +216,7 @@ function Admin_Reports () {
                 <div className='admin-sales-card'>
                     <div className='col-md-9'>
                         <h5 className='header-adminSales-label'>Monthly Sales</h5>
-                        <h3>4533</h3>
+                        <h3>0</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
                 </div>
@@ -225,7 +225,7 @@ function Admin_Reports () {
                 <div className='admin-sales-card'>
                     <div className='col-md-9'>
                         <h5 className='header-adminSales-label'>Yearly Sales</h5>
-                        <h3>4533</h3>
+                        <h3>0</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
                 </div>
@@ -233,10 +233,7 @@ function Admin_Reports () {
             {/* GENERATE REPORT BUTTON */}
             <button className='admin-generate-report-btn' onClick={HandleExportToExcel}>Generate Report</button>
         </div>
-        {/* END OF HEADER CARDS */}
 
-
-        {/* BAR AND CHART GRAPH CONTAINER */}
         <div 
         style={{ display:'flex', flexFlow:'row', justifyContent:'space-evenly' }}>
             {/* SALES REVIEW BAR CHART */}
