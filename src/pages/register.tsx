@@ -120,7 +120,7 @@ function Register() {
         if (response.data) {
           registerUsersEventEmitter.emit("registerCustomer");
           toast.success('Successfully registered.', {
-            onClose: () => navigate('/')
+            onClose: () => navigate('/confirmation_email')
           });
           await sleep(1000);
         } else {
