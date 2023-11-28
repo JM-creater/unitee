@@ -38,6 +38,7 @@ import Reports from './pages/supplier/reports'
 import Forgot_Password from './pages/forgot_password'
 import Supplier_Chat from './pages/supplier/supplier_chat'
 import Chat from './pages/main/chat'
+import Confirmation_Code from './pages/confirmation_email'
 // import Unauthorized_Error from './pages/common/unauthorized_error'
 // import Internal_Error from './pages/common/internal_error'
 // import Bad_Request from './pages/common/bad_request'
@@ -59,6 +60,7 @@ function App() {
         <Routes>
           <Route index element={ <Login/> }/>
           <Route path='/accountType' element={ <AccountType /> }/>
+          <Route path='/confirmation_email' element={ <Confirmation_Code /> }/>
           <Route path='/register' element={ <Register/> }/>
           <Route path='/register_supplier' element={ <RegisterSupplier/> }/>
           <Route path='/forgot_password' element={ <Forgot_Password/> }/>

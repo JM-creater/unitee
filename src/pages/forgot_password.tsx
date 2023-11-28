@@ -59,7 +59,7 @@ function Forgot_Password () {
     };
 
 
-    return  (
+    return (
         <React.Fragment>
         {isLoading ? (
             <React.Fragment>
