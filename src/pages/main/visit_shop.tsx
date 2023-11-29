@@ -683,14 +683,23 @@ function Visit_Shop () {
                             className="btn-close"
                             data-bs-dismiss="modal" 
                             aria-label="Close"
-                            onClick={HandleCloseButton}
+                            onClick={() => window.location.reload()}
                         >
                         </button>
-                    </div>
+                    </div> 
                     <div className="image-container">
+                        {/* {selectedProduct && selectedProduct.sizeGuide ? (
+                            <img 
+                                className="prodSizeGuideModal-Image" 
+                                src={`https://localhost:7017/${selectedProduct.sizeGuide}`} 
+                                alt="Size Guide" 
+                            />
+                        ) : (
+                            <p>Size guide not available.</p>
+                        )} */}
                         <img className="prodSizeGuideModal-Image" src={ MWSizing }/>
                         <img className="prodSizeGuideModal-Image" src={ UNISEX } />
-                    </div>         
+                    </div>     
                 </div>
             </div>
         </div>
