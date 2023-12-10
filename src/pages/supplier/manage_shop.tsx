@@ -976,7 +976,7 @@ function Manage_Shop() {
                           id="productFrontImage2"
                           alt="Upload Product"
                           className="supplier-modal-addprod-img"
-                          src={selectedProduct && selectedProduct.frontViewImage ? `https://localhost:7017/${selectedProduct.frontViewImage}` : prodImage}
+                          src={newSelectedFrontImage ? `https://localhost:7017/${newSelectedFrontImage}` : prodImage}
                           onClick={handleFrontClick2}
                         />
                         <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
