@@ -53,7 +53,7 @@ function Supplier_Orders () {
     const statuses = [
       { key: 'Pending', href: '#supplier-pending-order' },
       { key: 'Approved', href: '#supplier-approved-order' },
-      { key: 'For Pick Up', href: '#supplier-forpickup-order' },
+      { key: 'ForPickUp', href: '#supplier-forpickup-order' },
       { key: 'Completed', href: '#supplier-completed-order' },
       { key: 'Canceled', href: '#supplier-canceled-order' },
     ];
@@ -283,18 +283,25 @@ function Supplier_Orders () {
     const updateNotification = useCallback(() => {
       axios.get(`https://localhost:7017/Notification/supplierUnread/${id}`)
         .then(response => {
-          const counts = { ...statusCounts };
+          // Reset the counts to their initial state
+          const resetCounts = {
+            Pending: 0,
+            Approved: 0,
+            ForPickUp: 0,
+            Completed: 0,
+            Canceled: 0
+          };
+          // Update the counts based on new notifications
           response.data.forEach(notification => {
             const orderStatus = notification.order && notification.order.status;
             const statusName = StatusMapping[orderStatus];
-            if (counts[statusName] !== undefined) {
-              counts[statusName] += 1;
+            if (resetCounts[statusName] !== undefined) {
+              resetCounts[statusName] += 1;
             }
           });
-          setStatusCounts(counts);
+          setStatusCounts(resetCounts);
         })
         .catch(error => console.error(error));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
   
     // * Fetch New Order Notification
@@ -356,9 +363,7 @@ function Supplier_Orders () {
                           <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
                           <td className="text-center">{orderItem.orderNumber}</td>
                           <td className="text-center">
-                            {Status[Object.keys(Status)[orderItem.status - 1]] === Status.Pending 
-                              ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).length 
-                              : ''}
+                            {orderItem.cart && orderItem.cart.items ? orderItem.cart.items.length : 0}
                           </td>
                           <td className="text-center">₱{orderItem.total}</td>
                           <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
@@ -398,9 +403,7 @@ function Supplier_Orders () {
                             <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
                             <td className="text-center">{orderItem.orderNumber}</td>
                             <td className="text-center">
-                            {Status[Object.keys(Status)[orderItem.status - 1]] === Status.Approved 
-                              ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Approved).length 
-                              : ''}
+                              {orderItem.cart && orderItem.cart.items ? orderItem.cart.items.length : 0}
                             </td>
                             <td className="text-center">₱{orderItem.total}</td>
                             <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
@@ -440,9 +443,7 @@ function Supplier_Orders () {
                             <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
                             <td className="text-center">{orderItem.orderNumber}</td>
                             <td className="text-center">
-                            {Status[Object.keys(Status)[orderItem.status - 1]] === Status.ForPickUp 
-                              ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.ForPickUp).length 
-                              : ''}
+                              {orderItem.cart && orderItem.cart.items ? orderItem.cart.items.length : 0}
                             </td>
                             <td className="text-center">₱{orderItem.total}</td>
                             <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
@@ -482,9 +483,7 @@ function Supplier_Orders () {
                             <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
                             <td className="text-center">{orderItem.orderNumber}</td>
                             <td className="text-center">
-                            {Status[Object.keys(Status)[orderItem.status - 1]] === Status.Completed 
-                              ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Completed).length 
-                              : ''}
+                              {orderItem.cart && orderItem.cart.items ? orderItem.cart.items.length : 0}
                             </td>
                             <td className="text-center">₱{orderItem.total}</td>
                             <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
@@ -524,9 +523,7 @@ function Supplier_Orders () {
                             <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
                             <td className="text-center">{orderItem.orderNumber}</td>
                             <td className="text-center">
-                            {Status[Object.keys(Status)[orderItem.status - 1]] === Status.Canceled 
-                              ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Canceled).length 
-                              : ''}
+                              {orderItem.cart && orderItem.cart.items ? orderItem.cart.items.length : 0}
                             </td>
                             <td className="text-center">₱{orderItem.total}</td>
                             <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
@@ -640,21 +637,21 @@ function Supplier_Orders () {
                                   <tr>
                                   <th scope="col">Product Name</th>
                                   <th scope="col">Product Type</th>
-                                  <th scope="col">Gender</th>
-                                  <th scope="col">Size</th>
-                                  <th scope="col">Quantity</th>
-                                  <th scope="col">Price</th>
+                                  <th className="text-center" scope="col">Gender</th>
+                                  <th className="text-center" scope="col">Size</th>
+                                  <th className="text-center" scope="col">Quantity</th>
+                                  <th className="text-center" scope="col">Price</th>
                                   </tr>
                               </thead>
                               <tbody>
                               {selectedOrders && Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Pending && (
                                 <tr>
                                   <th scope="row">{selectedOrders.cart.items[0].product.productName}</th>
-                                  <td>{getProductTypeName(selectedOrders.cart.items[0].product.productTypeId)}</td>
-                                  <td>{selectedOrders.cart.items[0].product.category}</td>
-                                  <td>{selectedOrders.cart.items[0].sizeQuantity.size}</td>
-                                  <td>{selectedOrders.cart.items[0].quantity}</td>
-                                  <td>{selectedOrders.cart.items[0].product.price}</td>
+                                  <td >{getProductTypeName(selectedOrders.cart.items[0].product.productTypeId)}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].product.category}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].sizeQuantity.size}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].quantity}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].product.price}</td>
                                 </tr>
                               )}
                               </tbody>
@@ -757,10 +754,10 @@ function Supplier_Orders () {
                                   <tr>
                                     <th scope="col">Product Name</th>
                                     <th scope="col">Product Type</th>
-                                    <th scope="col">Gender</th>
-                                    <th scope="col">Size</th>
-                                    <th scope="col">Quantity</th>
-                                    <th scope="col">Price</th>
+                                    <th className="text-center" scope="col">Gender</th>
+                                    <th className="text-center" scope="col">Size</th>
+                                    <th className="text-center" scope="col">Quantity</th>
+                                    <th className="text-center" scope="col">Price</th>
                                   </tr>
                               </thead>
                               <tbody>
@@ -768,10 +765,10 @@ function Supplier_Orders () {
                                 <tr>
                                   <th scope="row">{selectedOrders.cart.items[0].product.productName}</th>
                                   <td>{getProductTypeName(selectedOrders.cart.items[0].product.productTypeId)}</td>
-                                  <td>{selectedOrders.cart.items[0].product.category}</td>
-                                  <td>{selectedOrders.cart.items[0].sizeQuantity.size}</td>
-                                  <td>{selectedOrders.cart.items[0].quantity}</td>
-                                  <td>{selectedOrders.cart.items[0].product.price}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].product.category}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].sizeQuantity.size}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].quantity}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].product.price}</td>
                                 </tr>
                               )}
                               </tbody>
@@ -874,10 +871,10 @@ function Supplier_Orders () {
                                   <tr>
                                   <th scope="col">Product Name</th>
                                   <th scope="col">Product Type</th>
-                                  <th scope="col">Gender</th>
-                                  <th scope="col">Size</th>
-                                  <th scope="col">Quantity</th>
-                                  <th scope="col">Price</th>
+                                  <th className="text-center" scope="col">Gender</th>
+                                  <th className="text-center" scope="col">Size</th>
+                                  <th className="text-center" scope="col">Quantity</th>
+                                  <th className="text-center" scope="col">Price</th>
                                   </tr>
                               </thead>
                               <tbody>
@@ -885,10 +882,10 @@ function Supplier_Orders () {
                                 <tr>
                                   <th scope="row">{selectedOrders.cart.items[0].product.productName}</th>
                                   <td>{getProductTypeName(selectedOrders.cart.items[0].product.productTypeId)}</td>
-                                  <td>{selectedOrders.cart.items[0].product.category}</td>
-                                  <td>{selectedOrders.cart.items[0].sizeQuantity.size}</td>
-                                  <td>{selectedOrders.cart.items[0].quantity}</td>
-                                  <td>{selectedOrders.cart.items[0].product.price}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].product.category}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].sizeQuantity.size}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].quantity}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].product.price}</td>
                                 </tr>
                               )}
                               </tbody>
@@ -978,10 +975,10 @@ function Supplier_Orders () {
                                   <tr>
                                   <th scope="col">Product Name</th>
                                   <th scope="col">Product Type</th>
-                                  <th scope="col">Gender</th>
-                                  <th scope="col">Size</th>
-                                  <th scope="col">Quantity</th>
-                                  <th scope="col">Price</th>
+                                  <th className="text-center" scope="col">Gender</th>
+                                  <th className="text-center" scope="col">Size</th>
+                                  <th className="text-center" scope="col">Quantity</th>
+                                  <th className="text-center" scope="col">Price</th>
                                   </tr>
                               </thead>
                               <tbody>
@@ -989,10 +986,10 @@ function Supplier_Orders () {
                                 <tr>
                                   <th scope="row">{selectedOrders.cart.items[0].product.productName}</th>
                                   <td>{getProductTypeName(selectedOrders.cart.items[0].product.productTypeId)}</td>
-                                  <td>{selectedOrders.cart.items[0].product.category}</td>
-                                  <td>{selectedOrders.cart.items[0].sizeQuantity.size}</td>
-                                  <td>{selectedOrders.cart.items[0].quantity}</td>
-                                  <td>{selectedOrders.cart.items[0].product.price}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].product.category}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].sizeQuantity.size}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].quantity}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].product.price}</td>
                                 </tr>
                               )}
                               </tbody>
@@ -1082,10 +1079,10 @@ function Supplier_Orders () {
                                   <tr>
                                   <th scope="col">Product Name</th>
                                   <th scope="col">Product Type</th>
-                                  <th scope="col">Gender</th>
-                                  <th scope="col">Size</th>
-                                  <th scope="col">Quantity</th>
-                                  <th scope="col">Price</th>
+                                  <th className="text-center" scope="col">Gender</th>
+                                  <th className="text-center" scope="col">Size</th>
+                                  <th className="text-center" scope="col">Quantity</th>
+                                  <th className="text-center" scope="col">Price</th>
                                   </tr>
                               </thead>
                               <tbody>
@@ -1093,10 +1090,10 @@ function Supplier_Orders () {
                                 <tr>
                                   <th scope="row">{selectedOrders.cart.items[0].product.productName}</th>
                                   <td>{getProductTypeName(selectedOrders.cart.items[0].product.productTypeId)}</td>
-                                  <td>{selectedOrders.cart.items[0].product.category}</td>
-                                  <td>{selectedOrders.cart.items[0].sizeQuantity.size}</td>
-                                  <td>{selectedOrders.cart.items[0].quantity}</td>
-                                  <td>{selectedOrders.cart.items[0].product.price}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].product.category}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].sizeQuantity.size}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].quantity}</td>
+                                  <td className="text-center">{selectedOrders.cart.items[0].product.price}</td>
                                 </tr>
                               )}
                               </tbody>

@@ -53,11 +53,17 @@ function Manage_Shop() {
     const [newSelectedImage, setNewSelectedImage] = useState<File | null>(null);
 
     const [selectedFrontImage, setSelectedFrontImage] = useState<File | null>(null);
+    const [newSelectedFrontImage, setNewSelectedFrontImage] = useState<File | null>(null);
 
     const [selectedSideImage, setSelectedSideImage] = useState<File | null>(null);
+    const [newSelectedSideImage, setNewSelectedSideImage] = useState<File | null>(null);
 
     const [selectedBackImage, setSelectedBackImage] = useState<File | null>(null);
-    
+    const [newSelectedBackImage, setNewSelectedBackImage] = useState<File | null>(null);
+
+    const [sizeGuide, setSizeGuide] = useState<File | null>(null);
+    const [newSizeGuide, setNewSizeGuide] = useState<File | null>(null);
+
     const [NewisActive, setNewIsActive] = useState(); 
 
     const [selectedDepartments, setSelectedDepartments] = useState([]);
@@ -68,6 +74,9 @@ function Manage_Shop() {
     const frontImageRef = useRef<HTMLInputElement>(null);
     const sideImageRef = useRef<HTMLInputElement>(null);
     const backImageRef = useRef<HTMLInputElement>(null);
+    const sizeGuideRef = useRef<HTMLInputElement>(null);
+
+    const frontImageRef2 = useRef<HTMLInputElement>(null);
 
     // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -126,17 +135,25 @@ function Manage_Shop() {
       }
     }
 
+     // * Side Image Click
     const handleSideClick = () => {
       if (sideImageRef.current) {
         sideImageRef.current.click();
       }
     }
 
+     // * Back Image Click
     const handleBackClick = () => {
       if (backImageRef.current) {
         backImageRef.current.click();
       }
     }
+
+    // * Front Image Click For Edit
+    const handleFrontClick2 = () => {
+      frontImageRef2.current.click();
+    }
+
 
     // * Category Change for Add
     const handleCategoryChange = (e, gender) => {
@@ -152,6 +169,17 @@ function Manage_Shop() {
       }
     };
 
+    // * Handle Size Guide Image for Add
+    const handleSizeGuideChange = (event) => {
+      setSizeGuide(event.target.files[0]);
+    }
+
+    // * Handle Size Guide Image for Edit
+    const handleSizeGuideChange2 = (event) => {
+      setNewSizeGuide(event.target.files[0]);
+    }
+
+    // ! Add
     // * Upload Main Image for Add
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       if (event.target.files && event.target.files.length > 0) {
@@ -216,8 +244,10 @@ function Manage_Shop() {
       }
     };
 
+
+  // ! Edit  
   // * Upload Image for Edit
-  const handleFileChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMainImageChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setNewSelectedImage(event.target.files[0]);
       const reader = new FileReader();
@@ -225,6 +255,54 @@ function Manage_Shop() {
         if (e.target && e.target.result) {
           document
             .getElementById("productImage2")!
+            .setAttribute("src", e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  };
+
+  // * Upload Front Image for Edit
+  const handleFrontImageChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setNewSelectedFrontImage(event.target.files[0]);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target && e.target.result) {
+          document
+            .getElementById("productFrontImage2")!
+            .setAttribute("src", e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  };
+
+  // * Upload Side Image for Edit
+  const handleSideImageChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setNewSelectedSideImage(event.target.files[0]);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target && e.target.result) {
+          document
+            .getElementById("productSideImage2")!
+            .setAttribute("src", e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  };
+
+  // * Upload Back Image for Edit
+  const handleBackImageChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setNewSelectedBackImage(event.target.files[0]);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target && e.target.result) {
+          document
+            .getElementById("productBackImage2")!
             .setAttribute("src", e.target.result as string);
         }
       };
@@ -340,6 +418,10 @@ function Manage_Shop() {
       if (!newTypeId) errorMessages.push("Product Type is required");
       if (!newSelectedDepartments) errorMessages.push("Department is required");
       if (!newSelectedImage) errorMessages.push("Image is required");
+      if (!selectedFrontImage) errorMessages.push("Front Image is required");
+      if (!selectedSideImage) errorMessages.push("Side Image is required");
+      if (!selectedBackImage) errorMessages.push("Back Image is required");
+      if (!sizeGuide) errorMessages.push("Size Guide is required");
       if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
 
       if (errorMessages.length > 0) {
@@ -354,6 +436,10 @@ function Manage_Shop() {
       formData.append("Category", newCategory);
       formData.append("Price", newPrice);
       formData.append("Image", newSelectedImage as File);
+      formData.append("FrontViewImage", newSelectedFrontImage as File);
+      formData.append("SideViewImage", newSelectedSideImage as File);
+      formData.append("BackViewImage", newSelectedBackImage as File);
+      formData.append("SizeGuide", newSizeGuide as File);
       formData.append("SupplierId", id);
       newSelectedDepartments.forEach(departmentId => {
         formData.append('DepartmentIds', departmentId);
@@ -424,6 +510,7 @@ function Manage_Shop() {
     if (!selectedFrontImage) errorMessages.push("Front Image is required");
     if (!selectedSideImage) errorMessages.push("Side Image is required");
     if (!selectedBackImage) errorMessages.push("Back Image is required");
+    if (!sizeGuide) errorMessages.push("Size Guide is required");
     if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
 
     if (errorMessages.length > 0) {
@@ -441,6 +528,7 @@ function Manage_Shop() {
     formData.append("FrontViewImage", selectedFrontImage as File);
     formData.append("SideViewImage", selectedSideImage as File);
     formData.append("BackViewImage", selectedBackImage as File);
+    formData.append("SizeGuide", sizeGuide as File);
     formData.append("SupplierId", id);
     selectedDepartments.forEach(departmentId => {
       formData.append('DepartmentIds', departmentId);
@@ -554,6 +642,10 @@ function Manage_Shop() {
                       setNewName(productItem.productName);
                       setNewProductType(productItem.productTypeId);
                       setNewSelectedImage(productItem.image);
+                      setNewSelectedFrontImage(productItem.frontViewImage);
+                      setNewSelectedSideImage(productItem.sideViewImage);
+                      setNewSelectedBackImage(productItem.backViewImage);
+                      setNewSizeGuide(productItem.sizeGuide);
                       handleCategoryChange2(productItem.category);
                       selectProductForEditing(productItem);
                     }}
@@ -803,6 +895,9 @@ function Manage_Shop() {
                   onKeyDown={handleKeyDown}
                 />
 
+                <h2 className="prod-details-labels">Upload Size Guide:</h2>
+                <input type="file" ref={sizeGuideRef} className="size-guide-img" accept="image/png, image/gif, image/jpeg" onChange={handleSizeGuideChange}/>
+
                 {/* SIZES AVAILABLE CHECKBOX */}
                 <label className="prod-details-labels">Sizes Available</label>
                 <div className="suppliers-sizes-avail-checkbox">
@@ -852,10 +947,11 @@ function Manage_Shop() {
                     <button type="button" className="save-prod-btn" onClick={handleEdit}>Save</button>
                 </div>
             </div>
+
             <div className="modal-body" style={{ display:'flex', flexFlow:'row' }}>
                 <div>
                     <div className="thumbnail-container">
-                        <h3 className="prod-info-titles">Product Image</h3>
+                        <h3 className="prod-info-titles">Main Image</h3>
                         <img
                           id="productImage2"
                           alt="Upload Product"
@@ -869,7 +965,67 @@ function Manage_Shop() {
                           type="file"
                           name="prodImage"
                           accept="image/*"
-                          onChange={handleFileChange2}
+                          onChange={handleMainImageChange2}
+                          style={{ display: "none" }}
+                        />
+                    </div>
+
+                    <div className="thumbnail-container">
+                        <h3 className="prod-info-titles">Front Image</h3>
+                        <img
+                          id="productFrontImage2"
+                          alt="Upload Product"
+                          className="supplier-modal-addprod-img"
+                          src={newSelectedFrontImage ? `https://localhost:7017/${newSelectedFrontImage}` : prodImage}
+                          onClick={handleFrontClick2}
+                        />
+                        <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
+                        <input
+                          ref={frontImageRef2}
+                          type="file"
+                          name="prodImage"
+                          accept="image/*"
+                          onChange={handleFrontImageChange2}
+                          style={{ display: "none" }}
+                        />
+                    </div>
+
+                    <div className="thumbnail-container">
+                        <h3 className="prod-info-titles">Side Image</h3>
+                        <img
+                          id="productSideImage2"
+                          alt="Upload Product"
+                          className="supplier-modal-addprod-img"
+                          src={newSelectedSideImage?`https://localhost:7017/${newSelectedSideImage}`: prodImage}  
+                          onClick={handleImageClick}
+                        />
+                        <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
+                        <input
+                          ref={sideImageRef}
+                          type="file"
+                          name="prodImage"
+                          accept="image/*"
+                          onChange={handleSideImageChange2}
+                          style={{ display: "none" }}
+                        />
+                    </div>
+
+                    <div className="thumbnail-container">
+                        <h3 className="prod-info-titles">Back Image</h3>
+                        <img
+                          id="productBackImage2"
+                          alt="Upload Product"
+                          className="supplier-modal-addprod-img"
+                          src={newSelectedBackImage?`https://localhost:7017/${newSelectedBackImage}`: prodImage}  
+                          onClick={handleImageClick}
+                        />
+                        <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
+                        <input
+                          ref={backImageRef}
+                          type="file"
+                          name="prodImage"
+                          accept="image/*"
+                          onChange={handleBackImageChange2}
                           style={{ display: "none" }}
                         />
                     </div>
@@ -979,6 +1135,9 @@ function Manage_Shop() {
                             </option>
                         ))}
                     </select>
+
+                    <h2 className="prod-details-labels">Upload Size Guide:</h2>
+                    <input type="file" ref={sizeGuideRef} className="size-guide-img" accept="image/png, image/gif, image/jpeg" onChange={handleSizeGuideChange2}/>
 
                     {/* SIZES AVAILABLE CHECKBOX */}
                     <label className="prod-details-labels">Sizes Available</label>

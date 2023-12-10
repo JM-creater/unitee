@@ -848,9 +848,9 @@ function Notif() {
                   <p>
                     <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
                   </p>
-                  <p>
+                  {/* <p>
                     <span className="font-weight-bold">Estimated pickup date for your order. {formatDate(notificationItem.order.estimateDate)}</span>
-                  </p>
+                  </p> */}
                 </div>
               </div>
               {/* Add class 'active' to progress */}

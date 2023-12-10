@@ -8,7 +8,7 @@ import homeIcon from "../../assets/images/icons/homeIcon.png";
 import carts from "../../assets/images/icons/cartIcon.png";
 import orders from "../../assets/images/icons/shopping-bag-4.png";
 import notification from "../../assets/images/icons/notifIcon.png";
-import chatCustomer from "../../assets/images/icons/chat.png";
+//import chatCustomer from "../../assets/images/icons/chat.png";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -233,9 +233,9 @@ function Main() {
                 <img className="nav-icon" src={homeIcon} />
               </Link>
 
-              <Link className="customer-nav-link" to="chat">
+              {/* <Link className="customer-nav-link" to="chat">
                 <img className="nav-icon" src={chatCustomer} />
-              </Link>
+              </Link> */}
 
               <div className="customer-nav-link">
                 <div className="cart-icon-container">
