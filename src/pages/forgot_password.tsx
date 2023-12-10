@@ -1,40 +1,37 @@
-import "./forgot_password.css";
-import studentImg from "../../src/assets/images/forgot-pass-student-img.png";
-import submitIcon from "../../src/assets/images/icons/arrow.png";
-import backIcon from "../../src/assets/images/icons/back-2.png";
-import uniteeLogo from "../../src/assets/images/unitee.png";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import React from "react";
+import './forgot_password.css'
+import studentImg from '../../src/assets/images/forgot-pass-student-img.png'
+import submitIcon from "../../src/assets/images/icons/arrow.png"
+import backIcon from "../../src/assets/images/icons/back-2.png"
+import uniteeLogo from "../../src/assets/images/unitee.png"
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
+import React from 'react'
 import LoadingGif from '../assets/images/icons/loadingscreen.svg'
 
-type ValidationErrors = {
-  newPassword?: string;
-  confirmPassword?: string;
-};
+function Forgot_Password () {
 
-function Forgot_Password() {
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [resetToken, setResetToken] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [resetToken, setResetToken] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
 
-  // * For Delay
-  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    // * For Delay
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-  useEffect(() => {
-    const token = new URLSearchParams(location.search).get("token");
-    setResetToken(token);
-  }, [location]);
+    useEffect(() => {
+        const token = new URLSearchParams(location.search).get('token');
+        setResetToken(token);
+    }, [location]);
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSubmit(e);
-    }
-}  
+    // * Reset Password 
+    const handleSubmit = async () => {
+        if (newPassword !== confirmPassword) {
+            toast.error("Passwords do not match");
+            return;
+        }
 
   // * Reset Password
   const handleSubmit = async (event) => {
