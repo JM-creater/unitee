@@ -158,7 +158,7 @@ function Register() {
         if (response.data) {
           registerUsersEventEmitter.emit("registerSupplier");
           toast.success('Successfully registered.', {
-            onClose: () => navigate('/')
+            onClose: () => navigate('/confirmation_email')
           });
           localStorage.setItem('showSupplierIDModal', 'true');
           localStorage.setItem('generatedSupplierID', IDNumber);

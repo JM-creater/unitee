@@ -7,7 +7,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import React from 'react'
-import LoadingScreen from './common/LoadingScreen'
+import LoadingGif from '../assets/images/icons/loadingscreen.svg'
 
 function Forgot_Password () {
 
@@ -62,9 +62,9 @@ function Forgot_Password () {
     return (
         <React.Fragment>
         {isLoading ? (
-            <React.Fragment>
-                <LoadingScreen />
-            </React.Fragment>
+            <div className="mainloading-screen">
+                <img className='mainloading-bar' src={LoadingGif} alt="loading..." />
+            </div>
         ) : (
             <div className="forgot-pwd-main-container">
             <div className="forgot-pwd-subContainer">
