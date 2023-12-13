@@ -179,20 +179,20 @@ function Login() {
   // * Handle Reset Password with Email
   const HandleResetPassword = async () => {
     try {
-      const response = await fetch('https://localhost:7017/Users/forgot-password?email=' + resetEmail, {
-        method: 'POST',
-      });
-      const data = await response.json();
-      if (response.ok) {
+      const response = await axios.post(`https://localhost:7017/Users/forgot-password?email=${resetEmail}`);
+      if (response.data) {
         toast.success("Please check your email");
         setResetEmail('');
-      } else {
-        console.error("Error in password reset", data);
       }
     } catch (error) {
-      console.error("Error in sending password reset email", error);
+      if (error.response && error.response.status === 400) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('An error occurred. Please try again later.');
+      }
     }
   };
+  
 
   return (
     <React.Fragment>
