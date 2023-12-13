@@ -62,8 +62,11 @@ function Forgot_Password() {
           toast.error("Failed to update the password");
         }
       } catch (error) {
-        toast.error("An error occurred");
-        console.error(error);
+        if (error.response && error.response.status === 400) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error('An error occurred. Please try again later.');
+        }
       }
       setIsLoading(false);
     }
