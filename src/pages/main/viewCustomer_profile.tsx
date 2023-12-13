@@ -9,7 +9,7 @@ import { useParams } from 'react-router'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
-type ValidationErrors = {
+  type ValidationErrors = {
     firstName?: string;
     lastName?: string;
     email?: string;
@@ -31,7 +31,6 @@ type ValidationErrors = {
     gender: string;
     image: string;
   };
-  
 
 function ViewCustomer_Profile () {
 
@@ -45,7 +44,6 @@ function ViewCustomer_Profile () {
     const [departmentId, setDepartmentId] = useState('');
     const [departments, setDepartments] = useState([]);
     const [gender, setGender] = useState('');
-    //const [isDisabled, setIsDisabled] = useState(false);
     const {userId} = useParams();
 
     // * For Delay
@@ -61,12 +59,12 @@ function ViewCustomer_Profile () {
 
     // * Handle Phone Number
     const handlePhoneNumber = (value) => {
-        if (/^[0-9]*$/.test(value)) {
-          setPhoneNumber(value);
-        } else {
-          toast.error('Phone Number must contain only numbers.');
-        }
-      };
+      if (/^[0-9]*$/.test(value)) {
+        setPhoneNumber(value);
+      } else {
+        toast.error('Phone Number must contain only numbers.');
+      }
+    };
 
     // * Fetch User Data
     useEffect(() => {

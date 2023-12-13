@@ -295,7 +295,7 @@ function Cart () {
           if(error.response && error.response.status === 400) {
             toast.error(error.response.data.message);
           } else {
-            console.log("Error in placing order");
+            toast.error("Error in placing order");
           }
         }
       }
