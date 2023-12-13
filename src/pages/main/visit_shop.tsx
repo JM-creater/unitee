@@ -251,39 +251,44 @@ function Visit_Shop () {
     const addToCart = () => {
         const CloseBtn = document.getElementById("btnClose");
         if (!selectedProduct) return;
-    
+
         if (!selectedSize) {
             toast.warning("Please select a size.");
             return;
         }
-    
+
         if (quantity <= 0) {
             toast.warning("Please select a valid quantity.");
             return;
         }
-    
+
         const cartAddRequest = {
             userId: userId,
             productId: selectedProduct.productId,
             size: selectedSize,
             quantity: quantity
         };
-    
+
         axios.post('https://localhost:7017/Cart/add', cartAddRequest)
-        .then(() => {
-            toast.success("Item added to cart");
-            cartEventEmitter.emit("itemAddedToCart");
-            CloseBtn.click();
-            HandleCloseButton();
-            return axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
-        })
-        .then(updatedCartResponse => {
-            setCart(updatedCartResponse.data);
-        })
-        .catch(() => {
-            toast.error("Error adding item to cart. Please try again.");
+            .then(() => {
+                toast.success("Item added to cart");
+                cartEventEmitter.emit("itemAddedToCart");
+                CloseBtn.click();
+                HandleCloseButton();
+                return axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
+            })
+            .then(updatedCartResponse => {
+                setCart(updatedCartResponse.data);
+            })
+            .catch(error => {
+                if (error.response && error.response.status === 400) {
+                    toast.error(error.response.data.message);
+                } else {
+                    toast.error("Error adding item to cart. Please try again.");
+                }
         });
     };
+
 
     // * Update the Product Details Modal
     useEffect(() => {

@@ -1007,7 +1007,7 @@ function Supplier_Orders () {
         <div className="modal-dialog modal-fullscreen">
             <div className="modal-content" style={{ padding:'20px' }}>
                 <div className="pending-header">
-                    <h1 className="modal-title" id="exampleModalLabel">Completed Orders</h1>
+                    <h1 className="modal-title" id="exampleModalLabel">Canceled Orders</h1>
                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
                 </div>
                 <div className="modal-basta-container">
