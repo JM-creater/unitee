@@ -105,32 +105,46 @@ function Supplier (){
 
 
         </div>
-        <div className='col pending-orders-dash'>
-            <h3 style={{ marginBottom: '20px' }}>Pending Orders</h3>
-            {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).length > 0 ? (
-                    <Link to={`/supplier_dashboard/${id}/supplier_orders`} className='no-underline-link'>
-                        {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).map((orderItem, orderIndex) => (
-                            <div key={orderIndex} className='dash-pending-ords-container'>
-                                {orderItem.cart.items.length > 0 && (
-                                    <img className='cust-profile-pendOrder' 
-                                        src={`https://localhost:7017/${orderItem.cart.items[0].product.image}`} 
-                                        alt="Product" />
-                                )}
-                                <div className='cust-details-container'>
-                                    <span className='cust-name-dash'>{orderItem.user.firstName}</span>
-                                    <span className='cust-name-dash total'>₱{orderItem.total}</span>
+        <div className="pending-topRated-main-container">
+            <div className='col pending-orders-dash'>
+                <h3 style={{ marginBottom: '20px' }}>Pending Orders</h3>
+                {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).length > 0 ? (
+                        <Link to={`/supplier_dashboard/${id}/supplier_orders`} className='no-underline-link'>
+                            {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).map((orderItem, orderIndex) => (
+                                <div key={orderIndex} className='dash-pending-ords-container'>
+                                    {orderItem.cart.items.length > 0 && (
+                                        <img className='cust-profile-pendOrder' 
+                                            src={`https://localhost:7017/${orderItem.cart.items[0].product.image}`} 
+                                            alt="Product" />
+                                    )}
+                                    <div className='cust-details-container'>
+                                        <span className='cust-name-dash'>{orderItem.user.firstName}</span>
+                                        <span className='cust-name-dash total'>₱{orderItem.total}</span>
+                                    </div>
+                                    <span className='cust-order-num-dash'>{orderItem.orderNumber}</span>
                                 </div>
-                                <span className='cust-order-num-dash'>{orderItem.orderNumber}</span>
-                            </div>
-                        ))}
-                    </Link>
-                ) : (
-                <div className='no-pending-orders'>
-                    <img src={noOder} alt="No Pending Orders Icon" style={{ width: '100px', height: '100px' }} />
-                    <p>No pending orders available</p>
+                            ))}
+                        </Link>
+                    ) : (
+                    <div className='no-pending-orders'>
+                        <img src={noOder} alt="No Pending Orders Icon" style={{ width: '100px', height: '100px', marginTop:'13em' }} />
+                        <p>No pending orders available</p>
+                    </div>
+                )}
+            </div>
+
+            <div className="top-rated-products-container">
+                <h3>Top 3 Rated Products </h3>
+                <div className="top-rated-prod-container">
+                    {/* <img className='top-prod-img' src={ `https://localhost:7017/${productItem.image}` } /> */}
+                    <img className='top-prod-img' src="/" alt="" />
+                    <span className='top-ratedProd-name'>Sample</span>
+                    <span className='top-ratedProd-rating'>5.0</span>
                 </div>
-            )}
+            </div>
         </div>
+
+        
 
 
         </div>

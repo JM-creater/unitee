@@ -211,3 +211,56 @@
 /* .logout-container {
     margin-bottom: 10px;
 } */
+
+.customer-nav-link .tooltip-text-nav {
+    text-decoration: none;
+    visibility: hidden;
+    width: 50px;
+    background: black;
+    color: #ffff;
+    text-align: center;
+    padding: 5px;
+    border-radius: 5px;
+    position: bottom;
+    z-index: 1;
+}
+
+.customer-nav-link:hover .tooltip-text-nav {
+    visibility: visible;
+    text-decoration: none;
+}
+
+#tooltip {
+    position: relative;
+    cursor: pointer;
+}
+
+#tooltip-text {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    background-color: #020654;
+    color: #fff;
+    white-space: nowrap;
+    padding: 10px 15px;
+    border-radius: 7px;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+#tooltip-text::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    /* bottom:100%; */
+    transform: translateX(-50%);
+    /* border: 15px solid #000; */
+}
+
+#tooltip:hover #tooltip-text {
+    top: 120%;
+    visibility: visible;
+    opacity: 1;
+}

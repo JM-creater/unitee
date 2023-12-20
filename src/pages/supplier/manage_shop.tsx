@@ -812,6 +812,7 @@ function Manage_Shop() {
                   {departments.map((department, index) => (
                     <label key={index}>
                       <input
+                        className="departmentCheckbox"
                         type="checkbox"
                         value={department.departmentId}
                         checked={selectedDepartments.includes(department.departmentId)}
@@ -825,6 +826,7 @@ function Manage_Shop() {
                   <label className="prod-details-labels">Gender</label>
                   <div className="department-option">
                       <input 
+                          className="genderRadio"
                           type="radio" 
                           value="Male" 
                           name="gender"
@@ -839,6 +841,7 @@ function Manage_Shop() {
                   </div>
                   <div className="department-option">
                       <input 
+                          className="genderRadio"
                           type="radio" 
                           value="Female" 
                           name="gender"
@@ -853,6 +856,7 @@ function Manage_Shop() {
                   </div>
                   <div className="department-option">
                       <input 
+                          className="genderRadio"
                           type="radio" 
                           value="Unisex" 
                           name="gender"

@@ -224,12 +224,14 @@ function Main() {
               justifyContent: "space-between",
             }}
           >
-            <Link to="" className="col-md-2">
+            <Link to="" className="col-md-2" id="tooltip">
+            <span id="tooltip-text">Logo</span>
               <img className="logo" src={logo} />
             </Link>
 
             <div className="col-md-6 header-button-container">
-              <Link className="customer-nav-link" to="">
+              <Link className="customer-nav-link" to="" id="tooltip">
+                <span id="tooltip-text">Home</span>
                 <img className="nav-icon" src={homeIcon} />
               </Link>
 
@@ -305,7 +307,8 @@ function Main() {
                 to="notif"
                 onClick={handleNotificationClick}
               >
-                <div className="notif-icon-container">
+                <div className="notif-icon-container" id="tooltip">
+                  <span id="tooltip-text">Notification</span>
                   <img className="nav-icon" src={notification} />
                   {notifItem.length > 0 && (
                     <span className="notif-count">{notifItem.length}</span>
@@ -313,9 +316,10 @@ function Main() {
                 </div>
               </Link>
 
-              <div className="col-md-1 dropdown">
+              <div className="col-md-1 dropdown" id="tooltip">
                 {customer ? (
                   <React.Fragment>
+                    <span id="tooltip-text">Profile</span>
                     <img
                       className="imageProfile"
                       src={`https://localhost:7017/${customer.image}`}
