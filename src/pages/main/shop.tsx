@@ -10,9 +10,10 @@ import LoadingGif from '../../assets/images/icons/loadingscreen.svg'
 
 function Shop() {
 
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [products, setProducts] = useState([]);
     const [shop, setShop] = useState([]);
     const [departmentId, setDepartmentId] = useState<number | null>(null);
-    const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [averageRatingSupplier, setAverageRatingSupplier] = useState({});
     const [, setProductData] = useState([]);
@@ -22,7 +23,7 @@ function Shop() {
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
     // * Handle Search Input
-    const handleSearchInputChange = (event) => {
+    const handleSearchInputChange = (event: { target: { value: React.SetStateAction<string> } }) => {
         setSearchTerm(event.target.value);
     };
 
@@ -120,6 +121,19 @@ function Shop() {
             });
     }, [departmentId]);
 
+    // * Search Product Data
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await axios.get('https://localhost:7017/Product');
+                setProducts(response.data);
+                //console.log(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchProducts();
+    }, []);
 
     return (
     <React.Fragment>
@@ -158,7 +172,7 @@ function Shop() {
                 <div className="search-container">
                     <span className="fa fa-search form-control-feedback search-icon"></span>
                     <input 
-                        className="col-md-4 Supplier-SearchBar"
+                        className="Product-SearchBar"
                         type="text"
                         placeholder="Search Product"
                         value={searchTerm}
@@ -169,6 +183,27 @@ function Shop() {
                             }
                         }}
                     />
+                </div>
+                <div className='search-dropdown'>
+                    {products.filter(productFilter => {
+                        const searchTermLowerCase = searchTerm.toLowerCase();
+                        const productName = productFilter.productName?.toLowerCase();
+
+                        return (
+                            searchTermLowerCase &&
+                            productName?.startsWith(searchTermLowerCase) &&
+                            productName !== searchTermLowerCase
+                        );
+                    }).slice(0, 5).map((productData, index) => (
+                        <div 
+                            key={index} 
+                            className='search-dropdown-row'
+                            onClick={() => performSearch()} 
+                        >
+                            <span className="fa fa-search form-control-feedback search-icon"></span>
+                            {productData.productName}
+                        </div>
+                    ))}
                 </div>
 
                 <div className='col-md-10 shopLabel-text-container'>

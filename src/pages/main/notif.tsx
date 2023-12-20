@@ -825,7 +825,7 @@ function Notif() {
               >
                 Cancel Order
               </button>
-              {/* <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal">View Order Receipt</button> */}
+              <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal">View Order Receipt</button>
               </div>
             </div>
             );

@@ -121,7 +121,7 @@
     align-items: start;
     padding: 20px;
     flex-flow: column;
-    height: 900px;
+    height: fit-content;
 }
 
 .prod-info-titles {
@@ -169,13 +169,17 @@
 
 /* CHECKBOX */
 .suppliers-department-checkbox, .suppliers-sizes-avail-checkbox {
-    width: 100%;
-    max-height: 10rem;
+    max-width: fit-content;
+    max-height: fit-content;
     display: flex;
     justify-content: start;
     align-items: start;
     flex-wrap: wrap;
     flex-direction: column;
+}
+
+.departmentCheckbox, .genderRadio {
+    width: 5em;
 }
 
 .departmentCheckLabel {
@@ -212,6 +216,11 @@
     align-items: center;
     margin-bottom: 5px;
     gap: 5px;
+    flex-wrap: wrap;
+}
+
+.genderRadio {
+    width: 5em;
 }
 
 .quanti-input {

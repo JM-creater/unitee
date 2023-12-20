@@ -56,7 +56,7 @@ function  Search_Product () {
                 }
             } catch (error) {
                 console.log(error);
-                toast.error('Network error or server not responding');
+                //toast.error('Network error or server not responding');
             }
         }
         fetchProducts();
@@ -176,7 +176,6 @@ function  Search_Product () {
             };
         }
     }, []);
-
 
     // * Handle the Selected Size
     const HandleSelectedSize = (event) => {
