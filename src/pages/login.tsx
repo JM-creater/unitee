@@ -31,7 +31,7 @@ function Login() {
 
   const handleCloseButton = () => {
     setResetEmail('');
-  }
+  };
 
   // * Generate Random Id for Supplier
   const generateRandomID = () => {
@@ -70,11 +70,11 @@ function Login() {
     document.execCommand("copy");
     document.body.removeChild(copyClip);
     toast.success("Copied to clipboard: " + text);
-  }
+  };
   
   const handleResetPassword = (value: string) => {
     setResetEmail(value);
-  }
+  };
 
   const handleIDOrEmail = (value: string) => {
     setIDOrEmail(value);
@@ -88,13 +88,13 @@ function Login() {
     if (e.key === 'Enter') {
       handleLogin();
     }
-  }
+  };
 
   const handleKeyDownForgotPassword = (e) => {
     if (e.key === 'Enter') {
       HandleResetPassword();
     }
-  }
+  };
 
   // * Login Account
   const handleLogin = () => {
@@ -139,16 +139,19 @@ function Login() {
         if (result.status === 200) {
           switch (result.data.role) {
             case 'Customer':
+              localStorage.setItem('token', result.data.token);
               setIsLoading(true);
               await sleep(10000);
               navigate(`/shop/${result.data.user.id}`, { state: { userData: result.data.user } });
               break;
             case 'Supplier':
+              localStorage.setItem('token', result.data.token);
               setIsLoading(true);
               await sleep(10000);
               navigate(`/supplier_dashboard/${result.data.user.id}`, { state: { supplierData: result.data.user } });
               break;
             case 'Admin':
+              localStorage.setItem('token', result.data.token);
               setIsLoading(true);
               await sleep(10000);
               navigate(`/admin_dashboard/${result.data.user.id}`, { state: { adminData: result.data.user } });

@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import React from 'react';
 import submitRatingEventEmitter from '../../helpers/SubmitRatingEventEmitter';
+import { FaStar } from 'react-icons/fa'
 
 function Purchase_History () {
 
@@ -324,48 +325,56 @@ function Purchase_History () {
                             </table>
                         </div>
                         {!ratedPurchases.has(selectedPurchases.id) && (
-                            <div>
+                            <div className='rating-container'>
                                 {/* Product Rating */}
-                                <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Product Rating:</h3>
-                                <div className="rating-group">
-                                    {[...Array(5)].map((_, i) => {
-                                        const ratingValue = i + 1;
-                                        return (
-                                            <span className="rating-option" key={ratingValue}>
-                                                <input 
-                                                    type="radio" 
-                                                    id={`product-rating-${ratingValue}`} 
-                                                    name="product-rating" 
-                                                    value={ratingValue} 
-                                                    checked={ratingProduct === ratingValue} 
-                                                    onChange={(e) => setRatingProduct(parseInt(e.target.value))}
-                                                />
-                                                <label htmlFor={`product-rating-${ratingValue}`}>{ratingValue}</label>
-                                            </span>
-                                        );
-                                    })}
+                                <div className='prod-rating'>
+                                    <h3 className='order-details-titles'>Product Rating:</h3>
+                                    <div className="rating-group">
+                                        {[...Array(5)].map((_, i) => {
+                                            const ratingValue = i + 1;
+                                            return (
+                                                <span className="rating-option" key={ratingValue}>
+                                                    {/* <input 
+                                                        type="radio" 
+                                                        id={`product-rating-${ratingValue}`} 
+                                                        name="product-rating" 
+                                                        value={ratingValue} 
+                                                        checked={ratingProduct === ratingValue} 
+                                                        onChange={(e) => setRatingProduct(parseInt(e.target.value))}
+                                                    />
+                                                    <label htmlFor={`product-rating-${ratingValue}`}>{ratingValue}</label> */}
+                                                    <FaStar size={20} />
+                                                </span>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
+                                
 
                                 {/* Supplier Rating */}
-                                <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Supplier Rating:</h3>
-                                <div className="rating-group">
-                                    {[...Array(5)].map((_, i) => {
-                                        const supplierValue = i + 1;
-                                        return (
-                                            <span className="rating-option" key={supplierValue}>
-                                                <input 
-                                                    type="radio" 
-                                                    id={`supplier-rating-${supplierValue}`} 
-                                                    name="supplier-rating" 
-                                                    value={supplierValue} 
-                                                    checked={ratingSupplier === supplierValue} 
-                                                    onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
-                                                />
-                                                <label htmlFor={`supplier-rating-${supplierValue}`}>{supplierValue}</label>
-                                            </span>
-                                        );
-                                    })}
+                                <div className="supplier-rating">
+                                    <h3 className='order-details-titles'>Supplier Rating:</h3>
+                                    <div className="rating-group">
+                                        {[...Array(5)].map((_, i) => {
+                                            const supplierValue = i + 1;
+                                            return (
+                                                <span className="rating-option" key={supplierValue}>
+                                                    {/* <input 
+                                                        type="radio" 
+                                                        id={`supplier-rating-${supplierValue}`} 
+                                                        name="supplier-rating" 
+                                                        value={supplierValue} 
+                                                        checked={ratingSupplier === supplierValue} 
+                                                        onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
+                                                    />
+                                                    <label htmlFor={`supplier-rating-${supplierValue}`}>{supplierValue}</label> */}
+                                                    <FaStar size={20} />
+                                                </span>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
+                                
                             </div>
                         )}    
 
@@ -373,7 +382,7 @@ function Purchase_History () {
                             <React.Fragment>
                                 <button 
                                     className="proceed-Btn" 
-                                    style={{ background: '#FFAA00' }}
+                                    style={{ background: '#FFAA00', marginTop: '50px' }}
                                     onClick={() => HandleSubmitRatings(selectedPurchases.id, selectedPurchases.cart.items[0].product.productId, 
                                                                 selectedPurchases.cart.items[0].product.supplierId, 
                                                                 ratingProduct, 

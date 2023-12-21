@@ -33,6 +33,18 @@
   gap: 10px; 
 }
 
+.prod-rating, .supplier-rating {
+  height: fit-content;
+} 
+
+.rating-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+  gap: 20px;
+}
+
 .rating {
     display: flex;
     flex-direction: row-reverse;

@@ -1489,6 +1489,11 @@ react-hot-toast@^2.4.1:
   dependencies:
     goober "^2.1.10"
 
+react-icons@^4.12.0:
+  version "4.12.0"
+  resolved "https://registry.npmjs.org/react-icons/-/react-icons-4.12.0.tgz"
+  integrity sha512-IBaDuHiShdZqmfc/TwHu6+d6k2ltNCf3AszxNmjJc1KUfXdEeRJOKyNvLmAHaarhzGmTSVygNdyu8/opXv2gaw==
+
 react-is@^16.13.1:
   version "16.13.1"
   resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
@@ -1521,7 +1526,7 @@ react-toastify@^9.1.3:
   dependencies:
     clsx "^1.1.1"
 
-"react@^16.8.0 || ^17.0.0 || ^18.0.0", react@^18.2.0, react@>=16, react@>=16.3, react@>=16.8:
+react@*, "react@^16.8.0 || ^17.0.0 || ^18.0.0", react@^18.2.0, react@>=16, react@>=16.3, react@>=16.8:
   version "18.2.0"
   resolved "https://registry.npmjs.org/react/-/react-18.2.0.tgz"
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
