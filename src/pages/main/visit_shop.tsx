@@ -13,11 +13,6 @@ import React from "react"
 
 function Visit_Shop () {
 
-    interface Department {
-        departmentId: number;
-        department_Name: string;
-    }
-
     interface Supplier {
         id: number;
         shopName: string;
@@ -26,7 +21,7 @@ function Visit_Shop () {
 
     const [, setCart] = useState([]);
     const [displayProduct, setDisplayProduct] = useState([]);
-    const [departments, setDepartments] = useState<Department[]>([]);
+    const [departments, setDepartments] = useState([]);
     const [selectedProductType, setSelectedProductType] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -120,7 +115,7 @@ function Visit_Shop () {
 
     // * Get Department Name
     const getDepartmentName = (departmentId: number) => {
-        const department = departments.find(d => d.departmentId === departmentId);
+        const department = departments.find(d => d.productDepartments.departmentId === departmentId);
         return department ? department.department_Name : 'Unknown Department';
     };
 
@@ -605,7 +600,7 @@ function Visit_Shop () {
                                 </h5>
 
                                 <h5 className="prodModal-text">
-                                    {getDepartmentName(selectedProduct.departmentId)}
+                                    {getDepartmentName(selectedProduct.productDepartments.departmentId)}
                                 </h5>
                                 <h5 className="prodModal-text">
                                     {selectedProduct.category}

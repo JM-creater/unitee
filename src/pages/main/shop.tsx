@@ -23,13 +23,14 @@ function Shop() {
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
     // * Handle Search Input
-    const handleSearchInputChange = (event: { target: { value: React.SetStateAction<string> } }) => {
+    const handleSearchInputChange = (event) => {
         setSearchTerm(event.target.value);
     };
-
+    
     // * Navigate Search
-    const performSearch = () => {
-        navigate(`/shop/${userId}/search_product?search=${searchTerm}`);
+    const performSearch = (productName = searchTerm) => {
+        setSearchTerm(productName); 
+        navigate(`/shop/${userId}/search_product?search=${productName}`);
     };
 
     // * Get the Average Rating for Product
@@ -198,7 +199,7 @@ function Shop() {
                         <div 
                             key={index} 
                             className='search-dropdown-row'
-                            onClick={() => performSearch()} 
+                            onClick={() => performSearch(productData.productName)}
                         >
                             <span className="fa fa-search form-control-feedback search-icon"></span>
                             {productData.productName}

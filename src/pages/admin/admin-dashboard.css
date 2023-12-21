@@ -101,3 +101,23 @@
     margin: 5px;
     align-items: center;
 }
+
+.no-topselling-products {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh; 
+    font-size: 24px; 
+    overflow: -moz-hidden-unscrollable;
+}
+
+.no-topseller-seller {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh; 
+    font-size: 24px; 
+    overflow: -moz-hidden-unscrollable;
+}
