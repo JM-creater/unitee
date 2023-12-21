@@ -1,7 +1,7 @@
 import './admin_reports.css'
 import totalOrdersIcon from "../../assets/images/icons/order-2.png"
 import salesIcon from "../../assets/images/icons/sales.png"
-import * as XLSX from 'xlsx';
+//import * as XLSX from 'xlsx';
 
 import {
     Chart as ChartJS,
@@ -16,7 +16,8 @@ import {
 import { Bar, Pie } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import { utils, writeFile } from 'xlsx';
+//import { toast } from 'react-toastify';
 
 ChartJS.register(
     BarElement,
@@ -37,43 +38,44 @@ function Admin_Reports () {
 
     // * Download Report to Excel
     const HandleExportToExcel = () => {
-        const data = filteredOrders.map(ord => ({
-            OrderNumber: ord.orderNumber,
-            Shop: ord.cart.supplier.shopName,
-            Customer: `${ord.user.firstName} ${ord.user.lastName}`,
-            Items: ord.cart.items.reduce((total, item) => total + item.quantity, 0),
-            Total: ord.total,
-            Status: getStatusText(ord.status) 
-        }));
-    
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Orders");
-    
-        XLSX.writeFile(wb, "Report.xlsx");
-    }
+        const headings = [[
+            'Total Orders',
+            'Weekly Sales',
+            'Monthly Sales',
+            'Yearly Sales',
+            'Order Review'
+        ]];
+
+        const wb = utils.book_new();
+        const ws = utils.json_to_sheet([]);
+
+        utils.sheet_add_aoa(ws, headings);
+        utils.sheet_add_json(ws, orders, { origin: 'A2', skipHeader: true });
+        utils.book_append_sheet(wb, ws, 'Report');
+        writeFile(wb, 'Admin Report.xlsx');
+    };
     
     // * Get the Status of Orders
-    function getStatusText(status) {
-        switch (status) {
-            case 1:
-                return 'Order Placed';
-            case 2:
-                return 'Pending';
-            case 3:
-                return 'Approved';
-            case 4:
-                return 'For Pick Up';
-            case 5:
-                return 'Completed';
-            case 6:
-                return 'Canceled';
-            case 7:
-                return 'Denied';
-            default:
-                return 'Unavailable'; 
-        }
-    }
+    // const getStatusText = (status) => {
+    //     switch (status) {
+    //         case 1:
+    //             return 'Order Placed';
+    //         case 2:
+    //             return 'Pending';
+    //         case 3:
+    //             return 'Approved';
+    //         case 4:
+    //             return 'For Pick Up';
+    //         case 5:
+    //             return 'Completed';
+    //         case 6:
+    //             return 'Canceled';
+    //         case 7:
+    //             return 'Denied';
+    //         default:
+    //             return 'Unavailable'; 
+    //     }
+    // }
     
     // * Count the orders each supplier in pie graph
     useEffect(() => {
@@ -101,10 +103,14 @@ function Admin_Reports () {
                 const res = await axios.get('https://localhost:7017/Order');
                     setOrders(res.data);
             } catch (error) {
-                console.error(error)
-                toast.error("Error fetching orders.");
+                if (error.message === "Network Error") {
+                    console.error("Network error occurred. Please check your internet connection.");
+                } else {
+                    console.error("Error fetching orders: ", error);
+                }
             }
-        }
+        };
+
         fetchOrders();
     }, []);
 
@@ -115,10 +121,14 @@ function Admin_Reports () {
                 const res = await axios.get('https://localhost:7017/Users');
                     setShops(res.data);
             } catch (error) {
-                console.error(error)
-                toast.error("Error fetching orders.");
+                if (error.message === "Network Error") {
+                    console.error("Network error occurred. Please check your internet connection.");
+                } else {
+                    console.error("Network error or server not responding: ", error);
+                }
             }
-        }
+        };
+
         fetchShops();
     }, []);
 
@@ -158,7 +168,7 @@ function Admin_Reports () {
     }
 
     // * PIE CHART CHART
-     const pieChartData = {
+    const pieChartData = {
         labels: Object.keys(supplierOrderCounts).map(supplierId => 
             shops.find(shop => shop.id === parseInt(supplierId))?.shopName || 'Unknown'
         ),

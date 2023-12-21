@@ -40,7 +40,7 @@ function Admin_Shops () {
 
     // * Get the Department Name
     const getDepartmentName = (departmentId) => {
-        const department = departments.find(d => d.departmentId === departmentId);
+        const department = departments.find(d => d.productDepartments.departmentId === departmentId);
         return department ? department.department_Name : 'Unknown Department';
     };
 
