@@ -4,6 +4,7 @@ import totalOrdersIcon from "../../assets/images/icons/checkout.png"
 import totalProducts from "../../assets/images/icons/products.png"
 import noProdsImg from "../../assets/images/icons/empty-box.png"
 import noOder from "../../assets/images/icons/no-order.png"
+import product2 from "../../assets/images/shop_products/product2.png"
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useParams } from 'react-router'
@@ -27,23 +28,27 @@ function Supplier (){
     const { id } = useParams();
 
     useEffect(() => {
-        axios.get(`https://localhost:7017/Order/BySupplier/${id}`)
-            .then(response => {
+        const fetchOrderBySupplier = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Order/BySupplier/${id}`);
                 setOrders(response.data);
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error(error);
-            })
+            }
+        }
+        fetchOrderBySupplier();
     }, [id]);
 
     useEffect(() => {
-        axios.get(`https://localhost:7017/Product/ByShopProduct/${id}`)
-            .then(response => {
+        const fetchShopByProduct = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Product/ByShopProduct/${id}`);
                 setProducts(response.data);
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error(error);
-            })
+            }
+        }
+        fetchShopByProduct();
     }, [id])
 
 
@@ -137,8 +142,8 @@ function Supplier (){
                 <h3>Top 3 Rated Products </h3>
                 <div className="top-rated-prod-container">
                     {/* <img className='top-prod-img' src={ `https://localhost:7017/${productItem.image}` } /> */}
-                    <img className='top-prod-img' src="/" alt="" />
-                    <span className='top-ratedProd-name'>Sample</span>
+                    <img className='top-prod-img' src={product2} alt="" />
+                    <span className='top-ratedProd-name'>ICT Congress</span>
                     <span className='top-ratedProd-rating'>5.0</span>
                 </div>
             </div>

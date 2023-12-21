@@ -36,10 +36,9 @@ import Supplier_ViewProf from "./pages/supplier/supplier_viewProf";
 import Supplier from "./pages/supplier/supplier_dashboard";
 import Reports from "./pages/supplier/reports";
 import Forgot_Password from "./pages/forgot_password";
-import Supplier_Chat from "./pages/supplier/supplier_chat";
-import Chat from "./pages/main/chat";
 import Confirmation_Code from "./pages/confirmation_email";
-// import Unauthorized_Error from './pages/common/unauthorized_error'
+//import PrivateRoute from "./utils/private_route";
+//import Unauthorized_Error from './pages/common/unauthorized_error'
 // import Internal_Error from './pages/common/internal_error'
 // import Bad_Request from './pages/common/bad_request'
 
@@ -59,13 +58,13 @@ function App() {
         <Routes>
           <Route index element={<Login />} />
           <Route path="/accountType" element={<AccountType />} />
-          <Route path="/confirmation_email" element={<Confirmation_Code />} />
+          <Route path="/confirmation_email" element={  <Confirmation_Code /> } />
           <Route path="/register" element={<Register />} />
           <Route path="/register_supplier" element={<RegisterSupplier />} />
-          <Route path="/forgot_password" element={<Forgot_Password />} />
-          <Route path="/shop/:userId" element={<Main />}>
-            {/* <Route index element={ <Home/> }/> */}
-            {/* CUSTOMER */}
+          <Route path="/forgot_password" element={ <Forgot_Password /> } />
+
+          {/* CUSTOMER */}
+          <Route path="/shop/:userId" element={ <Main />  }>
             <Route index element={<Shop />} />
             <Route path="visit_shop/:id" element={<Visit_Shop />} />
             <Route path="cart" element={<Cart />} />
@@ -73,21 +72,12 @@ function App() {
             <Route path="user_profile/:id" element={<User_Profile />}></Route>
             <Route path="notif" element={<Notif />}></Route>
             <Route path="order_tracking" element={<Order_Tracking />}></Route>
-            <Route
-              path="viewCustomer_profile"
-              element={<ViewCustomer_Profile />}
-            />
-            <Route
-              path="purchase_history"
-              element={<Purchase_History />}
-            ></Route>
-            <Route path="notif" element={<Notif />}></Route>
-            <Route path="chat" element={<Chat />} />
-            {/* <Route path='/main/:id' element={ <Main/> }></Route>   */}
+            <Route path="viewCustomer_profile" element={<ViewCustomer_Profile />}/>
+            <Route path="purchase_history" element={<Purchase_History />}></Route>
           </Route>
 
           {/* ADMIN */}
-          <Route path="admin_dashboard/:id" element={<Admin_Main />}>
+          <Route path="admin_dashboard/:id" element={ <Admin_Main />  }>
             <Route index element={<Admin_Dashboard />} />
             <Route path="suppliers" element={<Suppliers />}></Route>
             <Route path="view_customers" element={<View_Customers />} />
@@ -98,22 +88,15 @@ function App() {
           </Route>
 
           {/* SUPPLIER */}
-          <Route path="supplier_dashboard/:id" element={<Supplier_Main />}>
+          <Route path="supplier_dashboard/:id" element={ <Supplier_Main /> }>
             <Route index element={<Supplier />} />
             <Route path="supplier_orders" element={<Supplier_Order />} />
             <Route path="manage_shop" element={<Manage_Shop />} />
-            <Route
-              path="supplier_viewProf/:id"
-              element={<Supplier_ViewProf />}
-            />
+            <Route path="supplier_viewProf/:id" element={<Supplier_ViewProf />} />
             <Route path="reports" element={<Reports />} />
-            <Route path="supplier_chat" element={<Supplier_Chat />} />
           </Route>
 
-          <Route
-            path="/update_item/:id/:productId"
-            element={<Update_item />}
-          ></Route>
+          <Route path="/update_item/:id/:productId" element={<Update_item />}></Route>
 
           {/* <Route path='supplier_items/:id' element={ <Supplier/> }></Route> */}
 
@@ -121,7 +104,7 @@ function App() {
 
           {/* ERROR WEBPAGES */}
           <Route path="*" element={<NotFound />} />
-          {/* <Route path='*' element={ <Unauthorized_Error/> }/> */}
+          {/* <Route path="" element={ <Unauthorized_Error/> }/> */}
           {/* <Route path='*' element={ <Internal_Error/> }/> */}
           {/* <Route path='*' element={ <Bad_Request/> }/> */}
         </Routes>

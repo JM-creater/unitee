@@ -224,8 +224,7 @@ function Main() {
               justifyContent: "space-between",
             }}
           >
-            <Link to="" className="col-md-2" id="tooltip">
-            <span id="tooltip-text">Logo</span>
+            <Link to="" className="col-md-2">
               <img className="logo" src={logo} />
             </Link>
 
