@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import React from 'react';
 import submitRatingEventEmitter from '../../helpers/SubmitRatingEventEmitter';
 import { FaStar } from 'react-icons/fa'
+import orderEventEmitter from '../../helpers/OrderEmitter';
 
 function Purchase_History () {
 
@@ -25,6 +26,8 @@ function Purchase_History () {
         Denied: 'Denied'
     };
 
+    const [recommendationProducts, setRecommendationProducts] = useState([]);
+    const [hover, setHover] = useState(null);
     const [purchases, setPurchases] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [selectedPurchases, setSelectedPurchases] = useState(null);
@@ -50,32 +53,32 @@ function Purchase_History () {
                 return;
         }
     
-            const cartAddRequest = {
-                userId: userId,
-                productId: item.productId,
-                size: item.sizeQuantity.size,
-                quantity: item.quantity
-            };
-    
-            axios.post('https://localhost:7017/Cart/add', cartAddRequest)
-                .then(async () => {
-                    toast.success("Item added to cart");
-                    closeBtn.click();
+        const cartAddRequest = {
+            userId: userId,
+            productId: item.productId,
+            size: item.sizeQuantity.size,
+            quantity: item.quantity
+        };
 
-                    await sleep(1000);
-                    window.location.reload();
-                })
-                .catch(error => {
-                    toast.error(error.message);
-                });
-            });
-            axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
-            .then(updatedCartResponse => {
-                setPurchases(updatedCartResponse.data);
+        axios.post('https://localhost:7017/Cart/add', cartAddRequest)
+            .then(async () => {
+                toast.success("Item added to cart");
+                closeBtn.click();
+
+                await sleep(1000);
+                window.location.reload();
             })
             .catch(error => {
                 toast.error(error.message);
             });
+        });
+        axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
+        .then(updatedCartResponse => {
+            setPurchases(updatedCartResponse.data);
+        })
+        .catch(error => {
+            toast.error(error.message);
+        });
     };
     
     // * Handle Submit Rating
@@ -113,8 +116,6 @@ function Purchase_History () {
             toast.success("Ratings submitted successfully");
             setRatingProduct(0);
             setRatingSupplier(0);
-            await sleep(200);
-            window.location.reload();
         } catch (error) {
             console.error("Error submitting ratings:", error);
             toast.error("Error submitting ratings");
@@ -136,9 +137,42 @@ function Purchase_History () {
             } catch (error) {
                 console.error(error);
             }
+        };
+
+        const validationListener = () => {
+            fetchOrders();
         }
-        fetchOrders();
+
+        orderEventEmitter.on("orderCompleted", validationListener);
+        validationListener();
+
+        return () => {
+            orderEventEmitter.on("orderCompleted", validationListener);
+        };
     }, [userId]);
+
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+                const response = await axios.get(`https://localhost:7017/Order/${userId}`);
+                setPurchases(response.data);
+            } catch (error) {
+                console.error('Network error or server not responding');
+            }
+        };
+    
+        const handleFocus = () => {
+            fetchData();
+        };
+    
+        window.addEventListener('focus', handleFocus);
+    
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [userId])
+
 
     // * Get All Product Types
     useEffect(() => {
@@ -192,6 +226,20 @@ function Purchase_History () {
             (star as HTMLInputElement).checked = false;
         });
     };
+
+    // * Product Recommendation 
+    useEffect(() => {
+        const fetchProductRecommendation = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Product/recommendations/${userId}`);
+                setRecommendationProducts(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchProductRecommendation();
+    }, [userId]);
+
 
     return <div className="purchase-history-main-container">
         <div className='col-md-12 purchase-title-container'>
@@ -290,7 +338,7 @@ function Purchase_History () {
 
                             <div className="claimed-details-container">
                                 <h3 style={{ fontSize: "15px" }}>Status: {Status[Object.keys(Status)[selectedPurchases.status - 1]]}</h3>
-                                <p style={{ fontSize: "15px" }}>Date Claimed: {formatDate(selectedPurchases.estimateDate)}</p>
+                                <p style={{ fontSize: "15px" }}>Date Claimed: {formatDate(selectedPurchases.dateUpdated)}</p>
                                 <p style={{ fontSize: "15px" }}>Receiver: {selectedPurchases.user.firstName} {selectedPurchases.user.lastName}</p>
                             </div>
                         </div>
@@ -324,27 +372,33 @@ function Purchase_History () {
                                 </tbody>
                             </table>
                         </div>
-                        {!ratedPurchases.has(selectedPurchases.id) && (
+                        {!ratedPurchases.has(selectedPurchases.id) ? (
                             <div className='rating-container'>
                                 {/* Product Rating */}
                                 <div className='prod-rating'>
                                     <h3 className='order-details-titles'>Product Rating:</h3>
                                     <div className="rating-group">
-                                        {[...Array(5)].map((_, i) => {
-                                            const ratingValue = i + 1;
+                                        {[...Array(5)].map((_, index) => {
+                                            const ratingValue = index + 1;
                                             return (
-                                                <span className="rating-option" key={ratingValue}>
-                                                    {/* <input 
-                                                        type="radio" 
+                                                <label key={ratingValue}>
+                                                    <input 
                                                         id={`product-rating-${ratingValue}`} 
-                                                        name="product-rating" 
-                                                        value={ratingValue} 
+                                                        type="radio"
+                                                        name='rating'
+                                                        value={ratingValue}
                                                         checked={ratingProduct === ratingValue} 
                                                         onChange={(e) => setRatingProduct(parseInt(e.target.value))}
+                                                        style={{ display: 'none' }}
                                                     />
-                                                    <label htmlFor={`product-rating-${ratingValue}`}>{ratingValue}</label> */}
-                                                    <FaStar size={20} />
-                                                </span>
+                                                    <FaStar 
+                                                        style={{ cursor: 'pointer' }}
+                                                        size={20} 
+                                                        color={ratingValue <= (hover || ratingProduct) ? "#ffc107" : "#e4e5e9"} 
+                                                        onMouseEnter={() => setHover(ratingValue)}
+                                                        onMouseLeave={() => setHover(null)}
+                                                    />
+                                                </label>
                                             );
                                         })}
                                     </div>
@@ -355,26 +409,49 @@ function Purchase_History () {
                                 <div className="supplier-rating">
                                     <h3 className='order-details-titles'>Supplier Rating:</h3>
                                     <div className="rating-group">
-                                        {[...Array(5)].map((_, i) => {
-                                            const supplierValue = i + 1;
+                                        {[...Array(5)].map((_, index) => {
+                                            const supplierValue = index + 1;
                                             return (
-                                                <span className="rating-option" key={supplierValue}>
-                                                    {/* <input 
-                                                        type="radio" 
+                                                <label key={supplierValue}>
+                                                    <input 
                                                         id={`supplier-rating-${supplierValue}`} 
-                                                        name="supplier-rating" 
+                                                        type="radio" 
+                                                        name="rating" 
                                                         value={supplierValue} 
                                                         checked={ratingSupplier === supplierValue} 
                                                         onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
+                                                        style={{ display: 'none' }}
                                                     />
-                                                    <label htmlFor={`supplier-rating-${supplierValue}`}>{supplierValue}</label> */}
-                                                    <FaStar size={20} />
-                                                </span>
+                                                    <FaStar 
+                                                        style={{ cursor: 'pointer' }}
+                                                        size={20} 
+                                                        color={supplierValue <= (hover || ratingSupplier) ? "#ffc107" : "#e4e5e9"} 
+                                                        onMouseEnter={() => setHover(supplierValue)}
+                                                        onMouseLeave={() => setHover(null)}
+                                                    />
+                                                </label>
                                             );
                                         })}
                                     </div>
                                 </div>
-                                
+                            </div>
+                        ) : (
+                            <div className="rating-complete-message">
+                                <p className="thank-you-message">Thank you for rating!</p>
+                                <p className="follow-up-message">Based on your previous purchases, we recommend the following products for you. If you wish to buy again, just click the 'buy again' button below of the modal.</p>
+                                <div className="recommendation-section">
+                                    {recommendationProducts.map((product, index) => (
+                                        <div key={index} className="recommendation-card">
+                                            <img src={`https://localhost:7017/${product.image}`} alt={product.productName} className="product-image" />
+                                            <div className="product-details">
+                                                <h4 className="product-name">{product.productName}</h4>
+                                                <p className="product-description">{product.description}</p>
+                                                <p className="product-price">₱{product.price.toFixed(2)}</p>
+                                            </div>
+                                            <button className="go-to-shop-button">Go to Shop</button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}    
 
