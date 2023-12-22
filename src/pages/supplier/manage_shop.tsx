@@ -418,10 +418,10 @@ function Manage_Shop() {
       if (!newTypeId) errorMessages.push("Product Type is required");
       if (!newSelectedDepartments) errorMessages.push("Department is required");
       if (!newSelectedImage) errorMessages.push("Image is required");
-      if (!selectedFrontImage) errorMessages.push("Front Image is required");
-      if (!selectedSideImage) errorMessages.push("Side Image is required");
-      if (!selectedBackImage) errorMessages.push("Back Image is required");
-      if (!sizeGuide) errorMessages.push("Size Guide is required");
+      if (!newSelectedFrontImage) errorMessages.push("Front Image is required");
+      if (!newSelectedSideImage) errorMessages.push("Side Image is required");
+      if (!newSelectedBackImage) errorMessages.push("Back Image is required");
+      if (!newSizeGuide) errorMessages.push("Size Guide is required");
       if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
 
       if (errorMessages.length > 0) {
@@ -983,7 +983,7 @@ function Manage_Shop() {
                           src={newSelectedFrontImage ? `https://localhost:7017/${newSelectedFrontImage}` : prodImage}
                           onClick={handleFrontClick2}
                         />
-                        <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
+                        <i className="overlay-icon fa fa-cloud-upload" onClick={handleFrontClick2}></i> 
                         <input
                           ref={frontImageRef2}
                           type="file"
@@ -1001,9 +1001,9 @@ function Manage_Shop() {
                           alt="Upload Product"
                           className="supplier-modal-addprod-img"
                           src={newSelectedSideImage?`https://localhost:7017/${newSelectedSideImage}`: prodImage}  
-                          onClick={handleImageClick}
+                          onClick={handleSideClick}
                         />
-                        <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
+                        <i className="overlay-icon fa fa-cloud-upload" onClick={handleSideClick}></i> 
                         <input
                           ref={sideImageRef}
                           type="file"
@@ -1021,9 +1021,9 @@ function Manage_Shop() {
                           alt="Upload Product"
                           className="supplier-modal-addprod-img"
                           src={newSelectedBackImage?`https://localhost:7017/${newSelectedBackImage}`: prodImage}  
-                          onClick={handleImageClick}
+                          onClick={handleBackClick}
                         />
-                        <i className="overlay-icon fa fa-cloud-upload" onClick={handleImageClick}></i> 
+                        <i className="overlay-icon fa fa-cloud-upload" onClick={handleBackClick}></i> 
                         <input
                           ref={backImageRef}
                           type="file"
