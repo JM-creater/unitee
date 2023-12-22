@@ -216,8 +216,7 @@ function Register() {
   };
 
   useEffect(() => {
-    axios
-      .get('https://localhost:7017/Department')
+    axios.get('https://localhost:7017/Department')
       .then((res) => {
         setDepartments(res.data);
       })
