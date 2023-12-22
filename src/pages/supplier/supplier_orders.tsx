@@ -40,7 +40,6 @@ function Supplier_Orders () {
     const [departments, setDepartments] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [selectedOrders, setSelectedOrders] = useState(null);
-    const [singleApproval, setSingleApproval] = useState(false);
     const { id } = useParams();
 
     const [statusCounts, setStatusCounts] = useState({
@@ -156,47 +155,30 @@ function Supplier_Orders () {
 
     // * Handle Approved Orders
     const HandleApprovedOrders = (orderId) => {
-      //const CloseBtn = document.getElementById("btnClose");
-      if (!singleApproval) {
-        toast.error("Please check the Single Approval checkbox before approving.");
-        return; 
-      }
       axios.put(`https://localhost:7017/Order/approvedOrder/${orderId}`)
         .then(async response => {
-          if (singleApproval) {
-            const updatedOrder = orders.find(order => order.Id === response.data.Id);
-            if (updatedOrder) {
-                Object.assign(updatedOrder, response.data);
+          const updatedOrders = orders.map(order => {
+            if (order.Id === response.data.Id) {
+                return response.data;
             }
-          } else {
-              const updatedOrders = orders.map(order => {
-                  if (order.Id === response.data.Id) {
-                      return response.data;
-                  }
-                  return order;
-              });
-              setOrders(updatedOrders);
-          }
-          toast.success("Order approved successfully");
-          notifEventEmitter.emit("notifAdded")
-          //CloseBtn.click();
+            return order;
+          });
+          setOrders(updatedOrders);
           
-          await sleep(1000);
+          toast.success("Order approved successfully");
+          notifEventEmitter.emit("notifAdded");
+          
+          await sleep(100);
           window.location.reload();
         })
         .catch(error => {
             console.error(error);
             console.error("Failed to approve the order. Please try again");
         });
-    }
+    };
 
     // * Handle Denied Orders
     const HandleDeniedOrders = (orderId) => {
-      const CloseBtn = document.getElementById("btnClose");
-      if (!singleApproval) {
-        toast.error("Please check the Single Approval checkbox before denying.");
-        return; 
-      }
       axios.put(`https://localhost:7017/Order/deniedOrder/${orderId}`)
         .then(async response => {
             const updatedOrder = orders.find(order => order.Id === response.data.Id);
@@ -204,25 +186,19 @@ function Supplier_Orders () {
                 Object.assign(updatedOrder, response.data);
             }
             toast.success("Order denied successfully");
-            notifEventEmitter.emit("notifAdded")
-            CloseBtn.click();
+            notifEventEmitter.emit("notifAdded");
 
-            await sleep(1000);
+            await sleep(100);
             window.location.reload();
         })
         .catch(error => {
             console.error(error);
             console.error("Failed to deny the order. Please try again");
         });
-    }
+    };
 
     // * Handle Pick Up Orders
     const HandleForPickUpOrders = (orderId) => {
-      const CloseBtn = document.getElementById("btnClose");
-      if (!singleApproval) {
-        toast.error("Please check the Single Approval checkbox before picking up the order.");
-        return; 
-      }
       axios.put(`https://localhost:7017/Order/forPickUp/${orderId}`)
         .then(async response => {
           const updatedOrder = orders.find(order => order.Id === response.data.Id);
@@ -230,25 +206,19 @@ function Supplier_Orders () {
                 Object.assign(updatedOrder, response.data);
             }
             toast.success("For pick up order success");
-            notifEventEmitter.emit("notifAdded")
-            CloseBtn.click();
+            notifEventEmitter.emit("notifAdded");
 
-            await sleep(1000);
+            await sleep(100);
             window.location.reload();
         })
         .catch(error => {
           console.error(error);
           console.error("Failed to pick up the order. Please try again");
         });
-    }
+    };
 
     // * Handle Completed Orders
     const HandleOrderCompleted = (orderId) => {
-      const CloseBtn = document.getElementById("btnClose");
-      if (!singleApproval) {
-        toast.error("Please check the Single Approval checkbox before completed the order.");
-        return; 
-      }
       axios.put(`https://localhost:7017/Order/orderCompleted/${orderId}`)
         .then(async response => {
           const updatedOrder = orders.find(order => order.Id === response.data.Id);
@@ -256,17 +226,16 @@ function Supplier_Orders () {
                 Object.assign(updatedOrder, response.data);
             }
             toast.success("Order completed success");
-            notifEventEmitter.emit("notifAdded")
-            CloseBtn.click();
-
-            await sleep(1000);
+            notifEventEmitter.emit("notifAdded");
+            orderEventEmitter.emit("orderCompleted");
+            //await sleep(100);
             window.location.reload();
         })
         .catch(error => {
           console.error(error);
           console.error("Failed to complete the order. Please try again");
         });
-    }
+    };
 
     // * Format Date
     const formatDate = (dateString) => {
@@ -313,6 +282,8 @@ function Supplier_Orders () {
         orderEventEmitter.off("notifNewOrderAdded", updateNotification);
       };
     }, [updateNotification]);
+
+    
 
     return <div className="manage-orders-main-container">
     <nav id="orders-nav" className="navbar px-3 mb-3" style={{ display:'flex', justifyContent:'end' }}>
@@ -551,16 +522,6 @@ function Supplier_Orders () {
         <div className="modal-dialog modal-fullscreen">
             <div className="modal-content" style={{ padding:'20px' }}>
                 <div className="pending-header">
-                    <label style={{ fontSize: '18px', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
-                      <input 
-                        type="checkbox" 
-                        id="singleApprovalCheckbox" 
-                        checked={singleApproval} 
-                        onChange={() => setSingleApproval(prev => !prev)}
-                        style={{ marginRight: '8px', width: '20px', height: '20px' }}
-                      />
-                      Single Approval
-                    </label>
                     <h1 className="modal-title" id="exampleModalLabel">Pending Order</h1>
                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
                 </div>
@@ -669,16 +630,6 @@ function Supplier_Orders () {
         <div className="modal-dialog modal-fullscreen">
             <div className="modal-content" style={{ padding:'20px' }}>
                 <div className="pending-header">
-                    <label style={{ fontSize: '18px', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
-                      <input 
-                        type="checkbox" 
-                        id="singleApprovalCheckbox" 
-                        checked={singleApproval} 
-                        onChange={() => setSingleApproval(prev => !prev)}
-                        style={{ marginRight: '8px', width: '20px', height: '20px' }}
-                      />
-                      Single Approval
-                    </label>
                     <h1 className="modal-title" id="exampleModalLabel">Approved Order</h1>
                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
                 </div>
@@ -786,16 +737,6 @@ function Supplier_Orders () {
         <div className="modal-dialog modal-fullscreen">
             <div className="modal-content" style={{ padding:'20px' }}>
                 <div className="pending-header">
-                    <label style={{ fontSize: '18px', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
-                      <input 
-                        type="checkbox" 
-                        id="singleApprovalCheckbox" 
-                        checked={singleApproval} 
-                        onChange={() => setSingleApproval(prev => !prev)}
-                        style={{ marginRight: '8px', width: '20px', height: '20px' }}
-                      />
-                      Single Approval
-                    </label>
                     <h1 className="modal-title" id="exampleModalLabel">For Pick Up Orders</h1>
                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
                 </div>

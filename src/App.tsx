@@ -39,8 +39,8 @@ import Forgot_Password from "./pages/forgot_password";
 import Confirmation_Code from "./pages/confirmation_email";
 //import PrivateRoute from "./utils/private_route";
 //import Unauthorized_Error from './pages/common/unauthorized_error'
-// import Internal_Error from './pages/common/internal_error'
-// import Bad_Request from './pages/common/bad_request'
+//import Internal_Error from './pages/common/internal_error'
+//import Bad_Request from './pages/common/bad_request'
 
 function App() {
   return (
