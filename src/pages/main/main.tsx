@@ -315,10 +315,9 @@ function Main() {
                 </div>
               </Link>
 
-              <div className="col-md-1 dropdown" id="tooltip">
+              <div className="col-md-1 dropdown">
                 {customer ? (
                   <React.Fragment>
-                    <span id="tooltip-text">Profile</span>
                     <img
                       className="imageProfile"
                       src={`https://localhost:7017/${customer.image}`}
