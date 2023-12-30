@@ -36,50 +36,23 @@ function Purchase_History () {
     const [ratedPurchases, setRatedPurchases] = useState(new Set());
     const { userId } = useParams();
 
-    // * For Delay
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-    // * Add to cart from purchase history 
-    const addPurchaseToCart = () => {
+    // * Handle Close Modal
+    const handleCLose = () => {
         const closeBtn = document.getElementById("btnClose");
-        if (!selectedPurchases || !selectedPurchases.cart || !Array.isArray(selectedPurchases.cart.items) || selectedPurchases.cart.items.length === 0) {
-            toast.error("No purchases selected");
-            return;
-        }
-    
-        selectedPurchases.cart.items.forEach(item => {
-            if (!item.productId || !item.sizeQuantity || !item.sizeQuantity.size || !item.sizeQuantity.quantity) {
-                toast.error("Invalid purchase item data");
-                return;
-        }
-    
-        const cartAddRequest = {
-            userId: userId,
-            productId: item.productId,
-            size: item.sizeQuantity.size,
-            quantity: item.quantity
-        };
-
-        axios.post('https://localhost:7017/Cart/add', cartAddRequest)
-            .then(async () => {
-                toast.success("Item added to cart");
-                closeBtn.click();
-
-                await sleep(1000);
-                window.location.reload();
-            })
-            .catch(error => {
-                toast.error(error.message);
-            });
-        });
-        axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
-        .then(updatedCartResponse => {
-            setPurchases(updatedCartResponse.data);
-        })
-        .catch(error => {
-            toast.error(error.message);
-        });
+        closeBtn.click();
     };
+
+    // * Update the Product Details Modal
+    useEffect(() => {
+        const modal = document.getElementById('viewProdDetailsModal') 
+        if (modal) {
+            modal.addEventListener('hidden.bs.modal', HandleCloseButton);
+
+            return () => {
+                modal.removeEventListener('hidden.bs.modal', HandleCloseButton);
+            };
+        }
+    }, []);
     
     // * Handle Submit Rating
     const HandleSubmitRatings = async (purchaseId, productId, supplierId, productRating, supplierRating) => {
@@ -474,13 +447,15 @@ function Purchase_History () {
                 </div>
                 )}
                 </div>
-                <div className="modal-footer">
-                    <Link to={`/shop/${userId}/cart`}>
-                        <button className="proceed-Btn" onClick={addPurchaseToCart}>
-                            Buy Again
-                        </button>
-                    </Link>
-                </div>
+                {selectedPurchases && (
+                    <div className="modal-footer">
+                        <Link to={`/shop/${userId}/visit_shop/${selectedPurchases.cart.supplier.id}`}>
+                            <button className="proceed-Btn" onClick={handleCLose}>
+                                Buy Again
+                            </button>
+                        </Link>
+                    </div>
+                )}
             </div>
         </div>
     </div>

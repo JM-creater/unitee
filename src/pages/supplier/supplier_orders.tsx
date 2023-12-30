@@ -943,7 +943,7 @@ function Supplier_Orders () {
         </div>
     </div>   
 
-
+    {/* COMPLETED ORDER DETAILS MODAL */}                            
     <div className="modal fade" id="canceledOrderModal" tabIndex={-1} aria-labelledby="canceledOrderModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-fullscreen">
             <div className="modal-content" style={{ padding:'20px' }}>
@@ -1027,7 +1027,7 @@ function Supplier_Orders () {
                                   </tr>
                               </thead>
                               <tbody>
-                              {selectedOrders && Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Completed && (
+                              {selectedOrders && Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Canceled && (
                                 <tr>
                                   <th scope="row">{selectedOrders.cart.items[0].product.productName}</th>
                                   <td>{getProductTypeName(selectedOrders.cart.items[0].product.productTypeId)}</td>
