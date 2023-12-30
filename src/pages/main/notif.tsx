@@ -160,11 +160,11 @@ function Notif() {
     window.addEventListener('focus', handleFocus);
 
     return () => {
-        window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('focus', handleFocus);
     };
   }, [userId]); 
 
-  // Function to handle canceling the order:
+  // * Function to handle canceling the order
   const HandleOrderCanceled = (orderId) => {
     axios.put(`https://localhost:7017/Order/orderCanceled/${orderId}`)
     .then(response => {
@@ -181,7 +181,7 @@ function Notif() {
         console.error(error);
         toast.error("Failed to cancel the order. Please try again");
     });
-  }
+  };
 
   return (
     <div className="container">
