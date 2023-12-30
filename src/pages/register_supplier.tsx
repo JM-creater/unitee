@@ -1,11 +1,11 @@
-import './register.css';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import logo from '../../src/assets/images/unitee.png';
-import 'react-toastify/dist/ReactToastify.css';
-import registerUsersEventEmitter from '../helpers/RegisterUsersEmitter';
+import "./register.css";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import logo from "../../src/assets/images/unitee.png";
+import "react-toastify/dist/ReactToastify.css";
+import registerUsersEventEmitter from "../helpers/RegisterUsersEmitter";
 
 type ValidationErrors = {
   IDNumber?: string;
@@ -22,34 +22,40 @@ type ValidationErrors = {
 };
 
 function Register() {
-
-  const [IDNumber, setIDNumber] = useState('');
-  const [shopName, setShopName] = useState('');
-  const [address, setAddress] = useState('');
-  const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [IDNumber, setIDNumber] = useState("");
+  const [shopName, setShopName] = useState("");
+  const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [image, setImage] = useState(null);
   const [bir, setImageBIR] = useState(null);
   const [cityPermit, setCityPermit] = useState(null);
   const [schoolPermit, setSchoolPermit] = useState(null);
   const navigate = useNavigate();
+  const [lastErrorMessage, setLastErrorMessage] = useState("");
 
   // * Get Countries for Registering
   useEffect(() => {
     const fetchData = async () => {
       const headers = new Headers();
-      headers.append("X-CSCAPI-KEY", "R0ljcVpYMHhyWGM4UUl4MmE1VGhVVFhlSWUxd0laeW5ESFpwdU44Mw==");
+      headers.append(
+        "X-CSCAPI-KEY",
+        "R0ljcVpYMHhyWGM4UUl4MmE1VGhVVFhlSWUxd0laeW5ESFpwdU44Mw=="
+      );
 
       const requestOptions = {
-        method: 'GET',
+        method: "GET",
         headers: headers,
-        redirect: 'follow' as RequestRedirect,
+        redirect: "follow" as RequestRedirect,
       };
 
       try {
-        const response = await fetch("https://api.countrystatecity.in/v1/countries", requestOptions);
+        const response = await fetch(
+          "https://api.countrystatecity.in/v1/countries",
+          requestOptions
+        );
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -58,7 +64,7 @@ function Register() {
         const result = await response.text();
         console.log(result);
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       }
     };
 
@@ -67,10 +73,10 @@ function Register() {
 
   // * Get the Generated ID number for Supplier
   useEffect(() => {
-    const fetchedID = localStorage.getItem('generatedSupplierID');
+    const fetchedID = localStorage.getItem("generatedSupplierID");
     if (fetchedID) {
-        setIDNumber(fetchedID);
-        localStorage.removeItem('generatedSupplierID');
+      setIDNumber(fetchedID);
+      localStorage.removeItem("generatedSupplierID");
     }
   }, []);
 
@@ -78,16 +84,12 @@ function Register() {
     if (/^[0-9]*$/.test(value)) {
       setIDNumber(value);
     } else {
-      toast.error('Store ID must contain only numbers.');
+      toast.error("Store ID must contain only numbers.");
     }
   };
 
   const handleShopName = (value) => {
-    if (/^[a-zA-Z ]*$/.test(value)) {
-      setShopName(value);
-    } else {
-      toast.error('First Name must contain only letters.');
-    }
+    setShopName(value);
   };
 
   const handleAddress = (value: string) => {
@@ -101,8 +103,11 @@ function Register() {
   const handlePhoneNumber = (value) => {
     if (/^[0-9]*$/.test(value)) {
       setPhoneNumber(value);
-    } else {
-      toast.error('Phone Number must contain only numbers.');
+    } else if (lastErrorMessage !== "Phone Number must contain only numbers.") {
+      // Show error toast only if the error message changes
+      toast.error("Phone Number must contain only numbers.");
+      // Set the last error message
+      setLastErrorMessage("Phone Number must contain only numbers.");
     }
   };
 
@@ -115,19 +120,19 @@ function Register() {
   };
 
   const handleImageProfile = (e) => {
-      setImage(e.target.files[0]);
+    setImage(e.target.files[0]);
   };
 
   const handleImageBirChange = (e) => {
-      setImageBIR(e.target.files[0]);
+    setImageBIR(e.target.files[0]);
   };
 
   const handleImageCityPermit = (e) => {
-      setCityPermit(e.target.files[0]);
+    setCityPermit(e.target.files[0]);
   };
 
   const handleImageSchoolPermit = (e) => {
-      setSchoolPermit(e.target.files[0]);
+    setSchoolPermit(e.target.files[0]);
   };
 
   // * Handle Register Supplier
@@ -139,37 +144,37 @@ function Register() {
     if (Object.keys(errors).length === 0) {
       const formData = new FormData();
 
-      formData.append('Id', IDNumber);
-      formData.append('ShopName', shopName);
-      formData.append('Address', address);
-      formData.append('Email', email);
-      formData.append('PhoneNumber', phoneNumber);
-      formData.append('Password', password);
-      formData.append('Image', image);
-      formData.append('BIR', bir);
-      formData.append('CityPermit', cityPermit);
-      formData.append('SchoolPermit', schoolPermit);
+      formData.append("Id", IDNumber);
+      formData.append("ShopName", shopName);
+      formData.append("Address", address);
+      formData.append("Email", email);
+      formData.append("PhoneNumber", phoneNumber);
+      formData.append("Password", password);
+      formData.append("Image", image);
+      formData.append("BIR", bir);
+      formData.append("CityPermit", cityPermit);
+      formData.append("SchoolPermit", schoolPermit);
 
       try {
         const response = await axios.post(
-          'https://localhost:7017/Users/registerSupplier',
+          "https://localhost:7017/Users/registerSupplier",
           formData
         );
         if (response.data) {
           registerUsersEventEmitter.emit("registerSupplier");
-          toast.success('Successfully registered.', {
-            onClose: () => navigate('/confirmation_email')
+          toast.success("Successfully registered.", {
+            onClose: () => navigate("/confirmation_email"),
           });
-          localStorage.setItem('showSupplierIDModal', 'true');
-          localStorage.setItem('generatedSupplierID', IDNumber);
+          localStorage.setItem("showSupplierIDModal", "true");
+          localStorage.setItem("generatedSupplierID", IDNumber);
         } else {
           toast.error(response.data);
         }
       } catch (error) {
         if (error.response && error.response.status === 400) {
-          toast.error(error.response.data.message); 
+          toast.error(error.response.data.message);
         } else {
-          toast.error('An error occurred. Please try again later.');
+          toast.error("An error occurred. Please try again later.");
         }
       }
     }
@@ -180,72 +185,73 @@ function Register() {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
     if (!IDNumber) {
-      errors.IDNumber = 'Store ID is required.';
+      errors.IDNumber = "Store ID is required.";
       toast.error(errors.IDNumber);
     } else if (!/^\d+$/.test(IDNumber) || IDNumber.length !== 8) {
-      errors.IDNumber = 'Store ID must be 8 numeric characters.';
+      errors.IDNumber = "Store ID must be 8 numeric characters.";
       toast.error(errors.IDNumber);
     }
 
     if (!shopName) {
-      errors.shopName = 'Shop Name is required.';
+      errors.shopName = "Shop Name is required.";
       toast.error(errors.shopName);
     }
 
     if (!address) {
-      errors.address = 'Address is required.';
+      errors.address = "Address is required.";
       toast.error(errors.address);
     }
 
     if (!email) {
-      errors.email = 'Email is required';
+      errors.email = "Email is required";
       toast.error(errors.email);
     } else if (!regex.test(email)) {
-      errors.email = 'This is not a valid email format';
+      errors.email = "This is not a valid email format";
       toast.error(errors.email);
     }
 
     if (!phoneNumber) {
-      errors.phoneNumber = 'Phone Number is required.';
+      errors.phoneNumber = "Phone Number is required.";
       toast.error(errors.phoneNumber);
     } else if (phoneNumber.length !== 11 || !/^\d+$/.test(phoneNumber)) {
-      errors.phoneNumber = 'Phone Number must be exactly 11 numeric characters.';
+      errors.phoneNumber =
+        "Phone Number must be exactly 11 numeric characters.";
       toast.error(errors.phoneNumber);
     }
 
     if (!password) {
-      errors.password = 'Password is required.';
+      errors.password = "Password is required.";
       toast.error(errors.password);
     } else if (password.length < 6) {
-      errors.password = 'Password must be at least 6 characters long.';
+      errors.password = "Password must be at least 6 characters long.";
       toast.error(errors.password);
     } else if (/^[a-zA-Z0-9]*$/.test(password)) {
-      errors.password = 'Password must be alpha numeric.';
+      errors.password = "Password must be alpha numeric.";
       toast.error(errors.password);
     }
 
     if (password !== confirmPassword) {
-      errors.confirmPassword = 'Passwords did not match.';
+      errors.confirmPassword = "Passwords did not match.";
       toast.error(errors.confirmPassword);
     }
 
     if (!image) {
-      errors.image = 'Please upload a Profile Picture.';
+      errors.image = "Please upload a Profile Picture.";
       toast.error(errors.image);
     }
 
     if (!bir) {
-      errors.bir = 'Please upload a BIR Permit.';
+      errors.bir = "Please upload a BIR Permit.";
       toast.error(errors.bir);
     }
 
     if (!cityPermit) {
-      errors.cityPermit = 'Please upload a City Permit.';
+      errors.cityPermit = "Please upload a City Permit.";
       toast.error(errors.cityPermit);
     }
 
     if (!schoolPermit) {
-      errors.schoolPermit = 'Please upload a School Permit.';
+      errors.schoolPermit = "Please upload a School Permit.";
       toast.error(errors.schoolPermit);
     }
 
@@ -262,13 +268,15 @@ function Register() {
             <div
               className="row"
               style={{
-                display: 'flex',
-                padding: '50px',
-                gap: '5px',
-                justifyContent: 'center',
+                display: "flex",
+                padding: "50px",
+                gap: "5px",
+                justifyContent: "center",
               }}
             >
-              <span style={{ paddingLeft: '70px' }}>This is your ID Number:</span>
+              <span style={{ paddingLeft: "70px" }}>
+                This is your ID Number:
+              </span>
               <input
                 className="col-md-5 input-register"
                 type="text"
@@ -327,24 +335,35 @@ function Register() {
                 <input type="file" onChange={handleImageProfile} />
               </div>
               <div className="col-md-5 birPermit-pic-register-container">
-                <span className="col-md-4 uploadImage-register-label">BIR Permit</span>
+                <span className="col-md-4 uploadImage-register-label">
+                  BIR Permit
+                </span>
                 <input type="file" onChange={handleImageBirChange} />
               </div>
               <div className="col-md-5 cityPermit-pic-register-container">
-                <span className="col-md-5 uploadImage-register-label">City Permit</span>
+                <span className="col-md-5 uploadImage-register-label">
+                  City Permit
+                </span>
                 <input type="file" onChange={handleImageCityPermit} />
               </div>
               <div
                 className="col-md-10 schoolPermit-pic-register-container"
-                style={{ marginRight: '10px' }}
+                style={{ marginRight: "10px" }}
               >
-                <span className="uploadImage-register-label" style={{ marginRight:'20px' }}>
+                <span
+                  className="uploadImage-register-label"
+                  style={{ marginRight: "20px" }}
+                >
                   School Permit
                 </span>
                 <input type="file" onChange={handleImageSchoolPermit} />
               </div>
               <div className="col-md-10 register-supplier-btn-container">
-                <button className="col-md-4 btn btn-lg btn-primary" style={{ borderRadius:'20px' }} type="submit">
+                <button
+                  className="col-md-4 btn btn-lg btn-primary"
+                  style={{ borderRadius: "20px" }}
+                  type="submit"
+                >
                   Register
                 </button>
               </div>
