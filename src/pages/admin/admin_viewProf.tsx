@@ -150,6 +150,7 @@ function Admin_viewProf() {
       }
     }
   };
+  
   return (
     <div className="viewProfile-customer-main-container">
       <div className="profile-details-container">

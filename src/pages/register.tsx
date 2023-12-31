@@ -34,23 +34,19 @@ function Register() {
   const [departmentId, setSelectedDepartment] = useState("");
   const [image, setImage] = useState(null);
   const [studyLoad, setStudyLoad] = useState(null);
+  const [lastErrorMessage, setLastErrorMessage] = useState("");
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const navigate = useNavigate();
 
   // * For Delay
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  const [lastErrorMessage, setLastErrorMessage] = useState("");
-
-  // Handle ID Number
   const handleIDnumber = (value) => {
     if (/^[0-9]*$/.test(value)) {
       setIDNumber(value);
-      // Clear the last error message when a valid value is entered
       setLastErrorMessage("");
     } else if (lastErrorMessage !== "ID Number must contain only numbers.") {
-      // Show error toast only if the error message changes
       toast.error("ID Number must contain only numbers.");
-      // Set the last error message
       setLastErrorMessage("ID Number must contain only numbers.");
     }
   };
@@ -59,9 +55,7 @@ function Register() {
     if (/^[a-zA-Z ]*$/.test(value)) {
       setFirstName(value);
     } else if (lastErrorMessage !== "First Name must contain only letters.") {
-      // Show error toast only if the error message changes
       toast.error("First Name must contain only letters.");
-      // Set the last error message
       setLastErrorMessage("First Name must contain only letters.");
     }
   };
@@ -70,9 +64,7 @@ function Register() {
     if (/^[a-zA-Z ]*$/.test(value)) {
       setLastName(value);
     } else if (lastErrorMessage !== "Last Name must contain only letters.") {
-      // Show error toast only if the error message changes
       toast.error("Last Name must contain only letters.");
-      // Set the last error message
       setLastErrorMessage("Last Name must contain only letters.");
     }
   };
@@ -85,9 +77,7 @@ function Register() {
     if (/^[0-9]*$/.test(value)) {
       setPhoneNumber(value);
     } else if (lastErrorMessage !== "Phone Number must contain only numbers.") {
-      // Show error toast only if the error message changes
       toast.error("Phone Number must contain only numbers.");
-      // Set the last error message
       setLastErrorMessage("Phone Number must contain only numbers.");
     }
   };
@@ -164,87 +154,71 @@ function Register() {
 
     if (!IDNumber) {
       errors.IDNumber = "ID Number is required.";
-      toast.error(errors.IDNumber);
     } else if (!/^\d+$/.test(IDNumber) || IDNumber.length !== 8) {
       errors.IDNumber = "ID Number must be 8 numeric characters.";
-      toast.error(errors.IDNumber);
     }
 
     if (!firstName) {
       errors.firstName = "First Name is required.";
-      toast.error(errors.firstName);
     }
 
     if (!lastName) {
       errors.lastName = "Last Name is required.";
-      toast.error(errors.lastName);
     }
 
     if (!email) {
       errors.email = "Email is required";
-      toast.error(errors.email);
     } else if (!regex.test(email)) {
       errors.email = "This is not a valid email format";
-      toast.error(errors.email);
     }
 
     if (!phoneNumber) {
       errors.phoneNumber = "Phone Number is required.";
-      toast.error(errors.phoneNumber);
     } else if (phoneNumber.length !== 11 || !/^\d+$/.test(phoneNumber)) {
-      errors.phoneNumber =
-        "Phone Number must be exactly 11 numeric characters.";
-      toast.error(errors.phoneNumber);
+      errors.phoneNumber = "Phone Number must be exactly 11 numeric characters.";
     }
 
     if (!password) {
       errors.password = "Password is required.";
-      toast.error(errors.password);
     } else if (password.length < 6) {
       errors.password = "Password must be at least 6 characters long.";
-      toast.error(errors.password);
     } else if (/^[a-zA-Z0-9]*$/.test(password)) {
       errors.password = "Password must be alpha numeric.";
-      toast.error(errors.password);
     }
 
     if (password !== confirmPassword) {
       errors.confirmPassword = "Passwords did not match.";
-      toast.error(errors.confirmPassword);
     }
 
     if (!image) {
       errors.image = "Please upload profile picture";
-      toast.error(errors.image);
     }
 
     if (!gender) {
       errors.gender = "Please select a gender.";
-      toast.error(errors.gender);
     }
 
     if (!departmentId) {
       errors.departmentId = "Please select a department.";
-      toast.error(errors.departmentId);
     }
 
     if (!studyLoad) {
       errors.studyLoad = "Please upload study load.";
-      toast.error(errors.studyLoad);
     }
-
+    setValidationErrors(errors);
     return errors;
   };
 
   useEffect(() => {
-    axios
-      .get("https://localhost:7017/Department")
-      .then((res) => {
-        setDepartments(res.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    const fetchDepartment = async () => {
+      try {
+        const response = await axios.get("https://localhost:7017/Department");
+        setDepartments(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchDepartment();
   }, []);
 
   return (
@@ -263,6 +237,9 @@ function Register() {
                 justifyContent: "center",
               }}
             >
+              <div className={`error-message-container ${validationErrors.IDNumber ? 'error-message' : 'hidden'}`}>
+                {validationErrors.IDNumber}
+              </div>
               <input
                 className="col-md-5 input-register"
                 type="text"
@@ -278,17 +255,17 @@ function Register() {
                 value={departmentId}
                 onChange={(e) => setSelectedDepartment(e.target.value)}
               >
-                <option>Select Department</option>
+                <option value="" hidden selected disabled>Select Department</option>
                 {departments.map((department) => (
-                  <option
-                    key={department.departmentId}
-                    value={department.departmentId}
-                  >
+                  <option key={department.departmentId} value={department.departmentId}>
                     {department.department_Name}
                   </option>
                 ))}
               </select>
 
+              <div className={`error-message-container ${validationErrors.firstName ? 'error-message' : 'hidden'}`}>
+                {validationErrors.firstName}
+              </div>
               <input
                 className="col-md-5 input-register"
                 type="text"
@@ -296,7 +273,9 @@ function Register() {
                 value={firstName}
                 onChange={(e) => handleFirstName(e.target.value)}
               />
-
+              <div className={`error-message-container ${validationErrors.lastName ? 'error-message' : 'hidden'}`}>
+                {validationErrors.lastName}
+              </div>
               <input
                 className="col-md-5 input-register"
                 type="text"
@@ -304,7 +283,9 @@ function Register() {
                 value={lastName}
                 onChange={(e) => handleLastName(e.target.value)}
               />
-
+              <div className={`error-message-container ${validationErrors.email ? 'error-message' : 'hidden'}`}>
+                {validationErrors.email}
+              </div>
               <input
                 className="col-md-5 input-register"
                 type="email"
@@ -312,7 +293,9 @@ function Register() {
                 value={email}
                 onChange={(e) => handleEmail(e.target.value)}
               />
-
+              <div className={`error-message-container ${validationErrors.phoneNumber ? 'error-message' : 'hidden'}`}>
+                {validationErrors.phoneNumber}
+              </div>
               <input
                 className="col-md-5 input-register"
                 type="text"
@@ -321,7 +304,9 @@ function Register() {
                 onChange={(e) => handlePhoneNumber(e.target.value)}
                 maxLength={11}
               />
-
+              <div className={`error-message-container ${validationErrors.password ? 'error-message' : 'hidden'}`}>
+                {validationErrors.password}
+              </div>
               <input
                 className="col-md-5 input-register"
                 type="password"
@@ -329,15 +314,19 @@ function Register() {
                 value={password}
                 onChange={(e) => handlePassword(e.target.value)}
               />
-
+              <div className={`error-message-container ${validationErrors.confirmPassword ? 'error-message' : 'hidden'}`}>
+                {validationErrors.confirmPassword}
+              </div>
               <input
                 className="col-md-5 input-register"
                 type="password"
                 placeholder="Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => handleConfirmPassword(e.target.value)}
-              />
-
+              />    
+              <div className={`error-message-container ${validationErrors.gender ? 'error-message' : 'hidden'}`}>
+                {validationErrors.lastName}
+              </div>
               <div className="col-md-5 register-gender-radio">
                 <span className="gender-text-register">Gender:</span>
                 <label>
@@ -361,14 +350,18 @@ function Register() {
                   <span className="gender-label-register">Female</span>
                 </label>
               </div>
-
+              <div className={`error-message-container ${validationErrors.image ? 'error-message' : 'hidden'}`}>
+                {validationErrors.image}
+              </div>
               <div className="col-md-5 profile-pic-register-container">
                 <span className="col-md-5 uploadImage-register-label">
                   Profile Picture
                 </span>
                 <input type="file" onChange={handleImage} />
               </div>
-
+              <div className={`error-message-container ${validationErrors.studyLoad ? 'error-message' : 'hidden'}`}>
+                {validationErrors.studyLoad}
+              </div>
               <div className="col-md-10 studyLoad-pic-register-container">
                 <span className="col-md-2 uploadImage-register-label">
                   Study Load

@@ -127,6 +127,17 @@
   background-color: #e8e7e7;
 }
 
-.error-border {
-  border: 2px solid red;
+.error-message-container {
+  height: 8px;  
+  margin-bottom: 5px;
+  color: red;
+  font-size: 0.8rem;
+}
+
+.error-message {
+  visibility: visible;
+}
+
+.hidden {
+  visibility: hidden;
 }
