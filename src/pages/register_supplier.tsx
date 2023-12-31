@@ -33,43 +33,9 @@ function Register() {
   const [bir, setImageBIR] = useState(null);
   const [cityPermit, setCityPermit] = useState(null);
   const [schoolPermit, setSchoolPermit] = useState(null);
+  //const [lastErrorMessage, setLastErrorMessage] = useState("");
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const navigate = useNavigate();
-  const [lastErrorMessage, setLastErrorMessage] = useState("");
-
-  // * Get Countries for Registering
-  useEffect(() => {
-    const fetchData = async () => {
-      const headers = new Headers();
-      headers.append(
-        "X-CSCAPI-KEY",
-        "R0ljcVpYMHhyWGM4UUl4MmE1VGhVVFhlSWUxd0laeW5ESFpwdU44Mw=="
-      );
-
-      const requestOptions = {
-        method: "GET",
-        headers: headers,
-        redirect: "follow" as RequestRedirect,
-      };
-
-      try {
-        const response = await fetch(
-          "https://api.countrystatecity.in/v1/countries",
-          requestOptions
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const result = await response.text();
-        console.log(result);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   // * Get the Generated ID number for Supplier
   useEffect(() => {
@@ -103,11 +69,9 @@ function Register() {
   const handlePhoneNumber = (value) => {
     if (/^[0-9]*$/.test(value)) {
       setPhoneNumber(value);
-    } else if (lastErrorMessage !== "Phone Number must contain only numbers.") {
-      // Show error toast only if the error message changes
-      toast.error("Phone Number must contain only numbers.");
-      // Set the last error message
-      setLastErrorMessage("Phone Number must contain only numbers.");
+      setValidationErrors((prevErrors) => ({ ...prevErrors, phoneNumber: "" }));
+    } else {
+      setValidationErrors((prevErrors) => ({ ...prevErrors, phoneNumber: "Phone Number must contain only numbers." }));
     }
   };
 
@@ -186,75 +150,60 @@ function Register() {
 
     if (!IDNumber) {
       errors.IDNumber = "Store ID is required.";
-      toast.error(errors.IDNumber);
     } else if (!/^\d+$/.test(IDNumber) || IDNumber.length !== 8) {
       errors.IDNumber = "Store ID must be 8 numeric characters.";
-      toast.error(errors.IDNumber);
     }
 
     if (!shopName) {
       errors.shopName = "Shop Name is required.";
-      toast.error(errors.shopName);
     }
 
     if (!address) {
       errors.address = "Address is required.";
-      toast.error(errors.address);
     }
 
     if (!email) {
       errors.email = "Email is required";
-      toast.error(errors.email);
     } else if (!regex.test(email)) {
       errors.email = "This is not a valid email format";
-      toast.error(errors.email);
     }
 
     if (!phoneNumber) {
       errors.phoneNumber = "Phone Number is required.";
-      toast.error(errors.phoneNumber);
     } else if (phoneNumber.length !== 11 || !/^\d+$/.test(phoneNumber)) {
-      errors.phoneNumber =
-        "Phone Number must be exactly 11 numeric characters.";
-      toast.error(errors.phoneNumber);
+      errors.phoneNumber = "Phone Number must be exactly 11 numeric characters.";
     }
 
     if (!password) {
       errors.password = "Password is required.";
-      toast.error(errors.password);
     } else if (password.length < 6) {
       errors.password = "Password must be at least 6 characters long.";
-      toast.error(errors.password);
     } else if (/^[a-zA-Z0-9]*$/.test(password)) {
       errors.password = "Password must be alpha numeric.";
-      toast.error(errors.password);
     }
 
-    if (password !== confirmPassword) {
+    if (!confirmPassword) {
+      errors.confirmPassword = "Confirm Password is required";
+    } else if (password !== confirmPassword) {
       errors.confirmPassword = "Passwords did not match.";
-      toast.error(errors.confirmPassword);
     }
 
     if (!image) {
       errors.image = "Please upload a Profile Picture.";
-      toast.error(errors.image);
     }
 
     if (!bir) {
       errors.bir = "Please upload a BIR Permit.";
-      toast.error(errors.bir);
     }
 
     if (!cityPermit) {
       errors.cityPermit = "Please upload a City Permit.";
-      toast.error(errors.cityPermit);
     }
 
     if (!schoolPermit) {
       errors.schoolPermit = "Please upload a School Permit.";
-      toast.error(errors.schoolPermit);
     }
-
+    setValidationErrors(errors);
     return errors;
   };
 
@@ -274,96 +223,159 @@ function Register() {
                 justifyContent: "center",
               }}
             >
-              <span style={{ paddingLeft: "70px" }}>
-                This is your ID Number:
-              </span>
-              <input
-                className="col-md-5 input-register"
-                type="text"
-                placeholder="Store ID"
-                onChange={(e) => handleIDnumber(e.target.value)}
-                value={IDNumber}
-                disabled
-              />
-              <input
-                className="col-md-5 input-register"
-                type="text"
-                placeholder="Shop Name"
-                onChange={(e) => handleShopName(e.target.value)}
-                value={shopName}
-              />
-              <input
-                className="col-md-5 input-register"
-                type="text"
-                placeholder="Address"
-                onChange={(e) => handleAddress(e.target.value)}
-                value={address}
-              />
-              <input
-                className="col-md-5 input-register"
-                type="email"
-                placeholder="Email"
-                onChange={(e) => handleEmail(e.target.value)}
-                value={email}
-              />
-              <input
-                className="col-md-5 input-register"
-                type="text"
-                placeholder="Phone Number"
-                value={phoneNumber}
-                onChange={(e) => handlePhoneNumber(e.target.value)}
-                maxLength={11}
-              />
-              <input
-                className="col-md-5 input-register"
-                type="password"
-                placeholder="Password (at least 6 characters long)"
-                onChange={(e) => handlePassword(e.target.value)}
-                value={password}
-              />
-              <input
-                className="col-md-5 input-register"
-                type="password"
-                placeholder="Confirm Password"
-                onChange={(e) => handleConfirmPassword(e.target.value)}
-                value={confirmPassword}
-              />
-              <div className="col-md-5 profile-pic-register-container">
-                <span className="col-md-5 uploadImage-register-label">
-                  Profile Picture
-                </span>
-                <input type="file" onChange={handleImageProfile} />
+              <div className="inputs-container">
+                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
+                  <span>This is your ID Number:</span>
+                  <input
+                    className="input-register"
+                    type="text"
+                    placeholder="Store ID"
+                    onChange={(e) => handleIDnumber(e.target.value)}
+                    value={IDNumber}
+                    disabled
+                  />
+                </div>
+                <div className='col-md-5 input-container-withErrorMessage'>
+                  <div className={`error-message-container ${validationErrors.shopName ? 'error-message' : 'hidden'}`}>
+                    {validationErrors.shopName}
+                  </div>
+                  <input
+                    className="input-register"
+                    type="text"
+                    placeholder="Shop Name"
+                    onChange={(e) => handleShopName(e.target.value)}
+                    value={shopName}
+                  />
+                </div>
               </div>
-              <div className="col-md-5 birPermit-pic-register-container">
-                <span className="col-md-4 uploadImage-register-label">
-                  BIR Permit
-                </span>
-                <input type="file" onChange={handleImageBirChange} />
+            
+              <div className="inputs-container">
+                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
+                  <div className={`error-message-container ${validationErrors.address ? 'error-message' : 'hidden'}`}>
+                    {validationErrors.address}
+                  </div>
+                  <input
+                      className="input-register"
+                      type="text"
+                      placeholder="Address"
+                      onChange={(e) => handleAddress(e.target.value)}
+                      value={address}
+                    />
+                </div>
+                <div className='col-md-5 input-container-withErrorMessage'>
+                  <div className={`error-message-container ${validationErrors.email ? 'error-message' : 'hidden'}`}>
+                    {validationErrors.email}
+                  </div>
+                  <input
+                    className="input-register"
+                    type="email"
+                    placeholder="Email"
+                    onChange={(e) => handleEmail(e.target.value)}
+                    value={email}
+                  />
+                </div>
               </div>
-              <div className="col-md-5 cityPermit-pic-register-container">
-                <span className="col-md-5 uploadImage-register-label">
-                  City Permit
-                </span>
-                <input type="file" onChange={handleImageCityPermit} />
+
+              <div className="inputs-container">
+                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
+                    <div className={`error-message-container ${validationErrors.phoneNumber ? 'error-message' : 'hidden'}`}>
+                      {validationErrors.phoneNumber && (
+                        <div className="error-message-container">
+                          {validationErrors.phoneNumber}
+                        </div>
+                      )}
+                    </div>
+                  <input
+                    className="input-register"
+                    type="text"
+                    placeholder="Phone Number"
+                    value={phoneNumber}
+                    onChange={(e) => handlePhoneNumber(e.target.value)}
+                    maxLength={11}
+                  />
+                </div>
+                <div className='col-md-5 input-container-withErrorMessage'>
+                  <div className={`error-message-container ${validationErrors.password ? 'error-message' : 'hidden'}`}>
+                    {validationErrors.password}
+                  </div>
+                  <input
+                    className="input-register"
+                    type="password"
+                    placeholder="Password (at least 6 characters long)"
+                    onChange={(e) => handlePassword(e.target.value)}
+                    value={password}
+                  />
+                </div>
               </div>
-              <div
-                className="col-md-10 schoolPermit-pic-register-container"
-                style={{ marginRight: "10px" }}
-              >
-                <span
-                  className="uploadImage-register-label"
-                  style={{ marginRight: "20px" }}
-                >
-                  School Permit
-                </span>
-                <input type="file" onChange={handleImageSchoolPermit} />
+              
+              <div className="inputs-container">
+                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
+                  <div className={`error-message-container ${validationErrors.confirmPassword ? 'error-message' : 'hidden'}`}>
+                    {validationErrors.confirmPassword}
+                  </div>
+                  <input
+                      className="input-register"
+                      type="password"
+                      placeholder="Confirm Password"
+                      onChange={(e) => handleConfirmPassword(e.target.value)}
+                      value={confirmPassword}
+                    />
+                </div>
+                <div className='col-md-5 input-container-withErrorMessage'>
+                  <div className={`error-message-container ${validationErrors.image ? 'error-message' : 'hidden'}`}>
+                    {validationErrors.image}
+                  </div>
+                  <div className="profile-pic-register-container">
+                    <span className="col-md-5 uploadImage-register-label">
+                      Profile Picture
+                    </span>
+                    <input type="file" onChange={handleImageProfile} />
+                  </div>
+                </div>
               </div>
+              
+              <div className="inputs-container">
+                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
+                  <div className={`error-message-container ${validationErrors.bir ? 'error-message' : 'hidden'}`}>
+                    {validationErrors.bir}
+                  </div>
+                  <div className="birPermit-pic-register-container">
+                    <span className="col-md-5 uploadImage-register-label">
+                      BIR Permit
+                    </span>
+                    <input type="file" onChange={handleImageBirChange} />
+                  </div>
+                </div>
+                
+                <div className='col-md-5 input-container-withErrorMessage'>
+                  <div className={`error-message-container ${validationErrors.cityPermit ? 'error-message' : 'hidden'}`}>
+                    {validationErrors.cityPermit}
+                  </div>
+                  <div className="cityPermit-pic-register-container">
+                    <span className="col-md-5 uploadImage-register-label">
+                      City Permit
+                    </span>
+                    <input type="file" onChange={handleImageCityPermit} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="inputs-container">
+                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
+                  <div className={`error-message-container ${validationErrors.schoolPermit ? 'error-message' : 'hidden'}`}>
+                    {validationErrors.schoolPermit}
+                  </div>
+                  <div className="schoolPermit-pic-register-container">
+                    <span className="col-md-5 uploadImage-register-label">
+                      School Permit
+                    </span>
+                    <input type="file" onChange={handleImageSchoolPermit} />
+                  </div>
+                </div>
+              </div>
+              
               <div className="col-md-10 register-supplier-btn-container">
-                <button
-                  className="col-md-4 btn btn-lg btn-primary"
-                  style={{ borderRadius: "20px" }}
-                  type="submit"
-                >
+                <button className="col-md-4 btn btn-lg btn-primary" style={{ borderRadius: "20px" }} type="submit">
                   Register
                 </button>
               </div>

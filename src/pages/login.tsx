@@ -218,34 +218,38 @@ function Login() {
           <div className="col-md-5 login-2-container">
 
             <h1 className="login-title">Login</h1>
-            
+
             <h4 className="login-text">
               Enter your valid credentials for logging in
             </h4>
-
-            <div className={`error-message-container ${validationErrors.IDOrEmail ? 'error-message' : 'hidden'}`}>
-              {validationErrors.IDOrEmail}
+            
+            <div className='col-md-8 login-input-container-withErrorMessage' style={{ marginLeft:'40px' }}>
+              <div className={`error-message-container ${validationErrors.IDOrEmail ? 'error-message' : 'hidden'}`}>
+                {validationErrors.IDOrEmail}
+              </div>
+              <input
+                className="col-md-11 input-login"
+                type="text"
+                placeholder="ID Number or Email"
+                value={IDOrEmail}
+                onChange={(e) => handleIDOrEmail(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
             </div>
-            <input
-              className="col-md-7 input-login"
-              type="text"
-              placeholder="ID Number or Email"
-              value={IDOrEmail}
-              onChange={(e) => handleIDOrEmail(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
 
-            <div className={`error-message-container ${validationErrors.Password ? 'error-message' : 'hidden'}`}>
-              {validationErrors.Password}
+            <div className='col-md-8 login-input-container-withErrorMessage' style={{ marginLeft:'40px' }}>
+              <div className={`error-message-container ${validationErrors.Password ? 'error-message' : 'hidden'}`}>
+                {validationErrors.Password}
+              </div>
+              <input
+                className="col-md-11 input-login"
+                type="password"
+                placeholder="Password"
+                value={Password}
+                onChange={(e) => handlePassword(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
             </div>
-            <input
-              className="col-md-7 input-login"
-              type="password"
-              placeholder="Password"
-              value={Password}
-              onChange={(e) => handlePassword(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
 
             <div className="col-md-7 forgot-pwd-container">
               <button
