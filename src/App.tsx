@@ -26,9 +26,8 @@ import Admin_Reports from "./pages/admin/admin_reports";
 import Purchase_History from "./pages/main/purchase_history";
 import AccountType from "./pages/accountType";
 import Notif from "./pages/main/notif";
-//import Manage_Prod from './pages/supplier/manage_prod'
 import Supplier_Order from "./pages/supplier/supplier_orders";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, Zoom } from "react-toastify";
 import RegisterSupplier from "./pages/register_supplier";
 import Manage_Shop from "./pages/supplier/manage_shop";
 import Supplier_Main from "./pages/supplier/supplier_main";
@@ -47,12 +46,16 @@ function App() {
     <div>
       <ToastContainer
         position="top-center"
-        autoClose={800}
-        hideProgressBar
+        autoClose={1500}
+        hideProgressBar={false}
+        newestOnTop
+        transition={Zoom}
         closeOnClick
-        pauseOnHover
-        draggable
-        toastClassName="custom-toast"
+        rtl={false}
+        pauseOnFocusLoss
+        draggable={false}
+        pauseOnHover={false}
+        theme="light"
       />
       <Router>
         <Routes>

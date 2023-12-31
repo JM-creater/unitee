@@ -23,11 +23,13 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [supplierID, setSupplierID] = useState("");
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const navigate = useNavigate();
 
   // * For Delay
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+  // * Reset the email
   const handleCloseButton = () => {
     setResetEmail("");
   };
@@ -107,10 +109,12 @@ function Login() {
       errors.Password = "Password is required.";
     }
 
+    setValidationErrors(errors);
+
     if (Object.keys(errors).length > 0) {
-      for (const key in errors) {
-        toast.error(errors[key]);
-      }
+      // for (const key in errors) {
+      //   toast.error(errors[key]);
+      // }
       return;
     }
 
@@ -170,18 +174,9 @@ function Login() {
       })
       .catch((error) => {
         if (error.response && error.response.status === 400) {
-          if (
-            error.response.data === "Invalid user id." ||
-            error.response.data === "Invalid password."
-          ) {
-            toast.error(error.response.data);
-          } else if (error.response.data === "Waiting for validation") {
-            toast.info("Please Wait for Validation.");
-          } else {
-            toast.error("Wrong Credentials");
-          }
+          toast.error(error.response.data.message);
         } else {
-          toast.error("Unexpected Error");
+          toast.error("An error occurred. Please try again later.");
         }
       });
   };
@@ -221,10 +216,16 @@ function Login() {
             <img className="stud-img" src={illustration} alt="" />
           </div>
           <div className="col-md-5 login-2-container">
+
             <h1 className="login-title">Login</h1>
+            
             <h4 className="login-text">
               Enter your valid credentials for logging in
             </h4>
+
+            <div className={`error-message-container ${validationErrors.IDOrEmail ? 'error-message' : 'hidden'}`}>
+              {validationErrors.IDOrEmail}
+            </div>
             <input
               className="col-md-7 input-login"
               type="text"
@@ -233,6 +234,10 @@ function Login() {
               onChange={(e) => handleIDOrEmail(e.target.value)}
               onKeyDown={handleKeyDown}
             />
+
+            <div className={`error-message-container ${validationErrors.Password ? 'error-message' : 'hidden'}`}>
+              {validationErrors.Password}
+            </div>
             <input
               className="col-md-7 input-login"
               type="password"

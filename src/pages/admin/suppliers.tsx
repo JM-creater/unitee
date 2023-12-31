@@ -11,8 +11,8 @@ import registerUsersEventEmitter from "../../helpers/RegisterUsersEmitter";
 function Suppliers() {
   const [supplier, setSupplier] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
-  const [departments, setDepartments] = useState([]);
-  const [selectedDepartments, setSelectedDepartments] = useState("All");
+  const [, setDepartments] = useState([]);
+  const [selectedDepartments, ] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -506,24 +506,6 @@ function Suppliers() {
           </div>
         </div>
       </div>
-
-      {/* CHANGE PASSWORD CONFIRMATION MODAL
-      <div className="modal fade" id="changeConfirmationModal" aria-hidden="true" aria-labelledby="changeConfirmationModalLabel" tabIndex={-1}>
-        <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-            <div className="modal-header">
-                <h1 className="modal-title fs-5" id="changeConfirmationModal">Modal 2</h1>
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div className="modal-body">
-                Hide this modal and show the first with the button below.
-            </div>
-            <div className="modal-footer">
-                <button className="btn btn-primary"data-bs-dismiss="supplierInfoModal" data-bs-toggle="modal">Back to first</button>
-            </div>
-            </div>
-        </div>
-    </div> */}
     </div>
   );
 }
