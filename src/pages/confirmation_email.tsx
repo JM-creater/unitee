@@ -37,9 +37,7 @@ function Confirmation_Code() {
     }
 
     try {
-      const response = await fetch(
-        "https://localhost:7017/Users/confirm-email",
-        {
+      const response = await fetch("https://localhost:7017/Users/confirm-email", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
