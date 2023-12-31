@@ -689,8 +689,7 @@ function Manage_Shop() {
   const handleDelete = async (id) => {
     try {
       const response = await fetch(
-        `https://localhost:7017/SizeQuantity/delete/${id}`,
-        {
+        `https://localhost:7017/SizeQuantity/delete/${id}`, {
           method: "DELETE",
         }
       );

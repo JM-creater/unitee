@@ -126,14 +126,14 @@ function Shop() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get('https://localhost:7017/Product');
+                const response = await axios.get(`https://localhost:7017/Product/searchByDepartment?userId=${userId}`);
                 setProducts(response.data);
             } catch (error) {
                 console.error(error);
             }
         }
         fetchProducts();
-    }, []);
+    }, [userId]);
 
     return (
     <React.Fragment>
