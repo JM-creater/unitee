@@ -176,7 +176,6 @@ function Cart() {
       return response.data;
     } catch (error) {
       console.error("Error fetching available quantity:", error);
-      return -1;
     }
   };
 

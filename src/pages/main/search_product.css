@@ -38,3 +38,61 @@
     justify-content: flex-start; 
     gap: 20px; 
 }
+
+.search-container-product {
+    position: relative;
+    margin-left: 600px;
+}
+
+.Product-Search-Bar {
+    width: 490px;
+    border: #f0f0f0 solid 1px;
+    padding: 7px;
+}
+
+.search-dropdown-product {
+    position: absolute;
+    top: 165px;
+    width: 500px;
+    margin-left: 608px;
+}
+
+.search-dropdown-row-product {
+    padding: 5px;
+    cursor: pointer;
+    text-align: start;
+    margin-left: 10px;
+    border: #f0f0f0 solid 1px;
+    border-top: none;
+    transition: background-color 0.3s ease;
+}
+
+.search-dropdown-row-product:hover {
+    background-color: #f0f0f0; 
+}
+
+.search-result-message {
+    background-color: #f5f5f5;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+.search-result-message h3 {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    margin: 10px 0;
+}
+
+.message-search {
+    font-size: 1.2em;
+}
+
+.search-result-message message-search {
+    font-style: italic;
+    padding: 3px 6px;
+    border-radius: 3px;
+    color: #0056b3;
+}
