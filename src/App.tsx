@@ -63,10 +63,10 @@ function App() {
           <Routes>
             <Route index element={<Login />} />
             <Route path="/accountType" element={<AccountType />} />
-            <Route path="/confirmation_email" element={  <Confirmation_Code /> } />
+            <Route path="/confirmation_email" element={ <PrivateRoute> <Confirmation_Code /> </PrivateRoute> } />
             <Route path="/register" element={<Register />} />
             <Route path="/register_supplier" element={<RegisterSupplier />} />
-            <Route path="/forgot_password" element={ <Forgot_Password /> } />
+            <Route path="/forgot_password" element={  <PrivateRoute> <Forgot_Password /> </PrivateRoute> } />
 
               {/* CUSTOMER */}
               <Route path="/shop/:userId" element={ <PrivateRoute> <Main /> </PrivateRoute>  }>
