@@ -129,10 +129,10 @@
 
 /*CONTAINER OF CAROUSEL WITH WEB SLOGAN */
 .shopCustomer-title-container {
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   margin: 40px 0 30px  ;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 40px 0 30px;
 }
 
 /* .shop-sort-container {
@@ -414,6 +414,10 @@
   margin-bottom: 20px; 
 }
 
+.search-container {
+  position: relative;
+}
+
 .Product-SearchBar {
   width: 490px;
   margin-right: 7px;
@@ -421,12 +425,13 @@
   padding: 7px;
 }
 
-.search-container {
-  position: relative;
+.search-dropdown {
+  position: absolute;
+  top: 512px;
+  width: 500px;
 }
 
 .search-dropdown-row {
-  width: 490px;
   padding: 5px;
   cursor: pointer;
   text-align: start;

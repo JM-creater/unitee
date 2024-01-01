@@ -12,16 +12,9 @@ import cartEventEmitter from "../../helpers/EventEmitter"
 
 function  Search_Product () {
 
-    interface Department {
-        departmentId: number;
-        department_Name: string;
-    }
-
-    //const [ratings, setRatings] = useState(null);
-    //const [averageRating, setAverageRating] = useState(0);
     const [, setCart] = useState([]);
     const [displayProduct, setDisplayProduct] = useState([]);
-    const [departments, setDepartments] = useState<Department[]>([]);
+    const [departments, setDepartments] = useState([]);
     const [selectedProductType, setSelectedProductType] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -42,8 +35,9 @@ function  Search_Product () {
     };
 
     // * Handle to perform search
-    const performSearch = () => {
-        navigate(`/shop/${userId}/search_product?search=${searchTerm}`);
+    const performSearch = (productName = searchTerm) => {
+        setSearchTerm(productName); 
+        navigate(`/shop/${userId}/search_product?search=${productName}`);
     };
 
     // * Fetch products based on search
@@ -56,26 +50,40 @@ function  Search_Product () {
                 }
             } catch (error) {
                 console.log(error);
-                //toast.error('Network error or server not responding');
             }
         }
         fetchProducts();
     }, [search]);
 
+    // * Search Product Data
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Product/searchByDepartment?userId=${userId}`);
+                setDisplayProduct(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchProducts();
+    }, [userId]);
+
     // * Get All departments
     useEffect(() => {
-        axios.get('https://localhost:7017/Department')
-        .then(response => {
-            setDepartments(response.data);
-        })
-        .catch(error => {
-            console.log(error);
-        })
+        const fetchDepartments = async () => {
+            try {
+                const response = await axios.get('https://localhost:7017/Department');
+                setDepartments(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        fetchDepartments();
     }, []);
 
     // * Get Department Name
     const getDepartmentName = (departmentId: number) => {
-        const department = departments.find(d => d.departmentId === departmentId);
+        const department = departments.find(d => d.productDepartments.departmentId === departmentId);
         return department ? department.department_Name : 'Unknown Department';
     };
 
@@ -118,6 +126,7 @@ function  Search_Product () {
         }
     }
 
+    // * Handle Price Range
     const handlePriceRangeClick = (e, priceRange) => {
         if (selectedPriceRange === priceRange) {
             setSelectedPriceRange('');
@@ -131,37 +140,41 @@ function  Search_Product () {
     const addToCart = () => {
         const CloseBtn = document.getElementById("btnClose");
         if (!selectedProduct) return;
-    
+
         if (!selectedSize) {
             toast.warning("Please select a size.");
             return;
         }
-    
+
         if (quantity <= 0) {
             toast.warning("Please select a valid quantity.");
             return;
         }
-    
+
         const cartAddRequest = {
             userId: userId,
             productId: selectedProduct.productId,
             size: selectedSize,
             quantity: quantity
         };
-    
+
         axios.post('https://localhost:7017/Cart/add', cartAddRequest)
-        .then(() => {
-            toast.success("Item added to cart");
-            cartEventEmitter.emit("itemAddedToCart");
-            CloseBtn.click();
-            HandleCloseButton();
-            return axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
-        })
-        .then(updatedCartResponse => {
-            setCart(updatedCartResponse.data);
-        })
-        .catch(error => {
-            toast.error(error);
+            .then(() => {
+                toast.success("Item added to cart");
+                cartEventEmitter.emit("itemAddedToCart");
+                CloseBtn.click();
+                HandleCloseButton();
+                return axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
+            })
+            .then(updatedCartResponse => {
+                setCart(updatedCartResponse.data);
+            })
+            .catch(error => {
+                if (error.response && error.response.status === 400) {
+                    toast.error(error.response.data.message);
+                } else {
+                    toast.error("Error adding item to cart. Please try again.");
+                }
         });
     };
 
@@ -215,36 +228,48 @@ function  Search_Product () {
         }
     };
 
-    // ! To Be Fixed
-    // useEffect(() => {
-    //     axios.get(`https://localhost:7017/Rating/${userId}`)
-    //         .then((response) => {
-    //             setRatings(response.data);
-
-    //             const totalValue = response.data.reduce((acc, cur) => acc + cur.value, 0);
-    //             const avg = response.data.length > 0 ? (totalValue / response.data.length) : 0;
-    //             setAverageRating(+avg.toFixed(1)); 
-    //         }).catch((error) => {
-    //             console.error(error);
-    //         });
-    // }, [userId]);
-
     return <div className="search-prod-main-container">
-        <div className="search-container">
-                <span className="fa fa-search form-control-feedback search-icon"></span>
-                <input 
-                    className="col-md-4 Supplier-SearchBar"
-                    type="text"
-                    placeholder="Search Product"
-                    value={searchTerm}
-                    onChange={handleSearchInputChange}
-                    onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                            performSearch();
-                        }
-                    }}
-                />
-            </div>
+
+        <div className="search-result-message">
+            {search && <h3>Search Result for <span className='message-search'>"{search}"</span></h3>}
+        </div>
+
+        <div className="search-container-product">
+            <span className="fa fa-search form-control-feedback search-icon"></span>
+            <input 
+                className="Product-Search-Bar"
+                type="text"
+                placeholder="Search Product"
+                value={searchTerm}
+                onChange={handleSearchInputChange}
+                onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                        performSearch();
+                    }
+                }}
+            />
+        </div>
+        <div className='search-dropdown-product'>
+            {displayProduct.filter(productFilter => {
+                const searchTermLowerCase = searchTerm.toLowerCase();
+                const productName = productFilter.productName?.toLowerCase();
+
+                return (
+                    searchTermLowerCase &&
+                    productName?.startsWith(searchTermLowerCase) &&
+                    productName !== searchTermLowerCase
+                );
+            }).slice(0, 5).map((productData, index) => (
+                <div 
+                    key={index} 
+                    className='search-dropdown-row-product'
+                    onClick={() => performSearch(productData.productName)}
+                >
+                    <span className="fa fa-search form-control-feedback search-icon"></span>
+                    {productData.productName}
+                </div>
+            ))}
+        </div>
 
         <div className='sub-container'>
             <div className='recommender-filter-container'>
@@ -422,7 +447,7 @@ function  Search_Product () {
                         </div>
                     </div>
             </div>
-
+            
             <div className="recommender-prod-container">
                 {filteredProduct.map(product => (
                     <div 
@@ -499,7 +524,7 @@ function  Search_Product () {
                                     {/* )} */}
 
                                     <h5 className="prodModal-text">
-                                        {getDepartmentName(selectedProduct.departmentId)}
+                                    {getDepartmentName(selectedProduct.productDepartments.departmentId)}
                                     </h5>
                                     <h5 className="prodModal-text">
                                         {selectedProduct.category}
