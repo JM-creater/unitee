@@ -18,7 +18,6 @@ import * as signalR from "@microsoft/signalr";
 import { toast } from "react-toastify";
 import navEmptyCartImg from "../../assets/images/icons/empty-cart.png";
 import LogoutLoadingScreen from "../common/LogoutLoadingScreen";
-//import NotificationSound from "../../assets/sound/notificationsound.mp3"
 import React from "react";
 
 function Main() {
@@ -45,19 +44,11 @@ function Main() {
     navigate("/");
   };
 
-  // * Notification Sound
-  // const playNotificationSound = () => {
-  //     const sound = new Audio(NotificationSound);
-  //     sound.play();
-  // };
-
   // * Fetch Users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(
-          `https://localhost:7017/Users/${userId}`
-        );
+        const response = await axios.get(`https://localhost:7017/Users/${userId}`);
         setCustomer(response.data);
       } catch (error) {
         console.error(error);
@@ -71,7 +62,7 @@ function Main() {
     const updateCartCount = () => {
       axios
         .get(`https://localhost:7017/Cart/myCart/${userId}`)
-        .then((res) => {
+        .then(async(res) => {
           setCart(res.data);
           setTotalItems(
             res.data.reduce((acc, cartItems) => acc + cartItems.items.length, 0)
@@ -160,7 +151,6 @@ function Main() {
 
     const handleFocus = () => {
       fetchData();
-      //playNotificationSound();
     };
 
     window.addEventListener("focus", handleFocus);
@@ -198,7 +188,6 @@ function Main() {
     connection
       .start()
       .then(() => {
-        //console.log("Connected!");
       })
       .catch((err) => console.error("SignalR Connection Error: ", err));
 
@@ -233,10 +222,6 @@ function Main() {
                 <span id="tooltip-text">Home</span>
                 <img className="nav-icon" src={homeIcon} />
               </Link>
-
-              {/* <Link className="customer-nav-link" to="chat">
-                <img className="nav-icon" src={chatCustomer} />
-              </Link> */}
 
               <div className="customer-nav-link">
                 <div className="cart-icon-container">
@@ -375,29 +360,16 @@ function Main() {
                   </div>
                 </ul>
               </div>
-              <div
-                className="modal fade"
-                id="logoutModal"
-                tabIndex={1}
-                aria-labelledby="logoutModalLabel"
-                aria-hidden={!showLogoutModal}
-              >
+              <div className="modal fade" id="logoutModal" tabIndex={1} aria-labelledby="logoutModalLabel" aria-hidden={!showLogoutModal}>
                 <div className="modal-dialog modal-dialog-centered">
                   <div className="modal-content">
                     <div className="logout-confirmation-modalBody">
                       <h3>Are you sure you want to logout?</h3>
                       <div className="col-md-12 logout-btn-container">
-                        <button
-                          className="logout-btn"
-                          data-bs-dismiss="modal"
-                          onClick={HandleLogoutModal}
-                        >
+                        <button className="logout-btn" data-bs-dismiss="modal" onClick={HandleLogoutModal}>
                           Log Out
                         </button>
-                        <button
-                          className="cancel-logout-btn"
-                          data-bs-dismiss="modal"
-                        >
+                        <button className="cancel-logout-btn" data-bs-dismiss="modal">
                           Cancel
                         </button>
                       </div>
