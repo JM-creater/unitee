@@ -158,29 +158,49 @@ function Cart() {
     const availableQuantity = await getAvailableQuantity(
       updatedCart[index].items[itemIndex].productId,
       updatedCart[index].items[itemIndex].sizeQuantityId
-    ); // Replace getAvailableQuantity with your actual function
+    ); 
 
     if (currentQuantity < availableQuantity) {
       updatedCart[index].items[itemIndex].quantity += 1;
       setCart(updatedCart);
       calculateTotalAmount();
     } else {
-      // Optionally, you can show a message or handle the situation when the available quantity is reached.
-      showToast("Maximum quantity reached", 3);
-      console.log(availableQuantity);
+      showToast(`Maximum quantity of ${availableQuantity} for this size reached`, 3);
     }
   };
 
+  // * Get the Available quantity for each sizes
   const getAvailableQuantity = async (productId, sizeQuantityId) => {
     try {
-      const response = await axios.get(
-        `https://localhost:7017/Product/getQuantity?productId=${productId}&sizeQuantityId=${sizeQuantityId}`
-      );
+      const response = await axios.get(`https://localhost:7017/Product/getQuantity?productId=${productId}&sizeQuantityId=${sizeQuantityId}`);
       return response.data;
     } catch (error) {
       console.error("Error fetching available quantity:", error);
-      return 0; // Default to 0 in case of an error
+      return -1;
     }
+  };
+
+  // * Handle Size Change
+  const handleSizeChange = async (index, itemIndex, newSizeIdString) => {
+    const newSizeId = parseInt(newSizeIdString);
+    if (isNaN(newSizeId)) {
+      return;
+    }
+    const updatedCart = [...cart];
+    updatedCart[index].items[itemIndex].sizeQuantityId = newSizeId;
+  
+    const newSize = updatedCart[index].items[itemIndex].product.sizes.find(size => size.id === newSizeId);
+    const availableQuantity = await getAvailableQuantity(
+      updatedCart[index].items[itemIndex].productId,
+      newSizeId
+    );
+  
+    if (newSize && updatedCart[index].items[itemIndex].quantity > availableQuantity) {
+      showToast(`Only ${availableQuantity} items left in stock for size ${newSize.size}`, 3);
+      updatedCart[index].items[itemIndex].quantity = availableQuantity;
+    }
+    
+    setCart(updatedCart);
   };
 
   // * Handle Shop Total Amount
@@ -558,11 +578,12 @@ function Cart() {
                           className="size-select"
                           name="size"
                           id={`size-${item.id}`}
+                          onChange={(e) => handleSizeChange(index, itemIndex, e.target.value)}
                         >
                           {item.product.sizes.map((sizeItem) => (
                             <option
                               key={sizeItem.id}
-                              value={sizeItem.size}
+                              value={sizeItem.id} 
                               selected={item.sizeQuantityId === sizeItem.id}
                             >
                               {sizeItem.size}
