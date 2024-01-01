@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import LoadingScreen from "./common/LoadingScreen";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
+import { useAuth } from "../utils/AuthContext";
 
 type ValidationErrors = {
   IDOrEmail?: string;
@@ -24,6 +25,7 @@ function Login() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [supplierID, setSupplierID] = useState("");
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   // * For Delay
@@ -112,9 +114,6 @@ function Login() {
     setValidationErrors(errors);
 
     if (Object.keys(errors).length > 0) {
-      // for (const key in errors) {
-      //   toast.error(errors[key]);
-      // }
       return;
     }
 
@@ -141,7 +140,7 @@ function Login() {
         if (result.status === 200) {
           switch (result.data.role) {
             case "Customer":
-              localStorage.setItem("token", result.data.token);
+              login(result.data.token);
               setIsLoading(true);
               await sleep(10000);
               navigate(`/shop/${result.data.user.id}`, {
@@ -149,7 +148,7 @@ function Login() {
               });
               break;
             case "Supplier":
-              localStorage.setItem("token", result.data.token);
+              login(result.data.token);
               setIsLoading(true);
               await sleep(10000);
               navigate(`/supplier_dashboard/${result.data.user.id}`, {
@@ -157,7 +156,7 @@ function Login() {
               });
               break;
             case "Admin":
-              localStorage.setItem("token", result.data.token);
+              login(result.data.token);
               setIsLoading(true);
               await sleep(10000);
               navigate(`/admin_dashboard/${result.data.user.id}`, {

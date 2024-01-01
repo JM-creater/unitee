@@ -36,7 +36,8 @@ import Supplier from "./pages/supplier/supplier_dashboard";
 import Reports from "./pages/supplier/reports";
 import Forgot_Password from "./pages/forgot_password";
 import Confirmation_Code from "./pages/confirmation_email";
-//import PrivateRoute from "./utils/private_route";
+import { AuthProvider } from "./utils/AuthContext";
+import PrivateRoute from "./utils/private_route";
 //import Unauthorized_Error from './pages/common/unauthorized_error'
 //import Internal_Error from './pages/common/internal_error'
 //import Bad_Request from './pages/common/bad_request'
@@ -58,59 +59,61 @@ function App() {
         theme="light"
       />
       <Router>
-        <Routes>
-          <Route index element={<Login />} />
-          <Route path="/accountType" element={<AccountType />} />
-          <Route path="/confirmation_email" element={  <Confirmation_Code /> } />
-          <Route path="/register" element={<Register />} />
-          <Route path="/register_supplier" element={<RegisterSupplier />} />
-          <Route path="/forgot_password" element={ <Forgot_Password /> } />
+        <AuthProvider>
+          <Routes>
+            <Route index element={<Login />} />
+            <Route path="/accountType" element={<AccountType />} />
+            <Route path="/confirmation_email" element={  <Confirmation_Code /> } />
+            <Route path="/register" element={<Register />} />
+            <Route path="/register_supplier" element={<RegisterSupplier />} />
+            <Route path="/forgot_password" element={ <Forgot_Password /> } />
 
-          {/* CUSTOMER */}
-          <Route path="/shop/:userId" element={ <Main />  }>
-            <Route index element={<Shop />} />
-            <Route path="visit_shop/:id" element={<Visit_Shop />} />
-            <Route path="cart" element={<Cart />} />
-            <Route path="search_product" element={<Search_Product />} />
-            <Route path="user_profile/:id" element={<User_Profile />}></Route>
-            <Route path="notif" element={<Notif />}></Route>
-            <Route path="order_tracking" element={<Order_Tracking />}></Route>
-            <Route path="viewCustomer_profile" element={<ViewCustomer_Profile />}/>
-            <Route path="purchase_history" element={<Purchase_History />}></Route>
-          </Route>
+              {/* CUSTOMER */}
+              <Route path="/shop/:userId" element={ <PrivateRoute> <Main /> </PrivateRoute>  }>
+                <Route index element={<Shop />} />
+                <Route path="visit_shop/:id" element={<Visit_Shop />} />
+                <Route path="cart" element={<Cart />} />
+                <Route path="search_product" element={<Search_Product />} />
+                <Route path="user_profile/:id" element={<User_Profile />}></Route>
+                <Route path="notif" element={<Notif />}></Route>
+                <Route path="order_tracking" element={<Order_Tracking />}></Route>
+                <Route path="viewCustomer_profile" element={<ViewCustomer_Profile />}/>
+                <Route path="purchase_history" element={<Purchase_History />}></Route>
+              </Route>
 
-          {/* ADMIN */}
-          <Route path="admin_dashboard/:id" element={ <Admin_Main />  }>
-            <Route index element={<Admin_Dashboard />} />
-            <Route path="suppliers" element={<Suppliers />}></Route>
-            <Route path="view_customers" element={<View_Customers />} />
-            <Route path="admin_reports" element={<Admin_Reports />} />
-            <Route path="admin_viewProf/:id" element={<Admin_viewProf />} />
-            <Route path="admin_shops" element={<Admin_Shops />} />
-            <Route path="add_supplier" element={<Add_supplier />} />
-          </Route>
+              {/* ADMIN */}
+              <Route path="admin_dashboard/:id" element={ <PrivateRoute> <Admin_Main /> </PrivateRoute> }>
+                <Route index element={<Admin_Dashboard />} />
+                <Route path="suppliers" element={<Suppliers />}></Route>
+                <Route path="view_customers" element={<View_Customers />} />
+                <Route path="admin_reports" element={<Admin_Reports />} />
+                <Route path="admin_viewProf/:id" element={<Admin_viewProf />} />
+                <Route path="admin_shops" element={<Admin_Shops />} />
+                <Route path="add_supplier" element={<Add_supplier />} />
+              </Route>
 
-          {/* SUPPLIER */}
-          <Route path="supplier_dashboard/:id" element={ <Supplier_Main /> }>
-            <Route index element={<Supplier />} />
-            <Route path="supplier_orders" element={<Supplier_Order />} />
-            <Route path="manage_shop" element={<Manage_Shop />} />
-            <Route path="supplier_viewProf/:id" element={<Supplier_ViewProf />} />
-            <Route path="reports" element={<Reports />} />
-          </Route>
+              {/* SUPPLIER */}
+              <Route path="supplier_dashboard/:id" element={ <PrivateRoute> <Supplier_Main /> </PrivateRoute> }>
+                <Route index element={<Supplier />} />
+                <Route path="supplier_orders" element={<Supplier_Order />} />
+                <Route path="manage_shop" element={<Manage_Shop />} />
+                <Route path="supplier_viewProf/:id" element={<Supplier_ViewProf />} />
+                <Route path="reports" element={<Reports />} />
+              </Route>
 
-          <Route path="/update_item/:id/:productId" element={<Update_item />}></Route>
+              <Route path="/update_item/:id/:productId" element={<Update_item />}></Route>
 
-          {/* <Route path='supplier_items/:id' element={ <Supplier/> }></Route> */}
+              {/* <Route path='supplier_items/:id' element={ <Supplier/> }></Route> */}
 
-          <Route path="/add_item/:id" element={<Add_item />}></Route>
+              <Route path="/add_item/:id" element={<Add_item />}></Route>
 
-          {/* ERROR WEBPAGES */}
-          <Route path="*" element={<NotFound />} />
-          {/* <Route path="" element={ <Unauthorized_Error/> }/> */}
-          {/* <Route path='*' element={ <Internal_Error/> }/> */}
-          {/* <Route path='*' element={ <Bad_Request/> }/> */}
-        </Routes>
+            {/* ERROR WEBPAGES */}
+            <Route path="*" element={<NotFound />} />
+            {/* <Route path="" element={ <Unauthorized_Error/> }/> */}
+            {/* <Route path='*' element={ <Internal_Error/> }/> */}
+            {/* <Route path='*' element={ <Bad_Request/> }/> */}
+          </Routes>
+        </AuthProvider>
       </Router>
     </div>
   );
