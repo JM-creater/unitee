@@ -15,6 +15,7 @@ import axios from "axios"
 import notifEventEmitter from '../../helpers/NotifEventEmitter'
 import React from 'react'
 import LogoutLoadingScreen from '../common/LogoutLoadingScreen'
+import { useAuth } from '../../utils/AuthContext'
 // import * as signalR from "@microsoft/signalr"
 // import { toast } from 'react-toastify'
 
@@ -29,6 +30,7 @@ function Supplier_Main (){
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const { id } = useParams();
+    const { setLogout } = useAuth();
     const navigate = useNavigate();
 
      // * For Delay
@@ -39,6 +41,7 @@ function Supplier_Main (){
         setIsLoggingOut(true);
         setShowLogoutModal(!showLogoutModal);
         await sleep(10000);
+        setLogout();
         navigate('/');
     };
 
