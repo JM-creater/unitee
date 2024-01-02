@@ -404,85 +404,42 @@ function Cart() {
   };
 
   // * Handle for Deleting a Cart
-  // const handleRemoveCart = async () => {
-  //   const itemsToRemove = [];
-  //   const shopsToRemove = [];
-  
-  //   cart.forEach((cartItem) => {
-  //     const shopChecked = (document.getElementById(`shopRadio-${cartItem.supplierId}`) as HTMLInputElement).checked;
-  //     if (shopChecked) {
-  //       shopsToRemove.push(cartItem.id); 
-  //       cartItem.items.forEach((item) => {
-  //         itemsToRemove.push(item.sizeQuantity.id); 
-  //       });
-  //     } else {
-  //       cartItem.items.forEach((item) => {
-  //         const itemChecked = (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement).checked;
-  //         if (itemChecked) {
-  //           itemsToRemove.push(item.sizeQuantity.id); 
-  //         }
-  //       });
-  //     }
-  //   });
-  
-  //   for (const sizeQuantityId of itemsToRemove) {
-  //     await removeCartItem(sizeQuantityId);
-  //   }
-  
-  //   for (const cartId of shopsToRemove) {
-  //     await removeCartItem(cartId);
-  //   }
-  
-  //   const updatedCart = cart.filter(cartItem => !shopsToRemove.includes(cartItem.id))
-  //     .map(cartItem => {
-  //       cartItem.items = cartItem.items.filter(item => !itemsToRemove.includes(item.sizeQuantity.id));
-  //       return cartItem;
-  //     });
-  
-  //   setCart(updatedCart);
-  //   setTotalAmount(0);
-  //   setTotalItemsChecked(0);
-  //   cartEventEmitter.emit("cartUpdated");
-  // };
+  const handleRemoveCart = async () => {
+    const itemsToRemove = [];
+    const shopsToRemove = [];
 
-  // * Handle for Deleting a Cart
-const handleRemoveCart = async () => {
-  const itemsToRemove = [];
-  const shopsToRemove = [];
-
-  cart.forEach((cartItem) => {
-    const shopChecked = (document.getElementById(`shopRadio-${cartItem.supplierId}`) as HTMLInputElement).checked;
-    if (shopChecked) {
-      shopsToRemove.push(cartItem.id); 
-      cartItem.items.forEach((item) => {
-        itemsToRemove.push({ cartId: cartItem.id, itemId: item.id }); 
-      });
-    } else {
-      cartItem.items.forEach((item) => {
-        const itemChecked = (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement ).checked;
-        if (itemChecked) {
+    cart.forEach((cartItem) => {
+      const shopChecked = (document.getElementById(`shopRadio-${cartItem.supplierId}`) as HTMLInputElement).checked;
+      if (shopChecked) {
+        shopsToRemove.push(cartItem.id); 
+        cartItem.items.forEach((item) => {
           itemsToRemove.push({ cartId: cartItem.id, itemId: item.id }); 
-        }
-      });
-    }
-  });
-
-  for (const { cartId, itemId } of itemsToRemove) {
-    await removeCartItem(cartId, itemId);
-  }
-
-  // Update the cart state after deletion
-  const updatedCart = cart.filter(cartItem => !shopsToRemove.includes(cartItem.id))
-    .map(cartItem => {
-      cartItem.items = cartItem.items.filter(item => !itemsToRemove.some(itm => itm.itemId === item.id));
-      return cartItem;
+        });
+      } else {
+        cartItem.items.forEach((item) => {
+          const itemChecked = (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement ).checked;
+          if (itemChecked) {
+            itemsToRemove.push({ cartId: cartItem.id, itemId: item.id }); 
+          }
+        });
+      }
     });
 
-  setCart(updatedCart);
-  setTotalAmount(0);
-  setTotalItemsChecked(0);
-  cartEventEmitter.emit("cartUpdated");
-};
+    for (const { cartId, itemId } of itemsToRemove) {
+      await removeCartItem(cartId, itemId);
+    }
+
+    const updatedCart = cart.filter(cartItem => !shopsToRemove.includes(cartItem.id))
+      .map(cartItem => {
+        cartItem.items = cartItem.items.filter(item => !itemsToRemove.some(itm => itm.itemId === item.id));
+        return cartItem;
+      });
+
+    setCart(updatedCart);
+    setTotalAmount(0);
+    setTotalItemsChecked(0);
+    cartEventEmitter.emit("cartUpdated");
+  };
   
 
   // * Handle Remove Cart Modal
