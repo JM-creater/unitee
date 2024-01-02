@@ -182,10 +182,13 @@ function Login() {
 
   // * Handle Reset Password with Email
   const HandleResetPassword = async () => {
+    if (!resetEmail) {
+      toast.error("Email is required");
+      return;
+    }
+
     try {
-      const response = await axios.post(
-        `https://localhost:7017/Users/forgot-password?email=${resetEmail}`
-      );
+      const response = await axios.post(`https://localhost:7017/Users/forgot-password?email=${resetEmail}`);
       if (response.data) {
         toast.success("Please check your email");
         setResetEmail("");
@@ -328,12 +331,7 @@ function Login() {
               </Link>
             </div>
           </div>
-          <div
-            className="modal fade"
-            id="logoutModal"
-            tabIndex={1}
-            aria-labelledby="logoutModalLabel"
-          >
+          <div className="modal fade" id="logoutModal" tabIndex={1} aria-labelledby="logoutModalLabel">
             <div className="modal-dialog modal-dialog-centered">
               <div className="modal-content">
                 <div className="col-md-12 close-btn-container">
@@ -354,17 +352,13 @@ function Login() {
                   <input
                     className="col-md-12 input-email"
                     type="text"
-                    placeholder="ID Number or Email"
+                    placeholder="Enter a valid email"
                     value={resetEmail}
                     onChange={(e) => handleResetPassword(e.target.value)}
                     onKeyDown={handleKeyDownForgotPassword}
                   />
                   <div className="col-md-12 logout-btn-container">
-                    <button
-                      className="reset-btn"
-                      data-bs-dismiss="modal"
-                      onClick={HandleResetPassword}
-                    >
+                    <button className="reset-btn" onClick={HandleResetPassword}>
                       Reset Password
                     </button>
                   </div>
