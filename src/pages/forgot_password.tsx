@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import React from "react";
 import LoadingScreen from "./common/LoadingScreen";
+import axios from "axios";
 
 type ValidationErrors = {
   newPassword?: string;
@@ -25,10 +26,28 @@ function Forgot_Password() {
   // * For Delay
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+  // * Get the token from the URI
   useEffect(() => {
     const token = new URLSearchParams(location.search).get("token");
-    setResetToken(token);
-  }, [location]);
+    
+    if (!token) {
+      navigate("/");
+    } else {
+      axios.get(`https://localhost:7017/Users/validate-reset-token?token=${token}`)
+        .then(response => {
+          if(response.data.isValid) {
+            localStorage.setItem("token", token);
+            setResetToken(token);
+          } else {
+            navigate("/");
+          }
+        })
+        .catch(error => {
+          console.error('Error validating token:', error);
+          navigate("/");
+        });
+    }
+  }, [location, navigate]);
 
   // * Reset Password
   const handleSubmit = async (event) => {
@@ -37,12 +56,10 @@ function Forgot_Password() {
     const errors = validateForm();
 
     if (Object.keys(errors).length === 0) {
-      setIsLoading(true);
+      setIsLoading(true); 
 
       try {
-        const response = await fetch(
-          "https://localhost:7017/Users/reset-password",
-          {
+        const response = await fetch("https://localhost:7017/Users/reset-password", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -55,9 +72,11 @@ function Forgot_Password() {
         );
 
         if (response.ok) {
+          localStorage.removeItem('token');
           toast.success("Successfully updated the password");
           await sleep(10000);
           navigate("/");
+          localStorage.removeItem(resetToken);
         } else {
           toast.error("Failed to update the password");
         }

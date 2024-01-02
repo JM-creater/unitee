@@ -182,6 +182,8 @@ function Login() {
 
   // * Handle Reset Password with Email
   const HandleResetPassword = async () => {
+    const CloseBtn = document.getElementById('btnClose');
+
     if (!resetEmail) {
       toast.error("Email is required");
       return;
@@ -192,6 +194,7 @@ function Login() {
       if (response.data) {
         toast.success("Please check your email");
         setResetEmail("");
+        CloseBtn.click();
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
