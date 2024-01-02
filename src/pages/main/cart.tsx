@@ -91,9 +91,7 @@ function Cart() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `https://localhost:7017/Cart/myCart/${userId}`
-        );
+        const response = await axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
         setCart(response.data);
       } catch (error) {
         console.error("Network error or server not responding");
@@ -257,18 +255,15 @@ function Cart() {
   const handleProductCheckboxChange = (cartIndex, itemId) => {
     const updatedCart = [...cart];
     const currentShopId = updatedCart[cartIndex].supplierId;
-
-    // Find the index of the item with the given itemId
     const itemIndex = updatedCart[cartIndex].items.findIndex(
       (item) => item.id === itemId
     );
-    if (itemIndex === -1) return; // Exit if item not found
+    if (itemIndex === -1) return;
 
     const currentItemChecked = (
       document.getElementById(`prodCheckbox-${itemId}`) as HTMLInputElement
     ).checked;
 
-    // Updating selected phone number and shop ID based on current item's checked state
     if (currentItemChecked) {
       setSelectedPhoneShop(updatedCart[cartIndex].supplier.phoneNumber);
       setSelectedShopId(currentShopId);
@@ -277,14 +272,12 @@ function Cart() {
       setSelectedShopId(null);
     }
 
-    // Check if all items in the shop are checked
     const allItemsChecked = updatedCart[cartIndex].items.every((item) => {
       return (
         document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement
       ).checked;
     });
 
-    // Update the shop's checkbox based on allItemsChecked
     (
       document.getElementById(`shopRadio-${currentShopId}`) as HTMLInputElement
     ).checked = allItemsChecked;
@@ -399,85 +392,111 @@ function Cart() {
   };
 
   // * Delete Method for Cart
-  const removeCartItem = async (cartId) => {
+  const removeCartItem = async (cartId, itemId) => {
     try {
-      await fetch(`https://localhost:7017/Cart/delete/${cartId}`, {
-        method: "DELETE",
-      });
+      const response = await axios.delete(`https://localhost:7017/Cart/delete/${cartId}/${itemId}`);
+      if (response.status !== 200) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
     } catch (error) {
       console.error("Error removing item from cart:", error);
     }
   };
 
   // * Handle for Deleting a Cart
-  const handleRemoveCart = async () => {
-    const itemsToRemove = [];
-    const shopsToRemove = [];
+  // const handleRemoveCart = async () => {
+  //   const itemsToRemove = [];
+  //   const shopsToRemove = [];
+  
+  //   cart.forEach((cartItem) => {
+  //     const shopChecked = (document.getElementById(`shopRadio-${cartItem.supplierId}`) as HTMLInputElement).checked;
+  //     if (shopChecked) {
+  //       shopsToRemove.push(cartItem.id); 
+  //       cartItem.items.forEach((item) => {
+  //         itemsToRemove.push(item.sizeQuantity.id); 
+  //       });
+  //     } else {
+  //       cartItem.items.forEach((item) => {
+  //         const itemChecked = (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement).checked;
+  //         if (itemChecked) {
+  //           itemsToRemove.push(item.sizeQuantity.id); 
+  //         }
+  //       });
+  //     }
+  //   });
+  
+  //   for (const sizeQuantityId of itemsToRemove) {
+  //     await removeCartItem(sizeQuantityId);
+  //   }
+  
+  //   for (const cartId of shopsToRemove) {
+  //     await removeCartItem(cartId);
+  //   }
+  
+  //   const updatedCart = cart.filter(cartItem => !shopsToRemove.includes(cartItem.id))
+  //     .map(cartItem => {
+  //       cartItem.items = cartItem.items.filter(item => !itemsToRemove.includes(item.sizeQuantity.id));
+  //       return cartItem;
+  //     });
+  
+  //   setCart(updatedCart);
+  //   setTotalAmount(0);
+  //   setTotalItemsChecked(0);
+  //   cartEventEmitter.emit("cartUpdated");
+  // };
 
-    cart.forEach((cartItem, cartIndex) => {
-      const shopChecked = (
-        document.getElementById(
-          `shopRadio-${cartItem.supplierId}`
-        ) as HTMLInputElement
-      ).checked;
-      if (shopChecked) {
-        shopsToRemove.push(cartIndex);
-        cartItem.items.forEach((item) => {
-          itemsToRemove.push(item.id);
-        });
-      } else {
-        cartItem.items.forEach((item) => {
-          const itemChecked = (
-            document.getElementById(
-              `prodCheckbox-${item.id}`
-            ) as HTMLInputElement
-          ).checked;
-          if (itemChecked) {
-            itemsToRemove.push(item.id);
-          }
-        });
-      }
+  // * Handle for Deleting a Cart
+const handleRemoveCart = async () => {
+  const itemsToRemove = [];
+  const shopsToRemove = [];
+
+  cart.forEach((cartItem) => {
+    const shopChecked = (document.getElementById(`shopRadio-${cartItem.supplierId}`) as HTMLInputElement).checked;
+    if (shopChecked) {
+      shopsToRemove.push(cartItem.id); 
+      cartItem.items.forEach((item) => {
+        itemsToRemove.push({ cartId: cartItem.id, itemId: item.id }); 
+      });
+    } else {
+      cartItem.items.forEach((item) => {
+        const itemChecked = (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement ).checked;
+        if (itemChecked) {
+          itemsToRemove.push({ cartId: cartItem.id, itemId: item.id }); 
+        }
+      });
+    }
+  });
+
+  for (const { cartId, itemId } of itemsToRemove) {
+    await removeCartItem(cartId, itemId);
+  }
+
+  // Update the cart state after deletion
+  const updatedCart = cart.filter(cartItem => !shopsToRemove.includes(cartItem.id))
+    .map(cartItem => {
+      cartItem.items = cartItem.items.filter(item => !itemsToRemove.some(itm => itm.itemId === item.id));
+      return cartItem;
     });
 
-    for (const itemId of itemsToRemove) {
-      await removeCartItem(itemId);
-    }
-
-    for (const cartIndex of shopsToRemove) {
-      await removeCartItem(cart[cartIndex].id);
-    }
-
-    const updatedCart = cart
-      .filter((_, index) => !shopsToRemove.includes(index))
-      .map((cartItem) => {
-        cartItem.items = cartItem.items.filter(
-          (item) => !itemsToRemove.includes(item.id)
-        );
-        return cartItem;
-      });
-    setCart(updatedCart);
-    setTotalAmount(0);
-    setTotalItemsChecked(0);
-    cartEventEmitter.emit("cartUpdated");
-  };
+  setCart(updatedCart);
+  setTotalAmount(0);
+  setTotalItemsChecked(0);
+  cartEventEmitter.emit("cartUpdated");
+};
+  
 
   // * Handle Remove Cart Modal
   const handleRemoveCartPrompt = () => {
     const anyProductChecked = cart.some((shop) => {
       return shop.items.some((item) => {
-        return (
-          document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement
-        ).checked;
+        return (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement).checked;
       });
     });
 
     if (!anyProductChecked) {
       toast.error("Please select a product");
     } else {
-      // * Existing logic to show modal
-      const modalElement = document.getElementById(
-        "removeCartConfirmationModal"
-      );
+      const modalElement = document.getElementById("removeCartConfirmationModal");
       const bootstrapModal = new Modal(modalElement);
       bootstrapModal.show();
     }
@@ -543,9 +562,7 @@ function Cart() {
                       type="checkbox"
                       value=""
                       id={`prodCheckbox-${item.id}`}
-                      onChange={() =>
-                        handleProductCheckboxChange(index, item.id)
-                      }
+                      onChange={() => handleProductCheckboxChange(index, item.id)}
                     />
                     <div className="col-md-11 prod-cart-container">
                       <img
@@ -698,52 +715,28 @@ function Cart() {
         </div>
       </div>
 
-      <div
-        className="modal fade"
-        id="removeCartConfirmationModal"
-        tabIndex={-1}
-        aria-labelledby="removeCartConfirmationModalLabel"
-        aria-hidden="true"
-      >
+      <div className="modal fade" id="removeCartConfirmationModal" tabIndex={-1} aria-labelledby="removeCartConfirmationModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="removeCartConfirmationModalLabel">
                 Remove items from cart
               </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body">
-              <h5>
-                Are you sure you want to remove the selected items from the
-                cart?
-              </h5>
+              <h5> Are you sure you want to remove the selected items from the cart? </h5>
             </div>
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="btn btn-danger"
-                data-bs-dismiss="modal"
-                onClick={handleRemoveCart}
-              >
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleRemoveCart}>
                 Remove
               </button>
             </div>
           </div>
         </div>
       </div>
+
     </div>
   );
 }

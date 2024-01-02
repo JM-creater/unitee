@@ -231,7 +231,7 @@ function  Search_Product () {
     return <div className="search-prod-main-container">
 
         <div className="search-result-message">
-            {search && <h3>Search Result for <span className='message-search'>"{search}"</span></h3>}
+            {search && <h3>Search Result for "{search}"</h3>}
         </div>
 
         <div className="search-container-product">
