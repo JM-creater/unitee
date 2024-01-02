@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import navEmptyCartImg from "../../assets/images/icons/empty-cart.png";
 import LogoutLoadingScreen from "../common/LogoutLoadingScreen";
 import React from "react";
+import { useAuth } from "../../utils/AuthContext";
 
 function Main() {
   interface Customer {
@@ -32,6 +33,7 @@ function Main() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { userId } = useParams();
+  const { setLogout } = useAuth();
   const navigate = useNavigate();
 
   // * For Delay
@@ -41,6 +43,7 @@ function Main() {
     setIsLoggingOut(true);
     setShowLogoutModal(!showLogoutModal);
     await sleep(10000);
+    setLogout();
     navigate("/");
   };
 

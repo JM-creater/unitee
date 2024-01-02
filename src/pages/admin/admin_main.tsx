@@ -12,10 +12,12 @@ import logoutAdminIcon from "../../assets/images/icons/logout-4.png";
 import { useState } from "react";
 import React from "react";
 import LogoutLoadingScreen from "../common/LogoutLoadingScreen";
+import { useAuth } from "../../utils/AuthContext";
 
 function Admin_Main() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const { setLogout } = useAuth();
   const navigate = useNavigate();
 
   const { id } = useParams();
@@ -28,6 +30,7 @@ function Admin_Main() {
     setIsLoggingOut(true);
     setShowLogoutModal(false);
     await sleep(10000);
+    setLogout();
     navigate("/");
   };
 
