@@ -50,6 +50,7 @@ function App() {
         autoClose={1500}
         hideProgressBar={false}
         newestOnTop
+        limit={1}
         transition={Zoom}
         closeOnClick
         rtl={false}

@@ -17,6 +17,7 @@ function Shop() {
     const [isLoading, setIsLoading] = useState(true);
     const [averageRatingSupplier, setAverageRatingSupplier] = useState({});
     const [, setProductData] = useState([]);
+    const [productTypes, setProductTypes] = useState([]);
     const { userId } = useParams();
     const navigate = useNavigate();
     
@@ -28,9 +29,9 @@ function Shop() {
     };
     
     // * Navigate Search
-    const performSearch = (productName = searchTerm) => {
-        setSearchTerm(productName); 
-        navigate(`/shop/${userId}/search_product?search=${productName}`);
+    const performSearch = (searchCriteria = searchTerm) => {
+        setSearchTerm(searchCriteria); 
+        navigate(`/shop/${userId}/search_product?search=${searchCriteria}`);
     };
 
     // * Get the Average Rating for Product
@@ -80,7 +81,7 @@ function Shop() {
 
                 setAverageRatingSupplier(ratingsMap);
             } catch (error) {
-                console.error('Network error or server not responding');
+                console.error(error);
             }
         };
     
@@ -135,6 +136,25 @@ function Shop() {
         fetchProducts();
     }, [userId]);
 
+    // * Get Product Type Name
+    const getProductTypeName = (productTypeId) => {
+        const productType = productTypes.find((p) => p.productTypeId === productTypeId);
+        return productType ? productType.product_Type : "Unknown Type";
+    };
+
+    // * Get All Product Types
+    useEffect(() => {
+        const fetchProductType = async () => {
+            try {
+                const response = await axios.get("https://localhost:7017/ProductType");
+                setProductTypes(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchProductType();
+    }, []);
+
     return (
     <React.Fragment>
         {isLoading ? (
@@ -188,22 +208,55 @@ function Shop() {
                     {products.filter(productFilter => {
                         const searchTermLowerCase = searchTerm.toLowerCase();
                         const productName = productFilter.productName?.toLowerCase();
-
+                        const productTypeName = getProductTypeName(productFilter.productTypeId).toLowerCase();
+                        const category = productFilter.category?.toLowerCase();
+                        const description = productFilter.description?.toLowerCase();
+                    
                         return (
                             searchTermLowerCase &&
-                            productName?.startsWith(searchTermLowerCase) &&
+                            (
+                                productName?.startsWith(searchTermLowerCase) ||
+                                productTypeName?.startsWith(searchTermLowerCase) ||
+                                category?.startsWith(searchTermLowerCase) ||
+                                description?.includes(searchTermLowerCase)
+                            ) &&
                             productName !== searchTermLowerCase
                         );
-                    }).slice(0, 5).map((productData, index) => (
-                        <div 
-                            key={index} 
-                            className='search-dropdown-row'
-                            onClick={() => performSearch(productData.productName)}
-                        >
-                            <span className="fa fa-search form-control-feedback search-icon"></span>
-                            {productData.productName}
-                        </div>
-                    ))}
+                    }).slice(0, 5).map((productData, index) => {
+                        const searchTermLowerCase = searchTerm.toLowerCase();
+                        const productName = productData.productName?.toLowerCase();
+                        const productTypeName = getProductTypeName(productData.productTypeId).toLowerCase();
+                        const category = productData.category?.toLowerCase();
+                        const description = productData.description?.toLowerCase();
+
+                        let displayText = '';
+                        let searchCriteria = '';
+
+                        if (productTypeName?.startsWith(searchTermLowerCase)) {
+                            displayText = productTypeName;
+                            searchCriteria = productTypeName;
+                        } else if (category?.startsWith(searchTermLowerCase)) {
+                            displayText = productData.category;
+                            searchCriteria = productData.category;
+                        } else if (description?.startsWith(searchTermLowerCase)) {
+                            displayText = productData.description;
+                            searchCriteria = productData.description; 
+                        } else if (productName?.startsWith(searchTermLowerCase)) {
+                            displayText = productData.productName;
+                            searchCriteria = productData.productName; 
+                        }
+
+                        return (
+                            <div 
+                                key={index} 
+                                className='search-dropdown-row'
+                                onClick={() => performSearch(searchCriteria)}
+                            >
+                                <span className="fa fa-search form-control-feedback search-icon"></span>
+                                {displayText}
+                            </div>
+                        );
+                    })}
                 </div>
 
                 <div className='col-md-10 shopLabel-text-container'>

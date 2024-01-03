@@ -1,5 +1,5 @@
-import MWSizing from "../../assets/images/MW SIZING.png"
-import UNISEX from "../../assets/images/UNISEX SIZING.png"
+// import MWSizing from "../../assets/images/MW SIZING.png"
+// import UNISEX from "../../assets/images/UNISEX SIZING.png"
 import starIcon from "../../assets/images/icons/starRating.png"
 import cartIcon from "../../assets/images/icons/addToCart.png"
 import prodRatingModal from "../../assets/images/icons/starRating.png"
@@ -34,7 +34,8 @@ function Visit_Shop () {
     const [averageRatingSupplier, setAverageRatingSupplier] = useState(null);
     const [, setProductData] = useState([]);
     const [productAverageRating ,setProductAverageRating] = useState({}); 
-    const [, setMainImage] = useState(null);
+    const [image, setImage] = useState('');
+    const [notHover, setNotHover] = useState('');
     const { userId, id: shopId } = useParams();
     const supplier = suppliers[shopId];
 
@@ -286,13 +287,31 @@ function Visit_Shop () {
 
 
     // * Update the Product Details Modal
-    useEffect(() => {
-        const modal = document.getElementById('viewProdDetailsModal') 
-        if (modal) {
-            modal.addEventListener('hidden.bs.modal', HandleCloseButton);
+    // useEffect(() => {
+    //     const modal = document.getElementById('viewProdDetailsModal') 
+    //     if (modal) {
+    //         modal.addEventListener('hidden.bs.modal', HandleCloseButton);
 
+    //         return () => {
+    //             modal.removeEventListener('hidden.bs.modal', HandleCloseButton);
+    //         };
+    //     }
+    // }, []);
+
+    // * Update the Product Details Modal
+    useEffect(() => {
+        const modal = document.getElementById('viewSizeGuideModal');
+        if (modal) {
+            const handleModalReset = (event) => {
+                if (event.target.id === 'viewSizeGuideModal') {
+                    handleResetModal();
+                }
+            };
+    
+            modal.addEventListener('hidden.bs.modal', handleModalReset);
+    
             return () => {
-                modal.removeEventListener('hidden.bs.modal', HandleCloseButton);
+                modal.removeEventListener('hidden.bs.modal', handleModalReset);
             };
         }
     }, []);
@@ -305,7 +324,7 @@ function Visit_Shop () {
             setSelectedSize(selectedSize.size);
             setNewQuantity(selectedSize.quantity);
         }
-    }
+    };
 
     // * Handle Close Button
     const HandleCloseButton = () => {
@@ -314,6 +333,10 @@ function Visit_Shop () {
         setNewQuantity(0);
         setSelectedSize(null);
     };
+
+    const handleResetModal = () => {
+        window.location.reload();
+    }
 
     // * Handle Minus Quantity
     const HandleMinusQuantity = () => {
@@ -535,7 +558,10 @@ function Visit_Shop () {
                     data-bs-toggle="modal" 
                     data-bs-target="#viewProdDetailsModal" 
                     key={product.productId} 
-                    onClick={() => setSelectedProduct(product)}
+                    onClick={() => {
+                        setSelectedProduct(product);
+                        setImage(`https://localhost:7017/${product.image}`);
+                    }}
                 > 
                     <img className="visitShopProdImg" src={ `https://localhost:7017/${product.image}` }/>
                     <div className="col-md-12 shop-prodDetails-container">
@@ -567,23 +593,32 @@ function Visit_Shop () {
                                 <div className="img-container">
                                     <img 
                                         className="prodModal-Image" 
-                                        src={`https://localhost:7017/${selectedProduct.image}`} 
+                                        src={notHover || image} 
                                     />
                                 </div>
                                 <div className="hover-container">
-                                    <div onMouseOver={() => setMainImage(selectedProduct.frontViewImage)}>
+                                    <div 
+                                        onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.frontViewImage}`)}
+                                        onMouseLeave={() => setNotHover('')}
+                                    >
                                         <img 
                                             className="small-image" 
                                             src={`https://localhost:7017/${selectedProduct.frontViewImage}`} 
                                         />
                                     </div>
-                                    <div onMouseOver={() => setMainImage(selectedProduct.sideViewImage)}>
+                                    <div 
+                                        onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.sideViewImage}`)}
+                                        onMouseLeave={() => setNotHover('')}
+                                    >
                                         <img 
                                             className="small-image" 
                                             src={`https://localhost:7017/${selectedProduct.sideViewImage}`} 
                                         />
                                     </div>
-                                    <div onMouseOver={() => setMainImage(selectedProduct.backViewImage)}>
+                                    <div 
+                                        onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.backViewImage}`)}
+                                        onMouseLeave={() => setNotHover('')}
+                                    >
                                         <img 
                                             className="small-image" 
                                             src={`https://localhost:7017/${selectedProduct.backViewImage}`}
@@ -688,17 +723,13 @@ function Visit_Shop () {
                         </button>
                     </div> 
                     <div className="image-container">
-                        {/* {selectedProduct && selectedProduct.sizeGuide ? (
+                        {selectedProduct &&  (
                             <img 
                                 className="prodSizeGuideModal-Image" 
                                 src={`https://localhost:7017/${selectedProduct.sizeGuide}`} 
                                 alt="Size Guide" 
                             />
-                        ) : (
-                            <p>Size guide not available.</p>
-                        )} */}
-                        <img className="prodSizeGuideModal-Image" src={ MWSizing }/>
-                        <img className="prodSizeGuideModal-Image" src={ UNISEX } />
+                        )}
                     </div>     
                 </div>
             </div>
