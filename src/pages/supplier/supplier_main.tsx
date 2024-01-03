@@ -8,7 +8,6 @@ import supplierReportsIcon from "../../assets/images/icons/reports.png"
 import shopIcon from "../../assets/images/icons/store-2.png"
 import editprof from "../../assets/images/icons/user-avatar.png"
 import logoutIcon from "../../assets/images/icons/logout-4.png"
-//import chatSupplier from "../../assets/images/icons/chat.png"
 import { useCallback, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
@@ -16,8 +15,6 @@ import notifEventEmitter from '../../helpers/NotifEventEmitter'
 import React from 'react'
 import LogoutLoadingScreen from '../common/LogoutLoadingScreen'
 import { useAuth } from '../../utils/AuthContext'
-// import * as signalR from "@microsoft/signalr"
-// import { toast } from 'react-toastify'
 
 function Supplier_Main (){
 
@@ -114,10 +111,6 @@ function Supplier_Main (){
                             <img className="supplier-nav-icon" src={ supplierReportsIcon }/>
                             <span className="supplier-nav-text">Reports</span>
                         </Link>
-                        {/* <Link to='supplier_chat' className="supplier-nav-link">
-                            <img className="supplier-nav-icon" src={ chatSupplier }/>
-                            <span className="supplier-nav-text">Chat</span>
-                        </Link> */}
                     </div>
                 </header>
                 <div style={{ minHeight: '100%' }}>

@@ -8,14 +8,11 @@ import homeIcon from "../../assets/images/icons/homeIcon.png";
 import carts from "../../assets/images/icons/cartIcon.png";
 import orders from "../../assets/images/icons/shopping-bag-4.png";
 import notification from "../../assets/images/icons/notifIcon.png";
-//import chatCustomer from "../../assets/images/icons/chat.png";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import cartEventEmitter from "../../helpers/EventEmitter";
 import notifEventEmitter from "../../helpers/NotifEventEmitter";
-import * as signalR from "@microsoft/signalr";
-import { toast } from "react-toastify";
 import navEmptyCartImg from "../../assets/images/icons/empty-cart.png";
 import LogoutLoadingScreen from "../common/LogoutLoadingScreen";
 import React from "react";
@@ -177,28 +174,6 @@ function Main() {
     };
     fetchNotificationClick();
   };
-
-  // * Notification Hub in SignalR
-  useEffect(() => {
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:7017/notificationHub", {
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets,
-      })
-      .configureLogging(signalR.LogLevel.Information)
-      .build();
-
-    connection
-      .start()
-      .then(() => {
-      })
-      .catch((err) => console.error("SignalR Connection Error: ", err));
-
-    connection.on("OrderStatusUpdated", (message) => {
-      toast.success(`New Notification: ${message}`);
-      updateNotification();
-    });
-  }, [updateNotification]);
 
   return (
     <React.Fragment>

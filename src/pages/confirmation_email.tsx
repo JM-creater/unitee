@@ -1,5 +1,5 @@
 import "./login.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import illustration from "../../src/assets/images/loginPic.png";
 import logo from "../../src/assets/images/unitee.png";
 import { toast } from "react-toastify";
@@ -29,6 +29,14 @@ function Confirmation_Code() {
     navigate("/");
   };
 
+  // * Check if the email is confirmed
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/');
+    }
+  }, [navigate]);
+
   // * Confirm Email
   const handleConfirmEmail = async () => {
     if (!confirmEmail) {
@@ -53,13 +61,14 @@ function Confirmation_Code() {
         } catch (e) {
           toast.success("Confirmation Successful.");
         }
+        localStorage.removeItem('token');
         setIsLoading(true);
         await sleep(500);
         navigate("/");
       } else {
         try {
           const errorData = await response.json();
-          toast.error(errorData.message || "Failed to confirm email");
+          toast.error(errorData.message);
         } catch (e) {
           toast.error("An error occurred while confirming email.");
         }
