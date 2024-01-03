@@ -215,12 +215,11 @@ function Shop() {
                         return (
                             searchTermLowerCase &&
                             (
-                                productName?.startsWith(searchTermLowerCase) ||
-                                productTypeName?.startsWith(searchTermLowerCase) ||
-                                category?.startsWith(searchTermLowerCase) ||
+                                productName?.includes(searchTermLowerCase) ||
+                                productTypeName?.includes(searchTermLowerCase) ||
+                                category?.includes(searchTermLowerCase) ||
                                 description?.includes(searchTermLowerCase)
-                            ) &&
-                            productName !== searchTermLowerCase
+                            )
                         );
                     }).slice(0, 5).map((productData, index) => {
                         const searchTermLowerCase = searchTerm.toLowerCase();
@@ -232,18 +231,18 @@ function Shop() {
                         let displayText = '';
                         let searchCriteria = '';
 
-                        if (productTypeName?.startsWith(searchTermLowerCase)) {
-                            displayText = productTypeName;
-                            searchCriteria = productTypeName;
-                        } else if (category?.startsWith(searchTermLowerCase)) {
-                            displayText = productData.category;
-                            searchCriteria = productData.category;
-                        } else if (description?.startsWith(searchTermLowerCase)) {
-                            displayText = productData.description;
-                            searchCriteria = productData.description; 
-                        } else if (productName?.startsWith(searchTermLowerCase)) {
+                        if (productName?.includes(searchTermLowerCase)) {
                             displayText = productData.productName;
                             searchCriteria = productData.productName; 
+                        } else if (productTypeName?.includes(searchTermLowerCase)) {
+                            displayText = productTypeName;
+                            searchCriteria = productTypeName;
+                        } else if (category?.includes(searchTermLowerCase)) {
+                            displayText = productData.category;
+                            searchCriteria = productData.category;
+                        } else if (description?.includes(searchTermLowerCase)) {
+                            displayText = productData.description;
+                            searchCriteria = productData.description;
                         }
 
                         return (
