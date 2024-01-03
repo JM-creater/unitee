@@ -63,7 +63,7 @@ function App() {
           <Routes>
             <Route index element={<Login />} />
             <Route path="/accountType" element={<AccountType />} />
-            <Route path="/confirmation_email" element={ <PrivateRoute> <Confirmation_Code /> </PrivateRoute> } />
+            <Route path="/confirmation_email" element={ <Confirmation_Code /> } />
             <Route path="/register" element={<Register />} />
             <Route path="/register_supplier" element={<RegisterSupplier />} />
             <Route path="/forgot_password" element={ <Forgot_Password /> } />

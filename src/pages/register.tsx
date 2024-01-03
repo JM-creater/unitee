@@ -139,6 +139,7 @@ function Register() {
           formData
         );
         if (response.data) {
+          localStorage.setItem('token', response.data.token);
           registerUsersEventEmitter.emit("registerCustomer");
           toast.success("Successfully registered.", {
             onClose: () => navigate("/confirmation_email"),
