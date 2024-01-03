@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from  './AuthContext'; 
 
-const ProtectedRoute = ({ children }) => {
+const PrivateRoute = ({ children }) => {
     const { authToken } = useAuth();
 
     if (!authToken) {
@@ -11,4 +11,4 @@ const ProtectedRoute = ({ children }) => {
     return children;
 };
 
-export default ProtectedRoute
+export default PrivateRoute

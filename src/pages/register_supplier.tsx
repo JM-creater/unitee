@@ -46,6 +46,14 @@ function Register() {
     }
   }, []);
 
+   // * Check if the email is confirmed
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/');
+    }
+  }, [navigate]);
+
   const handleIDnumber = (value) => {
     if (/^[0-9]*$/.test(value)) {
       setIDNumber(value);
@@ -125,6 +133,7 @@ function Register() {
           formData
         );
         if (response.data) {
+          localStorage.setItem('token', response.data.token);
           registerUsersEventEmitter.emit("registerSupplier");
           toast.success("Successfully registered.", {
             onClose: () => navigate("/confirmation_email"),
