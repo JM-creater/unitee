@@ -7,6 +7,16 @@
     flex-flow: row;
 }
 
+.report-main-container {
+    height: 92vh;
+    width: 85vw;
+    padding: 20px;
+    background-color: #F0F0F0;
+    flex-flow: column;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
 .dash-supplier-container {
     display: flex;
     flex-flow: row;
@@ -220,12 +230,4 @@
     border-radius: 5px;
     padding: 15px;
     height: fit-content;
-}
-
-.report-main-container {
-    height: 92vh;
-    width: 85vw;
-    padding: 20px;
-    background-color: #F0F0F0;
-    flex-flow: row;
 }
