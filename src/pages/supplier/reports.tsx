@@ -17,8 +17,31 @@ import axios from "axios";
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 function Supplier() {
+  const [weeklySales, setWeeklySales] = useState([]);
+  const [monthlySales, setMonthlySales] = useState([]);
+  const [yearlySales, setYearlySales] = useState([]);
   const [topSellingProducts, setTopSellingProducts] = useState([]);
   const { id } = useParams();
+
+  // * Get the Sales by Weekly, Monthly, Yearly
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const weeklyResponse = await axios.get(`https://localhost:7017/Order/weekly?startDate=${new Date().toISOString()}&supplierId=${id}`);
+        setWeeklySales(weeklyResponse.data);
+
+        const monthlyResponse = await axios.get(`https://localhost:7017/Order/monthly?year=${new Date().getFullYear()}&month=${new Date().getMonth() + 1}&supplierId=${id}`);
+        setMonthlySales(monthlyResponse.data);
+
+        const yearlyResponse = await axios.get(`https://localhost:7017/Order/yearly?year=${new Date().getFullYear()}&supplierId=${id}`);
+        setYearlySales(yearlyResponse.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [id]);
 
   useEffect(() => {
     const fetchTopSellingProducts = async () => {
@@ -34,35 +57,21 @@ function Supplier() {
     fetchTopSellingProducts();
   }, [id]);
 
-  // BAR GRAPH
+
+  // * BAR GRAPH
+  const months = [
+    "January", "February", "March", "April",
+    "May", "June", "July", "August",
+    "September", "October", "November", "December"
+  ];
+
   const data = {
-    labels: ["January", "February", "March"],
+    labels: months, 
     datasets: [
       {
-        label: "1st Week",
-        data: [3, 6, 7],
-        backgroundColor: "#004AAD",
-        borderColor: "white",
-        borderWidth: 1,
-      },
-      {
-        label: "2nd Week",
-        data: [4, 5, 1],
+        label: "Yearly Sales",
+        data: yearlySales,
         backgroundColor: "#65A4F6",
-        borderColor: "white",
-        borderWidth: 1,
-      },
-      {
-        label: "3rd Week",
-        data: [8, 3, 5],
-        backgroundColor: "#020654",
-        borderColor: "white",
-        borderWidth: 1,
-      },
-      {
-        label: "4th Week",
-        data: [7, 1, 6],
-        backgroundColor: "#FDB833",
         borderColor: "white",
         borderWidth: 1,
       },
@@ -88,7 +97,9 @@ function Supplier() {
           <div className="card-content-container">
             <div className="col-md-9 dash-card">
               <span>Weekly Sales</span>
-              <h1 className="col-md-11 number-dash">0</h1>
+              <h1 className="col-md-11 number-dash">
+                ₱{weeklySales.length > 0 ? weeklySales.reduce((a, b) => a + b) : 0}
+              </h1>
             </div>
             <img
               className="dash-card-icon"
@@ -99,7 +110,9 @@ function Supplier() {
           <div className="card-content-container">
             <div className="col-md-9 dash-card">
               <span>Monthly Sales</span>
-              <h1 className="col-md-11 number-dash">0</h1>
+              <h1 className="col-md-11 number-dash">
+                ₱{monthlySales.length > 0 ? monthlySales.reduce((a, b) => a + b) : 0}
+              </h1>
             </div>
             <img
               className="dash-card-icon"
@@ -110,7 +123,9 @@ function Supplier() {
           <div className="card-content-container">
             <div className="col-md-9 dash-card">
               <span>Yearly Sales</span>
-              <h1 className="col-md-11 number-dash">0</h1>
+              <h1 className="col-md-11 number-dash">
+                ₱{yearlySales.length > 0 ? yearlySales.reduce((a, b) => a + b) : 0}
+              </h1>
             </div>
             <img
               className="dash-card-icon"
@@ -132,11 +147,6 @@ function Supplier() {
           }}
         >
           <h1 style={{ color: "#020654" }}>Sales Review</h1>
-          <span>
-            Your average sales for the past
-            <span className="num-months-chartReview"> number of months </span>
-            is <span className="total-sales-chartReview">0</span>
-          </span>
           <Bar
             style={{ marginTop: "15px" }}
             data={data}

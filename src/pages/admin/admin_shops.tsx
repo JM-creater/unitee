@@ -531,11 +531,6 @@ function Admin_Shops () {
                                     <div className="collapse" id={`prodDetailsCollapse${product.productId}`} style={{ marginRight:'18px' }}>
                                         {/* START OF CARD BODY */}
                                         <div className="card card-body" style={{ display:'flex', justifyContent:'space-between', gap:'10px' }}>
-                                            {/* PRODUCT ID */}
-                                            <h4 className='admin-prodDetails-labels' 
-                                            style={{ display:'flex', flexFlow:'row', gap:'10px', fontWeight:'600'}}>Product ID: 
-                                                <h4 className='admin-prodDetails-text'>{product.productId}</h4>
-                                            </h4>
 
                                             {/* DESCRIPTION */}
                                             <h5 className='admin-prodDetails-labels' style={{ display:'flex', flexWrap:'wrap' }}>Description:

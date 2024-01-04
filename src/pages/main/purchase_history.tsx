@@ -6,8 +6,8 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import React from 'react';
 import submitRatingEventEmitter from '../../helpers/SubmitRatingEventEmitter';
-import { FaStar } from 'react-icons/fa'
 import orderEventEmitter from '../../helpers/OrderEmitter';
+import { Rating } from '../../components/common/rate';
 
 function Purchase_History () {
 
@@ -27,7 +27,6 @@ function Purchase_History () {
     };
 
     const [recommendationProducts, setRecommendationProducts] = useState([]);
-    const [hover, setHover] = useState(null);
     const [purchases, setPurchases] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [selectedPurchases, setSelectedPurchases] = useState(null);
@@ -246,7 +245,7 @@ function Purchase_History () {
                                     <th scope="row">{formatDate(purchaseItem.dateCreated)}</th>
                                     <td className="text-center">{purchaseItem.orderNumber}</td>
                                     <td className="text-center">{purchaseItem.cart.supplier.shopName}</td>
-                                    <td className="text-center">{purchaseItem.cart.items.length}</td>
+                                    <td className="text-center">{purchaseItem.orderItems.length}</td>
                                     <td className="text-center">{purchaseItem.total}</td>
                                 </tr>
                             </tbody>
@@ -291,7 +290,7 @@ function Purchase_History () {
                                 <h3 className='order-details-titles'>Order Details</h3>
                                 <span className="order-details-text">Order Date: <p className="order-details-input">{formatDate(selectedPurchases.dateCreated)}</p></span>
                                 <span className="order-details-text">Order No: <p className="order-details-input">{selectedPurchases.orderNumber}</p></span>
-                                <span className="order-details-text">Number of Items: <p className="order-details-input">{selectedPurchases.cart.items.length}</p></span>
+                                <span className="order-details-text">Number of Items: <p className="order-details-input">{selectedPurchases.orderItems.length}</p></span>
                                 <span className="order-details-text">Payment option: <p className="order-details-input">{PaymentType[Object.keys(PaymentType)[selectedPurchases.paymentType - 1]]}</p></span>
                             </div>
                             
@@ -332,81 +331,48 @@ function Purchase_History () {
                                     </tr>
                                 </thead>
                                 <tbody className="table-group-divider">
-                                {selectedPurchases && Status[Object.keys(Status)[selectedPurchases.status - 1]] === Status.Completed && (
-                                    <tr>
-                                        <th scope="row">{selectedPurchases.cart.items[0].product.productName}</th>
-                                        <td className='text-center'>{getProductTypeName(selectedPurchases.cart.items[0].product.productTypeId)}</td>
-                                        <td className='text-center'>{selectedPurchases.cart.items[0].product.category}</td>
-                                        <td className='text-center'>{selectedPurchases.cart.items[0].sizeQuantity.size}</td>
-                                        <td className='text-center'>{selectedPurchases.cart.items[0].quantity}</td>
-                                        <td className='text-center'>{selectedPurchases.cart.items[0].product.price}</td>
-                                    </tr>
+                                {selectedPurchases && selectedPurchases.orderItems && 
+                                    (Status[Object.keys(Status)[selectedPurchases.status - 1]] === Status.Completed) && (
+                                        selectedPurchases.orderItems.map((item, index) => (
+                                        <tr key={index}>
+                                            <th scope="row">{item.product.productName}</th>
+                                            <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                            <td className="text-center">{item.product.category}</td>
+                                            <td className="text-center">{item.sizeQuantity.size}</td>
+                                            <td className="text-center">{item.quantity}</td>
+                                            <td className="text-center">₱{item.product.price}</td>
+                                        </tr>
+                                    ))
                                 )}
                                 </tbody>
                             </table>
                         </div>
                         {!ratedPurchases.has(selectedPurchases.id) ? (
                             <div className='rating-container'>
-                                {/* Product Rating */}
-                                <div className='prod-rating'>
+                               {/* Product Rating */}
+                                <div className="prod-rating">
                                     <h3 className='order-details-titles'>Product Rating:</h3>
-                                    <div className="rating-group">
-                                        {[...Array(5)].map((_, index) => {
-                                            const ratingValue = index + 1;
-                                            return (
-                                                <label key={ratingValue}>
-                                                    <input 
-                                                        id={`product-rating-${ratingValue}`} 
-                                                        type="radio"
-                                                        name='rating'
-                                                        value={ratingValue}
-                                                        checked={ratingProduct === ratingValue} 
-                                                        onChange={(e) => setRatingProduct(parseInt(e.target.value))}
-                                                        style={{ display: 'none' }}
-                                                    />
-                                                    <FaStar 
-                                                        style={{ cursor: 'pointer' }}
-                                                        size={20} 
-                                                        color={ratingValue <= (hover || ratingProduct) ? "#ffc107" : "#e4e5e9"} 
-                                                        onMouseEnter={() => setHover(ratingValue)}
-                                                        onMouseLeave={() => setHover(null)}
-                                                    />
-                                                </label>
-                                            );
-                                        })}
-                                    </div>
+                                    <Rating 
+                                        activeColor="#ffd700" 
+                                        count={5} 
+                                        size={45} 
+                                        value={ratingProduct}  
+                                        onChange={(rating) => setRatingProduct(rating)} 
+                                    />
                                 </div>
-                                
 
                                 {/* Supplier Rating */}
-                                <div className="supplier-rating">
+                                <div className="prod-rating">
                                     <h3 className='order-details-titles'>Supplier Rating:</h3>
-                                    <div className="rating-group">
-                                        {[...Array(5)].map((_, index) => {
-                                            const supplierValue = index + 1;
-                                            return (
-                                                <label key={supplierValue}>
-                                                    <input 
-                                                        id={`supplier-rating-${supplierValue}`} 
-                                                        type="radio" 
-                                                        name="rating" 
-                                                        value={supplierValue} 
-                                                        checked={ratingSupplier === supplierValue} 
-                                                        onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
-                                                        style={{ display: 'none' }}
-                                                    />
-                                                    <FaStar 
-                                                        style={{ cursor: 'pointer' }}
-                                                        size={20} 
-                                                        color={supplierValue <= (hover || ratingSupplier) ? "#ffc107" : "#e4e5e9"} 
-                                                        onMouseEnter={() => setHover(supplierValue)}
-                                                        onMouseLeave={() => setHover(null)}
-                                                    />
-                                                </label>
-                                            );
-                                        })}
-                                    </div>
+                                        <Rating 
+                                            activeColor="#ffd700" 
+                                            count={5} 
+                                            size={45} 
+                                            value={ratingSupplier}
+                                            onChange={(rating) => setRatingSupplier(rating)} 
+                                        />
                                 </div>
+
                             </div>
                         ) : (
                             <div className="rating-complete-message">

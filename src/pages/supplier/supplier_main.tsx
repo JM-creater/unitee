@@ -78,6 +78,28 @@ function Supplier_Main (){
         };
     }, [id, updateNotification]);
 
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+            const response = await axios.get(`https://localhost:7017/Notification/supplierUnread/${id}`);
+            setNotifItem(response.data);
+        } catch (error) {
+            console.error('Network error or server not responding');
+        }
+        };
+
+        const handleFocus = () => {
+            fetchData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [id]); 
+
     // * Mark as Read Supplier in Notification
     const handleNotificationClick = () => {
         const fetchNotificationClick = async () => {
