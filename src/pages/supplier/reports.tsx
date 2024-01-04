@@ -8,7 +8,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-
+import ExcelJS from "exceljs"
 import { Bar } from "react-chartjs-2";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
@@ -24,6 +24,140 @@ function Supplier() {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [topSellingProducts, setTopSellingProducts] = useState([]);
   const { id } = useParams();
+
+  // * Download Report to Excel
+  const HandleExportToExcel = async () => {
+    const ordersData = filteredOrders.map(ord => ({
+        OrderNumber: ord.orderNumber,
+        Customer: `${ord.user.firstName} ${ord.user.lastName}`,
+        Items: ord.cart.items.reduce((total, item) => total + item.quantity, 0),
+        Total: ord.total,
+        Status: getStatusText(ord.status)
+    }));
+
+    const salesData = [
+        { Type: 'Weekly Sales', Amount: weeklySales.length > 0 ? weeklySales.reduce((a, b) => a + b) : 0 },
+        { Type: 'Monthly Sales', Amount: monthlySales.length > 0 ? monthlySales.reduce((a, b) => a + b) : 0 },
+        { Type: 'Yearly Sales', Amount: yearlySales.length > 0 ? yearlySales.reduce((a, b) => a + b) : 0 }
+    ];
+
+    const workbook = new ExcelJS.Workbook();
+
+    const ordersSheet = workbook.addWorksheet('Orders');
+
+    ordersSheet.columns = [
+        { header: 'OrderNumber', key: 'OrderNumber', width: 15 },
+        { header: 'Customer', key: 'Customer', width: 20 },
+        { header: 'Items', key: 'Items', width: 15 },
+        { header: 'Total', key: 'Total', width: 10 },
+        { header: 'Status', key: 'Status', width: 15 }
+    ];
+
+    ordersSheet.addRows(ordersData);
+
+    ordersSheet.getRow(1).eachCell(cell => {
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFFFAA00' }
+        };
+        cell.border = {
+            top: { style: 'thin', color: { argb: 'FF000000' } },
+            left: { style: 'thin', color: { argb: 'FF000000' } },
+            bottom: { style: 'thin', color: { argb: 'FF000000' } },
+            right: { style: 'thin', color: { argb: 'FF000000' } }
+        };
+        cell.font = { bold: true };
+    });
+
+    const salesSheet = workbook.addWorksheet('Sales');
+
+    salesSheet.columns = [
+        { header: 'Type', key: 'Type', width: 20 },
+        { header: 'Amount', key: 'Amount', width: 15 }
+    ];
+
+    salesSheet.addRows(salesData);
+
+    salesSheet.getRow(1).eachCell(cell => {
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFFFAA00' }
+        };
+        cell.border = {
+            top: { style: 'thin', color: { argb: 'FF000000' } },
+            left: { style: 'thin', color: { argb: 'FF000000' } },
+            bottom: { style: 'thin', color: { argb: 'FF000000' } },
+            right: { style: 'thin', color: { argb: 'FF000000' } }
+        };
+        cell.font = { bold: true };
+    });
+
+    const totalOrdersSheet = workbook.addWorksheet('Total Orders');
+
+    totalOrdersSheet.columns = [
+        { header: 'Total Orders', key: 'totalOrders', width: 20 }
+    ];
+
+    if (orders && orders.length > 0) {
+        totalOrdersSheet.addRow({ totalOrders: orders.length });
+    } else {
+        totalOrdersSheet.addRow({ totalOrders: 0 });
+    }
+
+    totalOrdersSheet.getRow(1).eachCell(cell => {
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFFFAA00' }
+        };
+        cell.border = {
+            top: { style: 'thin', color: { argb: 'FF000000' } },
+            left: { style: 'thin', color: { argb: 'FF000000' } },
+            bottom: { style: 'thin', color: { argb: 'FF000000' } },
+            right: { style: 'thin', color: { argb: 'FF000000' } }
+        };
+        cell.font = { bold: true };
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = 'Report.xlsx';
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+};
+
+const getStatusText = (status) => {
+    switch (status) {
+        case 1:
+            return 'Order Placed';
+        case 2:
+            return 'Pending';
+        case 3:
+            return 'Approved';
+        case 4:
+            return 'For Pick Up';
+        case 5:
+            return 'Completed';
+        case 6:
+            return 'Canceled';
+        case 7:
+            return 'Denied';
+        default:
+            return 'Unavailable'; 
+    }
+};
 
   // * Fetch Data of All Orders
   useEffect(() => {
@@ -55,21 +189,6 @@ function Supplier() {
 
     return matchesStatus && matchesShop;
   });
-
-  // * Get Order By Supplier from Customer
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await axios.get(
-          `https://localhost:7017/Order/BySupplier/${id}`
-        );
-        setOrders(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchOrders();
-  }, [id]);
 
   // * Get the Sales by Weekly, Monthly, Yearly
   useEffect(() => {
@@ -236,7 +355,7 @@ function Supplier() {
               display: "flex",
             }}
           >
-            <button className="generate-report-btn">Generate Report</button>
+            <button className="generate-report-btn" onClick={HandleExportToExcel}>Generate Report</button>
           </div>
         </div>
         <div className="col-md-5 top-selling-prods-container">
@@ -347,7 +466,6 @@ function Supplier() {
             {filteredOrders.map((ord) => (
               <tr key={ord.id}>
                 <th scope="row">{ord.orderNumber}</th>
-                {/* <td className="text-center">{ord.cart.supplier.shopName}</td> */}
                 <td className="text-center">
                   {ord.user.firstName} {ord.user.lastName}
                 </td>

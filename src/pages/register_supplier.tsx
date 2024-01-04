@@ -46,14 +46,6 @@ function Register() {
     }
   }, []);
 
-   // * Check if the email is confirmed
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/');
-    }
-  }, [navigate]);
-
   const handleIDnumber = (value) => {
     if (/^[0-9]*$/.test(value)) {
       setIDNumber(value);
