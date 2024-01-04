@@ -104,15 +104,7 @@ function Admin_Main() {
 
           <div style={{ minHeight: "100%" }}>
             <div className="admin-second-nav-container">
-              <div className="search-container-admin">
-                <span className="fa fa-search form-control-feedback search-icon"></span>
-                <input
-                  className="Supplier-SearchBar"
-                  type="text"
-                  placeholder="Search"
-                />
-              </div>
-
+              <div className="search-container-admin"></div>
               <div>
                 <div>
                   <button

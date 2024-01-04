@@ -39,25 +39,18 @@ function Cart() {
   const [proofOfPayment, setProofOfPayment] = useState(null);
   const [referenceId, setReferenceId] = useState("");
   const [selectedPhoneShop, setSelectedPhoneShop] = useState("");
-  const [selectedShopId, setSelectedShopId] = useState(null);
+  const [, setSelectedShopId] = useState(null);
+  const [lastErrorMessage, setLastErrorMessage] = useState("");
   const { userId } = useParams();
   const fileInputRef = useRef(null);
 
-  // * For Delay
-  //const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-  const [lastErrorMessage, setLastErrorMessage] = useState("");
-
-  // Handle Reference Id
+  // * Handle Reference Id
   const handleReferenceId = (value) => {
     if (/^[0-9]*$/.test(value)) {
       setReferenceId(value);
-      // Clear the last error message when a valid value is entered
       setLastErrorMessage("");
     } else if (lastErrorMessage !== "Reference ID must contain only numbers.") {
-      // Show error toast only if the error message changes
       toast.error("Reference ID must contain only numbers.");
-      // Set the last error message
       setLastErrorMessage("Reference ID must contain only numbers.");
     }
   };
@@ -119,14 +112,9 @@ function Cart() {
     let count = 0;
     const amount = cart.reduce((sum, cartItem) => {
       return (
-        sum +
-        cartItem.items.reduce((sumItem, item) => {
+        sum + cartItem.items.reduce((sumItem, item) => {
           if (
-            (
-              document.getElementById(
-                `prodCheckbox-${item.id}`
-              ) as HTMLInputElement
-            ).checked
+            (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement).checked
           ) {
             count += 1;
             return sumItem + (item.product.price || 0) * item.quantity;
@@ -200,28 +188,28 @@ function Cart() {
     setCart(updatedCart);
   };
 
-  // * Handle Shop Total Amount
-  // const handleShopCheckboxChange = (cartIndex) => {
-  //   const updatedCart = [...cart];
-  //   const shopChecked = (document.getElementById(`shopRadio-${updatedCart[cartIndex].supplierId}`) as HTMLInputElement).checked;
-
-  //   updatedCart[cartIndex].items.forEach(item => {
-  //       (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement).checked = shopChecked;
-  //   });
-
-  //   updatedCart
-
-  //   setCart(updatedCart);
-  //   calculateTotalAmount();
-  // };
-
+  // * Handle Shop Cart
   const handleShopCheckboxChange = (cartIndex) => {
+    cart.forEach((shop, index) => {
+      if (index !== cartIndex) {
+        const otherShopCheckbox = document.getElementById(`shopRadio-${shop.supplierId}`) as HTMLInputElement;
+        if (otherShopCheckbox) otherShopCheckbox.checked = false;
+        shop.items.forEach(item => {
+          const itemCheckbox = document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement;
+          if (itemCheckbox) itemCheckbox.checked = false;
+        });
+      }
+    });
+  
     const updatedCart = [...cart];
     const currentShopId = updatedCart[cartIndex].supplierId;
-    const shopChecked = (
-      document.getElementById(`shopRadio-${currentShopId}`) as HTMLInputElement
-    ).checked;
-
+    const shopChecked = (document.getElementById(`shopRadio-${currentShopId}`) as HTMLInputElement).checked;
+  
+    updatedCart[cartIndex].items.forEach((item) => {
+      const itemCheckbox = document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement;
+      if (itemCheckbox) itemCheckbox.checked = shopChecked;
+    });
+  
     if (shopChecked) {
       setSelectedPhoneShop(updatedCart[cartIndex].supplier.phoneNumber);
       setSelectedShopId(currentShopId);
@@ -229,59 +217,42 @@ function Cart() {
       setSelectedPhoneShop("");
       setSelectedShopId(null);
     }
-
-    updatedCart.forEach((cartItem) => {
-      const isCurrentShop = cartItem.supplierId === currentShopId;
-      cartItem.items.forEach((item) => {
-        (
-          document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement
-        ).checked = isCurrentShop && shopChecked;
-      });
-    });
-
+  
     setCart(updatedCart);
     calculateTotalAmount();
   };
 
-  // * Handle Individual Product Total Amount
-  // const handleProductCheckboxChange = (cartIndex) => {
-  //   const allItemsChecked = cart[cartIndex].items.every(item => {
-  //     return (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement).checked;
-  //   });
-  //   (document.getElementById(`shopRadio-${cart[cartIndex].supplierId}`) as HTMLInputElement).checked = allItemsChecked;
-  //   calculateTotalAmount();
-  // };
-
+  // * Handle Individual Product From The Shop Cart
   const handleProductCheckboxChange = (cartIndex, itemId) => {
-    const updatedCart = [...cart];
-    const currentShopId = updatedCart[cartIndex].supplierId;
-    const itemIndex = updatedCart[cartIndex].items.findIndex(
-      (item) => item.id === itemId
-    );
-    if (itemIndex === -1) return;
-
-    const currentItemChecked = (
-      document.getElementById(`prodCheckbox-${itemId}`) as HTMLInputElement
-    ).checked;
-
-    if (currentItemChecked) {
-      setSelectedPhoneShop(updatedCart[cartIndex].supplier.phoneNumber);
-      setSelectedShopId(currentShopId);
-    } else if (selectedShopId === currentShopId) {
-      setSelectedPhoneShop("");
-      setSelectedShopId(null);
-    }
-
-    const allItemsChecked = updatedCart[cartIndex].items.every((item) => {
-      return (
-        document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement
-      ).checked;
+    cart.forEach((shop, index) => {
+      if (index !== cartIndex) {
+        shop.items.forEach(item => {
+          const itemCheckbox = document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement;
+          if (itemCheckbox) itemCheckbox.checked = false;
+        });
+      }
     });
-
-    (
-      document.getElementById(`shopRadio-${currentShopId}`) as HTMLInputElement
-    ).checked = allItemsChecked;
-
+  
+    const updatedCart = [...cart];
+    const currentItem = updatedCart[cartIndex].items.find(item => item.id === itemId);
+    if (!currentItem) return;
+  
+    const currentItemCheckbox = (document.getElementById(`prodCheckbox-${itemId}`) as HTMLInputElement).checked;
+    currentItem.checked = currentItemCheckbox; 
+  
+    if (currentItemCheckbox) {
+      setSelectedPhoneShop(updatedCart[cartIndex].supplier.phoneNumber);
+      setSelectedShopId(updatedCart[cartIndex].supplierId);
+    } else {
+      const isAnyItemChecked = updatedCart[cartIndex].items.some(item => item.checked);
+      if (!isAnyItemChecked) {
+        setSelectedPhoneShop("");
+        setSelectedShopId(null);
+        const shopCheckbox = document.getElementById(`shopRadio-${updatedCart[cartIndex].supplierId}`) as HTMLInputElement;
+        if (shopCheckbox) shopCheckbox.checked = false;
+      }
+    }
+  
     setCart(updatedCart);
     calculateTotalAmount();
   };

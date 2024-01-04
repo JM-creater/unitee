@@ -7,6 +7,7 @@ import { useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import notifEventEmitter from '../../helpers/NotifEventEmitter';
 import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 function Notif() {
 
@@ -31,18 +32,17 @@ function Notif() {
     setShowAllNotifications(!showAllNotifications);
   }
 
-  // * Download Receipt
+  // * Download Receipt in PDF
   const downloadReceipt = (orderNumber) => {
     const content = document.getElementById(`receipt-content-${orderNumber}`);
-
     html2canvas(content, { scrollY: -window.scrollY }).then(canvas => {
-      const image = canvas.toDataURL('image/png');
-      const downloadLink = document.createElement('a');
-      downloadLink.href = image;
-      downloadLink.download = `receipt-${orderNumber}.png`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png');
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`receipt-${orderNumber}.pdf`);
     });
   };
 
@@ -1006,7 +1006,7 @@ function Notif() {
   
                       <div className='notif-order-details-2'>
                         <span>{selectedOrderReceipt.order.orderNumber}</span>
-                        <span>{selectedOrderReceipt.order.cart.items.length}</span>
+                        <span>{selectedOrderReceipt.order.orderItems.length}</span>
                         <span>{selectedOrderReceipt.order.cart.supplier.shopName}</span>
                       </div>
                     </div>
@@ -1035,7 +1035,7 @@ function Notif() {
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedOrderReceipt.order.cart.items.map((item, index) => ( 
+                      {selectedOrderReceipt && selectedOrderReceipt.order && selectedOrderReceipt.order.orderItems.map((item, index) => ( 
                         <tr key={index}>
                           <th scope="row">{item.product.productName}</th>
                           <td>{item.quantity}</td>
