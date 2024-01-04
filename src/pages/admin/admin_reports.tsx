@@ -30,11 +30,34 @@ ChartJS.register(
 
 function Admin_Reports () {
 
+    const [weeklySales, setWeeklySales] = useState([]);
+    const [monthlySales, setMonthlySales] = useState([]);
+    const [yearlySales, setYearlySales] = useState([]);
     const [orders, setOrders] = useState([]);
     const [shops, setShops] = useState([]);
     const [selectedShop, setSelectedShop] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('');
     const [supplierOrderCounts, setSupplierOrderCounts] = useState({});
+
+
+    // * Get the Sales by Weekly, Monthly, Yearly
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const weeklyResponse = await axios.get(`https://localhost:7017/Order/weeklyAdmin?startDate=${new Date().toISOString()}`);
+                setWeeklySales(weeklyResponse.data);
+        
+                const monthlyResponse = await axios.get(`https://localhost:7017/Order/monthlyAdmin?year=${new Date().getFullYear()}&month=${new Date().getMonth() + 1}`);
+                setMonthlySales(monthlyResponse.data);
+        
+                const yearlyResponse = await axios.get(`https://localhost:7017/Order/yearlyAdmin?year=${new Date().getFullYear()}`);
+                setYearlySales(yearlyResponse.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchData();
+    }, []);
 
     // * Download Report to Excel
     const HandleExportToExcel = () => {
@@ -54,28 +77,6 @@ function Admin_Reports () {
         utils.book_append_sheet(wb, ws, 'Report');
         writeFile(wb, 'Admin Report.xlsx');
     };
-    
-    // * Get the Status of Orders
-    // const getStatusText = (status) => {
-    //     switch (status) {
-    //         case 1:
-    //             return 'Order Placed';
-    //         case 2:
-    //             return 'Pending';
-    //         case 3:
-    //             return 'Approved';
-    //         case 4:
-    //             return 'For Pick Up';
-    //         case 5:
-    //             return 'Completed';
-    //         case 6:
-    //             return 'Canceled';
-    //         case 7:
-    //             return 'Denied';
-    //         default:
-    //             return 'Unavailable'; 
-    //     }
-    // }
     
     // * Count the orders each supplier in pie graph
     useEffect(() => {
@@ -132,40 +133,24 @@ function Admin_Reports () {
         fetchShops();
     }, []);
 
-    // * BAR GRAPH
-    const salesData = {
-        labels: ['January', 'February', 'March'],
+    const months = [
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    ];
+    
+    const data = {
+        labels: months, 
         datasets: [
             {
-                label: 'Supplier 1',
-                data: [ 3,6,7 ],
-                backgroundColor: '#004AAD',
-                borderColor: 'white',
+                label: "Yearly Sales",
+                data: yearlySales,
+                backgroundColor: "#65A4F6",
+                borderColor: "white",
                 borderWidth: 1,
             },
-            {
-                label: 'Supplier 2',
-                data: [ 4,5,1 ],
-                backgroundColor: '#65A4F6',
-                borderColor: 'white',
-                borderWidth: 1,
-            },
-            {
-                label: 'Supplier 3',
-                data: [ 8,3,5 ],
-                backgroundColor: '#020654',
-                borderColor: 'white',
-                borderWidth: 1,
-            },
-            {
-                label: 'Supplier 4',
-                data: [ 7,1,6 ],
-                backgroundColor: '#FDB833',
-                borderColor: 'white',
-                borderWidth: 1,
-            }
-        ]
-    }
+        ],
+    };
 
     // * PIE CHART CHART
     const pieChartData = {
@@ -178,9 +163,7 @@ function Admin_Reports () {
         }]
     };
 
-    const options = {
-
-    }
+    const options = {}
 
     return <div className="admin-reports-main-container">
         <h3 style={{ marginBottom:'20px', color:'#020654', fontWeight:'600' }}>Reports</h3>
@@ -217,7 +200,7 @@ function Admin_Reports () {
                     {/* WEEKLY */}
                     <div className='col-md-9'>
                         <h5 className='header-adminSales-label'>Weekly Sales</h5>
-                        <h3>0</h3>
+                        <h3>₱{weeklySales.length > 0 ? weeklySales.reduce((a, b) => a + b) : 0}</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
                 </div>
@@ -226,7 +209,7 @@ function Admin_Reports () {
                 <div className='admin-sales-card'>
                     <div className='col-md-9'>
                         <h5 className='header-adminSales-label'>Monthly Sales</h5>
-                        <h3>0</h3>
+                        <h3>₱{monthlySales.length > 0 ? monthlySales.reduce((a, b) => a + b) : 0}</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
                 </div>
@@ -235,7 +218,7 @@ function Admin_Reports () {
                 <div className='admin-sales-card'>
                     <div className='col-md-9'>
                         <h5 className='header-adminSales-label'>Yearly Sales</h5>
-                        <h3>0</h3>
+                        <h3>₱{yearlySales.length > 0 ? yearlySales.reduce((a, b) => a + b) : 0}</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
                 </div>
@@ -255,13 +238,10 @@ function Admin_Reports () {
                     borderRadius:'10px'}}>
                     
                     <h1 style={{ color:'#020654' }}>Sales Review</h1>
-                    <span>Suppliers average sales for the past 
-                        <span className='num-months-chartReview'> number of months </span>
-                            is <span className='total-sales-chartReview'> $100000</span>
-                    </span>
+                    
                     <Bar
                         style={{ marginTop:'15px' }}
-                        data= { salesData }
+                        data= { data }
                         options= { options }
                     ></Bar>
             </div>
