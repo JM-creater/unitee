@@ -148,6 +148,7 @@ function Login() {
               });
               break;
             case "Supplier":
+              localStorage.removeItem('generatedSupplierID');
               login(result.data.token);
               setIsLoading(true);
               await sleep(10000);
