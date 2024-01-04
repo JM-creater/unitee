@@ -1,7 +1,6 @@
 import './admin_reports.css'
 import totalOrdersIcon from "../../assets/images/icons/order-2.png"
 import salesIcon from "../../assets/images/icons/sales.png"
-// import * as XLSX from 'xlsx';
 import ExcelJS from "exceljs"
 import {
     Chart as ChartJS,
