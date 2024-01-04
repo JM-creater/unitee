@@ -164,9 +164,7 @@ function Main() {
   const handleNotificationClick = () => {
     const fetchNotificationClick = async () => {
       try {
-        await axios.post(
-          `https://localhost:7017/Notification/markRead/${userId}`
-        );
+        await axios.post(`https://localhost:7017/Notification/markRead/${userId}`);
         updateNotification();
       } catch (error) {
         console.error(error);
@@ -216,7 +214,7 @@ function Main() {
                         if (acc.length < 5) {
                           acc.push(
                             ...cartObj.items
-                              .slice(0, 5 - acc.length)
+                              .slice(0, 4 - acc.length)
                               .map((item, itemIndex) => (
                                 <Link
                                   to={`visit_shop/${cartObj.supplierId}`}

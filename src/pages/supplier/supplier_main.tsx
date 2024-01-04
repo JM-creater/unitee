@@ -78,6 +78,18 @@ function Supplier_Main (){
         };
     }, [id, updateNotification]);
 
+    // * Mark as Read Supplier in Notification
+    const handleNotificationClick = () => {
+        const fetchNotificationClick = async () => {
+            try {
+                await axios.post(`https://localhost:7017/Notification/markReadSupplier/${id}`);
+                updateNotification();
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchNotificationClick();
+    };
 
     return (
         <React.Fragment>
@@ -98,10 +110,9 @@ function Supplier_Main (){
                             <img className="supplier-nav-icon" src={ dashboardSupplierIcon }/>
                             <span className="supplier-nav-text">Dashboard</span>
                         </Link>
-                        <Link to='supplier_orders' className="supplier-nav-link">
+                        <Link to='supplier_orders' className="supplier-nav-link" onClick={handleNotificationClick}>
                             <img className="supplier-nav-icon" src={ ordersSupplierIcon }/>
                             <span className="supplier-nav-text">Orders {notifItem.length > 0 && <span className='notifOrder-count'>{notifItem.length}</span>}</span>
-                            
                         </Link>
                         <Link to='manage_shop' className="supplier-nav-link">
                             <img className="supplier-nav-icon" src={ shopIcon }/>
@@ -117,10 +128,7 @@ function Supplier_Main (){
                     
                     <div className="second-nav-container">
 
-                        <div className="search-container">
-                            <span className="fa fa-search form-control-feedback search-icon"></span>
-                            <input className="Supplier-SearchBar" type="text" placeholder="Search" />
-                        </div>
+                        <div className="search-container"></div>
                         {supplier && (
                             <React.Fragment>
                                 <img 

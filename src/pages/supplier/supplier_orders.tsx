@@ -7,16 +7,6 @@ import notifEventEmitter from "../../helpers/NotifEventEmitter";
 import orderEventEmitter from "../../helpers/OrderEmitter";
 import cartEventEmitter from "../../helpers/EventEmitter";
 
-// eslint-disable-next-line react-refresh/only-export-components
-const StatusMapping = {
-  1: 'OrderPlaced',
-  2: 'Pending',
-  3: 'Approved',
-  4: 'ForPickUp',
-  5: 'Completed',
-  6: 'Canceled',
-  7: 'Denied'
-};
 
 function Supplier_Orders () {
 
@@ -49,6 +39,7 @@ function Supplier_Orders () {
       Completed: 0,
       Canceled: 0
     });
+    
     const statuses = [
       { key: 'Pending', href: '#supplier-pending-order' },
       { key: 'Approved', href: '#supplier-approved-order' },
@@ -66,6 +57,7 @@ function Supplier_Orders () {
       window.location.reload();
     };
 
+    // * Handle Order Click
     const handleOrderClick = (orderItem) => {
       setSelectedOrders(orderItem);
     }
@@ -149,9 +141,10 @@ function Supplier_Orders () {
     
     // * Get Product Type Name
     const getProductTypeName = (productTypeId) => {
-        const productType = productTypes.find(p => p.productTypeId === productTypeId);
-        return productType ? productType.product_Type : 'Unknown Type';
-    };
+      // Ensure productTypeId is of the correct type (e.g., number or string)
+      const productType = productTypes.find(p => p.productTypeId === productTypeId);
+      return productType ? productType.product_Type : 'Unknown Type';
+  };
 
     // * Handle Approved Orders
     const HandleApprovedOrders = (orderId) => {
@@ -167,13 +160,10 @@ function Supplier_Orders () {
           
           toast.success("Order approved successfully");
           notifEventEmitter.emit("notifAdded");
-          
-          await sleep(100);
           window.location.reload();
         })
         .catch(error => {
             console.error(error);
-            console.error("Failed to approve the order. Please try again");
         });
     };
 
@@ -187,13 +177,10 @@ function Supplier_Orders () {
             }
             toast.success("Order denied successfully");
             notifEventEmitter.emit("notifAdded");
-
-            await sleep(100);
             window.location.reload();
         })
         .catch(error => {
             console.error(error);
-            console.error("Failed to deny the order. Please try again");
         });
     };
 
@@ -207,13 +194,10 @@ function Supplier_Orders () {
             }
             toast.success("For pick up order success");
             notifEventEmitter.emit("notifAdded");
-
-            await sleep(100);
             window.location.reload();
         })
         .catch(error => {
           console.error(error);
-          console.error("Failed to pick up the order. Please try again");
         });
     };
 
@@ -228,12 +212,10 @@ function Supplier_Orders () {
             toast.success("Order completed success");
             notifEventEmitter.emit("notifAdded");
             orderEventEmitter.emit("orderCompleted");
-            //await sleep(100);
             window.location.reload();
         })
         .catch(error => {
           console.error(error);
-          console.error("Failed to complete the order. Please try again");
         });
     };
 
@@ -248,36 +230,44 @@ function Supplier_Orders () {
       return `${month}/${day}/${year} ${hours}:${minutes}`;
     };
     
+    // ! To be fixed
     // * Update Notification
     const updateNotification = useCallback(() => {
-      axios.get(`https://localhost:7017/Notification/supplierUnread/${id}`)
-        .then(response => {
-          // Reset the counts to their initial state
-          const resetCounts = {
-            Pending: 0,
-            Approved: 0,
-            ForPickUp: 0,
-            Completed: 0,
-            Canceled: 0
-          };
-          // Update the counts based on new notifications
-          response.data.forEach(notification => {
-            const orderStatus = notification.order && notification.order.status;
-            const statusName = StatusMapping[orderStatus];
-            if (resetCounts[statusName] !== undefined) {
-              resetCounts[statusName] += 1;
-            }
-          });
-          setStatusCounts(resetCounts);
-        })
-        .catch(error => console.error(error));
-    }, [id]);
-  
+      const savedCounts = JSON.parse(localStorage.getItem('statusCounts')) || {};
+      const newStatusCounts = {
+        Pending: savedCounts.Pending !== 0 ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).length : 0,
+        Approved: savedCounts.Approved !== 0 ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Approved).length : 0,
+        ForPickUp: savedCounts.ForPickUp !== 0 ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.ForPickUp).length : 0,
+        Completed: savedCounts.Completed !== 0 ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Completed).length : 0,
+        Canceled: savedCounts.Canceled !== 0 ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Canceled).length : 0
+      };
+      setStatusCounts(newStatusCounts);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [orders]);
+
+    // * Remove the notification count
+    const handleRemoveCount = (statusKey) => {
+      const updatedCounts = { ...statusCounts, [statusKey]: 0 };
+      setStatusCounts(updatedCounts);
+      localStorage.setItem('statusCounts', JSON.stringify(updatedCounts));
+    };
+
+    // ! To be fixed
+    // * Get the status count in local storage
+    useEffect(() => {
+      const savedCounts = JSON.parse(localStorage.getItem('statusCounts'));
+      if (savedCounts) {
+        setStatusCounts(savedCounts);
+      }
+    }, []);
+
+
+    // ! To be fixed
     // * Fetch New Order Notification
     useEffect(() => {
       orderEventEmitter.on("notifNewOrderAdded", updateNotification);
       updateNotification();
-
+    
       return () => {
         orderEventEmitter.off("notifNewOrderAdded", updateNotification);
       };
@@ -286,29 +276,22 @@ function Supplier_Orders () {
     
 
     return <div className="manage-orders-main-container">
+
     <nav id="orders-nav" className="navbar px-3 mb-3" style={{ display:'flex', justifyContent:'end' }}>
-    <ul className="nav nav-pills">
-    {statuses.map((status) => (
-        <li key={status.key} className="nav-item supplier-nav-items">
-          <a className="nav-link" href={status.href}>
-            {status.key}
-            {statusCounts[status.key] > 0 && (
-              <span 
-                style={{ 
-                  color: 'white', 
-                  backgroundColor: 'red', 
-                  padding: '2px 7px', 
-                  borderRadius: '50%', 
-                  marginLeft: '5px' 
-                }}
-              >
-                {statusCounts[status.key]}
-              </span>
-            )}
-          </a>
-        </li>
-      ))}
-    </ul>
+      <ul className="nav nav-pills">
+        {statuses.map((status) => (
+          <li key={status.key} className="nav-item supplier-nav-items">
+            <a className="nav-link" href={status.href} onClick={() => handleRemoveCount(status.key)}>
+              {status.key}
+              {statusCounts[status.key] > 0 && (
+                <span style={{  color: 'white', backgroundColor: 'red', padding: '2px 7px', borderRadius: '50%', marginLeft: '5px' }}>
+                  {statusCounts[status.key]}
+                </span>
+              )}
+            </a>
+          </li>
+        ))}
+      </ul>
     </nav>
 
     <div className="orders-supplier-container">
@@ -334,7 +317,7 @@ function Supplier_Orders () {
                           <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
                           <td className="text-center">{orderItem.orderNumber}</td>
                           <td className="text-center">
-                            {orderItem.cart && orderItem.cart.items ? orderItem.cart.items.length : 0}
+                            {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                           </td>
                           <td className="text-center">₱{orderItem.total}</td>
                           <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
@@ -374,7 +357,7 @@ function Supplier_Orders () {
                             <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
                             <td className="text-center">{orderItem.orderNumber}</td>
                             <td className="text-center">
-                              {orderItem.cart && orderItem.cart.items ? orderItem.cart.items.length : 0}
+                              {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}  
                             </td>
                             <td className="text-center">₱{orderItem.total}</td>
                             <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
@@ -414,7 +397,7 @@ function Supplier_Orders () {
                             <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
                             <td className="text-center">{orderItem.orderNumber}</td>
                             <td className="text-center">
-                              {orderItem.cart && orderItem.cart.items ? orderItem.cart.items.length : 0}
+                              {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                             </td>
                             <td className="text-center">₱{orderItem.total}</td>
                             <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
@@ -454,7 +437,7 @@ function Supplier_Orders () {
                             <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
                             <td className="text-center">{orderItem.orderNumber}</td>
                             <td className="text-center">
-                              {orderItem.cart && orderItem.cart.items ? orderItem.cart.items.length : 0}
+                              {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                             </td>
                             <td className="text-center">₱{orderItem.total}</td>
                             <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
@@ -494,7 +477,7 @@ function Supplier_Orders () {
                             <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
                             <td className="text-center">{orderItem.orderNumber}</td>
                             <td className="text-center">
-                              {orderItem.cart && orderItem.cart.items ? orderItem.cart.items.length : 0}
+                              {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                             </td>
                             <td className="text-center">₱{orderItem.total}</td>
                             <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
@@ -572,7 +555,7 @@ function Supplier_Orders () {
                                     <div className="modal-details-info">
                                       <span className="modal-info">{formatDate(selectedOrders.dateCreated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
-                                      <span className="modal-info">{selectedOrders.cart.items.length}</span>
+                                      <span className="modal-info">{selectedOrders.orderItems.length}</span>
                                       <span className="modal-info">₱{selectedOrders.total}</span>
                                       <a 
                                         className="modal-info" 
@@ -596,25 +579,29 @@ function Supplier_Orders () {
                             <table className="table">
                               <thead className="table-primary">
                                   <tr>
-                                  <th scope="col">Product Name</th>
-                                  <th scope="col">Product Type</th>
-                                  <th className="text-center" scope="col">Gender</th>
-                                  <th className="text-center" scope="col">Size</th>
-                                  <th className="text-center" scope="col">Quantity</th>
-                                  <th className="text-center" scope="col">Price</th>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col">Product Type</th>
+                                    <th className="text-center" scope="col">Gender</th>
+                                    <th className="text-center" scope="col">Size</th>
+                                    <th className="text-center" scope="col">Quantity</th>
+                                    <th className="text-center" scope="col">Price</th>
                                   </tr>
                               </thead>
                               <tbody>
-                              {selectedOrders && Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Pending && (
-                                <tr>
-                                  <th scope="row">{selectedOrders.cart.items[0].product.productName}</th>
-                                  <td >{getProductTypeName(selectedOrders.cart.items[0].product.productTypeId)}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].product.category}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].sizeQuantity.size}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].quantity}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].product.price}</td>
-                                </tr>
-                              )}
+                              {selectedOrders && selectedOrders.orderItems && 
+                                (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Pending) && (
+                                  selectedOrders.orderItems.map((item, index) => (
+                                    <tr key={index}>
+                                      <th scope="row">{item.product.productName}</th>
+                                      <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                      <td className="text-center">{item.product.category}</td>
+                                      <td className="text-center">{item.sizeQuantity.size}</td>
+                                      <td className="text-center">{item.quantity}</td>
+                                      <td className="text-center">₱{item.product.price}</td>
+                                    </tr>
+                                  ))
+                                )
+                              }
                               </tbody>
                             </table>
                           </div>
@@ -679,7 +666,7 @@ function Supplier_Orders () {
                                     <div className="modal-details-info">
                                       <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
-                                      <span className="modal-info">{selectedOrders.cart.items.length}</span>
+                                      <span className="modal-info">{selectedOrders.orderItems.length}</span>
                                       <span className="modal-info">₱{selectedOrders.total}</span>
                                       <a 
                                         className="modal-info" 
@@ -712,16 +699,20 @@ function Supplier_Orders () {
                                   </tr>
                               </thead>
                               <tbody>
-                              {selectedOrders && Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Approved && (
-                                <tr>
-                                  <th scope="row">{selectedOrders.cart.items[0].product.productName}</th>
-                                  <td>{getProductTypeName(selectedOrders.cart.items[0].product.productTypeId)}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].product.category}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].sizeQuantity.size}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].quantity}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].product.price}</td>
-                                </tr>
-                              )}
+                              {selectedOrders && selectedOrders.orderItems && 
+                                (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Approved) && (
+                                  selectedOrders.orderItems.map((item, index) => (
+                                    <tr key={index}>
+                                      <th scope="row">{item.product.productName}</th>
+                                      <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                      <td className="text-center">{item.product.category}</td>
+                                      <td className="text-center">{item.sizeQuantity.size}</td>
+                                      <td className="text-center">{item.quantity}</td>
+                                      <td className="text-center">₱{item.product.price}</td>
+                                    </tr>
+                                  ))
+                                )
+                              }
                               </tbody>
                             </table>
                           </div>
@@ -786,7 +777,7 @@ function Supplier_Orders () {
                                     <div className="modal-details-info">
                                       <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
-                                      <span className="modal-info">{selectedOrders.cart.items.length}</span>
+                                      <span className="modal-info">{selectedOrders.orderItems.length}</span>
                                       <span className="modal-info">₱{selectedOrders.total}</span>
                                       <a 
                                         className="modal-info" 
@@ -819,16 +810,20 @@ function Supplier_Orders () {
                                   </tr>
                               </thead>
                               <tbody>
-                              {selectedOrders && Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.ForPickUp && (
-                                <tr>
-                                  <th scope="row">{selectedOrders.cart.items[0].product.productName}</th>
-                                  <td>{getProductTypeName(selectedOrders.cart.items[0].product.productTypeId)}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].product.category}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].sizeQuantity.size}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].quantity}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].product.price}</td>
-                                </tr>
-                              )}
+                              {selectedOrders && selectedOrders.orderItems && 
+                                (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.ForPickUp) && (
+                                  selectedOrders.orderItems.map((item, index) => (
+                                    <tr key={index}>
+                                      <th scope="row">{item.product.productName}</th>
+                                      <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                      <td className="text-center">{item.product.category}</td>
+                                      <td className="text-center">{item.sizeQuantity.size}</td>
+                                      <td className="text-center">{item.quantity}</td>
+                                      <td className="text-center">₱{item.product.price}</td>
+                                    </tr>
+                                  ))
+                                )
+                              }
                               </tbody>
                             </table>
                           </div>
@@ -890,7 +885,7 @@ function Supplier_Orders () {
                                     <div className="modal-details-info">
                                       <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
-                                      <span className="modal-info">{selectedOrders.cart.items.length}</span>
+                                      <span className="modal-info">{selectedOrders.orderItems.length}</span>
                                       <span className="modal-info">₱{selectedOrders.total}</span>
                                       <a 
                                         className="modal-info" 
@@ -923,16 +918,20 @@ function Supplier_Orders () {
                                   </tr>
                               </thead>
                               <tbody>
-                              {selectedOrders && Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Completed && (
-                                <tr>
-                                  <th scope="row">{selectedOrders.cart.items[0].product.productName}</th>
-                                  <td>{getProductTypeName(selectedOrders.cart.items[0].product.productTypeId)}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].product.category}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].sizeQuantity.size}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].quantity}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].product.price}</td>
-                                </tr>
-                              )}
+                              {selectedOrders && selectedOrders.orderItems && 
+                                (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Completed) && (
+                                  selectedOrders.orderItems.map((item, index) => (
+                                    <tr key={index}>
+                                      <th scope="row">{item.product.productName}</th>
+                                      <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                      <td className="text-center">{item.product.category}</td>
+                                      <td className="text-center">{item.sizeQuantity.size}</td>
+                                      <td className="text-center">{item.quantity}</td>
+                                      <td className="text-center">₱{item.product.price}</td>
+                                    </tr>
+                                  ))
+                                )
+                              }
                               </tbody>
                             </table>
                           </div>
@@ -994,7 +993,7 @@ function Supplier_Orders () {
                                     <div className="modal-details-info">
                                       <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
-                                      <span className="modal-info">{selectedOrders.cart.items.length}</span>
+                                      <span className="modal-info">{selectedOrders.orderItems.length}</span>
                                       <span className="modal-info">₱{selectedOrders.total}</span>
                                       <a 
                                         className="modal-info" 
@@ -1027,16 +1026,20 @@ function Supplier_Orders () {
                                   </tr>
                               </thead>
                               <tbody>
-                              {selectedOrders && Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Canceled && (
-                                <tr>
-                                  <th scope="row">{selectedOrders.cart.items[0].product.productName}</th>
-                                  <td>{getProductTypeName(selectedOrders.cart.items[0].product.productTypeId)}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].product.category}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].sizeQuantity.size}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].quantity}</td>
-                                  <td className="text-center">{selectedOrders.cart.items[0].product.price}</td>
-                                </tr>
-                              )}
+                              {selectedOrders && selectedOrders.orderItems && 
+                                (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Canceled) && (
+                                  selectedOrders.orderItems.map((item, index) => (
+                                    <tr key={index}>
+                                      <th scope="row">{item.product.productName}</th>
+                                      <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                      <td className="text-center">{item.product.category}</td>
+                                      <td className="text-center">{item.sizeQuantity.size}</td>
+                                      <td className="text-center">{item.quantity}</td>
+                                      <td className="text-center">₱{item.product.price}</td>
+                                    </tr>
+                                  ))
+                                )
+                              }
                               </tbody>
                             </table>
                           </div>
