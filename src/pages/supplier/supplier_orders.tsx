@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./supplier_orders.css"
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -26,20 +26,12 @@ function Supplier_Orders () {
       Denied: 'Denied',
     };
 
+    const { id } = useParams();
     const [orders, setOrders] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [selectedOrders, setSelectedOrders] = useState(null);
-    const { id } = useParams();
 
-    const [statusCounts, setStatusCounts] = useState({
-      Pending: 0,
-      Approved: 0,
-      ForPickUp: 0,
-      Completed: 0,
-      Canceled: 0
-    });
-    
     const statuses = [
       { key: 'Pending', href: '#supplier-pending-order' },
       { key: 'Approved', href: '#supplier-approved-order' },
@@ -141,7 +133,6 @@ function Supplier_Orders () {
     
     // * Get Product Type Name
     const getProductTypeName = (productTypeId) => {
-      // Ensure productTypeId is of the correct type (e.g., number or string)
       const productType = productTypes.find(p => p.productTypeId === productTypeId);
       return productType ? productType.product_Type : 'Unknown Type';
   };
@@ -230,64 +221,14 @@ function Supplier_Orders () {
       return `${month}/${day}/${year} ${hours}:${minutes}`;
     };
     
-    // ! To be fixed
-    // * Update Notification
-    const updateNotification = useCallback(() => {
-      const savedCounts = JSON.parse(localStorage.getItem('statusCounts')) || {};
-      const newStatusCounts = {
-        Pending: savedCounts.Pending !== 0 ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).length : 0,
-        Approved: savedCounts.Approved !== 0 ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Approved).length : 0,
-        ForPickUp: savedCounts.ForPickUp !== 0 ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.ForPickUp).length : 0,
-        Completed: savedCounts.Completed !== 0 ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Completed).length : 0,
-        Canceled: savedCounts.Canceled !== 0 ? orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Canceled).length : 0
-      };
-      setStatusCounts(newStatusCounts);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [orders]);
-
-    // * Remove the notification count
-    const handleRemoveCount = (statusKey) => {
-      const updatedCounts = { ...statusCounts, [statusKey]: 0 };
-      setStatusCounts(updatedCounts);
-      localStorage.setItem('statusCounts', JSON.stringify(updatedCounts));
-    };
-
-    // ! To be fixed
-    // * Get the status count in local storage
-    useEffect(() => {
-      const savedCounts = JSON.parse(localStorage.getItem('statusCounts'));
-      if (savedCounts) {
-        setStatusCounts(savedCounts);
-      }
-    }, []);
-
-
-    // ! To be fixed
-    // * Fetch New Order Notification
-    useEffect(() => {
-      orderEventEmitter.on("notifNewOrderAdded", updateNotification);
-      updateNotification();
-    
-      return () => {
-        orderEventEmitter.off("notifNewOrderAdded", updateNotification);
-      };
-    }, [updateNotification]);
-
-    
 
     return <div className="manage-orders-main-container">
-
     <nav id="orders-nav" className="navbar px-3 mb-3" style={{ display:'flex', justifyContent:'end' }}>
       <ul className="nav nav-pills">
         {statuses.map((status) => (
           <li key={status.key} className="nav-item supplier-nav-items">
-            <a className="nav-link" href={status.href} onClick={() => handleRemoveCount(status.key)}>
+            <a className="nav-link" href={status.href}>
               {status.key}
-              {statusCounts[status.key] > 0 && (
-                <span style={{  color: 'white', backgroundColor: 'red', padding: '2px 7px', borderRadius: '50%', marginLeft: '5px' }}>
-                  {statusCounts[status.key]}
-                </span>
-              )}
             </a>
           </li>
         ))}
