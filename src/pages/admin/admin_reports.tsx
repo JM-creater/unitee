@@ -1,8 +1,8 @@
 import './admin_reports.css'
 import totalOrdersIcon from "../../assets/images/icons/order-2.png"
 import salesIcon from "../../assets/images/icons/sales.png"
-//import * as XLSX from 'xlsx';
-
+// import * as XLSX from 'xlsx';
+import ExcelJS from "exceljs"
 import {
     Chart as ChartJS,
     BarElement,
@@ -16,8 +16,7 @@ import {
 import { Bar, Pie } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { utils, writeFile } from 'xlsx';
-//import { toast } from 'react-toastify';
+//import { utils, writeFile } from 'xlsx';
 
 ChartJS.register(
     BarElement,
@@ -59,23 +58,168 @@ function Admin_Reports () {
         fetchData();
     }, []);
 
+    // * Fetch Data of All Orders
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const res = await axios.get('https://localhost:7017/Order');
+                setOrders(res.data);
+            } catch (error) {
+                console.error("Error fetching orders: ", error);
+            }
+        };
+
+        fetchOrders();
+    }, []);
+
+    // * Fetch Data of All Shops
+    useEffect(() => {
+        const fetchShops = async () => {
+            try {
+                const res = await axios.get('https://localhost:7017/Users');
+                    setShops(res.data);
+            } catch (error) {
+                console.error("Error fetching orders: ", error);
+            }
+        };
+
+        fetchShops();
+    }, []);
+
     // * Download Report to Excel
-    const HandleExportToExcel = () => {
-        const headings = [[
-            'Total Orders',
-            'Weekly Sales',
-            'Monthly Sales',
-            'Yearly Sales',
-            'Order Review'
-        ]];
+    const HandleExportToExcel = async () => {
+        const ordersData = filteredOrders.map(ord => ({
+            OrderNumber: ord.orderNumber,
+            Shop: ord.cart.supplier.shopName,
+            Customer: `${ord.user.firstName} ${ord.user.lastName}`,
+            Items: ord.cart.items.reduce((total, item) => total + item.quantity, 0),
+            Total: ord.total,
+            Status: getStatusText(ord.status)
+        }));
 
-        const wb = utils.book_new();
-        const ws = utils.json_to_sheet([]);
+        const salesData = [
+            { Type: 'Weekly Sales', Amount: weeklySales.length > 0 ? weeklySales.reduce((a, b) => a + b) : 0 },
+            { Type: 'Monthly Sales', Amount: monthlySales.length > 0 ? monthlySales.reduce((a, b) => a + b) : 0 },
+            { Type: 'Yearly Sales', Amount: yearlySales.length > 0 ? yearlySales.reduce((a, b) => a + b) : 0 }
+        ];
+    
+        const workbook = new ExcelJS.Workbook();
+    
+        const ordersSheet = workbook.addWorksheet('Orders');
+    
+        ordersSheet.columns = [
+            { header: 'OrderNumber', key: 'OrderNumber', width: 15 },
+            { header: 'Shop', key: 'Shop', width: 20 },
+            { header: 'Customer', key: 'Customer', width: 20 },
+            { header: 'Items', key: 'Items', width: 15 },
+            { header: 'Total', key: 'Total', width: 10 },
+            { header: 'Status', key: 'Status', width: 15 }
+        ];
+    
+        ordersSheet.addRows(ordersData);
+    
+        ordersSheet.getRow(1).eachCell(cell => {
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFFAA00' }
+            };
+            cell.border = {
+                top: { style: 'thin', color: { argb: 'FF000000' } },
+                left: { style: 'thin', color: { argb: 'FF000000' } },
+                bottom: { style: 'thin', color: { argb: 'FF000000' } },
+                right: { style: 'thin', color: { argb: 'FF000000' } }
+            };
+            cell.font = { bold: true };
+        });
+    
+        const salesSheet = workbook.addWorksheet('Sales');
+    
+        salesSheet.columns = [
+            { header: 'Type', key: 'Type', width: 20 },
+            { header: 'Amount', key: 'Amount', width: 15 }
+        ];
+    
+        salesSheet.addRows(salesData);
+    
+        salesSheet.getRow(1).eachCell(cell => {
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFFAA00' }
+            };
+            cell.border = {
+                top: { style: 'thin', color: { argb: 'FF000000' } },
+                left: { style: 'thin', color: { argb: 'FF000000' } },
+                bottom: { style: 'thin', color: { argb: 'FF000000' } },
+                right: { style: 'thin', color: { argb: 'FF000000' } }
+            };
+            cell.font = { bold: true };
+        });
+    
+        const totalOrdersSheet = workbook.addWorksheet('Total Orders');
 
-        utils.sheet_add_aoa(ws, headings);
-        utils.sheet_add_json(ws, orders, { origin: 'A2', skipHeader: true });
-        utils.book_append_sheet(wb, ws, 'Report');
-        writeFile(wb, 'Admin Report.xlsx');
+        totalOrdersSheet.columns = [
+            { header: 'Total Orders', key: 'totalOrders', width: 20 }
+        ];
+    
+        if (orders && orders.length > 0) {
+            totalOrdersSheet.addRow({ totalOrders: orders.length });
+        } else {
+            totalOrdersSheet.addRow({ totalOrders: 0 });
+        }
+    
+        totalOrdersSheet.getRow(1).eachCell(cell => {
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFFAA00' }
+            };
+            cell.border = {
+                top: { style: 'thin', color: { argb: 'FF000000' } },
+                left: { style: 'thin', color: { argb: 'FF000000' } },
+                bottom: { style: 'thin', color: { argb: 'FF000000' } },
+                right: { style: 'thin', color: { argb: 'FF000000' } }
+            };
+            cell.font = { bold: true };
+        });
+    
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        const blob = new Blob([buffer], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = 'Report.xlsx';
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    const getStatusText = (status) => {
+        switch (status) {
+            case 1:
+                return 'Order Placed';
+            case 2:
+                return 'Pending';
+            case 3:
+                return 'Approved';
+            case 4:
+                return 'For Pick Up';
+            case 5:
+                return 'Completed';
+            case 6:
+                return 'Canceled';
+            case 7:
+                return 'Denied';
+            default:
+                return 'Unavailable'; 
+        }
     };
     
     // * Count the orders each supplier in pie graph
@@ -96,42 +240,6 @@ function Admin_Reports () {
     
         return matchesStatus && matchesShop;
     });
-
-    // * Fetch Data of All Orders
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const res = await axios.get('https://localhost:7017/Order');
-                    setOrders(res.data);
-            } catch (error) {
-                if (error.message === "Network Error") {
-                    console.error("Network error occurred. Please check your internet connection.");
-                } else {
-                    console.error("Error fetching orders: ", error);
-                }
-            }
-        };
-
-        fetchOrders();
-    }, []);
-
-    // * Fetch Data of All Shops
-    useEffect(() => {
-        const fetchShops = async () => {
-            try {
-                const res = await axios.get('https://localhost:7017/Users');
-                    setShops(res.data);
-            } catch (error) {
-                if (error.message === "Network Error") {
-                    console.error("Network error occurred. Please check your internet connection.");
-                } else {
-                    console.error("Network error or server not responding: ", error);
-                }
-            }
-        };
-
-        fetchShops();
-    }, []);
 
     const months = [
         "January", "February", "March", "April",

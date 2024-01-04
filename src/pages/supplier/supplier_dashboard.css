@@ -221,3 +221,11 @@
     padding: 15px;
     height: fit-content;
 }
+
+.report-main-container {
+    height: 92vh;
+    width: 85vw;
+    padding: 20px;
+    background-color: #F0F0F0;
+    flex-flow: row;
+}
