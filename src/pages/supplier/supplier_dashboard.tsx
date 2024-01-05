@@ -137,9 +137,9 @@ function Supplier (){
         <div className="pending-topRated-main-container">
             <div className='col pending-orders-dash'>
                 <h3>Pending Orders</h3>
-                {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).length > 0 ? (
+                {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).slice(0, 3).length > 0 ? (
                         <Link to={`/supplier_dashboard/${id}/supplier_orders`} className='no-underline-link'>
-                            {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).map((orderItem, orderIndex) => (
+                            {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).slice(0, 3).map((orderItem, orderIndex) => (
                                 <div key={orderIndex} className='dash-pending-ords-container'>
                                     {orderItem.cart.items.length > 0 && (
                                         <img className='cust-profile-pendOrder' 
@@ -163,9 +163,10 @@ function Supplier (){
                 )}
             </div>
 
+
             <div className="top-rated-products-container">
                 <h3>Top 3 Rated Products </h3>
-                {topRated.map((rating, index) => (
+                {topRated.slice(0, 3).map((rating, index) => (
                     <div key={index} className="top-rated-prod-container">
                         <img className='top-prod-img' src={ `https://localhost:7017/${rating.product.image}` } />
                         <span className='top-ratedProd-name'>{rating.product.productName}</span>
