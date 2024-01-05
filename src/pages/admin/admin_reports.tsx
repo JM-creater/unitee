@@ -376,7 +376,7 @@ function Admin_Reports () {
                     {/* WEEKLY */}
                     <div className='col-md-9'>
                         <h5 className='header-adminSales-label'>Weekly Sales</h5>
-                        <h3>₱{weeklySales.length > 0 ? weeklySales.reduce((a, b) => a + b) : 0}</h3>
+                        <h3>₱{weeklySales.length > 0 ? weeklySales.reduce((a, b) => a + b).toLocaleString() : 0}</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
                 </div>
@@ -385,7 +385,7 @@ function Admin_Reports () {
                 <div className='admin-sales-card'>
                     <div className='col-md-9'>
                         <h5 className='header-adminSales-label'>Monthly Sales</h5>
-                        <h3>₱{monthlySales.length > 0 ? monthlySales.reduce((a, b) => a + b) : 0}</h3>
+                        <h3>₱{monthlySales.length > 0 ? monthlySales.reduce((a, b) => a + b).toLocaleString() : 0}</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
                 </div>
@@ -394,7 +394,7 @@ function Admin_Reports () {
                 <div className='admin-sales-card'>
                     <div className='col-md-9'>
                         <h5 className='header-adminSales-label'>Yearly Sales</h5>
-                        <h3>₱{yearlySales.length > 0 ? yearlySales.reduce((a, b) => a + b) : 0}</h3>
+                        <h3>₱{yearlySales.length > 0 ? yearlySales.reduce((a, b) => a + b).toLocaleString() : 0}</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
                 </div>
@@ -504,7 +504,7 @@ function Admin_Reports () {
                         <td className='text-center'>{ord.cart.supplier.shopName}</td>
                         <td className='text-center'>{ord.user.firstName} {ord.user.lastName}</td>
                         <td className='text-center'>{ord.orderItems.reduce((total, item) => total + item.quantity, 0)}</td>
-                        <td className='text-center'>{ord.total}</td>
+                        <td className='text-center'>{ord.total.toLocaleString()}</td>
                         <td className='text-center'>
                             {
                                 ord.status === 1 ? 'Order Placed' : 

@@ -265,3 +265,64 @@ body {
 .view-receipt-btn:hover {
     background-color: #0056b3; 
 }
+
+#cancellationModal .modal-content {
+    border-radius: 0.5rem;
+}
+
+#cancellationModal .modal-header, #cancellationModal .modal-footer {
+    border-bottom: none;
+    border-top: none;
+}
+
+#cancellationModal .btn-close {
+    background: none;
+    opacity: 0.7;
+}
+
+#cancellationModal .btn-close:hover {
+    opacity: 1;
+}
+
+#cancellationModal .form-check-input {
+    border-radius: 50%;
+    height: 1.2em;
+    width: 1.2em;
+    border: 2px solid #0d6efd; 
+    background-color: #fff;
+    transition: background-color 0.15s, border 0.15s;
+}
+
+#cancellationModal .form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+#cancellationModal .form-check-label {
+    margin-left: 0.5rem;
+    font-size: 1.3rem;
+}
+
+#cancellationModal .form-check {
+    margin-bottom: 1rem;
+}
+
+#cancellationModal .modal-footer button {
+    border-radius: 0.3rem;
+}
+
+#cancellationModal .btn-primary {
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+#cancellationModal .btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+}
+

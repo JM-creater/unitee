@@ -559,7 +559,7 @@ function Cart() {
                       {/* Price */}
                       <div className="col-md-2 prodPrice-container">
                         <h3 className="cartProd-price">
-                          ₱{(item.product.price * item.quantity).toFixed(2)}
+                        ₱{(item.product.price * item.quantity).toLocaleString('en-US', { maximumFractionDigits: 2 })}
                         </h3>
                       </div>
                     </div>
@@ -610,7 +610,7 @@ function Cart() {
                 </h2>
                 <h2 className="total-amount-text">Total amount:</h2>
                 <span className="total-amount-num">
-                  ₱{totalAmount.toFixed(2)}
+                  ₱{totalAmount.toLocaleString('en-US', { maximumFractionDigits: 2 })}
                 </span>
                 <h2 className="total-amount-text">Upload Proof of Payment:</h2>
                 <input

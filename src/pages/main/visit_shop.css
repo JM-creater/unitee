@@ -119,6 +119,7 @@
 
 .shop-prodDetails-container {
     margin-top: 10px;
+    margin-right: 20px;
     display: flex;
     flex-flow: row;
     justify-content: space-between;
@@ -291,3 +292,8 @@
     padding: 15px 15px 0;
 }
 
+.inactive-product {
+    opacity: 0.5;
+    pointer-events: none; 
+    cursor: not-allowed;
+}

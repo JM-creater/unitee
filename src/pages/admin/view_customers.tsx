@@ -125,6 +125,7 @@ function View_Customers() {
         setCustomerIsValid(newValidationStatus);
         setCustomerIsValid(newIsActive);
         validationEventEmitter.emit("validInvalid");
+        localStorage.setItem(`customerStatus_${customerId}`, JSON.stringify({ isActive: newIsActive }));
         window.location.reload();
       } else {
         toast.error(response.data.message);

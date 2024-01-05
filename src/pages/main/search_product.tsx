@@ -1,6 +1,4 @@
 import './search_product.css'
-import MWSizing from "../../assets/images/MW SIZING.png"
-import UNISEX from "../../assets/images/UNISEX SIZING.png"
 import cartIcon from "../../assets/images/icons/addToCart.png"
 import prodRatingModal from "../../assets/images/icons/starRating.png"
 import axios from 'axios'
@@ -8,12 +6,14 @@ import { toast } from 'react-toastify';
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import cartEventEmitter from "../../helpers/EventEmitter"
+import React from 'react'
 
 
 function  Search_Product () {
 
     const [, setCart] = useState([]);
     const [displayProduct, setDisplayProduct] = useState([]);
+    const [productTypes, setProductTypes] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [selectedProductType, setSelectedProductType] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
@@ -23,6 +23,8 @@ function  Search_Product () {
     const [quantity, setQuantity] = useState(0);
     const [newQuantity, setNewQuantity] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
+    const [image, setImage] = useState('');
+    const [notHover, setNotHover] = useState('');
     const { userId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -86,6 +88,25 @@ function  Search_Product () {
         const department = departments.find(d => d.productDepartments.departmentId === departmentId);
         return department ? department.department_Name : 'Unknown Department';
     };
+
+    // * Get Product Type Name
+    const getProductTypeName = (productTypeId) => {
+        const productType = productTypes.find((p) => p.productTypeId === productTypeId);
+        return productType ? productType.product_Type : "Unknown Type";
+    };
+
+    // * Get All Product Types
+    useEffect(() => {
+        const fetchProductType = async () => {
+            try {
+                const response = await axios.get("https://localhost:7017/ProductType");
+                setProductTypes(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchProductType();
+    }, []);
 
     // * Filter Products
     const filteredProduct = displayProduct.filter(product => 
@@ -179,13 +200,31 @@ function  Search_Product () {
     };
 
     // * Update the Product Details Modal
-    useEffect(() => {
-        const modal = document.getElementById('viewProdDetailsModal') 
-        if (modal) {
-            modal.addEventListener('hidden.bs.modal', HandleCloseButton);
+    // useEffect(() => {
+    //     const modal = document.getElementById('viewProdDetailsModal') 
+    //     if (modal) {
+    //         modal.addEventListener('hidden.bs.modal', HandleCloseButton);
 
+    //         return () => {
+    //             modal.removeEventListener('hidden.bs.modal', HandleCloseButton);
+    //         };
+    //     }
+    // }, []);
+
+    // * Update the Size Guide Modal
+    useEffect(() => {
+        const modal = document.getElementById('viewSizeGuideModal');
+        if (modal) {
+            const handleModalReset = (event) => {
+                if (event.target.id === 'viewSizeGuideModal') {
+                    handleResetModal();
+                }
+            };
+    
+            modal.addEventListener('hidden.bs.modal', handleModalReset);
+    
             return () => {
-                modal.removeEventListener('hidden.bs.modal', HandleCloseButton);
+                modal.removeEventListener('hidden.bs.modal', handleModalReset);
             };
         }
     }, []);
@@ -206,6 +245,11 @@ function  Search_Product () {
         setSelectedProduct(null);
         setNewQuantity(0);
         setSelectedSize(null);
+    };
+
+     // * Handle Reset Modal
+    const handleResetModal = () => {
+        window.location.reload();
     };
 
     // * Handle Minus Quantity
@@ -253,22 +297,54 @@ function  Search_Product () {
             {displayProduct.filter(productFilter => {
                 const searchTermLowerCase = searchTerm.toLowerCase();
                 const productName = productFilter.productName?.toLowerCase();
-
+                const productTypeName = getProductTypeName(productFilter.productTypeId).toLowerCase();
+                const category = productFilter.category?.toLowerCase();
+                const description = productFilter.description?.toLowerCase();
+            
                 return (
                     searchTermLowerCase &&
-                    productName?.startsWith(searchTermLowerCase) &&
-                    productName !== searchTermLowerCase
+                    (
+                        productName?.includes(searchTermLowerCase) ||
+                        productTypeName?.includes(searchTermLowerCase) ||
+                        category?.includes(searchTermLowerCase) ||
+                        description?.includes(searchTermLowerCase)
+                    )
                 );
-            }).slice(0, 5).map((productData, index) => (
-                <div 
-                    key={index} 
-                    className='search-dropdown-row-product'
-                    onClick={() => performSearch(productData.productName)}
-                >
-                    <span className="fa fa-search form-control-feedback search-icon"></span>
-                    {productData.productName}
-                </div>
-            ))}
+            }).slice(0, 5).map((productData, index) => {
+                const searchTermLowerCase = searchTerm.toLowerCase();
+                const productName = productData.productName?.toLowerCase();
+                const productTypeName = getProductTypeName(productData.productTypeId).toLowerCase();
+                const category = productData.category?.toLowerCase();
+                const description = productData.description?.toLowerCase();
+
+                let displayText = '';
+                let searchCriteria = '';
+
+                if (productName?.includes(searchTermLowerCase)) {
+                    displayText = productData.productName;
+                    searchCriteria = productData.productName; 
+                } else if (productTypeName?.includes(searchTermLowerCase)) {
+                    displayText = productTypeName;
+                    searchCriteria = productTypeName;
+                } else if (category?.includes(searchTermLowerCase)) {
+                    displayText = productData.category;
+                    searchCriteria = productData.category;
+                } else if (description?.includes(searchTermLowerCase)) {
+                    displayText = productData.description;
+                    searchCriteria = productData.description;
+                }
+
+                return (
+                    <div 
+                        key={index} 
+                        className='search-dropdown-row'
+                        onClick={() => performSearch(searchCriteria)}
+                    >
+                        <span className="fa fa-search form-control-feedback search-icon"></span>
+                        {displayText}
+                    </div>
+                );
+            })}
         </div>
 
         <div className='sub-container'>
@@ -451,16 +527,22 @@ function  Search_Product () {
             <div className="recommender-prod-container">
                 {filteredProduct.map(product => (
                     <div 
-                        className="prodShop-card" 
+                        className={`prodShop-card ${!product.isActive ? 'inactive-product' : ''}`} 
                         data-bs-toggle="modal" 
-                        data-bs-target="#viewProdDetailsModal" 
+                        data-bs-target={!product.isActive ? undefined : "#viewProdDetailsModal"}
                         key={product.productId} 
-                        onClick={() => setSelectedProduct(product)}
+                        onClick={() => {
+                            if (product.isActive) {
+                                setSelectedProduct(product);
+                                setImage(`https://localhost:7017/${product.image}`);
+                            }
+                        }}
                     > 
-                        <img className="visitShopProdImg" src={ `https://localhost:7017/${product.image}` }/>
+                        <img className="visitShopProdImg" src={`https://localhost:7017/${product.image}`} alt={product.productName}/>
                         <div className="col-md-12 shop-prodDetails-container">
                             <h4 className="col-md-8 visitShop-prodName">{product.productName}</h4>
-                            <h3 className="visitShop-prodPrice">₱{product.price}</h3>
+                            <h3 className="visitShop-prodPrice">₱{product.price.toLocaleString()}</h3>
+                            {!product.isActive && <span className="badge badge-danger">Inactive</span>}
                         </div>
                     </div>
                 ))}
@@ -482,31 +564,40 @@ function  Search_Product () {
                         </div>
                             <div className="modal-body viewProd-modalBody">
                             {selectedProduct && (
-                            <>
+                            <React.Fragment>
                                 <div className="product-div-left">
                                     <div className="img-container">
                                         <img 
                                             className="prodModal-Image" 
-                                            src={`https://localhost:7017/${selectedProduct.image}`} 
+                                            src={notHover || image} 
                                         />
                                     </div>
                                     <div className="hover-container">
-                                        <div>
+                                        <div 
+                                            onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.frontViewImage}`)}
+                                            onMouseLeave={() => setNotHover('')}
+                                        >
                                             <img 
                                                 className="small-image" 
-                                                src={`https://localhost:7017/${selectedProduct.image}`} 
+                                                src={`https://localhost:7017/${selectedProduct.frontViewImage}`} 
                                             />
                                         </div>
-                                        <div>
+                                        <div 
+                                            onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.sideViewImage}`)}
+                                            onMouseLeave={() => setNotHover('')}
+                                        >
                                             <img 
                                                 className="small-image" 
-                                                src={`https://localhost:7017/${selectedProduct.image}`} 
+                                                src={`https://localhost:7017/${selectedProduct.sideViewImage}`} 
                                             />
                                         </div>
-                                        <div>
+                                        <div 
+                                            onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.backViewImage}`)}
+                                            onMouseLeave={() => setNotHover('')}
+                                        >
                                             <img 
                                                 className="small-image" 
-                                                src={`https://localhost:7017/${selectedProduct.image}`}
+                                                src={`https://localhost:7017/${selectedProduct.backViewImage}`}
                                             />
                                         </div>
                                     </div>
@@ -515,12 +606,12 @@ function  Search_Product () {
                                     <h2 className="col-md-12 prodModal-Name">{selectedProduct.productName}</h2>
 
                                     {/* {ratings && ( */}
-                                        <>
+                                        <React.Fragment>
                                             <h5 className="prodModal-text">
                                                 <img className="prodModalRating-icon" src={ prodRatingModal }/>
                                                 0
                                             </h5>
-                                        </>
+                                        </React.Fragment>
                                     {/* )} */}
 
                                     <h5 className="prodModal-text">
@@ -529,7 +620,7 @@ function  Search_Product () {
                                     <h5 className="prodModal-text">
                                         {selectedProduct.category}
                                     </h5>
-                                    <h1 className="prodModal-Price">₱{selectedProduct.price}</h1>
+                                    <h1 className="prodModal-Price">₱{selectedProduct.price.toLocaleString()}</h1>
                                     <div className="prodModal-SizeGuide">
                                         <h5 className="prodModal-text">
                                             {/* <img className="sizeIcon-container" src={ sizeIcon }/> */}
@@ -559,8 +650,8 @@ function  Search_Product () {
                                                 Select Size
                                             </option>
                                             {selectedProduct.sizes && selectedProduct.sizes.map((size, index) => (
-                                                <option key={`${size}-${index}`} value={size.id}>
-                                                    {size.size}
+                                                <option key={`${size}-${index}`} value={size.id} disabled={size.quantity === 0}>
+                                                    {size.size} {size.quantity === 0 ? '(Sold Out)' : ''}
                                                 </option>
                                             ))}
                                         </select>
@@ -592,7 +683,7 @@ function  Search_Product () {
                                         Add to Cart
                                     </button>
                                 </div>
-                            </>
+                            </React.Fragment>
                             )}
                         </div>
                     </div>
@@ -608,14 +699,19 @@ function  Search_Product () {
                                 className="btn-close"
                                 data-bs-dismiss="modal" 
                                 aria-label="Close"
-                                onClick={HandleCloseButton}
+                                onClick={() => window.location.reload()}
                             >
                             </button>
-                        </div>
+                        </div> 
                         <div className="image-container">
-                            <img className="prodSizeGuideModal-Image" src={ MWSizing }/>
-                            <img className="prodSizeGuideModal-Image" src={ UNISEX } />
-                        </div>         
+                            {selectedProduct &&  (
+                                <img 
+                                    className="prodSizeGuideModal-Image" 
+                                    src={`https://localhost:7017/${selectedProduct.sizeGuide}`} 
+                                    alt="Size Guide" 
+                                />
+                            )}
+                        </div>     
                     </div>
                 </div>
             </div>

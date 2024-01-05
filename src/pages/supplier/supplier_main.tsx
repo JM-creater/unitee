@@ -173,12 +173,33 @@ function Supplier_Main (){
         });
     }, [notificationMessage, displayedNotifs]);
 
+    // ! To be fixed
+     // * Exit the web if deactivate 
+    // useEffect(() => {
+    //     const handleFocus = () => {
+    //         const statusData = localStorage.getItem(`supplierStatus_${id}`);
+    //         if (statusData) {
+    //             const status = JSON.parse(statusData);
+    //             if (!status.isActive) {
+    //                 navigate('/');
+    //             }
+    //         } else {
+    //             navigate('/');
+    //         }
+    //     };
+    
+    //     window.addEventListener('focus', handleFocus);
+    
+    //     return () => {
+    //         window.removeEventListener('focus', handleFocus);
+    //     };
+    // }, [navigate, id]);
 
     return (
         <React.Fragment>
             {isLoggingOut ? (
                 <React.Fragment>
-                    <LogoutLoadingScreen/>
+                    <LogoutLoadingScreen />
                 </React.Fragment>
             ) : (
             <div className="supplier-main">
@@ -238,9 +259,9 @@ function Supplier_Main (){
                         )}
 
                         <ul className="dropdown-menu" style={{ padding:'10px', width:'15rem' }}>
-                            <Link to={`supplier_viewProf/${id}`}>
+                            <Link to={`supplier_viewProf/${id}`} style={{ textDecoration: 'none' }}>
                                 <li className="drop-list">
-                                    <a className="dropdown-item supplier-drop-item" style={{ fontSize:'15px' }}>
+                                    <a className="dropdown-item supplier-drop-item" style={{ fontSize:'15px'}}>
                                         <img className="drop-icon" src={ editprof }/>
                                         View Profile
                                     </a>
@@ -248,7 +269,7 @@ function Supplier_Main (){
                             </Link>
                             
                             <li className="drop-list">
-                                <a className="dropdown-item supplier-drop-item" data-bs-toggle="modal" data-bs-target="#logoutModal" style={{ fontWeight:'600', fontSize:'15px' }}>
+                                <a className="dropdown-item supplier-drop-item" data-bs-toggle="modal" data-bs-target="#logoutModal" style={{ fontWeight:'600', fontSize:'15px', cursor: 'pointer' }}>
                                     <img className="drop-icon-logout" src={ logoutIcon }/>
                                     Log Out
                                 </a>

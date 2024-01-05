@@ -37,13 +37,13 @@
 .number-dash {
     font-weight: 600;
     color: #004AAD;
-    font-size: 22px
+    font-size: 22px;
 }
 
 .dash-card-icon {
-    width: 100%;
     max-width: 30px;
     height: 30px;
+    margin-right: 25px;
 }
 
 .top-selling-prods-container {

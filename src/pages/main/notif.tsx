@@ -25,12 +25,14 @@ function Notif() {
   const [notification, setNotification] = useState([]);
   const [showAllNotifications, setShowAllNotifications] = useState(false);
   const [selectedOrderReceipt, setSelectedOrderReceipt] = useState(null);
+  const [selectedReason, setSelectedReason] = useState("");
+  const [otherReasons, setOtherReasons] = useState("");
   const { userId } = useParams();
 
   // * Show More / Less Notification
   const toggleShowAll = () => {
     setShowAllNotifications(!showAllNotifications);
-  }
+  };
 
   // * Download Receipt in PDF
   const downloadReceipt = (orderNumber) => {
@@ -46,6 +48,39 @@ function Notif() {
     });
   };
 
+  // * Handle reason click radio
+  const handleReasonClick = (e) => {
+    const value = e.target.value;
+    setSelectedReason(currentSelected => {
+      if (currentSelected === value) {
+        if (value === "Others") {
+          setOtherReasons('');
+        }
+        return '';
+      } else {
+        if (value !== "Others") {
+          setOtherReasons('');
+        }
+        return value;
+      }
+    });
+  };
+  
+  // * Handle to add Id in local storage
+  const handleAddLocalStorageId = (orderId) => {
+    localStorage.setItem('orderId', orderId)
+  };
+
+
+  // * submit cancelation
+  const submitCancellation = () => {
+    const orderId = localStorage.getItem('orderId'); 
+    if (!selectedReason) {
+      toast.error("Please select a reason for cancellation.");
+      return;
+    }
+    HandleOrderCanceled(orderId, selectedReason);
+  };
 
   // * Get Notifications 
   useEffect(() => {
@@ -165,21 +200,31 @@ function Notif() {
   }, [userId]); 
 
   // * Function to handle canceling the order
-  const HandleOrderCanceled = (orderId) => {
-    axios.put(`https://localhost:7017/Order/orderCanceled/${orderId}`)
+  const HandleOrderCanceled = (orderId, reason) => {
+    const close = document.getElementById('btnClose');
+    axios.put(`https://localhost:7017/Order/orderCanceled/${orderId}`, { 
+      cancellationReason: reason === "Others" ? otherReasons : selectedReason
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
     .then(response => {
-        const updatedOrders = orders.filter(order => order.orderId !== response.data.Id);
-        setOrders(updatedOrders);
-        
-        const updatedNotifications = notification.filter(notification => notification.orderId !== response.data.Id);
-        setNotification(updatedNotifications); 
+      const updatedOrders = orders.filter(order => order.orderId !== response.data.Id);
+      setOrders(updatedOrders);
+      
+      const updatedNotifications = notification.filter(notification => notification.orderId !== response.data.Id);
+      setNotification(updatedNotifications); 
 
-        toast.success("Order canceled successfully");
-        notifEventEmitter.emit("notifAdded");
+      toast.success("Order canceled successfully");
+      notifEventEmitter.emit("notifAdded");
+      close.click();
+      setSelectedReason("");
+      setOtherReasons("");
     })
     .catch(error => {
-        console.error(error);
-        toast.error("Failed to cancel the order. Please try again");
+      console.error(error);
+      toast.error("Failed to cancel the order. Please try again");
     });
   };
 
@@ -274,11 +319,12 @@ function Notif() {
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
                   style={{ marginLeft: '30px' }} 
-                  onClick={() => HandleOrderCanceled(notificationItem.orderId)}
                   disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
+                  data-bs-toggle="modal" 
+                  data-bs-target="#cancellationModal"
                 >
                 Cancel Order
               </button>
@@ -374,12 +420,13 @@ function Notif() {
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
                 style={{ marginLeft: '30px' }} 
-                onClick={() => HandleOrderCanceled(notificationItem.orderId)}
                 disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
+                data-bs-toggle="modal" 
+                data-bs-target="#cancellationModal"
               >
                 Cancel Order
               </button>
@@ -401,7 +448,7 @@ function Notif() {
                 </div>
                 <div className="d-flex flex-column text-sm-left">
                   <p>
-                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total}</span>
+                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
                   </p>
                   <p>
                     <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
@@ -483,12 +530,14 @@ function Notif() {
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
                 style={{ marginLeft: '30px' }} 
-                onClick={() => HandleOrderCanceled(notificationItem.orderId)}
                 disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
+                data-bs-toggle="modal" 
+                data-bs-target="#cancellationModal"
+                onClick={() => handleAddLocalStorageId(notificationItem.orderId)}
               >
                 Cancel Order
               </button>
@@ -510,7 +559,7 @@ function Notif() {
                 </div>
                 <div className="d-flex flex-column text-sm-left">
                   <p>
-                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total}</span>
+                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
                   </p>
                   <p>
                     <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
@@ -590,7 +639,6 @@ function Notif() {
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
                 style={{ marginLeft: '30px' }} 
-                onClick={() => HandleOrderCanceled(notificationItem.orderId)}
                 disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
@@ -618,7 +666,7 @@ function Notif() {
                 </div>
                 <div className="d-flex flex-column text-sm-left">
                   <p>
-                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total}</span>
+                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
                   </p>
                   <p>
                     <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
@@ -698,7 +746,6 @@ function Notif() {
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
                 style={{ marginLeft: '30px' }} 
-                onClick={() => HandleOrderCanceled(notificationItem.orderId)}
                 disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
@@ -736,7 +783,7 @@ function Notif() {
                 </div>
                 <div className="d-flex flex-column text-sm-left">
                   <p>
-                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total}</span>
+                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
                   </p>
                   <p>
                     <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
@@ -816,7 +863,6 @@ function Notif() {
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
                 style={{ marginLeft: '30px' }} 
-                onClick={() => HandleOrderCanceled(notificationItem.orderId)}
                 disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
                             Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
@@ -843,7 +889,7 @@ function Notif() {
                 </div>
                 <div className="d-flex flex-column text-sm-left">
                   <p>
-                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total}</span>
+                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
                   </p>
                   <p>
                     <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
@@ -922,11 +968,13 @@ function Notif() {
                               Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
                               Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
                   style={{ marginLeft: '30px' }} 
-                  onClick={() => HandleOrderCanceled(notificationItem.orderId)}
                   disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
                               Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
                               Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
                               Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
+                  data-bs-toggle="modal" 
+                  data-bs-target="#cancellationModal"
+                  onClick={() => handleAddLocalStorageId(notificationItem.orderId)}
                 >
                 Cancel Order
               </button>
@@ -954,7 +1002,6 @@ function Notif() {
             {showAllNotifications ? 'Show Less' : 'Show More'}
           </button>
         </div>
-
       )}
 
     {/* RECEIPT MODAL  */}
@@ -1018,7 +1065,7 @@ function Notif() {
                       <h4 className='totalAmount-receipt'>Total Amount</h4>
                     </div>
                     <div className='total-amount-receipt'>
-                      <h4 className='receipt-amount'>₱{selectedOrderReceipt.order.total}</h4>
+                      <h4 className='receipt-amount'>₱{selectedOrderReceipt.order.total.toLocaleString()}</h4>
                     </div>
                   </div>
                 </div> 
@@ -1040,7 +1087,7 @@ function Notif() {
                           <th scope="row">{item.product.productName}</th>
                           <td className='text-center'>{item.sizeQuantity.size}</td>
                           <td className='text-center'>{item.quantity}</td>
-                          <td className='text-center'>₱{item.product.price}</td>
+                          <td className='text-center'>₱{item.product.price.toLocaleString()}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1058,6 +1105,113 @@ function Notif() {
       </div>
     </div>
 
+    <div className="modal fade" id="cancellationModal" tabIndex={-1} role="dialog" aria-labelledby="cancellationModalLabel" aria-hidden="true">
+      <div className="modal-dialog modal-dialog-centered">
+        <div className="modal-content w-80">
+          <div className="modal-header">
+            <h5 className="modal-title" id="exampleModalLabel2">Please select a reason for cancellation:</h5>
+            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose"></button>
+          </div>
+          <div className="modal-body p-4">
+            <div className="form-check mb-4">
+              <input 
+                type="radio" 
+                id="wrongRefNumber" 
+                name="cancelReason" 
+                value="Wrong reference number inputted"
+                className="form-check-input" 
+                checked={selectedReason === "Wrong reference number inputted"}
+                onChange={handleReasonClick} 
+              />
+              <label className="form-check-label" htmlFor="wrongRefNumber">Wrong reference number inputted</label>
+            </div>
+
+            <div className="form-check mb-4">
+              <input 
+                type="radio" 
+                id="changeOfMind" 
+                name="cancelReason" 
+                value="Change of mind"
+                className="form-check-input" 
+                checked={selectedReason === "Change of mind"}
+                onChange={handleReasonClick} 
+              />
+              <label className="form-check-label" htmlFor="changeOfMind">Change of mind</label>
+            </div>
+
+            <div className="form-check mb-4">
+              <input 
+                type="radio" 
+                id="modifyOrder" 
+                name="cancelReason" 
+                value="Need to modify order (size, quantity, etc)"
+                className="form-check-input" 
+                checked={selectedReason === "Need to modify order (size, quantity, etc)"}
+                onChange={handleReasonClick} 
+              />
+              <label className="form-check-label" htmlFor="modifyOrder">Need to modify order (size, quantity, etc)</label>
+            </div>
+
+            <div className="form-check mb-4">
+              <input 
+                type="radio" 
+                id="foundAlternative" 
+                name="cancelReason" 
+                value="Found an alternative"
+                className="form-check-input" 
+                checked={selectedReason === "Found an alternative"}
+                onChange={handleReasonClick} 
+              />
+              <label className="form-check-label" htmlFor="foundAlternative">Found an alternative</label>
+            </div>
+
+            <div className="form-check mb-4">
+              <input 
+                type="radio" 
+                id="notBuy" 
+                name="cancelReason" 
+                value="Don't want to buy anymore"
+                className="form-check-input" 
+                checked={selectedReason === "Don't want to buy anymore"}
+                onChange={handleReasonClick} 
+              />
+              <label className="form-check-label" htmlFor="notBuy">Don't want to buy anymore</label>
+            </div>
+
+            <div className="form-check mb-4">
+              <input 
+                type="radio" 
+                id="others" 
+                name="cancelReason" 
+                value="Others"
+                className="form-check-input" 
+                checked={selectedReason === "Others"}
+                onChange={handleReasonClick}
+              />
+              <label className="form-check-label" htmlFor="others">Others</label>
+            </div>
+
+            {selectedReason === "Others" && (
+              <div className="form-group">
+                <label htmlFor="otherReasons">Enter other reasons:</label>
+                <input
+                  type="text"
+                  id="otherReasons"
+                  name="otherReasons"
+                  className="form-control"
+                  placeholder="Enter other reasons here"
+                  value={otherReasons}
+                  onChange={(e) => setOtherReasons(e.target.value)}
+                />
+              </div>
+            )}
+
+            <button type="submit" className="btn btn-primary btn-block" onClick={submitCancellation}>Cancel Order</button>
+            <button type="submit" className="btn btn-danger btn-block" data-bs-dismiss="modal">NOT NOW</button>
+          </div>
+        </div>
+      </div>
+    </div>
     </div>
   )
 }
