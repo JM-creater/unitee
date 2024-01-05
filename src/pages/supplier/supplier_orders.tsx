@@ -265,7 +265,7 @@ function Supplier_Orders () {
                           <td className="text-center">
                             {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                           </td>
-                          <td className="text-center">₱{orderItem.total}</td>
+                          <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
                           <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                         </tr>
                       </tbody>
@@ -305,7 +305,7 @@ function Supplier_Orders () {
                             <td className="text-center">
                               {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}  
                             </td>
-                            <td className="text-center">₱{orderItem.total}</td>
+                            <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
                             <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                           </tr>
                         </tbody>
@@ -345,7 +345,7 @@ function Supplier_Orders () {
                             <td className="text-center">
                               {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                             </td>
-                            <td className="text-center">₱{orderItem.total}</td>
+                            <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
                             <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                           </tr>
                         </tbody>
@@ -385,7 +385,7 @@ function Supplier_Orders () {
                             <td className="text-center">
                               {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                             </td>
-                            <td className="text-center">₱{orderItem.total}</td>
+                            <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
                             <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                           </tr>
                         </tbody>
@@ -425,7 +425,7 @@ function Supplier_Orders () {
                             <td className="text-center">
                               {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                             </td>
-                            <td className="text-center">₱{orderItem.total}</td>
+                            <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
                             <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                           </tr>
                         </tbody>
@@ -502,7 +502,7 @@ function Supplier_Orders () {
                                       <span className="modal-info">{formatDate(selectedOrders.dateCreated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
                                       <span className="modal-info">{selectedOrders.orderItems.length}</span>
-                                      <span className="modal-info">₱{selectedOrders.total}</span>
+                                      <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
                                       <a 
                                         className="modal-info" 
                                         rel="noopener noreferrer" 
@@ -543,7 +543,7 @@ function Supplier_Orders () {
                                       <td className="text-center">{item.product.category}</td>
                                       <td className="text-center">{item.sizeQuantity.size}</td>
                                       <td className="text-center">{item.quantity}</td>
-                                      <td className="text-center">₱{item.product.price}</td>
+                                      <td className="text-center">₱{item.product.price.toLocaleString()}</td>
                                     </tr>
                                   ))
                                 )
@@ -613,7 +613,7 @@ function Supplier_Orders () {
                                       <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
                                       <span className="modal-info">{selectedOrders.orderItems.length}</span>
-                                      <span className="modal-info">₱{selectedOrders.total}</span>
+                                      <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
                                       <a 
                                         className="modal-info" 
                                         rel="noopener noreferrer" 
@@ -654,7 +654,7 @@ function Supplier_Orders () {
                                       <td className="text-center">{item.product.category}</td>
                                       <td className="text-center">{item.sizeQuantity.size}</td>
                                       <td className="text-center">{item.quantity}</td>
-                                      <td className="text-center">₱{item.product.price}</td>
+                                      <td className="text-center">₱{item.product.price.toLocaleString()}</td>
                                     </tr>
                                   ))
                                 )
@@ -724,7 +724,7 @@ function Supplier_Orders () {
                                       <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
                                       <span className="modal-info">{selectedOrders.orderItems.length}</span>
-                                      <span className="modal-info">₱{selectedOrders.total}</span>
+                                      <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
                                       <a 
                                         className="modal-info" 
                                         rel="noopener noreferrer" 
@@ -765,7 +765,7 @@ function Supplier_Orders () {
                                       <td className="text-center">{item.product.category}</td>
                                       <td className="text-center">{item.sizeQuantity.size}</td>
                                       <td className="text-center">{item.quantity}</td>
-                                      <td className="text-center">₱{item.product.price}</td>
+                                      <td className="text-center">₱{item.product.price.toLocaleString()}</td>
                                     </tr>
                                   ))
                                 )
@@ -832,7 +832,7 @@ function Supplier_Orders () {
                                       <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
                                       <span className="modal-info">{selectedOrders.orderItems.length}</span>
-                                      <span className="modal-info">₱{selectedOrders.total}</span>
+                                      <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
                                       <a 
                                         className="modal-info" 
                                         rel="noopener noreferrer" 
@@ -873,7 +873,7 @@ function Supplier_Orders () {
                                       <td className="text-center">{item.product.category}</td>
                                       <td className="text-center">{item.sizeQuantity.size}</td>
                                       <td className="text-center">{item.quantity}</td>
-                                      <td className="text-center">₱{item.product.price}</td>
+                                      <td className="text-center">₱{item.product.price.toLocaleString()}</td>
                                     </tr>
                                   ))
                                 )
@@ -935,12 +935,13 @@ function Supplier_Orders () {
                                         <span className="modal-label">Proof of Payment</span>
                                         <span className="modal-label">Reference No.</span>
                                         <span className="modal-label">Payment Type</span>
+                                        <span className="modal-label">Cancellation Reason</span>
                                     </div>
                                     <div className="modal-details-info">
                                       <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
                                       <span className="modal-info">{selectedOrders.orderNumber}</span>
                                       <span className="modal-info">{selectedOrders.orderItems.length}</span>
-                                      <span className="modal-info">₱{selectedOrders.total}</span>
+                                      <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
                                       <a 
                                         className="modal-info" 
                                         rel="noopener noreferrer" 
@@ -951,6 +952,7 @@ function Supplier_Orders () {
                                       </a>
                                       <span className="modal-info">{selectedOrders.referenceId}</span>
                                       <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
+                                      <span className="modal-info">{selectedOrders.cancellationReason}</span>
                                     </div>
                                 </div>
                             </div>
@@ -981,7 +983,7 @@ function Supplier_Orders () {
                                       <td className="text-center">{item.product.category}</td>
                                       <td className="text-center">{item.sizeQuantity.size}</td>
                                       <td className="text-center">{item.quantity}</td>
-                                      <td className="text-center">₱{item.product.price}</td>
+                                      <td className="text-center">₱{item.product.price.toLocaleString()}</td>
                                     </tr>
                                   ))
                                 )

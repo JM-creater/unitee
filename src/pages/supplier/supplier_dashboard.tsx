@@ -85,7 +85,7 @@ function Supplier (){
                 <div className='card-content-container'>
                     <div className='col-md-9 dash-card'>
                         <span>Total Sales</span>
-                        <h1 className='col-md-11 number-dash'>₱{totalSales}</h1>
+                        <h1 className='col-md-11 number-dash'>₱{totalSales.toLocaleString()}</h1>
                     </div>
                     <img className='dash-card-icon' src={ totalSalesIcon } alt="Total Sales Icon"/>
                 </div>
@@ -117,7 +117,7 @@ function Supplier (){
                             <div  key={index}  className='top-prods-container'>
                                 <img className='top-prod-img' src={ `https://localhost:7017/${productItem.image}` } />
                                 <span className='top-prod-name'>{productItem.productName}</span>
-                                <span className='top-prod-price'>₱{productItem.price}</span>
+                                <span className='top-prod-price'>₱{productItem.price.toLocaleString()}</span>
                             </div>
                         ))}
                         <Link to={`/supplier_dashboard/${id}/manage_shop`} className="no-underline-link">
@@ -149,7 +149,7 @@ function Supplier (){
                                     )}
                                     <div className='cust-details-container'>
                                         <span className='cust-name-dash'>{orderItem.user.firstName}</span>
-                                        <span className='cust-name-dash total'>₱{orderItem.total}</span>
+                                        <span className='cust-name-dash total'>₱{orderItem.total.toLocaleString()}</span>
                                     </div>
                                     <span className='cust-order-num-dash'>{orderItem.orderNumber}</span>
                                 </div>

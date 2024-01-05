@@ -24,6 +24,41 @@
     display: inline-block; 
 }
 
+
+
+.search-container {
+    position: relative;
+  }
+  
+  .Product-SearchBar {
+    width: 490px;
+    margin-right: 7px;
+    border: #f0f0f0 solid 1px;
+    padding: 7px;
+  }
+  
+  .search-dropdown {
+    position: absolute;
+    top: 512px;
+    width: 500px;
+  }
+  
+  .search-dropdown-row {
+    padding: 5px;
+    cursor: pointer;
+    color: rgba(0,0,0,.87);
+    text-align: start;
+    border: none;
+    margin-top: -477px;
+    margin-left: 390px;
+    width: 490px;
+    background-color: white;
+  }
+  
+  .search-dropdown-row:hover {
+    background-color: #f0f0f0 !important; 
+  }
+
 /* .notif-count {
     position: absolute; 
     top: -12px; 

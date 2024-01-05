@@ -268,7 +268,7 @@ function Admin_Dashboard () {
               <div key={product.productId} className='top-prods-container'>
                   <img className='top-prod-img' src={`https://localhost:7017/${product.image}`} alt={product.productName} />
                   <span className='top-prod-name'>{product.productName}</span>
-                  <span className='top-prod-price'>₱{product.price}</span>
+                  <span className='top-prod-price'>₱{product.price.toLocaleString()}</span>
               </div>
             )) : (
               <div className="no-topselling-products">

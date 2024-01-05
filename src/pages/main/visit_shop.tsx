@@ -10,6 +10,7 @@ import { useParams } from 'react-router-dom'
 import "./visit_shop.css"
 import cartEventEmitter from "../../helpers/EventEmitter"
 import React from "react"
+import addProductEventEmitter from "../../helpers/AddProductEventEmitter";
 
 function Visit_Shop () {
 
@@ -133,16 +134,16 @@ function Visit_Shop () {
         fetchDepartment();
     }, [userId]);
 
-    // * Get All Products
+    // * Get All Products by shop and department
     useEffect(() => {
         if (!departmentId) return;
-
-        axios.get(`https://localhost:7017/Product/ByShop/${shopId}/ByDepartment/${departmentId}`)
-            .then(async res => {
-                setDisplayProduct(res.data);
+        const fetchProductByShopDepartment = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Product/ByShop/${shopId}/ByDepartment/${departmentId}`);
+                setDisplayProduct(response.data);
 
                 // * Fetch supplier data for each product
-                const supplierIds = res.data.map(product => product.supplierId);
+                const supplierIds = response.data.map(product => product.supplierId);
                 const uniqueSupplierIds = [...new Set(supplierIds)];
                 const suppliersData = {};
 
@@ -152,10 +153,21 @@ function Visit_Shop () {
                 }
 
                 setSuppliers(suppliersData);
-            })
-            .catch(err => {
-                console.error(err);
-            });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        const validationListener = () => {
+            fetchProductByShopDepartment();
+        }
+
+        addProductEventEmitter.emit("addProduct", validationListener);
+        validationListener();
+
+        return () => {
+            addProductEventEmitter.emit("addProduct", validationListener);
+        };
     }, [shopId, departmentId]);
 
     // * Windows Event Listener Focus
@@ -298,7 +310,7 @@ function Visit_Shop () {
     //     }
     // }, []);
 
-    // * Update the Product Details Modal
+    // * Update the Size Guide Modal
     useEffect(() => {
         const modal = document.getElementById('viewSizeGuideModal');
         if (modal) {
@@ -334,9 +346,10 @@ function Visit_Shop () {
         setSelectedSize(null);
     };
 
+    // * Handle Reset Modal
     const handleResetModal = () => {
         window.location.reload();
-    }
+    };
 
     // * Handle Minus Quantity
     const HandleMinusQuantity = () => {
@@ -554,23 +567,27 @@ function Visit_Shop () {
         <div className="shop-content2-container">
             {filteredProduct.map(product => (
                 <div 
-                    className="prodShop-card" 
+                    className={`prodShop-card ${!product.isActive ? 'inactive-product' : ''}`} 
                     data-bs-toggle="modal" 
-                    data-bs-target="#viewProdDetailsModal" 
+                    data-bs-target={!product.isActive ? undefined : "#viewProdDetailsModal"}
                     key={product.productId} 
                     onClick={() => {
-                        setSelectedProduct(product);
-                        setImage(`https://localhost:7017/${product.image}`);
+                        if (product.isActive) {
+                            setSelectedProduct(product);
+                            setImage(`https://localhost:7017/${product.image}`);
+                        }
                     }}
                 > 
-                    <img className="visitShopProdImg" src={ `https://localhost:7017/${product.image}` }/>
+                    <img className="visitShopProdImg" src={`https://localhost:7017/${product.image}`} alt={product.productName}/>
                     <div className="col-md-12 shop-prodDetails-container">
                         <h4 className="col-md-8 visitShop-prodName">{product.productName}</h4>
-                        <h3 className="visitShop-prodPrice">₱{product.price}</h3>
+                        <h3 className="visitShop-prodPrice">₱{product.price.toLocaleString()}</h3>
+                        {!product.isActive && <span className="badge badge-danger">Inactive</span>}
                     </div>
                 </div>
             ))}
         </div>
+
 
         <div className="modal fade" id="viewProdDetailsModal" tabIndex={-1} aria-labelledby="viewProdDetailsModalLabel" aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered modal-lg">
@@ -640,7 +657,7 @@ function Visit_Shop () {
                                 <h5 className="prodModal-text">
                                     {selectedProduct.category}
                                 </h5>
-                                <h1 className="prodModal-Price">₱{selectedProduct.price}</h1>
+                                <h1 className="prodModal-Price">₱{selectedProduct.price.toLocaleString()}</h1>
                                 <div className="prodModal-SizeGuide">
                                     <h5 className="prodModal-text">
                                         <button 

@@ -351,9 +351,9 @@ function Supplier() {
               <div className="col-md-9 dash-card">
                 <span>Weekly Sales</span>
                 <h1 className="col-md-11 number-dash">
-                  ₱
+                  ₱ 
                   {weeklySales.length > 0
-                    ? weeklySales.reduce((a, b) => a + b)
+                    ? weeklySales.reduce((a, b) => a + b).toLocaleString()
                     : 0}
                 </h1>
               </div>
@@ -367,9 +367,9 @@ function Supplier() {
               <div className="col-md-9 dash-card">
                 <span>Monthly Sales</span>
                 <h1 className="col-md-11 number-dash">
-                  ₱
+                  ₱ 
                   {monthlySales.length > 0
-                    ? monthlySales.reduce((a, b) => a + b)
+                    ? monthlySales.reduce((a, b) => a + b).toLocaleString()
                     : 0}
                 </h1>
               </div>
@@ -383,9 +383,9 @@ function Supplier() {
               <div className="col-md-9 dash-card">
                 <span>Yearly Sales</span>
                 <h1 className="col-md-11 number-dash">
-                  ₱
+                  ₱ 
                   {yearlySales.length > 0
-                    ? yearlySales.reduce((a, b) => a + b)
+                    ? yearlySales.reduce((a, b) => a + b).toLocaleString()
                     : 0}
                 </h1>
               </div>
@@ -438,7 +438,7 @@ function Supplier() {
                   alt={product.productName}
                 />
                 <span className="top-prod-name">{product.productName}</span>
-                <span className="top-prod-price">₱{product.price}</span>
+                <span className="top-prod-price">₱{product.price.toLocaleString()}</span>
               </div>
             ))
           ) : (
@@ -544,7 +544,7 @@ function Supplier() {
                     0
                   )}
                 </td>
-                <td className="text-center">{ord.total}</td>
+                <td className="text-center">₱{ord.total.toLocaleString()}</td>
                 <td className="text-center">
                   {
                     ord.status === 1

@@ -19,6 +19,9 @@ type ValidationErrors = {
   bir?: string | null;
   cityPermit?: string | null;
   schoolPermit?: string | null;
+  barangayClearance?: string | null;
+  validIdFrontImage?: string | null;
+  validIdBackImage?: string | null;
 };
 
 function Register() {
@@ -33,6 +36,9 @@ function Register() {
   const [bir, setImageBIR] = useState(null);
   const [cityPermit, setCityPermit] = useState(null);
   const [schoolPermit, setSchoolPermit] = useState(null);
+  const [barangayClearance, setBarangayClearance] = useState(null);
+  const [validIdFront, setValidIdFront] = useState(null);
+  const [validIdBack, setValidIdBack] = useState(null);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const navigate = useNavigate();
 
@@ -98,6 +104,18 @@ function Register() {
     setSchoolPermit(e.target.files[0]);
   };
 
+  const handleBarangayClearance = (e) => {
+    setBarangayClearance(e.target.files[0]);
+  };
+
+  const handleValidIdFront = (e) => {
+    setValidIdFront(e.target.files[0]);
+  };
+
+  const handleValidIdBack = (e) => {
+    setValidIdBack(e.target.files[0]);
+  }
+
   // * Handle Register Supplier
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -117,6 +135,9 @@ function Register() {
       formData.append("BIR", bir);
       formData.append("CityPermit", cityPermit);
       formData.append("SchoolPermit", schoolPermit);
+      formData.append("BarangayClearance", barangayClearance);
+      formData.append("ValidIdFrontImage", validIdFront);
+      formData.append("ValidIdBackImage", validIdBack);
 
       try {
         const response = await axios.post(
@@ -203,6 +224,19 @@ function Register() {
     if (!schoolPermit) {
       errors.schoolPermit = "Please upload a School Permit.";
     }
+
+    if (!barangayClearance) {
+      errors.barangayClearance = "Please upload a Barangay Clearance.";
+    }
+
+    if (!validIdFront) {
+      errors.validIdFrontImage = "Please upload a valid front side of the ID card.";
+    }
+    
+    if (!validIdBack) {
+      errors.validIdBackImage = "Please upload a valid back side of the ID card.";
+    }
+
     setValidationErrors(errors);
     return errors;
   };
@@ -370,6 +404,44 @@ function Register() {
                       School Permit
                     </span>
                     <input type="file" onChange={handleImageSchoolPermit} />
+                  </div>
+                </div>
+
+                <div className='col-md-5 input-container-withErrorMessage'>
+                  <div className={`error-message-container ${validationErrors.barangayClearance ? 'error-message' : 'hidden'}`}>
+                    {validationErrors.barangayClearance}
+                  </div>
+                  <div className="schoolPermit-pic-register-container">
+                    <span className="col-md-5 uploadImage-register-label">
+                      Barangay Clearance
+                    </span>
+                    <input type="file" onChange={handleBarangayClearance} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="inputs-container">
+                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
+                  <div className={`error-message-container ${validationErrors.validIdFrontImage ? 'error-message' : 'hidden'}`}>
+                    {validationErrors.validIdFrontImage}
+                  </div>
+                  <div className="schoolPermit-pic-register-container">
+                    <span className="col-md-5 uploadImage-register-label">
+                      Valid ID (Front Side)
+                    </span>
+                    <input type="file" onChange={handleValidIdFront} />
+                  </div>
+                </div>
+
+                <div className='col-md-5 input-container-withErrorMessage'>
+                  <div className={`error-message-container ${validationErrors.validIdBackImage ? 'error-message' : 'hidden'}`}>
+                    {validationErrors.validIdBackImage}
+                  </div>
+                  <div className="schoolPermit-pic-register-container">
+                    <span className="col-md-5 uploadImage-register-label">
+                      Valid ID (Back Side)
+                    </span>
+                    <input type="file" onChange={handleValidIdBack} />
                   </div>
                 </div>
               </div>

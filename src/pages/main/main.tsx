@@ -32,6 +32,58 @@ function Main() {
   const { userId } = useParams();
   const { setLogout } = useAuth();
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [products, setProducts] = useState([]);
+  const [productTypes, setProductTypes] = useState([]);
+  //const [displayText, setdDsplayText] = useState("");
+  //const [searchCriteria, setdSearchCriteria] = useState("");
+
+  // * Handle Search Input
+  const handleSearchInputChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  // * Navigate Search
+  const performSearch = (searchCriteria = searchTerm) => {
+    setSearchTerm(searchCriteria);
+    navigate(`/shop/${userId}/search_product?search=${searchCriteria}`);
+  };
+
+  // * Search Product Data
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7017/Product/searchByDepartment?userId=${userId}`
+        );
+        setProducts(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProducts();
+  }, [userId]);
+
+  // * Get All Product Types
+  useEffect(() => {
+    const fetchProductType = async () => {
+      try {
+        const response = await axios.get("https://localhost:7017/ProductType");
+        setProductTypes(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProductType();
+  }, []);
+
+  // * Get Product Type Name
+  const getProductTypeName = (productTypeId) => {
+    const productType = productTypes.find(
+      (p) => p.productTypeId === productTypeId
+    );
+    return productType ? productType.product_Type : "Unknown Type";
+  };
 
   // * For Delay
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -48,7 +100,9 @@ function Main() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`https://localhost:7017/Users/${userId}`);
+        const response = await axios.get(
+          `https://localhost:7017/Users/${userId}`
+        );
         setCustomer(response.data);
       } catch (error) {
         console.error(error);
@@ -62,7 +116,7 @@ function Main() {
     const updateCartCount = () => {
       axios
         .get(`https://localhost:7017/Cart/myCart/${userId}`)
-        .then(async(res) => {
+        .then(async (res) => {
           setCart(res.data);
           setTotalItems(
             res.data.reduce((acc, cartItems) => acc + cartItems.items.length, 0)
@@ -164,7 +218,9 @@ function Main() {
   const handleNotificationClick = () => {
     const fetchNotificationClick = async () => {
       try {
-        await axios.post(`https://localhost:7017/Notification/markRead/${userId}`);
+        await axios.post(
+          `https://localhost:7017/Notification/markRead/${userId}`
+        );
         updateNotification();
       } catch (error) {
         console.error(error);
@@ -192,6 +248,86 @@ function Main() {
             <Link to="" className="col-md-2">
               <img className="logo" src={logo} />
             </Link>
+
+            <div className="search-container">
+              <span className="fa fa-search form-control-feedback search-icon"></span>
+              <input
+                className="Product-SearchBar"
+                type="text"
+                placeholder="Search Product"
+                value={searchTerm}
+                onChange={handleSearchInputChange}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    performSearch();
+                    setSearchTerm("");
+                  }
+                }}
+              />
+              <div className="search-dropdown">
+                {products
+                  .filter((productFilter) => {
+                    const searchTermLowerCase = searchTerm.toLowerCase();
+                    const productName =
+                      productFilter.productName?.toLowerCase();
+                    const productTypeName = getProductTypeName(
+                      productFilter.productTypeId
+                    ).toLowerCase();
+                    const category = productFilter.category?.toLowerCase();
+                    const description =
+                      productFilter.description?.toLowerCase();
+
+                    return (
+                      searchTermLowerCase &&
+                      (productName?.includes(searchTermLowerCase) ||
+                        productTypeName?.includes(searchTermLowerCase) ||
+                        category?.includes(searchTermLowerCase) ||
+                        description?.includes(searchTermLowerCase))
+                    );
+                  })
+                  .slice(0, 5)
+                  .map((productData, index) => {
+                    const searchTermLowerCase = searchTerm.toLowerCase();
+                    const productName = productData.productName?.toLowerCase();
+                    const productTypeName = getProductTypeName(
+                      productData.productTypeId
+                    ).toLowerCase();
+                    const category = productData.category?.toLowerCase();
+                    const description = productData.description?.toLowerCase();
+
+                    let displayText = "";
+                    let searchCriteria = "";
+
+                    if (productName?.includes(searchTermLowerCase)) {
+                      displayText = productData.productName;
+                      searchCriteria = productData.productName;
+                    } else if (productTypeName?.includes(searchTermLowerCase)) {
+                      displayText = productTypeName;
+                      searchCriteria = productTypeName;
+                    } else if (category?.includes(searchTermLowerCase)) {
+                      displayText = productData.category;
+                      searchCriteria = productData.category;
+                    } else if (description?.includes(searchTermLowerCase)) {
+                      displayText = productData.description;
+                      searchCriteria = productData.description;
+                    }
+
+                    return (
+                      <div
+                        key={index}
+                        className="search-dropdown-row"
+                        onClick={() => {
+                          performSearch(searchCriteria);
+                          setSearchTerm("");
+                        }}
+                      >
+                        <span className=" form-control-feedback"></span>
+                        {displayText}
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
 
             <div className="col-md-6 header-button-container">
               <Link className="customer-nav-link" to="" id="tooltip">
@@ -336,16 +472,29 @@ function Main() {
                   </div>
                 </ul>
               </div>
-              <div className="modal fade" id="logoutModal" tabIndex={1} aria-labelledby="logoutModalLabel" aria-hidden={!showLogoutModal}>
+              <div
+                className="modal fade"
+                id="logoutModal"
+                tabIndex={1}
+                aria-labelledby="logoutModalLabel"
+                aria-hidden={!showLogoutModal}
+              >
                 <div className="modal-dialog modal-dialog-centered">
                   <div className="modal-content">
                     <div className="logout-confirmation-modalBody">
                       <h3>Are you sure you want to logout?</h3>
                       <div className="col-md-12 logout-btn-container">
-                        <button className="logout-btn" data-bs-dismiss="modal" onClick={HandleLogoutModal}>
+                        <button
+                          className="logout-btn"
+                          data-bs-dismiss="modal"
+                          onClick={HandleLogoutModal}
+                        >
                           Log Out
                         </button>
-                        <button className="cancel-logout-btn" data-bs-dismiss="modal">
+                        <button
+                          className="cancel-logout-btn"
+                          data-bs-dismiss="modal"
+                        >
                           Cancel
                         </button>
                       </div>

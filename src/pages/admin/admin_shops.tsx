@@ -508,7 +508,7 @@ function Admin_Shops () {
                                                 <span className='totalStocks-adminProd'>{totalStock(product.sizes)}</span>
                                             </h4>
                                             <h4 className='col-md-3 admin-prodPrice'>Price:
-                                                <span className='price-adminProd'>₱{product.price}</span>
+                                                <span className='price-adminProd'>₱{product.price.toLocaleString()}</span>
                                             </h4>
                                         </div>
                                         

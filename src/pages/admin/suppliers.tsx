@@ -39,7 +39,7 @@ function Suppliers() {
         );
         setSupplier(response.data);
       } catch (error) {
-        console.error("Network error or server not responding");
+        console.error(error);
       }
     };
 
@@ -66,7 +66,7 @@ function Suppliers() {
         );
         setSupplier(response.data);
       } catch (error) {
-        console.error("Network error or server not responding");
+        console.error(error);
       }
     };
 
@@ -117,6 +117,7 @@ function Suppliers() {
         setSupplierValid(newValidationStatus);
         setSupplierValid(newIsActive);
         validationEventEmitter.emit("validInvalid");
+        localStorage.setItem(`supplierStatus_${supplierId}`, JSON.stringify({ isActive: newIsActive }));
         window.location.reload();
       } else {
         toast.error(response.data.message);
@@ -438,6 +439,33 @@ function Suppliers() {
                     >
                       <span>School Permit: </span>
                       {selectedSupplier.schoolPermit.split("\\").pop()}
+                    </a>
+                    <a
+                      className="permits-link"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      href={`https://localhost:7017/${selectedSupplier.schoolPermit}`}
+                    >
+                      <span>Barangay Clearance: </span>
+                      {selectedSupplier.barangayClearance.split("\\").pop()}
+                    </a>
+                    <a
+                      className="permits-link"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      href={`https://localhost:7017/${selectedSupplier.schoolPermit}`}
+                    >
+                      <span>Valid Id(Front Side): </span>
+                      {selectedSupplier.validIdFrontImage.split("\\").pop()}
+                    </a>
+                    <a
+                      className="permits-link"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      href={`https://localhost:7017/${selectedSupplier.schoolPermit}`}
+                    >
+                      <span>Valid Id(Back Side): </span>
+                      {selectedSupplier.validIdBackImage.split("\\").pop()}
                     </a>
                   </div>
                 </div>
