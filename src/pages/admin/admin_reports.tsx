@@ -15,6 +15,7 @@ import {
 import { Bar, Pie } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import orderEventEmitter from '../../helpers/OrderEmitter';
 
 ChartJS.register(
     BarElement,
@@ -36,10 +37,9 @@ function Admin_Reports () {
     const [selectedStatus, setSelectedStatus] = useState('');
     const [supplierOrderCounts, setSupplierOrderCounts] = useState({});
 
-
     // * Get the Sales by Weekly, Monthly, Yearly
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchSalesData = async () => {
             try {
                 const weeklyResponse = await axios.get(`https://localhost:7017/Order/weeklyAdmin?startDate=${new Date().toISOString()}`);
                 setWeeklySales(weeklyResponse.data);
@@ -53,7 +53,44 @@ function Admin_Reports () {
                 console.error(error);
             }
         };
-        fetchData();
+        const validationListener = () => {
+            fetchSalesData();
+        }
+
+        orderEventEmitter.on("updateSalesReport", validationListener);
+        validationListener();
+    
+        return () => {
+            orderEventEmitter.off("updateSalesReport", validationListener);
+        };
+    }, []);
+
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+                const weeklyResponse = await axios.get(`https://localhost:7017/Order/weeklyAdmin?startDate=${new Date().toISOString()}`);
+                setWeeklySales(weeklyResponse.data);
+        
+                const monthlyResponse = await axios.get(`https://localhost:7017/Order/monthlyAdmin?year=${new Date().getFullYear()}&month=${new Date().getMonth() + 1}`);
+                setMonthlySales(monthlyResponse.data);
+        
+                const yearlyResponse = await axios.get(`https://localhost:7017/Order/yearlyAdmin?year=${new Date().getFullYear()}`);
+                setYearlySales(yearlyResponse.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        const handleFocus = () => {
+            fetchData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
     }, []);
 
     // * Fetch Data of All Orders
@@ -67,7 +104,38 @@ function Admin_Reports () {
             }
         };
 
-        fetchOrders();
+        const validationListener = () => {
+            fetchOrders();
+        }
+
+        orderEventEmitter.on("statusUpdate", validationListener);
+        validationListener();
+    
+        return () => {
+            orderEventEmitter.off("statusUpdate", validationListener);
+        };
+    }, []);
+
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+                const response = await axios.get('https://localhost:7017/Order');
+                setOrders(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        const handleFocus = () => {
+            fetchData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
     }, []);
 
     // * Fetch Data of All Shops
