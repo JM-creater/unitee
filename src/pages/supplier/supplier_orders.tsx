@@ -151,6 +151,7 @@ function Supplier_Orders () {
           
           toast.success("Order approved successfully");
           notifEventEmitter.emit("notifAdded");
+          orderEventEmitter.emit("statusUpdate");
           window.location.reload();
         })
         .catch(error => {
@@ -168,6 +169,7 @@ function Supplier_Orders () {
             }
             toast.success("Order denied successfully");
             notifEventEmitter.emit("notifAdded");
+            orderEventEmitter.emit("statusUpdate");
             window.location.reload();
         })
         .catch(error => {
@@ -185,6 +187,7 @@ function Supplier_Orders () {
             }
             toast.success("For pick up order success");
             notifEventEmitter.emit("notifAdded");
+            orderEventEmitter.emit("statusUpdate");
             window.location.reload();
         })
         .catch(error => {
@@ -203,6 +206,8 @@ function Supplier_Orders () {
             toast.success("Order completed success");
             notifEventEmitter.emit("notifAdded");
             orderEventEmitter.emit("orderCompleted");
+            orderEventEmitter.emit("statusUpdate");
+            orderEventEmitter.emit("updateSalesReport");
             window.location.reload();
         })
         .catch(error => {

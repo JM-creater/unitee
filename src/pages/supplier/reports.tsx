@@ -13,6 +13,7 @@ import { Bar } from "react-chartjs-2";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import axios from "axios";
+import orderEventEmitter from "../../helpers/OrderEmitter";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -136,47 +137,72 @@ function Supplier() {
 
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-};
+  };
 
-const getStatusText = (status) => {
+  const getStatusText = (status) => {
     switch (status) {
-        case 1:
-            return 'Order Placed';
-        case 2:
-            return 'Pending';
-        case 3:
-            return 'Approved';
-        case 4:
-            return 'For Pick Up';
-        case 5:
-            return 'Completed';
-        case 6:
-            return 'Canceled';
-        case 7:
-            return 'Denied';
-        default:
-            return 'Unavailable'; 
+      case 1:
+        return 'Order Placed';
+      case 2:
+        return 'Pending';
+      case 3:
+        return 'Approved';
+      case 4:
+        return 'For Pick Up';
+      case 5:
+        return 'Completed';
+      case 6:
+        return 'Canceled';
+      case 7:
+        return 'Denied';
+      default:
+        return 'Unavailable'; 
     }
-};
+  };
 
   // * Fetch Data of All Orders
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("https://localhost:7017/Order");
-        setOrders(res.data);
+        const response = await axios.get("https://localhost:7017/Order");
+        setOrders(response.data);
       } catch (error) {
-        if (error.message === "Network Error") {
-          console.error(
-            "Network error occurred. Please check your internet connection."
-          );
-        } else {
-          console.error("Error fetching orders: ", error);
-        }
+        console.error("Error fetching orders: ", error);
       }
     };
 
-    fetchOrders();
+    const validationListener = () => {
+      fetchOrders();
+    }
+
+    orderEventEmitter.on("statusUpdate", validationListener);
+    validationListener();
+
+    return () => {
+      orderEventEmitter.off("statusUpdate", validationListener);
+    };
+  }, []);
+
+  // * Windows Event Listener Focus
+  useEffect(() => {
+    const fetchData = async () => {
+    try {
+          const response = await axios.get('https://localhost:7017/Order');
+          setOrders(response.data);
+        } catch (error) {
+          console.error('Network error or server not responding');
+        }
+    };
+
+    const handleFocus = () => {
+      fetchData();
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   // * Filtered By Status, Departments
@@ -192,7 +218,7 @@ const getStatusText = (status) => {
 
   // * Get the Sales by Weekly, Monthly, Yearly
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchSalesData = async () => {
       try {
         const weeklyResponse = await axios.get(
           `https://localhost:7017/Order/weekly?startDate=${new Date().toISOString()}&supplierId=${id}`
@@ -215,15 +241,58 @@ const getStatusText = (status) => {
       }
     };
 
-    fetchData();
+    const validationListener = () => {
+      fetchSalesData();
+    }
+
+    orderEventEmitter.on("updateSalesReport", validationListener);
+    validationListener();
+
+    return () => {
+      orderEventEmitter.off("updateSalesReport", validationListener);
+    };
+  }, [id]);
+
+  // * Windows Event Listener Focus
+  useEffect(() => {
+    const fetchData = async () => {
+    try {
+      const weeklyResponse = await axios.get(
+        `https://localhost:7017/Order/weekly?startDate=${new Date().toISOString()}&supplierId=${id}`
+      );
+      setWeeklySales(weeklyResponse.data);
+
+      const monthlyResponse = await axios.get(
+        `https://localhost:7017/Order/monthly?year=${new Date().getFullYear()}&month=${
+          new Date().getMonth() + 1
+        }&supplierId=${id}`
+      );
+      setMonthlySales(monthlyResponse.data);
+
+      const yearlyResponse = await axios.get(
+        `https://localhost:7017/Order/yearly?year=${new Date().getFullYear()}&supplierId=${id}`
+      );
+      setYearlySales(yearlyResponse.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleFocus = () => {
+        fetchData();
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+        window.removeEventListener('focus', handleFocus);
+    };
   }, [id]);
 
   useEffect(() => {
     const fetchTopSellingProducts = async () => {
       try {
-        const response = await axios.get(
-          `https://localhost:7017/Product/top-selling-by-shop/${id}`
-        );
+        const response = await axios.get(`https://localhost:7017/Product/top-selling-by-shop/${id}`);
         setTopSellingProducts(response.data);
       } catch (error) {
         console.error("Error fetching data: ", error);
