@@ -470,14 +470,15 @@ const getStatusText = (status) => {
                   {ord.user.firstName} {ord.user.lastName}
                 </td>
                 <td className="text-center">
-                  {ord.cart.items.reduce(
+                  {ord.orderItems.reduce(
                     (total, item) => total + item.quantity,
                     0
                   )}
                 </td>
                 <td className="text-center">{ord.total}</td>
                 <td className="text-center">
-                  {ord.status === 1
+                  {
+                    ord.status === 1
                     ? "Order Placed"
                     : ord.status === 2
                     ? "Pending"
@@ -491,7 +492,8 @@ const getStatusText = (status) => {
                     ? "Canceled"
                     : ord.status === 7
                     ? "Denied"
-                    : "Unavailable"}
+                    : "Unavailable"
+                  }
                 </td>
               </tr>
             ))}

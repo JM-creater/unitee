@@ -33,7 +33,6 @@ function Register() {
   const [bir, setImageBIR] = useState(null);
   const [cityPermit, setCityPermit] = useState(null);
   const [schoolPermit, setSchoolPermit] = useState(null);
-  //const [lastErrorMessage, setLastErrorMessage] = useState("");
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const navigate = useNavigate();
 

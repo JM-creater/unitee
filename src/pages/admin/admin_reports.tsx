@@ -15,7 +15,6 @@ import {
 import { Bar, Pie } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-//import { utils, writeFile } from 'xlsx';
 
 ChartJS.register(
     BarElement,
@@ -200,6 +199,8 @@ function Admin_Reports () {
         URL.revokeObjectURL(url);
     };
 
+
+    // * Get Status
     const getStatusText = (status) => {
         switch (status) {
             case 1:
@@ -434,7 +435,7 @@ function Admin_Reports () {
                         <th scope="row">{ord.orderNumber}</th>
                         <td className='text-center'>{ord.cart.supplier.shopName}</td>
                         <td className='text-center'>{ord.user.firstName} {ord.user.lastName}</td>
-                        <td className='text-center'>{ord.cart.items.reduce((total, item) => total + item.quantity, 0)}</td>
+                        <td className='text-center'>{ord.orderItems.reduce((total, item) => total + item.quantity, 0)}</td>
                         <td className='text-center'>{ord.total}</td>
                         <td className='text-center'>
                             {
