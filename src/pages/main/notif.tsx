@@ -150,7 +150,7 @@ function Notif() {
       case 5: 
         return [true, true, true, true, true];
       default:
-        return [false, false, false, false, false];
+        return [true, true, true, true, true];
     }
   }
 
@@ -353,7 +353,7 @@ function Notif() {
               {/* Add class 'active' to progress */}
               <div className="row d-flex justify-content-center">
                 <div className="col-12">
-                  <ul id="progressbar" className="text-center">
+                  <ul id="progressbarCancel" className="text-center">
                     <li className={placed ? "active step0" : "step0"}>
                       <div className="icon-content">
                         <img
