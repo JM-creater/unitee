@@ -24,6 +24,20 @@ function Manage_Shop() {
     quantity: string;
   }
 
+  // type ValidationErrors = {
+  //   department?: string;
+  //   productName?: string;
+  //   description?: string;
+  //   category?: string;
+  //   image?: string | null;
+  //   frontViewImage?: string | null;
+  //   sideViewImage?: string | null;
+  //   backViewImage?: string | null;
+  //   sizeGuide?: string | null;
+  //   price?: string;
+  //   sizes?: string
+  // }
+
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [products, setProducts] = useState([]);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -52,21 +66,14 @@ function Manage_Shop() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [newSelectedImage, setNewSelectedImage] = useState<File | null>(null);
 
-  const [selectedFrontImage, setSelectedFrontImage] = useState<File | null>(
-    null
-  );
-  const [newSelectedFrontImage, setNewSelectedFrontImage] =
-    useState<File | null>(null);
+  const [selectedFrontImage, setSelectedFrontImage] = useState<File | null>(null);
+  const [newSelectedFrontImage, setNewSelectedFrontImage] = useState<File | null>(null);
 
   const [selectedSideImage, setSelectedSideImage] = useState<File | null>(null);
-  const [newSelectedSideImage, setNewSelectedSideImage] = useState<File | null>(
-    null
-  );
+  const [newSelectedSideImage, setNewSelectedSideImage] = useState<File | null>(null);
 
   const [selectedBackImage, setSelectedBackImage] = useState<File | null>(null);
-  const [newSelectedBackImage, setNewSelectedBackImage] = useState<File | null>(
-    null
-  );
+  const [newSelectedBackImage, setNewSelectedBackImage] = useState<File | null>(null);
 
   const [sizeGuide, setSizeGuide] = useState<File | null>(null);
   const [newSizeGuide, setNewSizeGuide] = useState<File | null>(null);
@@ -76,6 +83,7 @@ function Manage_Shop() {
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [newSelectedDepartments, setNewSelectedDepartments] = useState([]);
   const [lastErrorMessage, setLastErrorMessage] = useState("");
+  //const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
   const { id } = useParams();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -137,12 +145,9 @@ function Manage_Shop() {
   const handlePrice = (value) => {
     if (/^[0-9.]*$/.test(value)) {
       setProductPrice(value);
-      // Clear the last error message when a valid value is entered
       setLastErrorMessage("");
     } else if (lastErrorMessage !== "Price must contain only numbers.") {
-      // Show error toast only if the error message changes
       toast.error("Price must contain only numbers.");
-      // Set the last error message
       setLastErrorMessage("Price must contain only numbers.");
     }
   };
@@ -151,12 +156,9 @@ function Manage_Shop() {
   const handleNewPrice = (value) => {
     if (/^[0-9.]*$/.test(value)) {
       setNewPrice(value);
-      // Clear the last error message when a valid value is entered
       setLastErrorMessage("");
     } else if (lastErrorMessage !== "Price must contain only numbers.") {
-      // Show error toast only if the error message changes
       toast.error("Price must contain only numbers.");
-      // Set the last error message
       setLastErrorMessage("Price must contain only numbers.");
     }
   };
@@ -584,10 +586,8 @@ function Manage_Shop() {
     const errorMessages = [];
 
     if (!productName) errorMessages.push("Product Name is required");
-    if (!productDescription)
-      errorMessages.push("Product Description is required");
-    if (!productPrice || isNaN(Number(productPrice)))
-      errorMessages.push("Valid Product Price is required");
+    if (!productDescription) errorMessages.push("Product Description is required");
+    if (!productPrice || isNaN(Number(productPrice))) errorMessages.push("Valid Product Price is required");
     if (!productCategory) errorMessages.push("Product Category is required");
     if (!productTypeId) errorMessages.push("Product Type is required");
     if (!selectedImage) errorMessages.push("Image is required");
@@ -595,8 +595,7 @@ function Manage_Shop() {
     if (!selectedSideImage) errorMessages.push("Side Image is required");
     if (!selectedBackImage) errorMessages.push("Back Image is required");
     if (!sizeGuide) errorMessages.push("Size Guide is required");
-    if (selectedSizes.length === 0)
-      errorMessages.push("Sizes and Quantity is required");
+    if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
 
     if (errorMessages.length > 0) {
       errorMessages.forEach((message) => toast.error(message));

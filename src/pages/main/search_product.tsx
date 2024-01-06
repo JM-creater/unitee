@@ -4,7 +4,7 @@ import prodRatingModal from "../../assets/images/icons/starRating.png"
 import axios from 'axios'
 import { toast } from 'react-toastify';
 import { useState, useEffect } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import cartEventEmitter from "../../helpers/EventEmitter"
 import React from 'react'
 
@@ -13,7 +13,6 @@ function  Search_Product () {
 
     const [, setCart] = useState([]);
     const [displayProduct, setDisplayProduct] = useState([]);
-    const [productTypes, setProductTypes] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [selectedProductType, setSelectedProductType] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
@@ -22,25 +21,12 @@ function  Search_Product () {
     const [selectedSize, setSelectedSize] = useState(null);
     const [quantity, setQuantity] = useState(0);
     const [newQuantity, setNewQuantity] = useState(0);
-    const [searchTerm, setSearchTerm] = useState('');
     const [image, setImage] = useState('');
     const [notHover, setNotHover] = useState('');
     const { userId } = useParams();
-    const navigate = useNavigate();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const search = searchParams.get('search');
-
-    // * Handle to handle input changes
-    const handleSearchInputChange = (event) => {
-        setSearchTerm(event.target.value);
-    };
-
-    // * Handle to perform search
-    const performSearch = (productName = searchTerm) => {
-        setSearchTerm(productName); 
-        navigate(`/shop/${userId}/search_product?search=${productName}`);
-    };
 
     // * Fetch products based on search
     useEffect(() => {
@@ -89,24 +75,7 @@ function  Search_Product () {
         return department ? department.department_Name : 'Unknown Department';
     };
 
-    // * Get Product Type Name
-    const getProductTypeName = (productTypeId) => {
-        const productType = productTypes.find((p) => p.productTypeId === productTypeId);
-        return productType ? productType.product_Type : "Unknown Type";
-    };
-
-    // * Get All Product Types
-    useEffect(() => {
-        const fetchProductType = async () => {
-            try {
-                const response = await axios.get("https://localhost:7017/ProductType");
-                setProductTypes(response.data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-        fetchProductType();
-    }, []);
+    
 
     // * Filter Products
     const filteredProduct = displayProduct.filter(product => 
@@ -277,76 +246,6 @@ function  Search_Product () {
         <div className="search-result-message">
             {search && <h3>Search Result for "{search}"</h3>}
         </div>
-
-        <div className="search-container-product">
-            <span className="fa fa-search form-control-feedback search-icon"></span>
-            <input 
-                className="Product-Search-Bar"
-                type="text"
-                placeholder="Search Product"
-                value={searchTerm}
-                onChange={handleSearchInputChange}
-                onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                        performSearch();
-                    }
-                }}
-            />
-        </div>
-        <div className='search-dropdown-product'>
-            {displayProduct.filter(productFilter => {
-                const searchTermLowerCase = searchTerm.toLowerCase();
-                const productName = productFilter.productName?.toLowerCase();
-                const productTypeName = getProductTypeName(productFilter.productTypeId).toLowerCase();
-                const category = productFilter.category?.toLowerCase();
-                const description = productFilter.description?.toLowerCase();
-            
-                return (
-                    searchTermLowerCase &&
-                    (
-                        productName?.includes(searchTermLowerCase) ||
-                        productTypeName?.includes(searchTermLowerCase) ||
-                        category?.includes(searchTermLowerCase) ||
-                        description?.includes(searchTermLowerCase)
-                    )
-                );
-            }).slice(0, 5).map((productData, index) => {
-                const searchTermLowerCase = searchTerm.toLowerCase();
-                const productName = productData.productName?.toLowerCase();
-                const productTypeName = getProductTypeName(productData.productTypeId).toLowerCase();
-                const category = productData.category?.toLowerCase();
-                const description = productData.description?.toLowerCase();
-
-                let displayText = '';
-                let searchCriteria = '';
-
-                if (productName?.includes(searchTermLowerCase)) {
-                    displayText = productData.productName;
-                    searchCriteria = productData.productName; 
-                } else if (productTypeName?.includes(searchTermLowerCase)) {
-                    displayText = productTypeName;
-                    searchCriteria = productTypeName;
-                } else if (category?.includes(searchTermLowerCase)) {
-                    displayText = productData.category;
-                    searchCriteria = productData.category;
-                } else if (description?.includes(searchTermLowerCase)) {
-                    displayText = productData.description;
-                    searchCriteria = productData.description;
-                }
-
-                return (
-                    <div 
-                        key={index} 
-                        className='search-dropdown-row'
-                        onClick={() => performSearch(searchCriteria)}
-                    >
-                        <span className="fa fa-search form-control-feedback search-icon"></span>
-                        {displayText}
-                    </div>
-                );
-            })}
-        </div>
-
         <div className='sub-container'>
             <div className='recommender-filter-container'>
                 {/* Filter */}

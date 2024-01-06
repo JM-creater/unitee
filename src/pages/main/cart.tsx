@@ -43,6 +43,7 @@ function Cart() {
   const [lastErrorMessage, setLastErrorMessage] = useState("");
   const { userId } = useParams();
   const fileInputRef = useRef(null);
+  const [, setSelectedShopIndex] = useState(null);
 
   // * Handle Reference Id
   const handleReferenceId = (value) => {
@@ -84,7 +85,9 @@ function Cart() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
+        const response = await axios.get(
+          `https://localhost:7017/Cart/myCart/${userId}`
+        );
         setCart(response.data);
       } catch (error) {
         console.error("Network error or server not responding");
@@ -112,9 +115,14 @@ function Cart() {
     let count = 0;
     const amount = cart.reduce((sum, cartItem) => {
       return (
-        sum + cartItem.items.reduce((sumItem, item) => {
+        sum +
+        cartItem.items.reduce((sumItem, item) => {
           if (
-            (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement).checked
+            (
+              document.getElementById(
+                `prodCheckbox-${item.id}`
+              ) as HTMLInputElement
+            ).checked
           ) {
             count += 1;
             return sumItem + (item.product.price || 0) * item.quantity;
@@ -144,21 +152,26 @@ function Cart() {
     const availableQuantity = await getAvailableQuantity(
       updatedCart[index].items[itemIndex].productId,
       updatedCart[index].items[itemIndex].sizeQuantityId
-    ); 
+    );
 
     if (currentQuantity < availableQuantity) {
       updatedCart[index].items[itemIndex].quantity += 1;
       setCart(updatedCart);
       calculateTotalAmount();
     } else {
-      showToast(`Maximum quantity of ${availableQuantity} for this size reached`, 3);
+      showToast(
+        `Maximum quantity of ${availableQuantity} for this size reached`,
+        3
+      );
     }
   };
 
   // * Get the Available quantity for each sizes
   const getAvailableQuantity = async (productId, sizeQuantityId) => {
     try {
-      const response = await axios.get(`https://localhost:7017/Product/getQuantity?productId=${productId}&sizeQuantityId=${sizeQuantityId}`);
+      const response = await axios.get(
+        `https://localhost:7017/Product/getQuantity?productId=${productId}&sizeQuantityId=${sizeQuantityId}`
+      );
       return response.data;
     } catch (error) {
       console.error("Error fetching available quantity:", error);
@@ -173,18 +186,26 @@ function Cart() {
     }
     const updatedCart = [...cart];
     updatedCart[index].items[itemIndex].sizeQuantityId = newSizeId;
-  
-    const newSize = updatedCart[index].items[itemIndex].product.sizes.find(size => size.id === newSizeId);
+
+    const newSize = updatedCart[index].items[itemIndex].product.sizes.find(
+      (size) => size.id === newSizeId
+    );
     const availableQuantity = await getAvailableQuantity(
       updatedCart[index].items[itemIndex].productId,
       newSizeId
     );
-  
-    if (newSize && updatedCart[index].items[itemIndex].quantity > availableQuantity) {
-      showToast(`Only ${availableQuantity} items left in stock for size ${newSize.size}`, 3);
+
+    if (
+      newSize &&
+      updatedCart[index].items[itemIndex].quantity > availableQuantity
+    ) {
+      showToast(
+        `Only ${availableQuantity} items left in stock for size ${newSize.size}`,
+        3
+      );
       updatedCart[index].items[itemIndex].quantity = availableQuantity;
     }
-    
+
     setCart(updatedCart);
   };
 
@@ -192,24 +213,32 @@ function Cart() {
   const handleShopCheckboxChange = (cartIndex) => {
     cart.forEach((shop, index) => {
       if (index !== cartIndex) {
-        const otherShopCheckbox = document.getElementById(`shopRadio-${shop.supplierId}`) as HTMLInputElement;
+        const otherShopCheckbox = document.getElementById(
+          `shopRadio-${shop.supplierId}`
+        ) as HTMLInputElement;
         if (otherShopCheckbox) otherShopCheckbox.checked = false;
-        shop.items.forEach(item => {
-          const itemCheckbox = document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement;
+        shop.items.forEach((item) => {
+          const itemCheckbox = document.getElementById(
+            `prodCheckbox-${item.id}`
+          ) as HTMLInputElement;
           if (itemCheckbox) itemCheckbox.checked = false;
         });
       }
     });
-  
+
     const updatedCart = [...cart];
     const currentShopId = updatedCart[cartIndex].supplierId;
-    const shopChecked = (document.getElementById(`shopRadio-${currentShopId}`) as HTMLInputElement).checked;
-  
+    const shopChecked = (
+      document.getElementById(`shopRadio-${currentShopId}`) as HTMLInputElement
+    ).checked;
+
     updatedCart[cartIndex].items.forEach((item) => {
-      const itemCheckbox = document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement;
+      const itemCheckbox = document.getElementById(
+        `prodCheckbox-${item.id}`
+      ) as HTMLInputElement;
       if (itemCheckbox) itemCheckbox.checked = shopChecked;
     });
-  
+
     if (shopChecked) {
       setSelectedPhoneShop(updatedCart[cartIndex].supplier.phoneNumber);
       setSelectedShopId(currentShopId);
@@ -217,42 +246,80 @@ function Cart() {
       setSelectedPhoneShop("");
       setSelectedShopId(null);
     }
-  
+
     setCart(updatedCart);
     calculateTotalAmount();
   };
 
   // * Handle Individual Product From The Shop Cart
   const handleProductCheckboxChange = (cartIndex, itemId) => {
+    const updatedCart = [...cart];
+
     cart.forEach((shop, index) => {
+      setSelectedShopIndex(index);
+
+      // Reset checkboxes only for different shopRadio
       if (index !== cartIndex) {
-        shop.items.forEach(item => {
-          const itemCheckbox = document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement;
-          if (itemCheckbox) itemCheckbox.checked = false;
-        });
+        const otherShopCheckbox = document.getElementById(
+          `shopRadio-${shop.supplierId}`
+        ) as HTMLInputElement;
+
+        if (otherShopCheckbox) {
+          otherShopCheckbox.checked = false;
+
+          shop.items.forEach((item) => {
+            const itemCheckbox = document.getElementById(
+              `prodCheckbox-${item.id}`
+            ) as HTMLInputElement;
+
+            if (itemCheckbox) {
+              itemCheckbox.checked = false;
+              item.checked = false; // Reset the checked property in the cart data
+            }
+          });
+        }
       }
     });
-  
-    const updatedCart = [...cart];
-    const currentItem = updatedCart[cartIndex].items.find(item => item.id === itemId);
+
+    const currentItem = updatedCart[cartIndex].items.find(
+      (item) => item.id === itemId
+    );
+
     if (!currentItem) return;
-  
-    const currentItemCheckbox = (document.getElementById(`prodCheckbox-${itemId}`) as HTMLInputElement).checked;
-    currentItem.checked = currentItemCheckbox; 
-  
+
+    const currentItemCheckbox = (
+      document.getElementById(`prodCheckbox-${itemId}`) as HTMLInputElement
+    ).checked;
+
+    currentItem.checked = currentItemCheckbox;
+
+    const isAllItemsChecked = updatedCart[cartIndex].items.every(
+      (item) => item.checked
+    );
+
+    const shopCheckbox = document.getElementById(
+      `shopRadio-${updatedCart[cartIndex].supplierId}`
+    ) as HTMLInputElement;
+
+    if (isAllItemsChecked) {
+      shopCheckbox.checked = true;
+    } else {
+      shopCheckbox.checked = false;
+    }
+
     if (currentItemCheckbox) {
       setSelectedPhoneShop(updatedCart[cartIndex].supplier.phoneNumber);
       setSelectedShopId(updatedCart[cartIndex].supplierId);
     } else {
-      const isAnyItemChecked = updatedCart[cartIndex].items.some(item => item.checked);
+      const isAnyItemChecked = updatedCart[cartIndex].items.some(
+        (item) => item.checked
+      );
       if (!isAnyItemChecked) {
         setSelectedPhoneShop("");
         setSelectedShopId(null);
-        const shopCheckbox = document.getElementById(`shopRadio-${updatedCart[cartIndex].supplierId}`) as HTMLInputElement;
-        if (shopCheckbox) shopCheckbox.checked = false;
       }
     }
-  
+
     setCart(updatedCart);
     calculateTotalAmount();
   };
@@ -365,7 +432,9 @@ function Cart() {
   // * Delete Method for Cart
   const removeCartItem = async (cartId, itemId) => {
     try {
-      const response = await axios.delete(`https://localhost:7017/Cart/delete/${cartId}/${itemId}`);
+      const response = await axios.delete(
+        `https://localhost:7017/Cart/delete/${cartId}/${itemId}`
+      );
       if (response.status !== 200) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -380,17 +449,25 @@ function Cart() {
     const shopsToRemove = [];
 
     cart.forEach((cartItem) => {
-      const shopChecked = (document.getElementById(`shopRadio-${cartItem.supplierId}`) as HTMLInputElement).checked;
+      const shopChecked = (
+        document.getElementById(
+          `shopRadio-${cartItem.supplierId}`
+        ) as HTMLInputElement
+      ).checked;
       if (shopChecked) {
-        shopsToRemove.push(cartItem.id); 
+        shopsToRemove.push(cartItem.id);
         cartItem.items.forEach((item) => {
-          itemsToRemove.push({ cartId: cartItem.id, itemId: item.id }); 
+          itemsToRemove.push({ cartId: cartItem.id, itemId: item.id });
         });
       } else {
         cartItem.items.forEach((item) => {
-          const itemChecked = (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement ).checked;
+          const itemChecked = (
+            document.getElementById(
+              `prodCheckbox-${item.id}`
+            ) as HTMLInputElement
+          ).checked;
           if (itemChecked) {
-            itemsToRemove.push({ cartId: cartItem.id, itemId: item.id }); 
+            itemsToRemove.push({ cartId: cartItem.id, itemId: item.id });
           }
         });
       }
@@ -400,9 +477,12 @@ function Cart() {
       await removeCartItem(cartId, itemId);
     }
 
-    const updatedCart = cart.filter(cartItem => !shopsToRemove.includes(cartItem.id))
-      .map(cartItem => {
-        cartItem.items = cartItem.items.filter(item => !itemsToRemove.some(itm => itm.itemId === item.id));
+    const updatedCart = cart
+      .filter((cartItem) => !shopsToRemove.includes(cartItem.id))
+      .map((cartItem) => {
+        cartItem.items = cartItem.items.filter(
+          (item) => !itemsToRemove.some((itm) => itm.itemId === item.id)
+        );
         return cartItem;
       });
 
@@ -411,20 +491,23 @@ function Cart() {
     setTotalItemsChecked(0);
     cartEventEmitter.emit("cartUpdated");
   };
-  
 
   // * Handle Remove Cart Modal
   const handleRemoveCartPrompt = () => {
     const anyProductChecked = cart.some((shop) => {
       return shop.items.some((item) => {
-        return (document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement).checked;
+        return (
+          document.getElementById(`prodCheckbox-${item.id}`) as HTMLInputElement
+        ).checked;
       });
     });
 
     if (!anyProductChecked) {
       toast.error("Please select a product");
     } else {
-      const modalElement = document.getElementById("removeCartConfirmationModal");
+      const modalElement = document.getElementById(
+        "removeCartConfirmationModal"
+      );
       const bootstrapModal = new Modal(modalElement);
       bootstrapModal.show();
     }
@@ -490,7 +573,9 @@ function Cart() {
                       type="checkbox"
                       value=""
                       id={`prodCheckbox-${item.id}`}
-                      onChange={() => handleProductCheckboxChange(index, item.id)}
+                      onChange={() =>
+                        handleProductCheckboxChange(index, item.id)
+                      }
                     />
                     <div className="col-md-11 prod-cart-container">
                       <img
@@ -522,12 +607,14 @@ function Cart() {
                           className="size-select"
                           name="size"
                           id={`size-${item.id}`}
-                          onChange={(e) => handleSizeChange(index, itemIndex, e.target.value)}
+                          onChange={(e) =>
+                            handleSizeChange(index, itemIndex, e.target.value)
+                          }
                         >
                           {item.product.sizes.map((sizeItem) => (
                             <option
                               key={sizeItem.id}
-                              value={sizeItem.id} 
+                              value={sizeItem.id}
                               selected={item.sizeQuantityId === sizeItem.id}
                             >
                               {sizeItem.size}
@@ -559,7 +646,11 @@ function Cart() {
                       {/* Price */}
                       <div className="col-md-2 prodPrice-container">
                         <h3 className="cartProd-price">
-                        ₱{(item.product.price * item.quantity).toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                          ₱
+                          {(item.product.price * item.quantity).toLocaleString(
+                            "en-US",
+                            { maximumFractionDigits: 2 }
+                          )}
                         </h3>
                       </div>
                     </div>
@@ -610,7 +701,10 @@ function Cart() {
                 </h2>
                 <h2 className="total-amount-text">Total amount:</h2>
                 <span className="total-amount-num">
-                  ₱{totalAmount.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                  ₱
+                  {totalAmount.toLocaleString("en-US", {
+                    maximumFractionDigits: 2,
+                  })}
                 </span>
                 <h2 className="total-amount-text">Upload Proof of Payment:</h2>
                 <input
@@ -643,28 +737,53 @@ function Cart() {
         </div>
       </div>
 
-      <div className="modal fade" id="removeCartConfirmationModal" tabIndex={-1} aria-labelledby="removeCartConfirmationModalLabel" aria-hidden="true">
+      <div
+        className="modal fade"
+        id="removeCartConfirmationModal"
+        tabIndex={-1}
+        aria-labelledby="removeCartConfirmationModalLabel"
+        aria-hidden="true"
+      >
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="removeCartConfirmationModalLabel">
                 Remove items from cart
               </h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
             </div>
             <div className="modal-body">
-              <h5> Are you sure you want to remove the selected items from the cart? </h5>
+              <h5>
+                {" "}
+                Are you sure you want to remove the selected items from the
+                cart?{" "}
+              </h5>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleRemoveCart}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                data-bs-dismiss="modal"
+                onClick={handleRemoveCart}
+              >
                 Remove
               </button>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   );
 }

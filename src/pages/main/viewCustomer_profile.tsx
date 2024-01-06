@@ -30,10 +30,11 @@ import toast from 'react-hot-toast'
     };
     gender: string;
     image: string;
-    emailVerificationStatus: string;
+    emailVerificationStatus: number;
   };
 
 function ViewCustomer_Profile () {
+
 
     const [UserProfile, setUserProfile] = useState<UserProfileType | null>(null)
     const [firstName, setFirstName] = useState('');
@@ -195,6 +196,7 @@ function ViewCustomer_Profile () {
           "Content-Type": "application/json",
         }
       })
+      toast.success("Please confirm your email");
       navigate("/secondconfirmation_email");
     } catch (error) {
       console.error(error);
@@ -316,31 +318,37 @@ function ViewCustomer_Profile () {
                   </div>
                 )}
                 <div>
-                {UserProfile && (
-                  (() => {
-                    if (UserProfile.emailVerificationStatus === 'Verified') {
-                      return null;
-                    } else if (UserProfile.emailVerificationStatus === 'Deferred' || UserProfile.emailVerificationStatus === 'Expired') {
-                      return ( 
-                        <button
-                          onClick={handleVerifyEmail}
-                          style={{
-                            backgroundColor: 'red',
-                            color: 'white',
-                            padding: '2px 8px',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
-                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                            transition: 'background-color 0.3s ease',
-                          }}
-                        >
-                          Verify Email
-                        </button>
-                      );
-                    }
-                  })()
-                )}
+                  {UserProfile && (
+                    (() => {
+
+                      if (UserProfile && UserProfile.emailVerificationStatus === 2) {
+                        return (
+                          <div style={{ color: 'green', marginTop: '76px' }}>
+                            Verified
+                          </div>
+                        );
+                      } else if (UserProfile && UserProfile.emailVerificationStatus === 3 || UserProfile && UserProfile.emailVerificationStatus === 4) {
+                        return (
+                          <button
+                            onClick={handleVerifyEmail}
+                            style={{
+                              backgroundColor: 'red',
+                              color: 'white',
+                              padding: '2px 8px',
+                              border: 'none',
+                              borderRadius: '5px',
+                              cursor: 'pointer',
+                              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                              transition: 'background-color 0.3s ease',
+                              marginTop: '76px'
+                            }}
+                          >
+                            Verify Email
+                          </button>
+                        );
+                      }
+                    })()
+                  )}
                 </div>
             </div>
         </div>

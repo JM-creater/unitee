@@ -23,13 +23,12 @@ type SupplierProfileType = {
   password: string;
   gender: string;
   image: string;
-  emailVerificationStatus: string;
+  emailVerificationStatus: number;
 };
 
 function Supplier_ViewProf() {
-  const [UserProfile, setUserProfile] = useState<SupplierProfileType | null>(
-    null
-  );
+
+  const [UserProfile, setUserProfile] = useState<SupplierProfileType | null>(null);
   const [shopName, setShopName] = useState("");
   const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
@@ -149,6 +148,7 @@ function Supplier_ViewProf() {
           "Content-Type": "application/json",
         }
       })
+      toast.success("Please confirm your email");
       navigate("/secondconfirmation_email");
     } catch (error) {
       console.error(error);
@@ -288,10 +288,14 @@ function Supplier_ViewProf() {
           <div>
             {UserProfile && (
               (() => {
-                if (UserProfile.emailVerificationStatus === 'Verified') {
-                  return null;
-                } else if (UserProfile.emailVerificationStatus === 'Deferred' || UserProfile.emailVerificationStatus === 'Expired') {
-                  return ( 
+                if (UserProfile && UserProfile.emailVerificationStatus === 2) {
+                  return (
+                    <div style={{ color: 'green' }}>
+                      Verified
+                    </div>
+                  );
+                } else if (UserProfile && UserProfile.emailVerificationStatus === 3 || UserProfile && UserProfile.emailVerificationStatus === 4) {
+                  return (
                     <button
                       onClick={handleVerifyEmail}
                       style={{
