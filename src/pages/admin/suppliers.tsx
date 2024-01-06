@@ -444,7 +444,7 @@ function Suppliers() {
                       className="permits-link"
                       rel="noopener noreferrer"
                       target="_blank"
-                      href={`https://localhost:7017/${selectedSupplier.schoolPermit}`}
+                      href={`https://localhost:7017/${selectedSupplier.barangayClearance}`}
                     >
                       <span>Barangay Clearance: </span>
                       {selectedSupplier.barangayClearance.split("\\").pop()}
@@ -453,7 +453,7 @@ function Suppliers() {
                       className="permits-link"
                       rel="noopener noreferrer"
                       target="_blank"
-                      href={`https://localhost:7017/${selectedSupplier.schoolPermit}`}
+                      href={`https://localhost:7017/${selectedSupplier.validIdFrontImage}`}
                     >
                       <span>Valid Id(Front Side): </span>
                       {selectedSupplier.validIdFrontImage.split("\\").pop()}
@@ -462,7 +462,7 @@ function Suppliers() {
                       className="permits-link"
                       rel="noopener noreferrer"
                       target="_blank"
-                      href={`https://localhost:7017/${selectedSupplier.schoolPermit}`}
+                      href={`https://localhost:7017/${selectedSupplier.validIdBackImage}`}
                     >
                       <span>Valid Id(Back Side): </span>
                       {selectedSupplier.validIdBackImage.split("\\").pop()}
