@@ -240,8 +240,8 @@ function Register() {
               }}>
 
               {/* ID NUMBER AND DEPARTMENT */}
-              <div className="inputs-container">
-                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
+              <div className="inputs-customerContainer">
+                <div className='col-md-5 customerInput-container-withErrorMessage' style={{ marginLeft:'45px' }}>
                   <div className={`error-message-container ${validationErrors.IDNumber ? 'error-message' : 'hidden'}`}>
                     {validationErrors.IDNumber && (
                       <div className="error-message-container">
@@ -251,11 +251,11 @@ function Register() {
                   </div>
                   <input className="input-register" type="text" placeholder="ID Number (8 digits)" value={IDNumber} onChange={(e) => handleIDnumber(e.target.value)} maxLength={8}/>
                 </div>
-                <div className='col-md-5 input-container-withErrorMessage'>
+                <div className='col-md-5 customerInput-container-withErrorMessage'>
                 <div className={`error-message-container ${validationErrors.departmentId ? 'error-message' : 'hidden'}`}>
                     {validationErrors.departmentId}
                   </div>
-                  <select className="select-depa" style={{ padding: "10px", border: "2px solid white" }} value={departmentId} onChange={(e) => setSelectedDepartment(e.target.value)}>
+                  <select className="select-depaCustomer" style={{ padding: "10px", border: "2px solid white" }} value={departmentId} onChange={(e) => setSelectedDepartment(e.target.value)}>
                     <option value="" hidden selected disabled>Select Department</option>
                     {departments.map((department) => (
                       <option key={department.departmentId} value={department.departmentId}>
@@ -267,9 +267,9 @@ function Register() {
               </div>
               
               {/* FIRST AND LAST NAME */}
-              <div className="inputs-container">
+              <div className="inputs-customerContainer">
                 {/* ERROR MESSAGE */}
-                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px'}}>
+                <div className='col-md-5 customerInput-container-withErrorMessage' style={{ marginLeft:'45px'}}>
                   <div className={`error-message-container ${validationErrors.firstName ? 'error-message' : 'hidden'}`}>
                     {validationErrors.firstName && (
                       <div className="error-message-container">
@@ -279,7 +279,7 @@ function Register() {
                   </div>
                   <input className="input-register" type="text" placeholder="First Name" value={firstName} onChange={(e) => handleFirstName(e.target.value)}/>
                 </div>
-                <div className='col-md-5 input-container-withErrorMessage'>
+                <div className='col-md-5 customerInput-container-withErrorMessage'>
                   <div className={`error-message-container ${validationErrors.lastName ? 'error-message' : 'hidden'}`}>
                     {validationErrors.lastName && (
                       <div className="error-message-container">
@@ -292,14 +292,14 @@ function Register() {
               </div>
 
               {/* EMAIL AND PHONE NUMBER */}
-              <div className="inputs-container">
-                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px'}}>
+              <div className="inputs-customerContainer">
+                <div className='col-md-5 customerInput-container-withErrorMessage' style={{ marginLeft:'45px'}}>
                   <div className={`error-message-container ${validationErrors.email ? 'error-message' : 'hidden'}`}>
                     {validationErrors.email}
                   </div>
                   <input className="input-register" type="email" placeholder="Email" value={email} onChange={(e) => handleEmail(e.target.value)}/>
                 </div>
-                <div className='col-md-5 input-container-withErrorMessage'>
+                <div className='col-md-5 customerInput-container-withErrorMessage'>
                   <div className={`error-message-container ${validationErrors.phoneNumber ? 'error-message' : 'hidden'}`}>
                     {validationErrors.phoneNumber && (
                       <div className="error-message-container">
@@ -312,14 +312,14 @@ function Register() {
               </div>
 
               {/* PASSWORD AND CONFIRM PASSWORD */}
-              <div className="inputs-container">
-                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px'}}>
+              <div className="inputs-customerContainer">
+                <div className='col-md-5 customerInput-container-withErrorMessage' style={{ marginLeft:'45px'}}>
                   <div className={`error-message-container ${validationErrors.password ? 'error-message' : 'hidden'}`}>
                     {validationErrors.password}
                   </div>
                   <input className="input-register" type="password" placeholder="Password (Alphanumeric)" value={password} onChange={(e) => handlePassword(e.target.value)}/>
                 </div>
-                <div className='col-md-5 input-container-withErrorMessage'>
+                <div className='col-md-5 customerInput-container-withErrorMessage'>
                   <div className={`error-message-container ${validationErrors.confirmPassword ? 'error-message' : 'hidden'}`}>
                     {validationErrors.confirmPassword}
                   </div>
@@ -328,8 +328,8 @@ function Register() {
               </div>
 
               {/* GENDER AND PROFILE PICTURE */}
-              <div className="inputs-container">
-                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px'}}>
+              <div className="inputs-customerContainer">
+                <div className='col-md-5 customerInput-container-withErrorMessage' style={{ marginLeft:'45px'}}>
                   <div className={`error-message-container ${validationErrors.gender ? 'error-message' : 'hidden'}`}>
                     {validationErrors.gender}
                   </div>
@@ -345,7 +345,7 @@ function Register() {
                     </label>
                   </div>
                 </div>
-                <div className='col-md-5 input-container-withErrorMessage'>
+                <div className='col-md-5 customerInput-container-withErrorMessage'>
                   <div className={`error-message-container ${validationErrors.image ? 'error-message' : 'hidden'}`}>
                     {validationErrors.image}
                   </div>
@@ -359,7 +359,7 @@ function Register() {
               </div>
 
                 {/* STUDY LOAD */}
-                <div className='col-md-12 input-container-withErrorMessage' style={{ marginLeft: '89px'}}>
+                <div className='col-md-12 customerInput-container-withErrorMessage' style={{ marginLeft: '89px'}}>
                   <div className={`error-message-container ${validationErrors.studyLoad ? 'error-message' : 'hidden'}`} style={{ marginLeft:'15px' }}>
                     {validationErrors.studyLoad}
                   </div>
@@ -371,12 +371,8 @@ function Register() {
                   </div>
                 </div>
               
-              <div className="col-md-10 register-customer-btn-container">
-                <button
-                  className="col-md-4 btn btn-lg btn-primary"
-                  style={{ borderRadius: "20px" }}
-                  type="submit"
-                >
+              <div className="register-customer-btn-container">
+                <button className="btn registerCustomer-btn btn-lg btn-primary" style={{ borderRadius: "20px" }} type="submit">
                   Register
                 </button>
               </div>

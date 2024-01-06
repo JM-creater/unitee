@@ -226,6 +226,10 @@
         align-items: center;
     }
 
+    .error-message-container {
+        margin-left: 5em;
+    }
+
     .register-text {
         margin: 40px 0px 10px 0px;
         font-size: 15px;

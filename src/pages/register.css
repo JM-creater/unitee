@@ -108,11 +108,11 @@
   width: 28em;
 }
 
-.register-customer-btn-container, .register-supplier-btn-container {
-display: flex;
-justify-content: center;
-align-items: center;
-padding-top: 20px;
+.register-customer-btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 20px;
 }
 
 .register-to-login {
@@ -160,11 +160,16 @@ justify-content: center;
   visibility: visible;
 }
 
+.registerCustomer-btn {
+  width: 14em;
+}
+
+
 .hidden {
   visibility: hidden;
 }
 
-.input-container-withErrorMessage {
+.customerInput-container-withErrorMessage {
   display: flex;
   flex-flow: column;
   justify-content: space-evenly;
@@ -176,7 +181,7 @@ justify-content: center;
   gap: 5px;
 }
 
-.inputs-container {
+.inputs-customerContainer {
   display: flex;
   flex-direction: row;
   width: 70em;
@@ -191,45 +196,19 @@ justify-content: center;
 }
 
 @media screen and (max-width: 480px) {
-  /* REGISTER PAGE */
-  .registerCustomer-main-container {
-    flex-flow: column;
+  .customerInput-container-withErrorMessage {
+      max-width: 20em;
+      max-height: 5em;
+      flex-flow: column;
+      justify-content: start;
   }
 
-  .input-register {
-    font-size: 10px;
+  .studyLoad-pic-register-container {
+    width: 25em;
   }
-
-  .input-register-container {
-    padding: 10px;
-  }
-
-  .inputs-container {
-    flex-direction: column;
-  }
-
-  .input-container-withErrorMessage {
-    max-width: fit-content;
+  
+  .inputs-customerContainer {
+    gap: 1px;
+    margin-right: 28px;
   }
 }
-
-  /* FOR TABLETS */
-  @media screen and (max-width: 768px) {
-    .registerCustomer-main-container {
-      flex-direction: column;
-    }
-
-    .registerCustomer-1 {
-      max-height: 100vh;
-      padding-top: 10em;
-      padding-bottom: 40px;
-    }
-
-    .registerCustomer-2 {
-      width: 75em;
-      height: 100vh;
-      margin-top: 20px;
-      padding-top: 5em;
-      padding-bottom: 5em;
-    }
-  }

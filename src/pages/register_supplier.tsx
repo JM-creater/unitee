@@ -1,4 +1,4 @@
-import "./register.css";
+import "./register_supplier.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";

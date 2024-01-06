@@ -453,10 +453,5 @@
   .supplier-container {
     flex-flow: column;
   }
-
-  .shopDetails-container-shop {
-    width: fit-content;
-  }
-
   
 }
