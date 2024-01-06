@@ -3,7 +3,7 @@ import emailIcon from "../../assets/images/icons/mail-2.png";
 import phoneIcon from "../../assets/images/icons/smartphone-call.png";
 import "./supplier_viewProf.css";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -23,6 +23,7 @@ type SupplierProfileType = {
   password: string;
   gender: string;
   image: string;
+  emailVerificationStatus: string;
 };
 
 function Supplier_ViewProf() {
@@ -35,6 +36,7 @@ function Supplier_ViewProf() {
   const [phoneNumber, setPhoneNumber] = useState("");
   //const [password, setPassword] = useState('');
   const { id } = useParams();
+  const navigate = useNavigate();
 
   // * For Delay
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -135,6 +137,21 @@ function Supplier_ViewProf() {
         console.error(error);
         toast.error("Failed to Update. Please try again later.");
       }
+    }
+  };
+
+  // * Handle Verify Email
+  const handleVerifyEmail = async () => {
+    try {
+      await fetch(`https://localhost:7017/Users/verify-email/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      })
+      navigate("/secondconfirmation_email");
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -268,6 +285,33 @@ function Supplier_ViewProf() {
               <h5 className="about-details-prof">{UserProfile.phoneNumber}</h5>
             </div>
           )}
+          <div>
+            {UserProfile && (
+              (() => {
+                if (UserProfile.emailVerificationStatus === 'Verified') {
+                  return null;
+                } else if (UserProfile.emailVerificationStatus === 'Deferred' || UserProfile.emailVerificationStatus === 'Expired') {
+                  return ( 
+                    <button
+                      onClick={handleVerifyEmail}
+                      style={{
+                        backgroundColor: 'red',
+                        color: 'white',
+                        padding: '2px 8px',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                        transition: 'background-color 0.3s ease',
+                      }}
+                    >
+                      Verify Email
+                    </button>
+                  );
+                }
+              })()
+            )}
+          </div>
         </div>
       </div>
     </div>

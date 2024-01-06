@@ -36,6 +36,7 @@ import Supplier from "./pages/supplier/supplier_dashboard";
 import Reports from "./pages/supplier/reports";
 import Forgot_Password from "./pages/forgot_password";
 import Confirmation_Code from "./pages/confirmation_email";
+import SecondConfirmation_Code from "./pages/secondconfirmation_email";
 import { AuthProvider } from "./utils/AuthContext";
 import PrivateRoute from "./utils/private_route";
 //import Unauthorized_Error from './pages/common/unauthorized_error'
@@ -65,6 +66,7 @@ function App() {
             <Route index element={<Login />} />
             <Route path="/accountType" element={<AccountType />} />
             <Route path="/confirmation_email" element={ <Confirmation_Code /> } />
+            <Route path="/secondconfirmation_email" element={ <SecondConfirmation_Code /> } />
             <Route path="/register" element={<Register />} />
             <Route path="/register_supplier" element={<RegisterSupplier />} />
             <Route path="/forgot_password" element={ <Forgot_Password /> } />
