@@ -25,7 +25,15 @@ function Confirmation_Code() {
     }
   };
 
-  const handleVerifyLater = () => {
+  // * Handle verify later
+  const handleVerifyLater = async () => {
+    const id = localStorage.getItem('Id');
+    await fetch(`https://localhost:7017/Users/verify-later/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     navigate("/");
   };
 
