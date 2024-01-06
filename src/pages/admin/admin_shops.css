@@ -10,6 +10,8 @@
 .shopProfileImgCard {
     width: 100%;
     max-width: 10rem;
+    max-height: 10rem;
+    object-fit: cover;
     border-radius: 5px;
 }
 

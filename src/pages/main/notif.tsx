@@ -270,7 +270,7 @@ function Notif() {
               </div>
               {/* Add class 'active' to progress */}
               <div className="row d-flex justify-content-center">
-                <div className="col-12">
+                <div className="col-12 order-progress-container">
                   <ul id="progressbarCancel" className="text-center">
                     <li className={placed ? "active step0" : "step0"}>
                       <div className="icon-content">

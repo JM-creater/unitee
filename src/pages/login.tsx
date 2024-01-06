@@ -234,7 +234,7 @@ function Login() {
                 {validationErrors.IDOrEmail}
               </div>
               <input
-                className="col-md-11 input-login"
+                className="input-login"
                 type="text"
                 placeholder="ID Number or Email"
                 value={IDOrEmail}
@@ -248,7 +248,7 @@ function Login() {
                 {validationErrors.Password}
               </div>
               <input
-                className="col-md-11 input-login"
+                className="input-login"
                 type="password"
                 placeholder="Password"
                 value={Password}
@@ -269,7 +269,7 @@ function Login() {
             </div>
 
             <button
-              className="col-md-7 login-btn"
+              className="login-btn"
               onClick={() => handleLogin()}
             >
               Log In

@@ -427,7 +427,7 @@ function Supplier() {
             <button className="generate-report-btn" onClick={HandleExportToExcel}>Generate Report</button>
           </div>
         </div>
-        <div className="col-md-5 top-selling-prods-container">
+        <div className="col-md-4 top-selling-prods-ReportsContainer">
           <h3 className="top-selling-prods-title">Top Selling Products</h3>
           {topSellingProducts.length > 0 ? (
             topSellingProducts.slice(0, 5).map((product) => (

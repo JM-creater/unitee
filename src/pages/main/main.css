@@ -11,7 +11,7 @@
     display: flex;
     align-items: center;
     justify-content: end;
-    gap: 15px;
+    gap: 14px;
 }
 
 .header-img-button {
@@ -19,22 +19,35 @@
     width: 23px;
 }
 
+.imageProfile {
+    width: 100%;
+    max-width: 33px;
+    max-height: 33px;
+    object-fit: cover;
+    border: solid 2px #D3D3D3;
+    border-radius: 50%;
+}
+
+.navLabel {
+    display: none;
+    color: white;
+}
+
 .notif-icon-container {
     position: relative; 
     display: inline-block; 
 }
-
-
 
 .search-container {
     position: relative;
   }
   
   .Product-SearchBar {
-    width: 490px;
+    max-width: 25em;
     margin-right: 7px;
-    border: #f0f0f0 solid 1px;
+    border-radius: 5px;
     padding: 7px;
+    font-size: 14px;
   }
   
   .search-dropdown {
@@ -58,19 +71,6 @@
   .search-dropdown-row:hover {
     background-color: #f0f0f0 !important; 
   }
-
-/* .notif-count {
-    position: absolute; 
-    top: -12px; 
-    left: 15px;
-    background-color: red;
-    color: white;
-    border-radius: 50%;
-    padding: 0px 5px;
-    font-size: 12px;
-    min-width: 20px; 
-    text-align: center; 
-} */
 
 .notif-count {
     margin: 2px;
@@ -210,10 +210,6 @@
     color: #FFAA00;
 }
 
-/* .customer-nav-link :hover{
-    color: #FFAA00;
-    text-decoration: none;
-} */
 
 .dropdown-icon {
     width: 8%;
@@ -283,6 +279,7 @@
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.5s ease;
+    z-index: 5;
 }
 
 #tooltip-text::before {
@@ -294,8 +291,55 @@
     /* border: 15px solid #000; */
 }
 
+i {
+    color: #004AAD;
+}
+
+
 #tooltip:hover #tooltip-text {
     top: 120%;
     visibility: visible;
     opacity: 1;
+}
+
+@media screen and (max-width: 480px) {
+    .logo {
+        max-width: 5em;
+        max-height: 2em;
+    }
+
+    i {
+        color: #fff;
+    }
+
+    .navLabel {
+        display: block;
+        margin-right: 10px;
+        margin-left: 40px;
+    }
+
+    .header-button-container {
+        position: absolute;
+        background-color: #020654 ;
+        top: 10px;
+        right: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        visibility: hidden;
+        flex-direction: column;
+        width: 10em;
+        opacity: 0;
+        z-index: 5;
+        transition: .3s ease;
+    }
+
+    input:checked ~ .header-button-container {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .Product-SearchBar {
+        font-size: 12px;
+        max-width: 18em;
+    }
 }

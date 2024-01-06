@@ -413,3 +413,23 @@ body {
     font-family: FontAwesome;
     content: "\f00c";
 }
+
+@media screen and (max-width: 480px) {
+    .icon {
+        max-width: 2em;
+        max-height: 2em;
+    }
+
+    .order-status-text {
+        font-size: 10px;
+        font-weight: 400;
+    }
+
+    .order-details-itemList-container {
+        flex-flow: column;
+    }
+
+    .receipt-num-header {
+        font-size: 15px;
+    }
+}

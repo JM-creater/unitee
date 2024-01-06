@@ -244,20 +244,12 @@ function Register() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="col-md-12 registerCustomer-main-container">
-        <div className="col-md-8 registerCustomer-1">
+      <div className="registerCustomer-main-container">
+        <div className="registerCustomer-1">
           <h1 className="loginText-1">Let's Get Started!</h1>
           <h5>Create an account using your credentials</h5>
           <div>
-            <div
-              className="row"
-              style={{
-                display: "flex",
-                padding: "50px",
-                gap: "5px",
-                justifyContent: "center",
-              }}
-            >
+            <div className="input-register-container">
               <div className="inputs-container">
                 <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
                   <span>This is your ID Number:</span>
@@ -447,8 +439,8 @@ function Register() {
                 </div>
               </div>
               
-              <div className="col-md-10 register-supplier-btn-container">
-                <button className="col-md-4 btn btn-lg btn-primary" style={{ borderRadius: "20px" }} type="submit">
+              <div className="register-supplier-btn-container">
+                <button className="btn register-btn btn-primary" style={{ borderRadius:'20px' }} type="submit">
                   Register
                 </button>
               </div>

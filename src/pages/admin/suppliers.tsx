@@ -215,7 +215,7 @@ function Suppliers() {
               Status:
             </label>
             <select
-              style={{ padding: "10px", border: "2px solid white" }}
+              style={{ padding: "5px", border: "2px solid white", borderRadius: '10px' }}
               name="supplierStatus"
               id="status"
               onChange={(e) => setSelectedStatus(e.target.value)}

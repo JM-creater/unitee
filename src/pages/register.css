@@ -2,6 +2,8 @@
   display: flex;
   flex-flow: row;
   padding: 0%;
+  width: 100vw;
+  height: 100vh;
  }
 
  .registerCustomer-1 {
@@ -11,6 +13,7 @@
   flex-flow: column;
   justify-content: center;
   align-items: center;
+  width: fit-content;
  }
 
  .registerCustomer-2 {
@@ -20,6 +23,10 @@
   flex-flow: column;
   justify-content: center;
   align-items: center;
+  text-align: justify;
+  letter-spacing: -1px;
+  padding: 20px;
+  width: fit-content;
  }
 
 .logoRegister {
@@ -45,7 +52,7 @@
 
 .loginText-1 {
   font-weight: 800;
-  font-size: 40px;
+  font-size: 30px;
   color: #020654;
 }
 
@@ -83,17 +90,18 @@
 }
 
 .uploadImage-register-label {
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .select-depa {
-  width: 35em;
+  width: 28em;
   border-radius: 5px;
+  font-size: 12px;
 }
 
 .input-register {
-  font-size: 15px;
+  font-size: 12px;
   padding: 10px;
   border-style: none;
   border-radius: 5px;
@@ -103,7 +111,8 @@
 .register-customer-btn-container, .register-supplier-btn-container {
 display: flex;
 justify-content: center;
-padding-top: 40px;
+align-items: center;
+padding-top: 20px;
 }
 
 .register-to-login {
@@ -117,6 +126,10 @@ text-decoration: none;
 .back-to-login-btn-container {
 display: flex;
 justify-content: center;
+}
+
+.register-btn {
+  width: 14em;
 }
 
 .back-to-loginBTN {
@@ -166,6 +179,57 @@ justify-content: center;
 .inputs-container {
   display: flex;
   flex-direction: row;
-  width: fit-content;
+  width: 70em;
   gap: 22px;
 }
+
+.input-register-container {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  justify-content: center;
+}
+
+@media screen and (max-width: 480px) {
+  /* REGISTER PAGE */
+  .registerCustomer-main-container {
+    flex-flow: column;
+  }
+
+  .input-register {
+    font-size: 10px;
+  }
+
+  .input-register-container {
+    padding: 10px;
+  }
+
+  .inputs-container {
+    flex-direction: column;
+  }
+
+  .input-container-withErrorMessage {
+    max-width: fit-content;
+  }
+}
+
+  /* FOR TABLETS */
+  @media screen and (max-width: 768px) {
+    .registerCustomer-main-container {
+      flex-direction: column;
+    }
+
+    .registerCustomer-1 {
+      max-height: 100vh;
+      padding-top: 10em;
+      padding-bottom: 40px;
+    }
+
+    .registerCustomer-2 {
+      width: 75em;
+      height: 100vh;
+      margin-top: 20px;
+      padding-top: 5em;
+      padding-bottom: 5em;
+    }
+  }

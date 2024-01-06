@@ -1,7 +1,5 @@
 import "./shop.css";
 import { Link, useParams } from "react-router-dom";
-import shopPic1Carousel from "../../assets/images/carouselPic2.png";
-import shopPic2Carousel from "../../assets/images/carouselPic1.png";
 import starIcon from "../../assets/images/icons/starRating.png";
 import "react-toastify/dist/ReactToastify.css";
 import React, { useEffect, useState } from "react";
@@ -125,50 +123,7 @@ function Shop() {
             <div className="container shop-contianer">
                 <div className="content-container">
                     <div className="col-md-12 shopCustomer-title-container">
-                        <div
-                            id="carouselExampleAutoplaying"
-                            className="shopCarousel-container carousel slide carousel-fade"
-                            data-bs-ride="carousel"
-                        >
-                            <div className="carousel-inner">
-                                <div className="carousel-item active">
-                                    <img
-                                    src={shopPic1Carousel}
-                                    className="carouselPic d-block w-100"
-                                    />
-                                </div>
-                                <div className="carousel-item">
-                                    <img
-                                    src={shopPic2Carousel}
-                                    className="carouselPic d-block w-100"
-                                    />
-                                </div>
-                            </div>
-                            <button
-                            className="carousel-control-prev"
-                            type="button"
-                            data-bs-target="#carouselExampleAutoplaying"
-                            data-bs-slide="prev"
-                            >
-                                <span
-                                    className="carousel-control-prev-icon"
-                                    aria-hidden="true"
-                                ></span>
-                            <span className="visually-hidden">Previous</span>
-                            </button>
-                            <button
-                            className="carousel-control-next"
-                            type="button"
-                            data-bs-target="#carouselExampleAutoplaying"
-                            data-bs-slide="next"
-                            >
-                                <span
-                                    className="carousel-control-next-icon"
-                                    aria-hidden="true"
-                                ></span>
-                            <span className="visually-hidden">Next</span>
-                            </button>
-                        </div>
+                        
                         <div className="motto-container">
                             <p className="shop-title1">New Clothes,</p>
                             <p className="shop-title2">New Passion.</p>

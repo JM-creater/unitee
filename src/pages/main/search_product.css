@@ -96,3 +96,7 @@
     border-radius: 3px;
     color: #0056b3;
 } */
+
+.search-container-product {
+    visibility: hidden;
+}

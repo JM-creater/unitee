@@ -209,8 +209,8 @@ function ViewCustomer_Profile () {
 
         {/* EDIT COLLAPSE */}
         <div className="collapse" id="editProfCollapse" style={{ padding: '40px'}}>
-            <h1>Edit Profile Information</h1>
-            <div className="card card-body" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
+            <h1 className='editProf-subTitle'>Edit Profile Information</h1>
+            <div className="card card-body">
                 <div className="editProf-details-1">
                     <label className='profLabelEdit' htmlFor="profFirstName">First Name</label>
                     <input className='input-prof' type="text" id='profFirstName' value={firstName} onChange={(e) => setFirstName(e.target.value)}></input>
@@ -298,12 +298,13 @@ function ViewCustomer_Profile () {
                     <h5 className='about-details-prof'>{UserProfile.phoneNumber}</h5>
                   </div>
                 )}
-                <div>
+                
+            </div>
+            <div>
                   <button style={{ marginTop: '76px' }}>
                     Verify Email
-                    </button>
+                  </button>
                 </div>
-            </div>
         </div>
     </div>
 }

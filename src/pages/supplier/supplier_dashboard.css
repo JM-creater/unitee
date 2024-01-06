@@ -5,6 +5,7 @@
     background-color: #F0F0F0;
     display: flex;
     flex-flow: row;
+    gap: 30px;
 }
 
 .report-main-container {
@@ -15,6 +16,7 @@
     flex-flow: column;
     overflow-y: auto;
     scroll-behavior: smooth;
+    gap: 30px;
 }
 
 .dash-supplier-container {
@@ -53,6 +55,16 @@
     width: 52rem;
     height:fit-content;
     border-radius: 10px;
+}
+
+.top-selling-prods-ReportsContainer {
+    margin-top: 20px;
+    background-color: white;
+    padding: 5px;
+    width: 52rem;
+    height:fit-content;
+    border-radius: 10px;
+    margin-left: 30px;
 }
 
 .top-prods-container {

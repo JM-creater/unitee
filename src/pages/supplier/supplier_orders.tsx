@@ -32,13 +32,13 @@ function Supplier_Orders () {
     const [productTypes, setProductTypes] = useState([]);
     const [selectedOrders, setSelectedOrders] = useState(null);
 
-    const statuses = [
-      { key: 'Pending', href: '#supplier-pending-order' },
-      { key: 'Approved', href: '#supplier-approved-order' },
-      { key: 'ForPickUp', href: '#supplier-forpickup-order' },
-      { key: 'Completed', href: '#supplier-completed-order' },
-      { key: 'Canceled', href: '#supplier-canceled-order' },
-    ];
+    // const statuses = [
+    //   { key: 'Pending', href: '#supplier-pending-order' },
+    //   { key: 'Approved', href: '#supplier-approved-order' },
+    //   { key: 'ForPickUp', href: '#supplier-forpickup-order' },
+    //   { key: 'Completed', href: '#supplier-completed-order' },
+    //   { key: 'Canceled', href: '#supplier-canceled-order' },
+    // ];
 
     // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -228,7 +228,7 @@ function Supplier_Orders () {
     
 
     return <div className="manage-orders-main-container">
-    <nav id="orders-nav" className="navbar px-3 mb-3" style={{ display:'flex', justifyContent:'end' }}>
+    {/* <nav id="orders-nav" className="navbar px-3 mb-3" style={{ display:'flex', justifyContent:'end' }}>
       <ul className="nav nav-pills">
         {statuses.map((status) => (
           <li key={status.key} className="nav-item supplier-nav-items">
@@ -238,7 +238,7 @@ function Supplier_Orders () {
           </li>
         ))}
       </ul>
-    </nav>
+    </nav> */}
 
     <div className="orders-supplier-container">
         <div data-bs-spy="scroll" data-bs-target="#orders-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true" className="scrollspy-example p-3 rounded-2" tabIndex={-1}>

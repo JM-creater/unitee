@@ -433,7 +433,7 @@ function Cart() {
   return (
     <div className="cart-container row">
       <Toaster position="bottom-center" reverseOrder={false} />
-      <div className="col-md-8 cart-title-container">
+      <div className="col-md-10 cart-title-container">
         <h1 className="cart-title">Shopping Cart</h1>
         <div className="cart-remove-btn-container">
           <button
@@ -484,15 +484,16 @@ function Cart() {
 
                 {cartItem.items.map((item, itemIndex) => (
                   <div key={item.id} className="prod-main-container">
-                    <input
-                      style={{ marginRight: "840px", height: "20px" }}
-                      className="form-check-input prod-cart-checkBox"
-                      type="checkbox"
-                      value=""
-                      id={`prodCheckbox-${item.id}`}
-                      onChange={() => handleProductCheckboxChange(index, item.id)}
-                    />
-                    <div className="col-md-11 prod-cart-container">
+                    
+                    <div className="col-md-12 prod-cart-container">
+                      <input
+                        style={{ marginRight: "840px", height: "20px" }}
+                        className="form-check-input prod-cart-checkBox"
+                        type="checkbox"
+                        value=""
+                        id={`prodCheckbox-${item.id}`}
+                        onChange={() => handleProductCheckboxChange(index, item.id)}
+                      />
                       <img
                         className="prod-img-cart"
                         src={`https://localhost:7017/${item.product.image}`}

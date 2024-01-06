@@ -5,8 +5,10 @@
 .profileImg {
     width: 100%;
     max-width: 17em;
+    max-height: 17em;
     border-radius: 50%;
     border: solid 6px #f0f0f0;
+    object-fit: cover;
 }
 
 .profile-details-container {
@@ -56,7 +58,7 @@
 .editProf-details-1, .editProf-details-2 {
     display: flex;
     flex-direction: column;
-    width: 45em;
+    width: 30em;
 }
 
 .profLabelEdit {
@@ -103,4 +105,54 @@
 .input-prof {
     padding: 5px;
     border-radius: 5px;
+}
+
+@media screen and (max-width: 480px) {
+    .profileImg {
+        max-width: 10em;
+        max-height: 10em;
+    }
+    
+    .profile-details-container {
+        width: 30em;
+        flex-direction: column;
+        height: 20em;
+    }
+
+    .acc-name {
+        font-size: 20px;
+    }
+
+    .editProf-subTitle {
+        font-size: 20px;
+    }
+
+    .about-details-prof {
+        font-size: 12px;
+    }
+
+    .aboutIcons {
+        max-width: 12px;
+    }
+
+    .edit-Profile-collapse {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-prof {
+        width: 20em;
+    }
+
+    #profDepartment, #profGender {
+        width: 20em;
+    }
+
+    .about-userInfo-container {
+        gap: 70px;
+    }
+
+    .about-user-container {
+        width: fit-content;
+    }
 }

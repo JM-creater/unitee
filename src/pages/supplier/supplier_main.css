@@ -76,6 +76,7 @@
 .seller-profile {
     width: 100%;
     max-width: 40px;
+    max-height: 40px;
     border: solid #f0f0f0;
     border-radius: 50%;
     cursor: pointer;
@@ -129,7 +130,7 @@
 
 .notifOrder-count {
     position: absolute; 
-    margin-left: 100px;
+    margin-left: 70px;
     margin-top: 3px;
     background-color: red;
     color: white;

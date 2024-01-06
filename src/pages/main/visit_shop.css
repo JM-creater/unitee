@@ -15,9 +15,10 @@
 .shop-img {
     width: 100%;
     max-width: 100px;
+    max-height: 100px;
     border-radius: 50%;
     border: solid 5px white;
-    margin-left: 52px;
+    margin-left: 12px;
 }
 
 .shopDetails-container-shop {
@@ -296,4 +297,58 @@
     opacity: 0.5;
     pointer-events: none; 
     cursor: not-allowed;
+}
+
+@media screen and (max-width: 480px) {
+    .shop-main-container {
+        flex-flow: row;
+        gap: 50px;
+    }
+
+    .visitShop-Name {
+        font-size: 15px;
+    }
+
+    .prodModal-Image {
+        max-width: 200px;
+        max-height: 200px;
+    }
+
+    .visitShopProdImg {
+        max-width: 50px;
+    }
+    .shopDetails-container-shop {
+        width: fit-content;
+      }
+
+      .shop-img {
+        max-width: 70px;
+        max-height: 70px;
+      }
+
+      .prodShop-card {
+        width: 190px;
+        height: 150px;
+      }
+
+      .visitShopProdImg {
+        max-width: 50px;
+        max-height: 50px;
+      }
+
+      .type-filter-label, .price-filter-label, .gender-filter-label {
+        font-size: 10px;
+        gap: 40px;
+      }
+
+      .shopDetails-container-shop {
+        width: fit-content;
+        margin-left: 6em;
+        justify-content: start;
+        align-items: start;
+      }
+      
+      .shop-content2-container {
+        margin-left: 40px;
+      }
 }

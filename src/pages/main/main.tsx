@@ -2,11 +2,11 @@ import { Outlet } from "react-router";
 import { Link, useNavigate } from "react-router-dom";
 import "./main.css";
 import logo from "../../assets/images/unitee.png";
-import profIcon from "../../assets/images/icons/profile2.png";
+import profIcon from "../../assets/images/icons/viewProfile.png";
 import logout from "../../assets/images/icons/logout-3.png";
 import homeIcon from "../../assets/images/icons/homeIcon.png";
 import carts from "../../assets/images/icons/cartIcon.png";
-import orders from "../../assets/images/icons/shopping-bag-4.png";
+import orders from "../../assets/images/icons/purchHisto.png";
 import notification from "../../assets/images/icons/notifIcon.png";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -328,8 +328,15 @@ function Main() {
                   })}
               </div>
             </div>
+                  <input type="checkbox" id="menu" hidden/>
+                  <label className="navLabel" htmlFor="menu">
+                    <i className="fa-solid fa-bars"></i>
+                  </label>
 
-            <div className="col-md-6 header-button-container">
+            <div className="col-md-3 header-button-container">
+              <label className="navLabel" htmlFor="menu">
+                <i className="fa-solid fa-xmark"></i>
+              </label>
               <Link className="customer-nav-link" to="" id="tooltip">
                 <span id="tooltip-text">Home</span>
                 <img className="nav-icon" src={homeIcon} />
@@ -412,20 +419,12 @@ function Main() {
                 </div>
               </Link>
 
-              <div className="col-md-1 dropdown">
+              <div className="dropdown">
                 {customer ? (
                   <React.Fragment>
                     <img
                       className="imageProfile"
                       src={`https://localhost:7017/${customer.image}`}
-                      style={{
-                        width: "100%",
-                        maxWidth: "30px",
-                        borderStyle: "solid",
-                        borderRadius: "50%",
-                        maxHeight: "30px",
-                        borderColor: "#D3D3D3",
-                      }}
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     />

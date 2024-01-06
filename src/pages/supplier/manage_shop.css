@@ -15,6 +15,11 @@
     height: 80vh;
 }
 
+.productImage2 {
+    width: 100%;
+    max-width: 10em;
+}
+
 .prod-card {
     background-color: white;
     height: 100px;
@@ -139,7 +144,8 @@
 .modal-btns-container {
     width: 200px;
     display: flex;
-    justify-content: space-between;
+    margin-right: 30px;
+    gap: 10px;
 }
 
 .cancel-btn-modal {
@@ -273,7 +279,7 @@
     align-items: center;
     justify-content: center;
     max-height: 30em;
-     
+    max-width: 30em;
 }
 
 .overlay-icon {
