@@ -348,7 +348,7 @@ body {
 #progressbarCancel .step0:before {
     font-family: FontAwesome;
     content: "\f10c";
-    color: red;
+    color: #fff;
 }
 
 #progressbarCancel li:before {

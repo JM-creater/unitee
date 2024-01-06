@@ -30,6 +30,7 @@ import toast from 'react-hot-toast'
     };
     gender: string;
     image: string;
+    emailVerificationStatus: string;
   };
 
 function ViewCustomer_Profile () {
@@ -44,7 +45,7 @@ function ViewCustomer_Profile () {
     const [departmentId, setDepartmentId] = useState('');
     const [departments, setDepartments] = useState([]);
     const [gender, setGender] = useState('');
-    const {userId} = useParams();
+    const { userId } = useParams();
 
     // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -297,6 +298,11 @@ function ViewCustomer_Profile () {
                     <h5 className='about-details-prof'>{UserProfile.phoneNumber}</h5>
                   </div>
                 )}
+                <div>
+                  <button style={{ marginTop: '76px' }}>
+                    Verify Email
+                    </button>
+                </div>
             </div>
         </div>
     </div>

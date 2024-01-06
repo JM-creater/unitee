@@ -228,6 +228,24 @@ function Notif() {
     });
   };
 
+  // * Handle close button
+  const HandleCloseButton = () => {
+    setSelectedReason('');
+    setOtherReasons('');
+  };
+
+  // * Update the Product Details Modal
+  useEffect(() => {
+      const modal = document.getElementById('cancellationModal') 
+      if (modal) {
+          modal.addEventListener('hidden.bs.modal', HandleCloseButton);
+
+          return () => {
+              modal.removeEventListener('hidden.bs.modal', HandleCloseButton);
+          };
+      }
+  }, []);
+
   return (
     <div className="container">
       {notification.length > 0 ? (
@@ -253,7 +271,7 @@ function Notif() {
               {/* Add class 'active' to progress */}
               <div className="row d-flex justify-content-center">
                 <div className="col-12">
-                  <ul id="progressbar" className="text-center">
+                  <ul id="progressbarCancel" className="text-center">
                     <li className={placed ? "active step0" : "step0"}>
                       <div className="icon-content">
                         <img
@@ -1207,7 +1225,7 @@ function Notif() {
             )}
 
             <button type="submit" className="btn btn-primary btn-block" onClick={submitCancellation}>Cancel Order</button>
-            <button type="submit" className="btn btn-danger btn-block" data-bs-dismiss="modal">NOT NOW</button>
+            <button type="submit" className="btn btn-danger btn-block" data-bs-dismiss="modal" onClick={HandleCloseButton}>NOT NOW</button>
           </div>
         </div>
       </div>

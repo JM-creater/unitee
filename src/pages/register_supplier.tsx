@@ -145,6 +145,7 @@ function Register() {
           formData
         );
         if (response.data) {
+          localStorage.setItem('Id', response.data.newSupplier.id)
           localStorage.setItem('token', response.data.token);
           registerUsersEventEmitter.emit("registerSupplier");
           toast.success("Successfully registered.", {
