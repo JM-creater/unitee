@@ -227,11 +227,11 @@
 
 .top-rated-products-container {
     background-color: white;
-    height: 30vh;
     padding: 10px;
     border-radius: 10px;
     display: flex;
     flex-wrap: wrap;
+    height: fit-content;
 }
 
 .top-rated-prod-container {

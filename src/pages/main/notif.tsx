@@ -25,11 +25,12 @@ function Notif() {
 
   const [orders, setOrders] = useState([]);
   const [notification, setNotification] = useState([]);
+  const [disabledButtons, setDisabledButtons] = useState(new Map());
   const [showAllNotifications, setShowAllNotifications] = useState(false);
   const [selectedOrderReceipt, setSelectedOrderReceipt] = useState(null);
   const [selectedReason, setSelectedReason] = useState("");
   const [otherReasons, setOtherReasons] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { userId } = useParams();
 
   // * Show More / Less Notification
@@ -233,6 +234,30 @@ function Notif() {
       toast.error("Failed to cancel the order. Please try again");
     });
   };
+
+    // * Order Received
+    const handleOrderReceived = (orderId) => {
+      axios.put(`https://localhost:7017/Order/orderReceived/${orderId}`)
+        .then(() => {
+          // * Update the state to disable this specific button
+          setDisabledButtons(prevState => new Map(prevState).set(orderId, true));
+          localStorage.setItem(`clickReceived_${orderId}`, 'true');
+          toast.success("Order Received");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    };
+  
+    // * useEffect to set the initial state of buttons
+    useEffect(() => {
+      const initialState = new Map();
+      notification.forEach(item => {
+        const isButtonClicked = localStorage.getItem(`clickReceived_${item.orderId}`) === 'true';
+        initialState.set(item.orderId, isButtonClicked);
+      });
+      setDisabledButtons(initialState);
+    }, [notification]);
 
   // * Handle close button
   const HandleCloseButton = () => {
@@ -902,6 +927,18 @@ function Notif() {
                   Cancel Order
                 </button>
                 <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal" onClick={() => setSelectedOrderReceipt(notificationItem)}>View Order Receipt</button>
+                <button 
+                    className='view-receipt-received-btn' 
+                    onClick={() => handleOrderReceived(notificationItem.orderId)}
+                    disabled={disabledButtons.get(notificationItem.orderId)}
+                    style={{
+                      backgroundColor: disabledButtons.get(notificationItem.orderId) ? 'grey' : 'red',
+                      color: disabledButtons.get(notificationItem.orderId) ? 'darkgray' : 'white',
+                      cursor: 'not-allowed'
+                    }}
+                  >
+                    Order Received
+                </button>
                 </div>
               </div>
               );
@@ -1114,7 +1151,7 @@ function Notif() {
                       <tbody>
                         {selectedOrderReceipt && selectedOrderReceipt.order && selectedOrderReceipt.order.orderItems.map((item, index) => ( 
                           <tr key={index}>
-                            <th scope="row">{item.product.productName}</th>
+                            {/* <th scope="row">{item.product.productName}</th> */}
                             <td className='text-center'>{item.sizeQuantity.size}</td>
                             <td className='text-center'>{item.quantity}</td>
                             <td className='text-center'>₱{item.product.price.toLocaleString()}</td>
@@ -1245,7 +1282,6 @@ function Notif() {
       </div>
       )}
     </React.Fragment>
-   
   )
 }
 export default Notif;

@@ -266,6 +266,21 @@ body {
     background-color: #0056b3; 
 }
 
+.view-receipt-received-btn {
+    margin-left: 30px;
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: red;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.view-receipt-received-btn:hover {
+    background-color: red; 
+}
+
 #cancellationModal .modal-content {
     border-radius: 0.5rem;
 }

@@ -391,13 +391,15 @@ function Purchase_History () {
                                         <div className="recommendation-section">
                                             {recommendationProducts.map((product, index) => (
                                                 <div key={index} className="recommendation-card">
-                                                    <img src={`https://localhost:7017/${product.image}`} alt={product.productName} className="product-image" />
+                                                    <img src={`https://localhost:7017/${product.image}`}className="product-image" />
                                                     <div className="product-details">
                                                         <h4 className="product-name">{product.productName}</h4>
                                                         <p className="product-description">{product.description}</p>
                                                         <p className="product-price">₱{product.price.toLocaleString()}</p>
                                                     </div>
-                                                    <button className="go-to-shop-button">Go to Shop</button>
+                                                    <Link to={`/shop/${userId}/visit_shop/${product.supplierId}`}>
+                                                        <button className="go-to-shop-button" onClick={handleCLose}>Go to Shop</button>
+                                                    </Link>
                                                 </div>
                                             ))}
                                         </div>
