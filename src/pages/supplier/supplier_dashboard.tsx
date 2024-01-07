@@ -20,32 +20,61 @@ function Supplier (){
         Completed: 'Completed',
         Canceled: 'Canceled',
         Denied: 'Denied'
-    }
+    };
 
     const [orders, setOrders] = useState([]);
     const [products, setProducts] = useState([]);
+    const [totalSales, setTotalSales] = useState(0);
+    const [topRated, setTopRated] = useState([]);
     const { id } = useParams();
 
     useEffect(() => {
-        axios.get(`https://localhost:7017/Order/BySupplier/${id}`)
-            .then(response => {
+        const fetchOrderBySupplier = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Order/BySupplier/${id}`);
                 setOrders(response.data);
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error(error);
-            })
+            }
+        }
+        fetchOrderBySupplier();
     }, [id]);
 
     useEffect(() => {
-        axios.get(`https://localhost:7017/Product/ByShopProduct/${id}`)
-            .then(response => {
+        const fetchShopByProduct = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Product/ByShopProduct/${id}`);
                 setProducts(response.data);
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error(error);
-            })
+            }
+        }
+        fetchShopByProduct();
     }, [id])
 
+    useEffect(() => {
+        const fetchTotalSales = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Order/totalSales/${id}`);
+                setTotalSales(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        fetchTotalSales();
+    }, [id]);
+
+    useEffect(() => {
+        const fetchTopRatedProducts = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Rating/top3/${id}`);
+                setTopRated(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        fetchTopRatedProducts();
+    }, [id]);
 
     return (
         <div className='orders-supplier-main-container'>    
@@ -56,7 +85,7 @@ function Supplier (){
                 <div className='card-content-container'>
                     <div className='col-md-9 dash-card'>
                         <span>Total Sales</span>
-                        <h1 className='col-md-11 number-dash'>0</h1>
+                        <h1 className='col-md-11 number-dash'>₱{totalSales.toLocaleString()}</h1>
                     </div>
                     <img className='dash-card-icon' src={ totalSalesIcon } alt="Total Sales Icon"/>
                 </div>
@@ -88,7 +117,7 @@ function Supplier (){
                             <div  key={index}  className='top-prods-container'>
                                 <img className='top-prod-img' src={ `https://localhost:7017/${productItem.image}` } />
                                 <span className='top-prod-name'>{productItem.productName}</span>
-                                <span className='top-prod-price'>₱{productItem.price}</span>
+                                <span className='top-prod-price'>₱{productItem.price.toLocaleString()}</span>
                             </div>
                         ))}
                         <Link to={`/supplier_dashboard/${id}/manage_shop`} className="no-underline-link">
@@ -105,34 +134,49 @@ function Supplier (){
 
 
         </div>
-        <div className='col pending-orders-dash'>
-            <h3 style={{ marginBottom: '20px' }}>Pending Orders</h3>
-            {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).length > 0 ? (
-                    <Link to={`/supplier_dashboard/${id}/supplier_orders`} className='no-underline-link'>
-                        {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).map((orderItem, orderIndex) => (
-                            <div key={orderIndex} className='dash-pending-ords-container'>
-                                {orderItem.cart.items.length > 0 && (
-                                    <img className='cust-profile-pendOrder' 
-                                        src={`https://localhost:7017/${orderItem.cart.items[0].product.image}`} 
-                                        alt="Product" />
-                                )}
-                                <div className='cust-details-container'>
-                                    <span className='cust-name-dash'>{orderItem.user.firstName}</span>
-                                    <span className='cust-name-dash total'>₱{orderItem.total}</span>
+        <div className="pending-topRated-main-container">
+            <div className='col pending-orders-dash'>
+                <h3>Pending Orders</h3>
+                {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).slice(0, 3).length > 0 ? (
+                        <Link to={`/supplier_dashboard/${id}/supplier_orders`} className='no-underline-link'>
+                            {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).slice(0, 3).map((orderItem, orderIndex) => (
+                                <div key={orderIndex} className='dash-pending-ords-container'>
+                                    {orderItem.cart.items.length > 0 && (
+                                        <img className='cust-profile-pendOrder' 
+                                            src={`https://localhost:7017/${orderItem.cart.items[0].product.image}`} 
+                                            alt="Product" 
+                                        />
+                                    )}
+                                    <div className='cust-details-container'>
+                                        <span className='cust-name-dash'>{orderItem.user.firstName}</span>
+                                        <span className='cust-name-dash total'>₱{orderItem.total.toLocaleString()}</span>
+                                    </div>
+                                    <span className='cust-order-num-dash'>{orderItem.orderNumber}</span>
                                 </div>
-                                <span className='cust-order-num-dash'>{orderItem.orderNumber}</span>
-                            </div>
-                        ))}
-                    </Link>
-                ) : (
-                <div className='no-pending-orders'>
-                    <img src={noOder} alt="No Pending Orders Icon" style={{ width: '100px', height: '100px' }} />
-                    <p>No pending orders available</p>
-                </div>
-            )}
+                            ))}
+                        </Link>
+                    ) : (
+                    <div className='no-pending-orders'>
+                        <img src={noOder} alt="No Pending Orders Icon" style={{ width: '100px', height: '100px', marginTop:'13em' }} />
+                        <p>No pending orders available</p>
+                    </div>
+                )}
+            </div>
+
+
+            <div className="top-rated-products-container">
+                <h3>Top 3 Rated Products </h3>
+                {topRated.slice(0, 3).map((rating, index) => (
+                    <div key={index} className="top-rated-prod-container">
+                        <img className='top-prod-img' src={ `https://localhost:7017/${rating.product.image}` } />
+                        <span className='top-ratedProd-name'>{rating.product.productName}</span>
+                        <span className='top-ratedProd-rating'>{rating.value}</span>
+                    </div>
+                ))}
+                
+            </div>
         </div>
-
-
+        
         </div>
     )
 }

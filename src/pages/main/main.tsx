@@ -2,24 +2,21 @@ import { Outlet } from "react-router";
 import { Link, useNavigate } from "react-router-dom";
 import "./main.css";
 import logo from "../../assets/images/unitee.png";
-import profIcon from "../../assets/images/icons/profile2.png";
+import profIcon from "../../assets/images/icons/viewProfile.png";
 import logout from "../../assets/images/icons/logout-3.png";
 import homeIcon from "../../assets/images/icons/homeIcon.png";
 import carts from "../../assets/images/icons/cartIcon.png";
-import orders from "../../assets/images/icons/shopping-bag-4.png";
+import orders from "../../assets/images/icons/purchHisto.png";
 import notification from "../../assets/images/icons/notifIcon.png";
-//import chatCustomer from "../../assets/images/icons/chat.png";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import cartEventEmitter from "../../helpers/EventEmitter";
 import notifEventEmitter from "../../helpers/NotifEventEmitter";
-import * as signalR from "@microsoft/signalr";
-import { toast } from "react-toastify";
 import navEmptyCartImg from "../../assets/images/icons/empty-cart.png";
 import LogoutLoadingScreen from "../common/LogoutLoadingScreen";
-//import NotificationSound from "../../assets/sound/notificationsound.mp3"
 import React from "react";
+import { useAuth } from "../../utils/AuthContext";
 
 function Main() {
   interface Customer {
@@ -33,7 +30,60 @@ function Main() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { userId } = useParams();
+  const { setLogout } = useAuth();
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [products, setProducts] = useState([]);
+  const [productTypes, setProductTypes] = useState([]);
+  //const [displayText, setdDsplayText] = useState("");
+  //const [searchCriteria, setdSearchCriteria] = useState("");
+
+  // * Handle Search Input
+  const handleSearchInputChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  // * Navigate Search
+  const performSearch = (searchCriteria = searchTerm) => {
+    setSearchTerm(searchCriteria);
+    navigate(`/shop/${userId}/search_product?search=${searchCriteria}`);
+  };
+
+  // * Search Product Data
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7017/Product/searchByDepartment?userId=${userId}`
+        );
+        setProducts(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProducts();
+  }, [userId]);
+
+  // * Get All Product Types
+  useEffect(() => {
+    const fetchProductType = async () => {
+      try {
+        const response = await axios.get("https://localhost:7017/ProductType");
+        setProductTypes(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProductType();
+  }, []);
+
+  // * Get Product Type Name
+  const getProductTypeName = (productTypeId) => {
+    const productType = productTypes.find(
+      (p) => p.productTypeId === productTypeId
+    );
+    return productType ? productType.product_Type : "Unknown Type";
+  };
 
   // * For Delay
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -42,14 +92,9 @@ function Main() {
     setIsLoggingOut(true);
     setShowLogoutModal(!showLogoutModal);
     await sleep(10000);
+    setLogout();
     navigate("/");
   };
-
-  // * Notification Sound
-  // const playNotificationSound = () => {
-  //     const sound = new Audio(NotificationSound);
-  //     sound.play();
-  // };
 
   // * Fetch Users
   useEffect(() => {
@@ -71,7 +116,7 @@ function Main() {
     const updateCartCount = () => {
       axios
         .get(`https://localhost:7017/Cart/myCart/${userId}`)
-        .then((res) => {
+        .then(async (res) => {
           setCart(res.data);
           setTotalItems(
             res.data.reduce((acc, cartItems) => acc + cartItems.items.length, 0)
@@ -160,7 +205,6 @@ function Main() {
 
     const handleFocus = () => {
       fetchData();
-      //playNotificationSound();
     };
 
     window.addEventListener("focus", handleFocus);
@@ -185,29 +229,6 @@ function Main() {
     fetchNotificationClick();
   };
 
-  // * Notification Hub in SignalR
-  useEffect(() => {
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:7017/notificationHub", {
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets,
-      })
-      .configureLogging(signalR.LogLevel.Information)
-      .build();
-
-    connection
-      .start()
-      .then(() => {
-        //console.log("Connected!");
-      })
-      .catch((err) => console.error("SignalR Connection Error: ", err));
-
-    connection.on("OrderStatusUpdated", (message) => {
-      toast.success(`New Notification: ${message}`);
-      updateNotification();
-    });
-  }, [updateNotification]);
-
   return (
     <React.Fragment>
       {isLoggingOut ? (
@@ -228,14 +249,98 @@ function Main() {
               <img className="logo" src={logo} />
             </Link>
 
-            <div className="col-md-6 header-button-container">
-              <Link className="customer-nav-link" to="">
+            <div className="search-container">
+              <span className="fa fa-search form-control-feedback search-icon"></span>
+              <input
+                className="Product-SearchBar"
+                type="text"
+                placeholder="Search Product"
+                value={searchTerm}
+                onChange={handleSearchInputChange}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    performSearch();
+                    setSearchTerm("");
+                  }
+                }}
+              />
+              <div className="search-dropdown">
+                {products
+                  .filter((productFilter) => {
+                    const searchTermLowerCase = searchTerm.toLowerCase();
+                    const productName =
+                      productFilter.productName?.toLowerCase();
+                    const productTypeName = getProductTypeName(
+                      productFilter.productTypeId
+                    ).toLowerCase();
+                    const category = productFilter.category?.toLowerCase();
+                    const description =
+                      productFilter.description?.toLowerCase();
+
+                    return (
+                      searchTermLowerCase &&
+                      (productName?.includes(searchTermLowerCase) ||
+                        productTypeName?.includes(searchTermLowerCase) ||
+                        category?.includes(searchTermLowerCase) ||
+                        description?.includes(searchTermLowerCase))
+                    );
+                  })
+                  .slice(0, 5)
+                  .map((productData, index) => {
+                    const searchTermLowerCase = searchTerm.toLowerCase();
+                    const productName = productData.productName?.toLowerCase();
+                    const productTypeName = getProductTypeName(
+                      productData.productTypeId
+                    ).toLowerCase();
+                    const category = productData.category?.toLowerCase();
+                    const description = productData.description?.toLowerCase();
+
+                    let displayText = "";
+                    let searchCriteria = "";
+
+                    if (productName?.includes(searchTermLowerCase)) {
+                      displayText = productData.productName;
+                      searchCriteria = productData.productName;
+                    } else if (productTypeName?.includes(searchTermLowerCase)) {
+                      displayText = productTypeName;
+                      searchCriteria = productTypeName;
+                    } else if (category?.includes(searchTermLowerCase)) {
+                      displayText = productData.category;
+                      searchCriteria = productData.category;
+                    } else if (description?.includes(searchTermLowerCase)) {
+                      displayText = productData.description;
+                      searchCriteria = productData.description;
+                    }
+
+                    return (
+                      <div
+                        key={index}
+                        className="search-dropdown-row"
+                        onClick={() => {
+                          performSearch(searchCriteria);
+                          setSearchTerm("");
+                        }}
+                      >
+                        <span className=" form-control-feedback"></span>
+                        {displayText}
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+                  <input type="checkbox" id="menu" hidden/>
+                  <label className="navLabel" htmlFor="menu">
+                    <i className="fa-solid fa-bars"></i>
+                  </label>
+
+            <div className="col-md-3 header-button-container">
+              <label className="navLabel" htmlFor="menu">
+                <i className="fa-solid fa-xmark"></i>
+              </label>
+              <Link className="customer-nav-link" to="" id="tooltip">
+                <span id="tooltip-text">Home</span>
                 <img className="nav-icon" src={homeIcon} />
               </Link>
-
-              {/* <Link className="customer-nav-link" to="chat">
-                <img className="nav-icon" src={chatCustomer} />
-              </Link> */}
 
               <div className="customer-nav-link">
                 <div className="cart-icon-container">
@@ -252,7 +357,7 @@ function Main() {
                         if (acc.length < 5) {
                           acc.push(
                             ...cartObj.items
-                              .slice(0, 5 - acc.length)
+                              .slice(0, 4 - acc.length)
                               .map((item, itemIndex) => (
                                 <Link
                                   to={`visit_shop/${cartObj.supplierId}`}
@@ -305,7 +410,8 @@ function Main() {
                 to="notif"
                 onClick={handleNotificationClick}
               >
-                <div className="notif-icon-container">
+                <div className="notif-icon-container" id="tooltip">
+                  <span id="tooltip-text">Notification</span>
                   <img className="nav-icon" src={notification} />
                   {notifItem.length > 0 && (
                     <span className="notif-count">{notifItem.length}</span>
@@ -313,20 +419,12 @@ function Main() {
                 </div>
               </Link>
 
-              <div className="col-md-1 dropdown">
+              <div className="dropdown">
                 {customer ? (
                   <React.Fragment>
                     <img
                       className="imageProfile"
                       src={`https://localhost:7017/${customer.image}`}
-                      style={{
-                        width: "100%",
-                        maxWidth: "30px",
-                        borderStyle: "solid",
-                        borderRadius: "50%",
-                        maxHeight: "30px",
-                        borderColor: "#D3D3D3",
-                      }}
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     />

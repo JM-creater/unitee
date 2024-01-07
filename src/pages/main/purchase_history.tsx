@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import React from 'react';
 import submitRatingEventEmitter from '../../helpers/SubmitRatingEventEmitter';
+import orderEventEmitter from '../../helpers/OrderEmitter';
+import { Rating } from '../../components/common/rate';
 
 function Purchase_History () {
 
@@ -24,6 +26,7 @@ function Purchase_History () {
         Denied: 'Denied'
     };
 
+    const [recommendationProducts, setRecommendationProducts] = useState([]);
     const [purchases, setPurchases] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [selectedPurchases, setSelectedPurchases] = useState(null);
@@ -32,50 +35,23 @@ function Purchase_History () {
     const [ratedPurchases, setRatedPurchases] = useState(new Set());
     const { userId } = useParams();
 
-    // * For Delay
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-    // * Add to cart from purchase history 
-    const addPurchaseToCart = () => {
+    // * Handle Close Modal
+    const handleCLose = () => {
         const closeBtn = document.getElementById("btnClose");
-        if (!selectedPurchases || !selectedPurchases.cart || !Array.isArray(selectedPurchases.cart.items) || selectedPurchases.cart.items.length === 0) {
-            toast.error("No purchases selected");
-            return;
-        }
-    
-        selectedPurchases.cart.items.forEach(item => {
-            if (!item.productId || !item.sizeQuantity || !item.sizeQuantity.size || !item.sizeQuantity.quantity) {
-                toast.error("Invalid purchase item data");
-                return;
-        }
-    
-            const cartAddRequest = {
-                userId: userId,
-                productId: item.productId,
-                size: item.sizeQuantity.size,
-                quantity: item.quantity
-            };
-    
-            axios.post('https://localhost:7017/Cart/add', cartAddRequest)
-                .then(async () => {
-                    toast.success("Item added to cart");
-                    closeBtn.click();
-
-                    await sleep(1000);
-                    window.location.reload();
-                })
-                .catch(error => {
-                    toast.error(error.message);
-                });
-            });
-            axios.get(`https://localhost:7017/Cart/myCart/${userId}`)
-            .then(updatedCartResponse => {
-                setPurchases(updatedCartResponse.data);
-            })
-            .catch(error => {
-                toast.error(error.message);
-            });
+        closeBtn.click();
     };
+
+    // * Update the Product Details Modal
+    useEffect(() => {
+        const modal = document.getElementById('viewProdDetailsModal') 
+        if (modal) {
+            modal.addEventListener('hidden.bs.modal', HandleCloseButton);
+
+            return () => {
+                modal.removeEventListener('hidden.bs.modal', HandleCloseButton);
+            };
+        }
+    }, []);
     
     // * Handle Submit Rating
     const HandleSubmitRatings = async (purchaseId, productId, supplierId, productRating, supplierRating) => {
@@ -112,8 +88,6 @@ function Purchase_History () {
             toast.success("Ratings submitted successfully");
             setRatingProduct(0);
             setRatingSupplier(0);
-            await sleep(200);
-            window.location.reload();
         } catch (error) {
             console.error("Error submitting ratings:", error);
             toast.error("Error submitting ratings");
@@ -135,9 +109,42 @@ function Purchase_History () {
             } catch (error) {
                 console.error(error);
             }
+        };
+
+        const validationListener = () => {
+            fetchOrders();
         }
-        fetchOrders();
+
+        orderEventEmitter.on("orderCompleted", validationListener);
+        validationListener();
+
+        return () => {
+            orderEventEmitter.on("orderCompleted", validationListener);
+        };
     }, [userId]);
+
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+                const response = await axios.get(`https://localhost:7017/Order/${userId}`);
+                setPurchases(response.data);
+            } catch (error) {
+                console.error('Network error or server not responding');
+            }
+        };
+    
+        const handleFocus = () => {
+            fetchData();
+        };
+    
+        window.addEventListener('focus', handleFocus);
+    
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [userId])
+
 
     // * Get All Product Types
     useEffect(() => {
@@ -192,6 +199,20 @@ function Purchase_History () {
         });
     };
 
+    // * Product Recommendation 
+    useEffect(() => {
+        const fetchProductRecommendation = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Product/recommendations/${userId}`);
+                setRecommendationProducts(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchProductRecommendation();
+    }, [userId]);
+
+
     return <div className="purchase-history-main-container">
         <div className='col-md-12 purchase-title-container'>
         <h1 className='history-title'>Purchase History</h1>
@@ -224,8 +245,8 @@ function Purchase_History () {
                                     <th scope="row">{formatDate(purchaseItem.dateCreated)}</th>
                                     <td className="text-center">{purchaseItem.orderNumber}</td>
                                     <td className="text-center">{purchaseItem.cart.supplier.shopName}</td>
-                                    <td className="text-center">{purchaseItem.cart.items.length}</td>
-                                    <td className="text-center">{purchaseItem.total}</td>
+                                    <td className="text-center">{purchaseItem.orderItems.length}</td>
+                                    <td className="text-center">₱{purchaseItem.total.toLocaleString()}</td>
                                 </tr>
                             </tbody>
                         ))
@@ -269,13 +290,13 @@ function Purchase_History () {
                                 <h3 className='order-details-titles'>Order Details</h3>
                                 <span className="order-details-text">Order Date: <p className="order-details-input">{formatDate(selectedPurchases.dateCreated)}</p></span>
                                 <span className="order-details-text">Order No: <p className="order-details-input">{selectedPurchases.orderNumber}</p></span>
-                                <span className="order-details-text">Number of Items: <p className="order-details-input">{selectedPurchases.cart.items.length}</p></span>
+                                <span className="order-details-text">Number of Items: <p className="order-details-input">{selectedPurchases.orderItems.length}</p></span>
                                 <span className="order-details-text">Payment option: <p className="order-details-input">{PaymentType[Object.keys(PaymentType)[selectedPurchases.paymentType - 1]]}</p></span>
                             </div>
                             
                             <div className='payment-details-content'>
                                 <h3 className='order-details-titles'>Payment Details</h3>
-                                <p style={{ fontSize: "15px" }}>Total Amount: ₱{selectedPurchases.total}</p>
+                                <p style={{ fontSize: "15px" }}>Total Amount: ₱{selectedPurchases.total.toLocaleString()}</p>
                                 <span className="order-details-text">Proof of payment:</span>
                                 <a 
                                     className="modal-info" 
@@ -289,7 +310,7 @@ function Purchase_History () {
 
                             <div className="claimed-details-container">
                                 <h3 style={{ fontSize: "15px" }}>Status: {Status[Object.keys(Status)[selectedPurchases.status - 1]]}</h3>
-                                <p style={{ fontSize: "15px" }}>Date Claimed: {formatDate(selectedPurchases.estimateDate)}</p>
+                                <p style={{ fontSize: "15px" }}>Date Claimed: {formatDate(selectedPurchases.dateUpdated)}</p>
                                 <p style={{ fontSize: "15px" }}>Receiver: {selectedPurchases.user.firstName} {selectedPurchases.user.lastName}</p>
                             </div>
                         </div>
@@ -310,61 +331,65 @@ function Purchase_History () {
                                     </tr>
                                 </thead>
                                 <tbody className="table-group-divider">
-                                {selectedPurchases && Status[Object.keys(Status)[selectedPurchases.status - 1]] === Status.Completed && (
-                                    <tr>
-                                        <th scope="row">{selectedPurchases.cart.items[0].product.productName}</th>
-                                        <td className='text-center'>{getProductTypeName(selectedPurchases.cart.items[0].product.productTypeId)}</td>
-                                        <td className='text-center'>{selectedPurchases.cart.items[0].product.category}</td>
-                                        <td className='text-center'>{selectedPurchases.cart.items[0].sizeQuantity.size}</td>
-                                        <td className='text-center'>{selectedPurchases.cart.items[0].quantity}</td>
-                                        <td className='text-center'>{selectedPurchases.cart.items[0].product.price}</td>
-                                    </tr>
+                                {selectedPurchases && selectedPurchases.orderItems && 
+                                    (Status[Object.keys(Status)[selectedPurchases.status - 1]] === Status.Completed) && (
+                                        selectedPurchases.orderItems.map((item, index) => (
+                                        <tr key={index}>
+                                            <th scope="row">{item.product.productName}</th>
+                                            <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                            <td className="text-center">{item.product.category}</td>
+                                            <td className="text-center">{item.sizeQuantity.size}</td>
+                                            <td className="text-center">{item.quantity}</td>
+                                            <td className="text-center">₱{item.product.price.toLocaleString()}</td>
+                                        </tr>
+                                    ))
                                 )}
                                 </tbody>
                             </table>
                         </div>
-                        {!ratedPurchases.has(selectedPurchases.id) && (
-                            <div>
-                                {/* Product Rating */}
-                                <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Product Rating:</h3>
-                                <div className="rating-group">
-                                    {[...Array(5)].map((_, i) => {
-                                        const ratingValue = i + 1;
-                                        return (
-                                            <span className="rating-option" key={ratingValue}>
-                                                <input 
-                                                    type="radio" 
-                                                    id={`product-rating-${ratingValue}`} 
-                                                    name="product-rating" 
-                                                    value={ratingValue} 
-                                                    checked={ratingProduct === ratingValue} 
-                                                    onChange={(e) => setRatingProduct(parseInt(e.target.value))}
-                                                />
-                                                <label htmlFor={`product-rating-${ratingValue}`}>{ratingValue}</label>
-                                            </span>
-                                        );
-                                    })}
+                        {!ratedPurchases.has(selectedPurchases.id) ? (
+                            <div className='rating-container'>
+                               {/* Product Rating */}
+                                <div className="prod-rating">
+                                    <h3 className='order-details-titles'>Product Rating:</h3>
+                                    <Rating 
+                                        activeColor="#ffd700" 
+                                        count={5} 
+                                        size={45} 
+                                        value={ratingProduct}  
+                                        onChange={(rating) => setRatingProduct(rating)} 
+                                    />
                                 </div>
 
                                 {/* Supplier Rating */}
-                                <h3 className='order-details-titles' style={{ marginTop:'120px' }}>Supplier Rating:</h3>
-                                <div className="rating-group">
-                                    {[...Array(5)].map((_, i) => {
-                                        const supplierValue = i + 1;
-                                        return (
-                                            <span className="rating-option" key={supplierValue}>
-                                                <input 
-                                                    type="radio" 
-                                                    id={`supplier-rating-${supplierValue}`} 
-                                                    name="supplier-rating" 
-                                                    value={supplierValue} 
-                                                    checked={ratingSupplier === supplierValue} 
-                                                    onChange={(e) => setRatingSupplier(parseInt(e.target.value))}
-                                                />
-                                                <label htmlFor={`supplier-rating-${supplierValue}`}>{supplierValue}</label>
-                                            </span>
-                                        );
-                                    })}
+                                <div className="prod-rating">
+                                    <h3 className='order-details-titles'>Supplier Rating:</h3>
+                                        <Rating 
+                                            activeColor="#ffd700" 
+                                            count={5} 
+                                            size={45} 
+                                            value={ratingSupplier}
+                                            onChange={(rating) => setRatingSupplier(rating)} 
+                                        />
+                                </div>
+
+                            </div>
+                        ) : (
+                            <div className="rating-complete-message">
+                                <p className="thank-you-message">Thank you for rating!</p>
+                                <p className="follow-up-message">Based on your previous purchases, we recommend the following products for you. If you wish to buy again, just click the 'buy again' button below of the modal.</p>
+                                <div className="recommendation-section">
+                                    {recommendationProducts.map((product, index) => (
+                                        <div key={index} className="recommendation-card">
+                                            <img src={`https://localhost:7017/${product.image}`} alt={product.productName} className="product-image" />
+                                            <div className="product-details">
+                                                <h4 className="product-name">{product.productName}</h4>
+                                                <p className="product-description">{product.description}</p>
+                                                <p className="product-price">₱{product.price.toLocaleString()}</p>
+                                            </div>
+                                            <button className="go-to-shop-button">Go to Shop</button>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}    
@@ -373,7 +398,7 @@ function Purchase_History () {
                             <React.Fragment>
                                 <button 
                                     className="proceed-Btn" 
-                                    style={{ background: '#FFAA00' }}
+                                    style={{ background: '#FFAA00', marginTop: '50px' }}
                                     onClick={() => HandleSubmitRatings(selectedPurchases.id, selectedPurchases.cart.items[0].product.productId, 
                                                                 selectedPurchases.cart.items[0].product.supplierId, 
                                                                 ratingProduct, 
@@ -388,13 +413,15 @@ function Purchase_History () {
                 </div>
                 )}
                 </div>
-                <div className="modal-footer">
-                    <Link to={`/shop/${userId}/cart`}>
-                        <button className="proceed-Btn" onClick={addPurchaseToCart}>
-                            Buy Again
-                        </button>
-                    </Link>
-                </div>
+                {selectedPurchases && (
+                    <div className="modal-footer">
+                        <Link to={`/shop/${userId}/visit_shop/${selectedPurchases.cart.supplier.id}`}>
+                            <button className="proceed-Btn" onClick={handleCLose}>
+                                Buy Again
+                            </button>
+                        </Link>
+                    </div>
+                )}
             </div>
         </div>
     </div>

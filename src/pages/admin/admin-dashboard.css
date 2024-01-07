@@ -5,6 +5,7 @@
     background-color: #F0F0F0;
     display: flex;
     flex-flow: row;
+    gap: 40px;
 }
 /*
 .card-container {
@@ -72,6 +73,8 @@
 .shop-profile-top-seller {
     width: 100%;
     max-width: 60px;
+    max-height: 60px;
+    object-fit: fill;
     border-radius: 50%;
     border: solid white 4px;
 }
@@ -100,4 +103,24 @@
     justify-content: space-between;
     margin: 5px;
     align-items: center;
+}
+
+.no-topselling-products {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh; 
+    font-size: 24px; 
+    overflow: -moz-hidden-unscrollable;
+}
+
+.no-topseller-seller {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh; 
+    font-size: 24px; 
+    overflow: -moz-hidden-unscrollable;
 }

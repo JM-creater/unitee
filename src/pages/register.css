@@ -1,107 +1,122 @@
-  .registerCustomer-main-container {
-    display: flex;
-    flex-flow: row;
-    padding: 0%;
-   }
+.registerCustomer-main-container {
+  display: flex;
+  flex-flow: row;
+  padding: 0%;
+  width: 100vw;
+  height: 100vh;
+ }
 
-   .registerCustomer-1 {
-    background-color: #F0F0F0;
-    height: 100vh;
-    display: flex;
-    flex-flow: column;
-    justify-content: center;
-    align-items: center;
-   }
+ .registerCustomer-1 {
+  background-color: #F0F0F0;
+  height: 100vh;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+ }
 
-   .registerCustomer-2 {
-    background-color: #004AAD;
-    height: 100vh;
-    display: flex;
-    flex-flow: column;
-    justify-content: center;
-    align-items: center;
-   }
+ .registerCustomer-2 {
+  background-color: #004AAD;
+  height: 100vh;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  text-align: justify;
+  letter-spacing: -1px;
+  padding: 20px;
+  width: fit-content;
+ }
 
-  .logoRegister {
-    width: 100%;
-    max-width: 250px;
-    margin-bottom: 5px;
-  }
-
-  .registerText-2 {
-    color: white;
-    font-weight: 300;
-    font-size: 20px;
-    cursor: pointer;
-  }
-
-  .registerLogIn-text {
-    color: white;
-    font-weight: 500;
-    font-size: 20px;
-    margin-left: 10px;
-    cursor: pointer;
-  }
-
-  .loginText-1 {
-    font-weight: 800;
-    font-size: 40px;
-    color: #020654;
-  }
-
-  .departmentSelect {
-    font-size: 20px;
-    background-color: #004AAD;
-
-  }
-
-  .gender-text-register {
-    font-size: 15px;
-    font-weight: 600;
-  }
-
-  .register-gender-radio {
-    gap: 15px;
-    display: flex;
-    justify-content: start;
-    align-items: center;
-    padding: 10px;
-  }
-
-  .gender-label-register {
-    font-size: 15px;
-    padding: 5px;
-  }
-
-  .profile-pic-register-container, .studyLoad-pic-register-container,
-  .birPermit-pic-register-container, .cityPermit-pic-register-container,
-  .schoolPermit-pic-register-container {
-    display: flex;
-    justify-content: start;
-    flex-flow: row;
-    padding: 10px;
-  }
-
-  .uploadImage-register-label {
-    font-size: 15px;
-    font-weight: 600;
-  }
-
-  .input-register {
-    font-size: 15px;
-    padding: 10px 0px;
-    border-style: none;
-    border-radius: 5px;
+.logoRegister {
+  width: 100%;
+  max-width: 250px;
+  margin-bottom: 5px;
 }
 
-.register-customer-btn-container, .register-supplier-btn-container {
+.registerText-2 {
+  color: white;
+  font-weight: 300;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.registerLogIn-text {
+  color: white;
+  font-weight: 500;
+  font-size: 20px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.loginText-1 {
+  font-weight: 800;
+  font-size: 30px;
+  color: #020654;
+}
+
+.departmentSelect {
+  font-size: 20px;
+  background-color: #004AAD;
+
+}
+
+.gender-text-register {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.register-gender-radio {
+  gap: 15px;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 10px;
+}
+
+.gender-label-register {
+  font-size: 15px;
+  padding: 5px;
+}
+
+.profile-pic-register-container, .studyLoad-pic-register-container,
+.birPermit-pic-register-container, .cityPermit-pic-register-container,
+.schoolPermit-pic-register-container {
+  display: flex;
+  justify-content: start;
+  flex-flow: row;
+  padding: 10px;
+}
+
+.uploadImage-register-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.select-depa {
+  width: 28em;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.input-register {
+  font-size: 12px;
+  padding: 10px;
+  border-style: none;
+  border-radius: 5px;
+  width: 28em;
+}
+
+.register-customer-btn-container {
   display: flex;
   justify-content: center;
-  padding-top: 40px;
+  align-items: center;
+  padding-top: 20px;
 }
 
 .register-to-login {
-  text-decoration: none;
+text-decoration: none;
 }
 
 .register-to-login:hover {
@@ -109,8 +124,12 @@
 }
 
 .back-to-login-btn-container {
-  display: flex;
-  justify-content: center;
+display: flex;
+justify-content: center;
+}
+
+.register-btn {
+  width: 14em;
 }
 
 .back-to-loginBTN {
@@ -127,6 +146,69 @@
   background-color: #e8e7e7;
 }
 
-.error-border {
-  border: 2px solid red;
+.error-message-container {
+  height: 8px;  
+  margin-bottom: 8px;
+  color: red;
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  max-width: fit-content;
+}
+
+.error-message {
+  visibility: visible;
+}
+
+.registerCustomer-btn {
+  width: 14em;
+}
+
+
+.hidden {
+  visibility: hidden;
+}
+
+.customerInput-container-withErrorMessage {
+  display: flex;
+  flex-flow: column;
+  justify-content: space-evenly;
+}
+
+.inputs-div {
+  display: flex;
+  padding-left: 16px;
+  gap: 5px;
+}
+
+.inputs-customerContainer {
+  display: flex;
+  flex-direction: row;
+  width: 70em;
+  gap: 22px;
+}
+
+.input-register-container {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  justify-content: center;
+}
+
+@media screen and (max-width: 480px) {
+  .customerInput-container-withErrorMessage {
+      max-width: 20em;
+      max-height: 5em;
+      flex-flow: column;
+      justify-content: start;
+  }
+
+  .studyLoad-pic-register-container {
+    width: 25em;
+  }
+  
+  .inputs-customerContainer {
+    gap: 1px;
+    margin-right: 28px;
+  }
 }

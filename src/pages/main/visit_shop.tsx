@@ -1,5 +1,5 @@
-import MWSizing from "../../assets/images/MW SIZING.png"
-import UNISEX from "../../assets/images/UNISEX SIZING.png"
+// import MWSizing from "../../assets/images/MW SIZING.png"
+// import UNISEX from "../../assets/images/UNISEX SIZING.png"
 import starIcon from "../../assets/images/icons/starRating.png"
 import cartIcon from "../../assets/images/icons/addToCart.png"
 import prodRatingModal from "../../assets/images/icons/starRating.png"
@@ -10,13 +10,9 @@ import { useParams } from 'react-router-dom'
 import "./visit_shop.css"
 import cartEventEmitter from "../../helpers/EventEmitter"
 import React from "react"
+import addProductEventEmitter from "../../helpers/AddProductEventEmitter";
 
 function Visit_Shop () {
-
-    interface Department {
-        departmentId: number;
-        department_Name: string;
-    }
 
     interface Supplier {
         id: number;
@@ -26,7 +22,7 @@ function Visit_Shop () {
 
     const [, setCart] = useState([]);
     const [displayProduct, setDisplayProduct] = useState([]);
-    const [departments, setDepartments] = useState<Department[]>([]);
+    const [departments, setDepartments] = useState([]);
     const [selectedProductType, setSelectedProductType] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -39,7 +35,8 @@ function Visit_Shop () {
     const [averageRatingSupplier, setAverageRatingSupplier] = useState(null);
     const [, setProductData] = useState([]);
     const [productAverageRating ,setProductAverageRating] = useState({}); 
-    const [, setMainImage] = useState(null);
+    const [image, setImage] = useState('');
+    const [notHover, setNotHover] = useState('');
     const { userId, id: shopId } = useParams();
     const supplier = suppliers[shopId];
 
@@ -120,7 +117,7 @@ function Visit_Shop () {
 
     // * Get Department Name
     const getDepartmentName = (departmentId: number) => {
-        const department = departments.find(d => d.departmentId === departmentId);
+        const department = departments.find(d => d.productDepartments.departmentId === departmentId);
         return department ? department.department_Name : 'Unknown Department';
     };
 
@@ -137,16 +134,16 @@ function Visit_Shop () {
         fetchDepartment();
     }, [userId]);
 
-    // * Get All Products
+    // * Get All Products by shop and department
     useEffect(() => {
         if (!departmentId) return;
-
-        axios.get(`https://localhost:7017/Product/ByShop/${shopId}/ByDepartment/${departmentId}`)
-            .then(async res => {
-                setDisplayProduct(res.data);
+        const fetchProductByShopDepartment = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Product/ByShop/${shopId}/ByDepartment/${departmentId}`);
+                setDisplayProduct(response.data);
 
                 // * Fetch supplier data for each product
-                const supplierIds = res.data.map(product => product.supplierId);
+                const supplierIds = response.data.map(product => product.supplierId);
                 const uniqueSupplierIds = [...new Set(supplierIds)];
                 const suppliersData = {};
 
@@ -156,10 +153,21 @@ function Visit_Shop () {
                 }
 
                 setSuppliers(suppliersData);
-            })
-            .catch(err => {
-                console.error(err);
-            });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        const validationListener = () => {
+            fetchProductByShopDepartment();
+        }
+
+        addProductEventEmitter.emit("addProduct", validationListener);
+        validationListener();
+
+        return () => {
+            addProductEventEmitter.emit("addProduct", validationListener);
+        };
     }, [shopId, departmentId]);
 
     // * Windows Event Listener Focus
@@ -251,48 +259,71 @@ function Visit_Shop () {
     const addToCart = () => {
         const CloseBtn = document.getElementById("btnClose");
         if (!selectedProduct) return;
-    
+
         if (!selectedSize) {
             toast.warning("Please select a size.");
             return;
         }
-    
+
         if (quantity <= 0) {
             toast.warning("Please select a valid quantity.");
             return;
         }
-    
+
         const cartAddRequest = {
             userId: userId,
             productId: selectedProduct.productId,
             size: selectedSize,
             quantity: quantity
         };
-    
+
         axios.post('https://localhost:7017/Cart/add', cartAddRequest)
-        .then(() => {
-            toast.success("Item added to cart");
-            cartEventEmitter.emit("itemAddedToCart");
-            CloseBtn.click();
-            HandleCloseButton();
-            return axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
-        })
-        .then(updatedCartResponse => {
-            setCart(updatedCartResponse.data);
-        })
-        .catch(() => {
-            toast.error("Error adding item to cart. Please try again.");
+            .then(() => {
+                toast.success("Item added to cart");
+                cartEventEmitter.emit("itemAddedToCart");
+                CloseBtn.click();
+                HandleCloseButton();
+                return axios.get(`https://localhost:7017/Cart/myCart/${userId}`);
+            })
+            .then(updatedCartResponse => {
+                setCart(updatedCartResponse.data);
+            })
+            .catch(error => {
+                if (error.response && error.response.status === 400) {
+                    toast.error(error.response.data.message);
+                } else {
+                    toast.error("Error adding item to cart. Please try again.");
+                }
         });
     };
 
-    // * Update the Product Details Modal
-    useEffect(() => {
-        const modal = document.getElementById('viewProdDetailsModal') 
-        if (modal) {
-            modal.addEventListener('hidden.bs.modal', HandleCloseButton);
 
+    // * Update the Product Details Modal
+    // useEffect(() => {
+    //     const modal = document.getElementById('viewProdDetailsModal') 
+    //     if (modal) {
+    //         modal.addEventListener('hidden.bs.modal', HandleCloseButton);
+
+    //         return () => {
+    //             modal.removeEventListener('hidden.bs.modal', HandleCloseButton);
+    //         };
+    //     }
+    // }, []);
+
+    // * Update the Size Guide Modal
+    useEffect(() => {
+        const modal = document.getElementById('viewSizeGuideModal');
+        if (modal) {
+            const handleModalReset = (event) => {
+                if (event.target.id === 'viewSizeGuideModal') {
+                    handleResetModal();
+                }
+            };
+    
+            modal.addEventListener('hidden.bs.modal', handleModalReset);
+    
             return () => {
-                modal.removeEventListener('hidden.bs.modal', HandleCloseButton);
+                modal.removeEventListener('hidden.bs.modal', handleModalReset);
             };
         }
     }, []);
@@ -305,7 +336,7 @@ function Visit_Shop () {
             setSelectedSize(selectedSize.size);
             setNewQuantity(selectedSize.quantity);
         }
-    }
+    };
 
     // * Handle Close Button
     const HandleCloseButton = () => {
@@ -313,6 +344,11 @@ function Visit_Shop () {
         setSelectedProduct(null);
         setNewQuantity(0);
         setSelectedSize(null);
+    };
+
+    // * Handle Reset Modal
+    const handleResetModal = () => {
+        window.location.reload();
     };
 
     // * Handle Minus Quantity
@@ -531,20 +567,27 @@ function Visit_Shop () {
         <div className="shop-content2-container">
             {filteredProduct.map(product => (
                 <div 
-                    className="prodShop-card" 
+                    className={`prodShop-card ${!product.isActive ? 'inactive-product' : ''}`} 
                     data-bs-toggle="modal" 
-                    data-bs-target="#viewProdDetailsModal" 
+                    data-bs-target={!product.isActive ? undefined : "#viewProdDetailsModal"}
                     key={product.productId} 
-                    onClick={() => setSelectedProduct(product)}
+                    onClick={() => {
+                        if (product.isActive) {
+                            setSelectedProduct(product);
+                            setImage(`https://localhost:7017/${product.image}`);
+                        }
+                    }}
                 > 
-                    <img className="visitShopProdImg" src={ `https://localhost:7017/${product.image}` }/>
+                    <img className="visitShopProdImg" src={`https://localhost:7017/${product.image}`} alt={product.productName}/>
                     <div className="col-md-12 shop-prodDetails-container">
                         <h4 className="col-md-8 visitShop-prodName">{product.productName}</h4>
-                        <h3 className="visitShop-prodPrice">₱{product.price}</h3>
+                        <h3 className="visitShop-prodPrice">₱{product.price.toLocaleString()}</h3>
+                        {!product.isActive && <span className="badge badge-danger">Inactive</span>}
                     </div>
                 </div>
             ))}
         </div>
+
 
         <div className="modal fade" id="viewProdDetailsModal" tabIndex={-1} aria-labelledby="viewProdDetailsModalLabel" aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered modal-lg">
@@ -567,23 +610,32 @@ function Visit_Shop () {
                                 <div className="img-container">
                                     <img 
                                         className="prodModal-Image" 
-                                        src={`https://localhost:7017/${selectedProduct.image}`} 
+                                        src={notHover || image} 
                                     />
                                 </div>
                                 <div className="hover-container">
-                                    <div onMouseOver={() => setMainImage(selectedProduct.frontViewImage)}>
+                                    <div 
+                                        onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.frontViewImage}`)}
+                                        onMouseLeave={() => setNotHover('')}
+                                    >
                                         <img 
                                             className="small-image" 
                                             src={`https://localhost:7017/${selectedProduct.frontViewImage}`} 
                                         />
                                     </div>
-                                    <div onMouseOver={() => setMainImage(selectedProduct.sideViewImage)}>
+                                    <div 
+                                        onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.sideViewImage}`)}
+                                        onMouseLeave={() => setNotHover('')}
+                                    >
                                         <img 
                                             className="small-image" 
                                             src={`https://localhost:7017/${selectedProduct.sideViewImage}`} 
                                         />
                                     </div>
-                                    <div onMouseOver={() => setMainImage(selectedProduct.backViewImage)}>
+                                    <div 
+                                        onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.backViewImage}`)}
+                                        onMouseLeave={() => setNotHover('')}
+                                    >
                                         <img 
                                             className="small-image" 
                                             src={`https://localhost:7017/${selectedProduct.backViewImage}`}
@@ -600,12 +652,12 @@ function Visit_Shop () {
                                 </h5>
 
                                 <h5 className="prodModal-text">
-                                    {getDepartmentName(selectedProduct.departmentId)}
+                                    {getDepartmentName(selectedProduct.productDepartments.departmentId)}
                                 </h5>
                                 <h5 className="prodModal-text">
                                     {selectedProduct.category}
                                 </h5>
-                                <h1 className="prodModal-Price">₱{selectedProduct.price}</h1>
+                                <h1 className="prodModal-Price">₱{selectedProduct.price.toLocaleString()}</h1>
                                 <div className="prodModal-SizeGuide">
                                     <h5 className="prodModal-text">
                                         <button 
@@ -688,17 +740,13 @@ function Visit_Shop () {
                         </button>
                     </div> 
                     <div className="image-container">
-                        {/* {selectedProduct && selectedProduct.sizeGuide ? (
+                        {selectedProduct &&  (
                             <img 
                                 className="prodSizeGuideModal-Image" 
                                 src={`https://localhost:7017/${selectedProduct.sizeGuide}`} 
                                 alt="Size Guide" 
                             />
-                        ) : (
-                            <p>Size guide not available.</p>
-                        )} */}
-                        <img className="prodSizeGuideModal-Image" src={ MWSizing }/>
-                        <img className="prodSizeGuideModal-Image" src={ UNISEX } />
+                        )}
                     </div>     
                 </div>
             </div>

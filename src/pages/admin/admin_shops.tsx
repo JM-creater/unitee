@@ -40,7 +40,7 @@ function Admin_Shops () {
 
     // * Get the Department Name
     const getDepartmentName = (departmentId) => {
-        const department = departments.find(d => d.departmentId === departmentId);
+        const department = departments.find(d => d.productDepartments.departmentId === departmentId);
         return department ? department.department_Name : 'Unknown Department';
     };
 
@@ -508,7 +508,7 @@ function Admin_Shops () {
                                                 <span className='totalStocks-adminProd'>{totalStock(product.sizes)}</span>
                                             </h4>
                                             <h4 className='col-md-3 admin-prodPrice'>Price:
-                                                <span className='price-adminProd'>₱{product.price}</span>
+                                                <span className='price-adminProd'>₱{product.price.toLocaleString()}</span>
                                             </h4>
                                         </div>
                                         
@@ -531,11 +531,6 @@ function Admin_Shops () {
                                     <div className="collapse" id={`prodDetailsCollapse${product.productId}`} style={{ marginRight:'18px' }}>
                                         {/* START OF CARD BODY */}
                                         <div className="card card-body" style={{ display:'flex', justifyContent:'space-between', gap:'10px' }}>
-                                            {/* PRODUCT ID */}
-                                            <h4 className='admin-prodDetails-labels' 
-                                            style={{ display:'flex', flexFlow:'row', gap:'10px', fontWeight:'600'}}>Product ID: 
-                                                <h4 className='admin-prodDetails-text'>{product.productId}</h4>
-                                            </h4>
 
                                             {/* DESCRIPTION */}
                                             <h5 className='admin-prodDetails-labels' style={{ display:'flex', flexWrap:'wrap' }}>Description:

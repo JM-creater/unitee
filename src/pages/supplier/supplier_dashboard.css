@@ -5,6 +5,18 @@
     background-color: #F0F0F0;
     display: flex;
     flex-flow: row;
+    gap: 30px;
+}
+
+.report-main-container {
+    height: 92vh;
+    width: 85vw;
+    padding: 20px;
+    background-color: #F0F0F0;
+    flex-flow: column;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    gap: 30px;
 }
 
 .dash-supplier-container {
@@ -27,12 +39,13 @@
 .number-dash {
     font-weight: 600;
     color: #004AAD;
+    font-size: 22px;
 }
 
 .dash-card-icon {
-    width: 100%;
     max-width: 30px;
     height: 30px;
+    margin-right: 25px;
 }
 
 .top-selling-prods-container {
@@ -42,6 +55,16 @@
     width: 52rem;
     height:fit-content;
     border-radius: 10px;
+}
+
+.top-selling-prods-ReportsContainer {
+    margin-top: 20px;
+    background-color: white;
+    padding: 5px;
+    width: 52rem;
+    height:fit-content;
+    border-radius: 10px;
+    margin-left: 30px;
 }
 
 .top-prods-container {
@@ -66,6 +89,13 @@
     font-size: 15px;
     width: 30rem;
     height: 5rem;
+}
+
+.top-ratedProd-name {
+    font-size: 15px;
+    width: 30rem;
+    height: 5rem;
+    margin-left: 10px;
 }
 
 .top-prod-price {
@@ -95,7 +125,10 @@
     background-color: white;
     padding: 10px;
     border-radius: 10px;
-    height: fit-content;
+    max-height: 40vh;
+    justify: center;
+    align-items: start;
+    flex-wrap: wrap;
     margin-top: 45px;
 }
 
@@ -108,7 +141,7 @@
     gap: 10px;
     justify-content: space-between;
     margin: 5px;
-    align-items: center; /* Added for vertical centering */
+    align-items: center; 
 }
 
 .cust-details-container {
@@ -182,4 +215,31 @@
     background-color: #020654;
     color: white;
     font-weight: 600;
+}
+
+.pending-topRated-main-container {
+    width: 33vw;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.top-rated-products-container {
+    background-color: white;
+    height: 30vh;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.top-rated-prod-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #F0F0F0;
+    border-radius: 5px;
+    padding: 15px;
+    height: fit-content;
 }

@@ -12,10 +12,12 @@ import logoutAdminIcon from "../../assets/images/icons/logout-4.png";
 import { useState } from "react";
 import React from "react";
 import LogoutLoadingScreen from "../common/LogoutLoadingScreen";
+import { useAuth } from "../../utils/AuthContext";
 
 function Admin_Main() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const { setLogout } = useAuth();
   const navigate = useNavigate();
 
   const { id } = useParams();
@@ -28,6 +30,7 @@ function Admin_Main() {
     setIsLoggingOut(true);
     setShowLogoutModal(false);
     await sleep(10000);
+    setLogout();
     navigate("/");
   };
 
@@ -101,15 +104,7 @@ function Admin_Main() {
 
           <div style={{ minHeight: "100%" }}>
             <div className="admin-second-nav-container">
-              <div className="search-container-admin">
-                <span className="fa fa-search form-control-feedback search-icon"></span>
-                <input
-                  className="Supplier-SearchBar"
-                  type="text"
-                  placeholder="Search"
-                />
-              </div>
-
+              <div className="search-container-admin"></div>
               <div>
                 <div>
                   <button

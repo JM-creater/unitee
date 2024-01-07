@@ -1,6 +1,8 @@
 import prodIcon from "../../assets/images/icons/shirt.png"
 import supplierIcon from "../../assets/images/icons/supplier-2.png"
 import customerIcon from "../../assets/images/icons/male-student.png"
+import noTopProduct from "../../assets/images/icons/empty-box.png"
+import noTopSeller from "../../assets/images/icons/no-seller.png"
 import './admin-dashboard.css'
 import { useEffect, useState } from "react"
 import axios from "axios"
@@ -9,11 +11,11 @@ import registerUsersEventEmitter from "../../helpers/RegisterUsersEmitter"
 
 function Admin_Dashboard () {
 
-  const [customer, setCustomer] = useState([]);
-  const [supplierData, setSupplierData] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [topSellingProducts, setTopSellingProducts] = useState([]);
-  const [topSellingSupplier, setTopSellingSupplier] =  useState(null);
+    const [customer, setCustomer] = useState([]);
+    const [supplierData, setSupplierData] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [topSellingProducts, setTopSellingProducts] = useState([]);
+    const [topSellingSupplier, setTopSellingSupplier] =  useState(null);
 
     // * Get All Customers with Event Emitter 
     useEffect(() => {
@@ -262,13 +264,18 @@ function Admin_Dashboard () {
         <div className="top-selling-prods-container">
           <h3 className="top-selling-prods-title">Top Selling Products</h3>
           {topSellingProducts.length > 0 ? 
-            topSellingProducts.slice(0, 5).map(product => (
+            topSellingProducts.slice(0, 3).map(product => (
               <div key={product.productId} className='top-prods-container'>
                   <img className='top-prod-img' src={`https://localhost:7017/${product.image}`} alt={product.productName} />
                   <span className='top-prod-name'>{product.productName}</span>
-                  <span className='top-prod-price'>₱{product.price}</span>
+                  <span className='top-prod-price'>₱{product.price.toLocaleString()}</span>
               </div>
-            )) : <span>No Top Selling Products Found</span>
+            )) : (
+              <div className="no-topselling-products">
+                <img src={ noTopProduct }/>
+                <span>No Top Selling Products Found</span>
+              </div>
+            )
           }
         </div>
         </div>
@@ -285,7 +292,12 @@ function Admin_Dashboard () {
               </div>
               <span className="shop-totalProds-sold"></span>
             </div>
-            ) : <span>No Top Seller Found</span>
+            ) : (
+              <div className="no-topseller-seller">
+                <img src={ noTopSeller } style={{ width: 80, height: 80 }}/>
+                <span>No Top Seller Found</span>
+              </div>
+            )
           }
         </div>
     </div>

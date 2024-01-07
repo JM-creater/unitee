@@ -9,7 +9,7 @@ import { useParams } from 'react-router'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
-type ValidationErrors = {
+  type ValidationErrors = {
     firstName?: string;
     lastName?: string;
     email?: string;
@@ -30,8 +30,8 @@ type ValidationErrors = {
     };
     gender: string;
     image: string;
+    emailVerificationStatus: string;
   };
-  
 
 function ViewCustomer_Profile () {
 
@@ -45,8 +45,7 @@ function ViewCustomer_Profile () {
     const [departmentId, setDepartmentId] = useState('');
     const [departments, setDepartments] = useState([]);
     const [gender, setGender] = useState('');
-    //const [isDisabled, setIsDisabled] = useState(false);
-    const {userId} = useParams();
+    const { userId } = useParams();
 
     // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -61,12 +60,12 @@ function ViewCustomer_Profile () {
 
     // * Handle Phone Number
     const handlePhoneNumber = (value) => {
-        if (/^[0-9]*$/.test(value)) {
-          setPhoneNumber(value);
-        } else {
-          toast.error('Phone Number must contain only numbers.');
-        }
-      };
+      if (/^[0-9]*$/.test(value)) {
+        setPhoneNumber(value);
+      } else {
+        toast.error('Phone Number must contain only numbers.');
+      }
+    };
 
     // * Fetch User Data
     useEffect(() => {
@@ -210,8 +209,8 @@ function ViewCustomer_Profile () {
 
         {/* EDIT COLLAPSE */}
         <div className="collapse" id="editProfCollapse" style={{ padding: '40px'}}>
-            <h1>Edit Profile Information</h1>
-            <div className="card card-body" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
+            <h1 className='editProf-subTitle'>Edit Profile Information</h1>
+            <div className="card card-body">
                 <div className="editProf-details-1">
                     <label className='profLabelEdit' htmlFor="profFirstName">First Name</label>
                     <input className='input-prof' type="text" id='profFirstName' value={firstName} onChange={(e) => setFirstName(e.target.value)}></input>
@@ -299,7 +298,13 @@ function ViewCustomer_Profile () {
                     <h5 className='about-details-prof'>{UserProfile.phoneNumber}</h5>
                   </div>
                 )}
+                
             </div>
+            <div>
+                  <button style={{ marginTop: '76px' }}>
+                    Verify Email
+                  </button>
+                </div>
         </div>
     </div>
 }

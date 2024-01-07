@@ -1,8 +1,7 @@
 import './admin_reports.css'
 import totalOrdersIcon from "../../assets/images/icons/order-2.png"
 import salesIcon from "../../assets/images/icons/sales.png"
-import * as XLSX from 'xlsx';
-
+import ExcelJS from "exceljs"
 import {
     Chart as ChartJS,
     BarElement,
@@ -16,7 +15,7 @@ import {
 import { Bar, Pie } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import orderEventEmitter from '../../helpers/OrderEmitter';
 
 ChartJS.register(
     BarElement,
@@ -29,32 +28,248 @@ ChartJS.register(
 
 function Admin_Reports () {
 
+    const [weeklySales, setWeeklySales] = useState([]);
+    const [monthlySales, setMonthlySales] = useState([]);
+    const [yearlySales, setYearlySales] = useState([]);
     const [orders, setOrders] = useState([]);
     const [shops, setShops] = useState([]);
     const [selectedShop, setSelectedShop] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('');
     const [supplierOrderCounts, setSupplierOrderCounts] = useState({});
 
+    // * Get the Sales by Weekly, Monthly, Yearly
+    useEffect(() => {
+        const fetchSalesData = async () => {
+            try {
+                const weeklyResponse = await axios.get(`https://localhost:7017/Order/weeklyAdmin?startDate=${new Date().toISOString()}`);
+                setWeeklySales(weeklyResponse.data);
+        
+                const monthlyResponse = await axios.get(`https://localhost:7017/Order/monthlyAdmin?year=${new Date().getFullYear()}&month=${new Date().getMonth() + 1}`);
+                setMonthlySales(monthlyResponse.data);
+        
+                const yearlyResponse = await axios.get(`https://localhost:7017/Order/yearlyAdmin?year=${new Date().getFullYear()}`);
+                setYearlySales(yearlyResponse.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        const validationListener = () => {
+            fetchSalesData();
+        }
+
+        orderEventEmitter.on("updateSalesReport", validationListener);
+        validationListener();
+    
+        return () => {
+            orderEventEmitter.off("updateSalesReport", validationListener);
+        };
+    }, []);
+
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+                const weeklyResponse = await axios.get(`https://localhost:7017/Order/weeklyAdmin?startDate=${new Date().toISOString()}`);
+                setWeeklySales(weeklyResponse.data);
+        
+                const monthlyResponse = await axios.get(`https://localhost:7017/Order/monthlyAdmin?year=${new Date().getFullYear()}&month=${new Date().getMonth() + 1}`);
+                setMonthlySales(monthlyResponse.data);
+        
+                const yearlyResponse = await axios.get(`https://localhost:7017/Order/yearlyAdmin?year=${new Date().getFullYear()}`);
+                setYearlySales(yearlyResponse.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        const handleFocus = () => {
+            fetchData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, []);
+
+    // * Fetch Data of All Orders
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const res = await axios.get('https://localhost:7017/Order');
+                setOrders(res.data);
+            } catch (error) {
+                console.error("Error fetching orders: ", error);
+            }
+        };
+
+        const validationListener = () => {
+            fetchOrders();
+        }
+
+        orderEventEmitter.on("statusUpdate", validationListener);
+        validationListener();
+    
+        return () => {
+            orderEventEmitter.off("statusUpdate", validationListener);
+        };
+    }, []);
+
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+                const response = await axios.get('https://localhost:7017/Order');
+                setOrders(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        const handleFocus = () => {
+            fetchData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, []);
+
+    // * Fetch Data of All Shops
+    useEffect(() => {
+        const fetchShops = async () => {
+            try {
+                const res = await axios.get('https://localhost:7017/Users');
+                    setShops(res.data);
+            } catch (error) {
+                console.error("Error fetching orders: ", error);
+            }
+        };
+
+        fetchShops();
+    }, []);
+
     // * Download Report to Excel
-    const HandleExportToExcel = () => {
-        const data = filteredOrders.map(ord => ({
+    const HandleExportToExcel = async () => {
+        const ordersData = filteredOrders.map(ord => ({
             OrderNumber: ord.orderNumber,
             Shop: ord.cart.supplier.shopName,
             Customer: `${ord.user.firstName} ${ord.user.lastName}`,
             Items: ord.cart.items.reduce((total, item) => total + item.quantity, 0),
             Total: ord.total,
-            Status: getStatusText(ord.status) 
+            Status: getStatusText(ord.status)
         }));
+
+        const salesData = [
+            { Type: 'Weekly Sales', Amount: weeklySales.length > 0 ? weeklySales.reduce((a, b) => a + b) : 0 },
+            { Type: 'Monthly Sales', Amount: monthlySales.length > 0 ? monthlySales.reduce((a, b) => a + b) : 0 },
+            { Type: 'Yearly Sales', Amount: yearlySales.length > 0 ? yearlySales.reduce((a, b) => a + b) : 0 }
+        ];
     
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Orders");
+        const workbook = new ExcelJS.Workbook();
     
-        XLSX.writeFile(wb, "Report.xlsx");
-    }
+        const ordersSheet = workbook.addWorksheet('Orders');
     
-    // * Get the Status of Orders
-    function getStatusText(status) {
+        ordersSheet.columns = [
+            { header: 'OrderNumber', key: 'OrderNumber', width: 15 },
+            { header: 'Shop', key: 'Shop', width: 20 },
+            { header: 'Customer', key: 'Customer', width: 20 },
+            { header: 'Items', key: 'Items', width: 15 },
+            { header: 'Total', key: 'Total', width: 10 },
+            { header: 'Status', key: 'Status', width: 15 }
+        ];
+    
+        ordersSheet.addRows(ordersData);
+    
+        ordersSheet.getRow(1).eachCell(cell => {
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFFAA00' }
+            };
+            cell.border = {
+                top: { style: 'thin', color: { argb: 'FF000000' } },
+                left: { style: 'thin', color: { argb: 'FF000000' } },
+                bottom: { style: 'thin', color: { argb: 'FF000000' } },
+                right: { style: 'thin', color: { argb: 'FF000000' } }
+            };
+            cell.font = { bold: true };
+        });
+    
+        const salesSheet = workbook.addWorksheet('Sales');
+    
+        salesSheet.columns = [
+            { header: 'Type', key: 'Type', width: 20 },
+            { header: 'Amount', key: 'Amount', width: 15 }
+        ];
+    
+        salesSheet.addRows(salesData);
+    
+        salesSheet.getRow(1).eachCell(cell => {
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFFAA00' }
+            };
+            cell.border = {
+                top: { style: 'thin', color: { argb: 'FF000000' } },
+                left: { style: 'thin', color: { argb: 'FF000000' } },
+                bottom: { style: 'thin', color: { argb: 'FF000000' } },
+                right: { style: 'thin', color: { argb: 'FF000000' } }
+            };
+            cell.font = { bold: true };
+        });
+    
+        const totalOrdersSheet = workbook.addWorksheet('Total Orders');
+
+        totalOrdersSheet.columns = [
+            { header: 'Total Orders', key: 'totalOrders', width: 20 }
+        ];
+    
+        if (orders && orders.length > 0) {
+            totalOrdersSheet.addRow({ totalOrders: orders.length });
+        } else {
+            totalOrdersSheet.addRow({ totalOrders: 0 });
+        }
+    
+        totalOrdersSheet.getRow(1).eachCell(cell => {
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFFAA00' }
+            };
+            cell.border = {
+                top: { style: 'thin', color: { argb: 'FF000000' } },
+                left: { style: 'thin', color: { argb: 'FF000000' } },
+                bottom: { style: 'thin', color: { argb: 'FF000000' } },
+                right: { style: 'thin', color: { argb: 'FF000000' } }
+            };
+            cell.font = { bold: true };
+        });
+    
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        const blob = new Blob([buffer], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = 'Report.xlsx';
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+
+    // * Get Status
+    const getStatusText = (status) => {
         switch (status) {
             case 1:
                 return 'Order Placed';
@@ -73,7 +288,7 @@ function Admin_Reports () {
             default:
                 return 'Unavailable'; 
         }
-    }
+    };
     
     // * Count the orders each supplier in pie graph
     useEffect(() => {
@@ -94,71 +309,27 @@ function Admin_Reports () {
         return matchesStatus && matchesShop;
     });
 
-    // * Fetch Data of All Orders
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const res = await axios.get('https://localhost:7017/Order');
-                    setOrders(res.data);
-            } catch (error) {
-                console.error(error)
-                toast.error("Error fetching orders.");
-            }
-        }
-        fetchOrders();
-    }, []);
-
-    // * Fetch Data of All Shops
-    useEffect(() => {
-        const fetchShops = async () => {
-            try {
-                const res = await axios.get('https://localhost:7017/Users');
-                    setShops(res.data);
-            } catch (error) {
-                console.error(error)
-                toast.error("Error fetching orders.");
-            }
-        }
-        fetchShops();
-    }, []);
-
-    // * BAR GRAPH
-    const salesData = {
-        labels: ['January', 'February', 'March'],
+    const months = [
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    ];
+    
+    const data = {
+        labels: months, 
         datasets: [
             {
-                label: 'Supplier 1',
-                data: [ 3,6,7 ],
-                backgroundColor: '#004AAD',
-                borderColor: 'white',
+                label: "Yearly Sales",
+                data: yearlySales,
+                backgroundColor: "#65A4F6",
+                borderColor: "white",
                 borderWidth: 1,
             },
-            {
-                label: 'Supplier 2',
-                data: [ 4,5,1 ],
-                backgroundColor: '#65A4F6',
-                borderColor: 'white',
-                borderWidth: 1,
-            },
-            {
-                label: 'Supplier 3',
-                data: [ 8,3,5 ],
-                backgroundColor: '#020654',
-                borderColor: 'white',
-                borderWidth: 1,
-            },
-            {
-                label: 'Supplier 4',
-                data: [ 7,1,6 ],
-                backgroundColor: '#FDB833',
-                borderColor: 'white',
-                borderWidth: 1,
-            }
-        ]
-    }
+        ],
+    };
 
     // * PIE CHART CHART
-     const pieChartData = {
+    const pieChartData = {
         labels: Object.keys(supplierOrderCounts).map(supplierId => 
             shops.find(shop => shop.id === parseInt(supplierId))?.shopName || 'Unknown'
         ),
@@ -168,9 +339,7 @@ function Admin_Reports () {
         }]
     };
 
-    const options = {
-
-    }
+    const options = {}
 
     return <div className="admin-reports-main-container">
         <h3 style={{ marginBottom:'20px', color:'#020654', fontWeight:'600' }}>Reports</h3>
@@ -207,7 +376,7 @@ function Admin_Reports () {
                     {/* WEEKLY */}
                     <div className='col-md-9'>
                         <h5 className='header-adminSales-label'>Weekly Sales</h5>
-                        <h3>0</h3>
+                        <h3>₱{weeklySales.length > 0 ? weeklySales.reduce((a, b) => a + b).toLocaleString() : 0}</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
                 </div>
@@ -216,7 +385,7 @@ function Admin_Reports () {
                 <div className='admin-sales-card'>
                     <div className='col-md-9'>
                         <h5 className='header-adminSales-label'>Monthly Sales</h5>
-                        <h3>0</h3>
+                        <h3>₱{monthlySales.length > 0 ? monthlySales.reduce((a, b) => a + b).toLocaleString() : 0}</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
                 </div>
@@ -225,7 +394,7 @@ function Admin_Reports () {
                 <div className='admin-sales-card'>
                     <div className='col-md-9'>
                         <h5 className='header-adminSales-label'>Yearly Sales</h5>
-                        <h3>0</h3>
+                        <h3>₱{yearlySales.length > 0 ? yearlySales.reduce((a, b) => a + b).toLocaleString() : 0}</h3>
                     </div>
                     <img className='admin-reports-headerIcons' src={ salesIcon }/>
                 </div>
@@ -245,13 +414,10 @@ function Admin_Reports () {
                     borderRadius:'10px'}}>
                     
                     <h1 style={{ color:'#020654' }}>Sales Review</h1>
-                    <span>Suppliers average sales for the past 
-                        <span className='num-months-chartReview'> number of months </span>
-                            is <span className='total-sales-chartReview'> $100000</span>
-                    </span>
+                    
                     <Bar
                         style={{ marginTop:'15px' }}
-                        data= { salesData }
+                        data= { data }
                         options= { options }
                     ></Bar>
             </div>
@@ -337,8 +503,8 @@ function Admin_Reports () {
                         <th scope="row">{ord.orderNumber}</th>
                         <td className='text-center'>{ord.cart.supplier.shopName}</td>
                         <td className='text-center'>{ord.user.firstName} {ord.user.lastName}</td>
-                        <td className='text-center'>{ord.cart.items.reduce((total, item) => total + item.quantity, 0)}</td>
-                        <td className='text-center'>{ord.total}</td>
+                        <td className='text-center'>{ord.orderItems.reduce((total, item) => total + item.quantity, 0)}</td>
+                        <td className='text-center'>{ord.total.toLocaleString()}</td>
                         <td className='text-center'>
                             {
                                 ord.status === 1 ? 'Order Placed' : 

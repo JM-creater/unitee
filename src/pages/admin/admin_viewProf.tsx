@@ -1,12 +1,11 @@
 import "./admin_viewProf.css";
 import editProfIcon from "../../assets/images/icons/editing.png";
 import genderIcon from "../../assets/images/icons/gender-fluid.png";
-import departmentIcon from "../../assets/images/icons/department.png";
 import emailIcon from "../../assets/images/icons/mail-2.png";
 import phoneIcon from "../../assets/images/icons/smartphone-call.png";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import axios, { Axios } from "axios";
+import axios from "axios";
 import toast from "react-hot-toast";
 
 type ValidationErrors = {
@@ -151,8 +150,9 @@ function Admin_viewProf() {
       }
     }
   };
+  
   return (
-    <div className="viewProfile-customer-main-container">
+    <div className="viewProfile-admin-main-container">
       <div className="profile-details-container">
         {UserProfile && (
           <div className="user-details-viewProfile">

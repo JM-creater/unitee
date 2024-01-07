@@ -1,37 +1,53 @@
-import './forgot_password.css'
-import studentImg from '../../src/assets/images/forgot-pass-student-img.png'
-import submitIcon from "../../src/assets/images/icons/arrow.png"
-import backIcon from "../../src/assets/images/icons/back-2.png"
-import uniteeLogo from "../../src/assets/images/unitee.png"
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react'
-import { toast } from 'react-toastify'
-import React from 'react'
-import LoadingGif from '../assets/images/icons/loadingscreen.svg'
+import "./forgot_password.css";
+import studentImg from "../../src/assets/images/forgot-pass-student-img.png";
+import submitIcon from "../../src/assets/images/icons/arrow.png";
+import backIcon from "../../src/assets/images/icons/back-2.png";
+import uniteeLogo from "../../src/assets/images/unitee.png";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import React from "react";
+import LoadingScreen from "./common/LoadingScreen";
+import axios from "axios";
 
-function Forgot_Password () {
+type ValidationErrors = {
+  newPassword?: string;
+  confirmPassword?: string;
+};
 
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [resetToken, setResetToken] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
-    const location = useLocation();
+function Forgot_Password() {
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetToken, setResetToken] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    // * For Delay
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
+  // * For Delay
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-    useEffect(() => {
-        const token = new URLSearchParams(location.search).get('token');
-        setResetToken(token);
-    }, [location]);
-
-    // * Reset Password 
-    const handleSubmit = async () => {
-        if (newPassword !== confirmPassword) {
-            toast.error("Passwords do not match");
-            return;
-        }
+  // * Get the token from the URI
+  useEffect(() => {
+    const token = new URLSearchParams(location.search).get("token");
+    
+    if (!token) {
+      navigate("/");
+    } else {
+      axios.get(`https://localhost:7017/Users/validate-reset-token?token=${token}`)
+        .then(response => {
+          if(response.data.isValid) {
+            localStorage.setItem("token", token);
+            setResetToken(token);
+          } else {
+            navigate("/");
+          }
+        })
+        .catch(error => {
+          console.error('Error validating token:', error);
+          navigate("/");
+        });
+    }
+  }, [location, navigate]);
 
   // * Reset Password
   const handleSubmit = async (event) => {
@@ -40,12 +56,10 @@ function Forgot_Password () {
     const errors = validateForm();
 
     if (Object.keys(errors).length === 0) {
-      setIsLoading(true);
+      setIsLoading(true); 
 
       try {
-        const response = await fetch(
-          "https://localhost:7017/Users/reset-password",
-          {
+        const response = await fetch("https://localhost:7017/Users/reset-password", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -58,15 +72,20 @@ function Forgot_Password () {
         );
 
         if (response.ok) {
+          localStorage.removeItem('token');
           toast.success("Successfully updated the password");
           await sleep(10000);
           navigate("/");
+          localStorage.removeItem(resetToken);
         } else {
           toast.error("Failed to update the password");
         }
       } catch (error) {
-        toast.error("An error occurred");
-        console.error(error);
+        if (error.response && error.response.status === 400) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error('An error occurred. Please try again later.');
+        }
       }
       setIsLoading(false);
     }
@@ -98,9 +117,9 @@ function Forgot_Password () {
   return (
     <React.Fragment>
       {isLoading ? (
-        <div className="mainloading-screen">
-            <img className='mainloading-bar' src={LoadingGif} alt="loading..." />
-        </div>
+        <React.Fragment>
+          <LoadingScreen />
+        </React.Fragment>
       ) : (
         <div className="forgot-pwd-main-container">
           <div className="forgot-pwd-subContainer">
@@ -127,7 +146,6 @@ function Forgot_Password () {
                 name="forgot-password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                onKeyDown={handleKeyDown}
               />
 
               {/* CONFIRM PASSWORD */}
@@ -139,7 +157,6 @@ function Forgot_Password () {
                 name="forgot-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                onKeyDown={handleKeyDown}
               />
             </div>
 

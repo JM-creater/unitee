@@ -54,6 +54,7 @@
     border-style: none;
     border-radius: 5px;
     margin-bottom: 15px;
+    width: 22em;
 }
 
 .login-btn {
@@ -63,6 +64,7 @@
     background-color: #004AAD;
     border-radius: 20px;
     margin-top: 30px;
+    width: 20em;
 }
 
 .login-btn:hover {
@@ -157,3 +159,170 @@
     border-radius: 10px;
     margin-left: 80px;
 }
+
+.error-message-container {
+    height: 5px; 
+    margin-bottom: 8px;
+    color: red;
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    max-width: fit-content;
+}
+
+.error-message {
+    visibility: visible;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.login-input-container-withErrorMessage {
+    flex-flow: column;
+    justify-content: space-evenly;
+}
+
+/* FOR MOBILE PHONES */
+@media screen and (max-width: 480px) {
+    .login-1-container {
+        height: fit-content;
+        padding: 20px;
+    }
+
+    .login-2-container {
+        height: fit-content;
+        padding-top: 20px;
+    }
+
+    .web-logo {
+        max-width: 130px;
+    }
+
+    .text {
+        font-size: 10px;
+    }
+
+    .stud-img {
+        max-width: 150px;
+    }
+
+    .login-text {
+        font-size: 13px;
+    }
+
+    .login-btn {
+        font-size: 12px;
+        width: 15em;
+        padding: 8px 0;
+    }
+
+    .input-login {
+        font-size: 12px;
+    }
+
+    .login-input-container-withErrorMessage {
+        justify-content: center;
+        align-items: center;
+    }
+
+    .error-message-container {
+        margin-left: 5em;
+    }
+
+    .register-text {
+        margin: 40px 0px 10px 0px;
+        font-size: 15px;
+    }
+
+    .register-customer-btn {
+        font-size: 12px;
+    }
+
+    .forgot-pwd-btn {
+        font-size: 10px;
+        margin-left: 60px;
+    }
+
+    .forgot-pwd-icon {
+        max-width: 1.3em;
+        height: 1.3em;
+    }
+  }
+
+  @media screen and (max-width: 500px) {
+    .forgot-pwd-container {
+        width: 23em;
+    }
+
+    .forgot-pwd-icon {
+        max-width: 13px;
+    }
+
+    .forgot-pwd-btn {
+        font-size: 11px;
+    }
+  }
+
+/* FOR TABLETS */
+  @media screen and (max-width: 768px) {
+    .main-container {
+        width: 100vw;
+        height: 100vh
+    }
+    .login-1-container {
+        width: 100%;
+        height: 100%;
+        padding: 10px 0 15px;
+    }
+
+    .login-2-container {
+        width: 100vw;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .web-logo {
+        max-width: 250px;
+    }
+
+    .login-input-container-withErrorMessage {
+        width: fit-content;
+        margin-right: 80px;
+    }
+
+    .text {
+        font-size: 12px;
+    }
+
+    .stud-img {
+        max-width: 270px;
+    }
+
+    .input-login {
+        font-size: 12px;
+        width: 27em;
+        margin-left: 50px;
+    }
+
+    .login-text {
+        font-size: 13px;
+    }
+
+    .login-btn {
+        font-size: 12px;
+        width: 14em;
+        height: fit-content;
+        padding: 7px;
+    }
+
+    .register-text {
+        font-size: 15px;
+        margin-top: 20px;
+    }
+
+    .register-customer-btn {
+         font-size: 13px;
+    }
+  }

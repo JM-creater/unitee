@@ -8,15 +8,14 @@ import supplierReportsIcon from "../../assets/images/icons/reports.png"
 import shopIcon from "../../assets/images/icons/store-2.png"
 import editprof from "../../assets/images/icons/user-avatar.png"
 import logoutIcon from "../../assets/images/icons/logout-4.png"
-//import chatSupplier from "../../assets/images/icons/chat.png"
 import { useCallback, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
 import notifEventEmitter from '../../helpers/NotifEventEmitter'
 import React from 'react'
 import LogoutLoadingScreen from '../common/LogoutLoadingScreen'
-// import * as signalR from "@microsoft/signalr"
-// import { toast } from 'react-toastify'
+import { useAuth } from '../../utils/AuthContext'
+import { ToastContainer, Zoom, toast } from 'react-toastify'
 
 function Supplier_Main (){
 
@@ -24,12 +23,19 @@ function Supplier_Main (){
         image: string;
     }
 
+    const [notificationMessage, setNotificationMessage] = useState([]);
     const [notifItem, setNotifItem] = useState([]);
     const [supplier, setSupplier] = useState<Supplier | null>(null); 
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const { id } = useParams();
+    const { setLogout } = useAuth();
     const navigate = useNavigate();
+
+    const [displayedNotifs, setDisplayedNotifs] = useState(() => {
+        const savedNotifs = localStorage.getItem('displayedNotifs');
+        return savedNotifs ? new Set(JSON.parse(savedNotifs)) : new Set();
+    });
 
      // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -39,7 +45,21 @@ function Supplier_Main (){
         setIsLoggingOut(true);
         setShowLogoutModal(!showLogoutModal);
         await sleep(10000);
+        setLogout();
         navigate('/');
+    };
+
+    // * Mark as Read Supplier in Notification
+    const handleNotificationClick = () => {
+        const fetchNotificationClick = async () => {
+            try {
+                await axios.post(`https://localhost:7017/Notification/markReadSupplier/${id}`);
+                updateNotification();
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchNotificationClick();
     };
 
     // * Get Users
@@ -78,15 +98,125 @@ function Supplier_Main (){
         };
     }, [id, updateNotification]);
 
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+            const response = await axios.get(`https://localhost:7017/Notification/supplierUnread/${id}`);
+            setNotifItem(response.data);
+        } catch (error) {
+            console.error('Network error or server not responding');
+        }
+        };
+
+        const handleFocus = () => {
+            fetchData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [id]); 
+
+    // * Get the notification by id
+    const fetchNotificationMessage = useCallback(async () => {
+        try {
+            const response = await axios.get(`https://localhost:7017/Notification/${id}`);
+            setNotificationMessage(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    }, [id]); 
+
+    // * Event Emitter for notification
+    useEffect(() => {
+        fetchNotificationMessage();
+    }, [fetchNotificationMessage, id]);
+
+    useEffect(() => {
+        const handleNewNotification = () => {
+            fetchNotificationMessage();
+        };
+
+        notifEventEmitter.on('notifAdded', handleNewNotification);
+
+        return () => {
+            notifEventEmitter.off('notifAdded', handleNewNotification);
+        };
+    }, [fetchNotificationMessage]);
+
+     // * Windows Event Listener Focus
+    useEffect(() => {
+
+        const handleFocus = () => {
+            fetchNotificationMessage();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [fetchNotificationMessage]); 
+
+    // * show the notification in toast
+    useEffect(() => {
+        notificationMessage.forEach(notif => {
+            if (notif.userRole === 2 && !notif.isRead && !displayedNotifs.has(notif.id)) {
+                toast.info(notif.message);
+                const newDisplayedNotifs = new Set(displayedNotifs).add(notif.id);
+                setDisplayedNotifs(newDisplayedNotifs);
+                localStorage.setItem('displayedNotifs', JSON.stringify(Array.from(newDisplayedNotifs)));
+            }
+        });
+    }, [notificationMessage, displayedNotifs]);
+
+    // ! To be fixed
+     // * Exit the web if deactivate 
+    // useEffect(() => {
+    //     const handleFocus = () => {
+    //         const statusData = localStorage.getItem(`supplierStatus_${id}`);
+    //         if (statusData) {
+    //             const status = JSON.parse(statusData);
+    //             if (!status.isActive) {
+    //                 navigate('/');
+    //             }
+    //         } else {
+    //             navigate('/');
+    //         }
+    //     };
+    
+    //     window.addEventListener('focus', handleFocus);
+    
+    //     return () => {
+    //         window.removeEventListener('focus', handleFocus);
+    //     };
+    // }, [navigate, id]);
 
     return (
         <React.Fragment>
             {isLoggingOut ? (
                 <React.Fragment>
-                    <LogoutLoadingScreen/>
+                    <LogoutLoadingScreen />
                 </React.Fragment>
             ) : (
             <div className="supplier-main">
+                <ToastContainer
+                    position="top-center"
+                    autoClose={2500}
+                    hideProgressBar={false}
+                    newestOnTop
+                    limit={1}
+                    transition={Zoom}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable={false}
+                    pauseOnHover={false}
+                    theme="light"
+                />
                 <header className="supplier-header">
                     <Link to='' className="col-md-12 supplier-home-btn">
                             <img className="Supplierlogo" src={ logo }/>
@@ -98,10 +228,9 @@ function Supplier_Main (){
                             <img className="supplier-nav-icon" src={ dashboardSupplierIcon }/>
                             <span className="supplier-nav-text">Dashboard</span>
                         </Link>
-                        <Link to='supplier_orders' className="supplier-nav-link">
+                        <Link to='supplier_orders' className="supplier-nav-link" onClick={handleNotificationClick}>
                             <img className="supplier-nav-icon" src={ ordersSupplierIcon }/>
                             <span className="supplier-nav-text">Orders {notifItem.length > 0 && <span className='notifOrder-count'>{notifItem.length}</span>}</span>
-                            
                         </Link>
                         <Link to='manage_shop' className="supplier-nav-link">
                             <img className="supplier-nav-icon" src={ shopIcon }/>
@@ -111,20 +240,13 @@ function Supplier_Main (){
                             <img className="supplier-nav-icon" src={ supplierReportsIcon }/>
                             <span className="supplier-nav-text">Reports</span>
                         </Link>
-                        {/* <Link to='supplier_chat' className="supplier-nav-link">
-                            <img className="supplier-nav-icon" src={ chatSupplier }/>
-                            <span className="supplier-nav-text">Chat</span>
-                        </Link> */}
                     </div>
                 </header>
                 <div style={{ minHeight: '100%' }}>
                     
                     <div className="second-nav-container">
 
-                        <div className="search-container">
-                            <span className="fa fa-search form-control-feedback search-icon"></span>
-                            <input className="Supplier-SearchBar" type="text" placeholder="Search" />
-                        </div>
+                        <div className="search-container"></div>
                         {supplier && (
                             <React.Fragment>
                                 <img 
@@ -137,9 +259,9 @@ function Supplier_Main (){
                         )}
 
                         <ul className="dropdown-menu" style={{ padding:'10px', width:'15rem' }}>
-                            <Link to={`supplier_viewProf/${id}`}>
+                            <Link to={`supplier_viewProf/${id}`} style={{ textDecoration: 'none' }}>
                                 <li className="drop-list">
-                                    <a className="dropdown-item supplier-drop-item" style={{ fontSize:'15px' }}>
+                                    <a className="dropdown-item supplier-drop-item" style={{ fontSize:'15px'}}>
                                         <img className="drop-icon" src={ editprof }/>
                                         View Profile
                                     </a>
@@ -147,7 +269,7 @@ function Supplier_Main (){
                             </Link>
                             
                             <li className="drop-list">
-                                <a className="dropdown-item supplier-drop-item" data-bs-toggle="modal" data-bs-target="#logoutModal" style={{ fontWeight:'600', fontSize:'15px' }}>
+                                <a className="dropdown-item supplier-drop-item" data-bs-toggle="modal" data-bs-target="#logoutModal" style={{ fontWeight:'600', fontSize:'15px', cursor: 'pointer' }}>
                                     <img className="drop-icon-logout" src={ logoutIcon }/>
                                     Log Out
                                 </a>

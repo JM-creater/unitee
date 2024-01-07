@@ -8,7 +8,6 @@ class EventEmitter {
     }
 
     on(event: string, listener: Listener): void {
-        console.log(`Listener registered for event: ${event}`);
         if (!this.events[event]) {
             this.events[event] = [];
         }
