@@ -5,6 +5,7 @@ import departmentIcon from "../../assets/images/icons/department.png"
 import emailIcon from "../../assets/images/icons/mail-2.png"
 import phoneIcon from "../../assets/images/icons/smartphone-call.png"
 import uploadimage from "../../assets/images/icons/uploadimage.png"
+import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import axios from 'axios'
@@ -47,6 +48,7 @@ function ViewCustomer_Profile () {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [gender, setGender] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
     const { userId } = useParams();
     const navigate = useNavigate();
 
@@ -91,6 +93,7 @@ function ViewCustomer_Profile () {
 
     // * Fetch User Data
     useEffect(() => {
+      setIsLoading(true);
       const fetchUserData = async () => {
         try {
           const response = await axios.get(`https://localhost:7017/Users/${userId}`);
@@ -101,8 +104,10 @@ function ViewCustomer_Profile () {
             setPhoneNumber(response.data.phoneNumber)
             setGender(response.data.gender)
             setDepartmentName(response.data.department.department_Name)
+            setIsLoading(false);
         } catch (error) {
           console.error(error);
+          setIsLoading(false);
         }
       }
       fetchUserData();
@@ -240,6 +245,7 @@ function ViewCustomer_Profile () {
           "Content-Type": "application/json",
         }
       })
+      //localStorage.setItem("verifyEmail", userId);
       toast.success("Please confirm your email");
       navigate("/secondconfirmation_email");
     } catch (error) {
@@ -248,223 +254,235 @@ function ViewCustomer_Profile () {
   };
 
 
-    return <div className="viewProfile-customer-main-container">
-        <div className="profile-details-container">
-        {UserProfile && (
-          <div className="user-details-viewProfile">
-            {isEditing && (
-              <input
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                id="imageUploadInput"
-                onChange={handleImageUpload}
-              />
-            )}
-            <label htmlFor="imageUploadInput" style={{ position: 'relative', display: 'inline-block' }}>
-              <img
-                className='profileImg'
-                src={imagePreviewUrl || `https://localhost:7017/${UserProfile.image}`}
-                alt="Profile"
-                style={{ width: '200px', height: '200px'}}
-              />
-              {isEditing && (
-                <img 
-                  src={uploadimage}
-                  alt="Upload Icon" 
-                  style={{ 
-                    position: 'absolute', 
-                    bottom: '-5px', 
-                    right: '20px',
-                    cursor: 'pointer',
-                    width: '40px',
-                    height: '40px'
-                  }} 
-                />
-              )}
-            </label>
-            <div className="username-id-container">
-              <h1 className='acc-name'>{UserProfile.firstName} {UserProfile.lastName}</h1>
-              <p className='id-number-profile'>{userId}</p>
+    return (
+      <React.Fragment>
+          {isLoading ? (
+              <div className="mainloading-screen">
+                <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
             </div>
-          </div>
-        )}
-            
-            <button className="editProf-btn" type="button" 
-            data-bs-toggle="collapse" 
-            data-bs-target="#editProfCollapse" 
-            aria-expanded="false" 
-            aria-controls="editProfCollapse" 
-            onClick={handleEditProfileClick}>
-                <img className='editIconProf' src={ editProfIcon } alt="" />
-                    Edit Profile
-            </button>
-        </div>
-
-        {/* EDIT COLLAPSE */}
-        <div className="collapse" id="editProfCollapse" style={{ padding: '40px'}}>
-            <h1 className='editProf-subTitle'>Edit Profile Information</h1>
-            <div className="card card-body">
-                <div className="editProf-details-1">
-                    <label className='profLabelEdit' htmlFor="profFirstName">First Name</label>
-                    <input className='input-prof' type="text" id='profFirstName' value={firstName} onChange={(e) => setFirstName(e.target.value)} disabled={isDisabled}></input>
-
-                    <label className='profLabelEdit' htmlFor="profLastName">Last Name</label>
-                    <input className='input-prof' type="text" id='profLastName' value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={isDisabled}></input>
-
-                    {/* <label className='profLabelEdit' htmlFor="profDepartment">Department</label> */}
-                    {/* <select name="departmentProf" id="profDepartment"
-                    style={{ padding: '10px', border: '2px solid white' }}
-                    onChange={handleDepartmentChange}>
-                      {departments.map((dept) => (
-                        <option 
-                        key={dept.departmentId}
-                        defaultValue={dept.departmentId}
-                        selected={dept.departmentId == departmentId}
-                        >
-                            {dept.department_Name}
-                        </option>
-                      ))}
-                    </select> */}
-
-                    <label className='profLabelEdit' htmlFor="profGender">Gender</label>
-                    <select 
-                      name="genderProf" id="profGender"
-                      style={{ padding: '10px', border: '2px solid white' }}
-                      onChange={(e) => setGender(e.target.value)}
-                      disabled={isDisabled}
-                    >
-                        <option value="Male" selected={gender == 'Male'}>Male</option>
-                        <option value="Female" selected={gender == 'Female'}>Female</option>
-                    </select>
-                </div>
-
-                <div className="editProf-details-2">
-                    <label className='profLabelEdit' htmlFor="profEmail">Email</label>
-                    <input 
-                      className='input-prof' 
-                      type="email" 
-                      id='profEmail' 
-                      value={email} 
-                      onChange={(e) => setEmail(e.target.value)} 
-                      disabled={isDisabled}
-                    >
-                    </input>
-
-                    <label className='profLabelEdit' htmlFor="profPhone">Phone Number</label>
-                    <input 
-                      className='input-prof' 
-                      type="text" 
-                      id='profPhone' 
-                      value={phoneNumber} 
-                      onChange={(e) => handlePhoneNumber(e.target.value)} 
-                      maxLength={11} 
-                      disabled={isDisabled}
-                    >
-                    </input>
-
-                    <label className='profLabelEdit' htmlFor="editPass">Password</label>
-                    <button onClick={toggleInput}>
-                      {isDisabled ? 'Hide Input Password' : 'Edit Password'}
-                    </button>
-                    {isDisabled && (
-                      <React.Fragment>
-                        <label className='profLabelEdit' htmlFor="editPass">Current Password</label>
-                        <input 
-                          className='input-prof' 
-                          type="password" 
-                          name="" 
-                          id="editPass" 
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                        >
-                        </input>
-                        <label className='profLabelEdit' htmlFor="editPass">Confirm Password</label>
-                        <input 
-                          className='input-prof' 
-                          type="password" 
-                          name="" 
-                          id="editPass" 
-                          value={confirmPassword} 
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                        >
-                        </input>
-                        
-                        <div className="updatePassword-btn-container" style={{ display: 'flex', justifyContent: 'center' }}>
-                          <button className='editProf-save-btn' onClick={handleUpdatePassword}>Update</button>
-                        </div>
-                      </React.Fragment>
-                    )}
-                </div>
-            </div>
-            <div className="saveChanges-btn-container">
-                <button className='editProf-save-btn' onClick={HandleUpdate}>Save Changes</button>
-            </div>
-        </div>
-
-        <div className="about-user-container">
-            <h3
-            style={{
-                borderBottom: '2px solid #f0f0f0'
-            }}>About</h3>
-            <div className="about-userInfo-container">
-                <div>
-                    <h5 className='about-details-prof'>
-                        <img className='aboutIcons' src={ genderIcon } alt="" />
-                        Gender</h5>
-                    <h5 className='about-details-prof'>
-                        <img className='aboutIcons' src={ departmentIcon } alt="" />
-                        Department</h5>
-                    <h5 className='about-details-prof'>
-                        <img className='aboutIcons' src={ emailIcon } alt="" />
-                        Email</h5>
-                    <h5 className='about-details-prof'>
-                        <img className='aboutIcons' src={ phoneIcon } alt="" />
-                        Phone Number</h5>
-                </div>
-                {UserProfile && (
-                  <div>
-                    <h5 className='about-details-prof'>{UserProfile.gender}</h5>
-                    <h5 className='about-details-prof'>{departmentName}</h5>
-                    <h5 className='about-details-prof'>{UserProfile.email}</h5>
-                    <h5 className='about-details-prof'>{UserProfile.phoneNumber}</h5>
-                  </div>
+          ) : (
+            <div className="viewProfile-customer-main-container">
+            <div className="profile-details-container">
+            {UserProfile && (
+              <div className="user-details-viewProfile">
+                {isEditing && (
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    id="imageUploadInput"
+                    onChange={handleImageUpload}
+                  />
                 )}
-                <div>
-                  {UserProfile && (
-                    (() => {
-
-                      if (UserProfile && UserProfile.emailVerificationStatus === 2) {
-                        return (
-                          <div style={{ color: 'green', marginTop: '76px' }}>
-                            Verified
-                          </div>
-                        );
-                      } else if (UserProfile && UserProfile.emailVerificationStatus === 3 || UserProfile && UserProfile.emailVerificationStatus === 4) {
-                        return (
-                          <button
-                            onClick={handleVerifyEmail}
-                            style={{
-                              backgroundColor: 'red',
-                              color: 'white',
-                              padding: '2px 8px',
-                              border: 'none',
-                              borderRadius: '5px',
-                              cursor: 'pointer',
-                              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                              transition: 'background-color 0.3s ease',
-                              marginTop: '76px'
-                            }}
-                          >
-                            Verify Email
-                          </button>
-                        );
-                      }
-                    })()
+                <label htmlFor="imageUploadInput" style={{ position: 'relative', display: 'inline-block' }}>
+                  <img
+                    className='profileImg'
+                    src={imagePreviewUrl || `https://localhost:7017/${UserProfile.image}`}
+                    alt="Profile"
+                    style={{ width: '200px', height: '200px'}}
+                  />
+                  {isEditing && (
+                    <img 
+                      src={uploadimage}
+                      alt="Upload Icon" 
+                      style={{ 
+                        position: 'absolute', 
+                        bottom: '-5px', 
+                        right: '20px',
+                        cursor: 'pointer',
+                        width: '40px',
+                        height: '40px'
+                      }} 
+                    />
                   )}
+                </label>
+                <div className="username-id-container">
+                  <h1 className='acc-name'>{UserProfile.firstName} {UserProfile.lastName}</h1>
+                  <p className='id-number-profile'>{userId}</p>
                 </div>
+              </div>
+            )}
+                
+                <button className="editProf-btn" type="button" 
+                data-bs-toggle="collapse" 
+                data-bs-target="#editProfCollapse" 
+                aria-expanded="false" 
+                aria-controls="editProfCollapse" 
+                onClick={handleEditProfileClick}>
+                    <img className='editIconProf' src={ editProfIcon } alt="" />
+                        Edit Profile
+                </button>
+            </div>
+    
+            {/* EDIT COLLAPSE */}
+            <div className="collapse" id="editProfCollapse" style={{ padding: '40px'}}>
+                <h1 className='editProf-subTitle'>Edit Profile Information</h1>
+                <div className="card card-body">
+                    <div className="editProf-details-1">
+                        <label className='profLabelEdit' htmlFor="profFirstName">First Name</label>
+                        <input className='input-prof' type="text" id='profFirstName' value={firstName} onChange={(e) => setFirstName(e.target.value)} disabled={isDisabled}></input>
+    
+                        <label className='profLabelEdit' htmlFor="profLastName">Last Name</label>
+                        <input className='input-prof' type="text" id='profLastName' value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={isDisabled}></input>
+    
+                        {/* <label className='profLabelEdit' htmlFor="profDepartment">Department</label> */}
+                        {/* <select name="departmentProf" id="profDepartment"
+                        style={{ padding: '10px', border: '2px solid white' }}
+                        onChange={handleDepartmentChange}>
+                          {departments.map((dept) => (
+                            <option 
+                            key={dept.departmentId}
+                            defaultValue={dept.departmentId}
+                            selected={dept.departmentId == departmentId}
+                            >
+                                {dept.department_Name}
+                            </option>
+                          ))}
+                        </select> */}
+    
+                        <label className='profLabelEdit' htmlFor="profGender">Gender</label>
+                        <select 
+                          name="genderProf" id="profGender"
+                          style={{ padding: '10px', border: '2px solid white' }}
+                          onChange={(e) => setGender(e.target.value)}
+                          disabled={isDisabled}
+                        >
+                            <option value="Male" selected={gender == 'Male'}>Male</option>
+                            <option value="Female" selected={gender == 'Female'}>Female</option>
+                        </select>
+                    </div>
+    
+                    <div className="editProf-details-2">
+                        <label className='profLabelEdit' htmlFor="profEmail">Email</label>
+                        <input 
+                          className='input-prof' 
+                          type="email" 
+                          id='profEmail' 
+                          value={email} 
+                          onChange={(e) => setEmail(e.target.value)} 
+                          disabled={isDisabled}
+                        >
+                        </input>
+    
+                        <label className='profLabelEdit' htmlFor="profPhone">Phone Number</label>
+                        <input 
+                          className='input-prof' 
+                          type="text" 
+                          id='profPhone' 
+                          value={phoneNumber} 
+                          onChange={(e) => handlePhoneNumber(e.target.value)} 
+                          maxLength={11} 
+                          disabled={isDisabled}
+                        >
+                        </input>
+    
+                        <label className='profLabelEdit' htmlFor="editPass">Password</label>
+                        <button onClick={toggleInput}>
+                          {isDisabled ? 'Hide Input Password' : 'Edit Password'}
+                        </button>
+                        {isDisabled && (
+                          <React.Fragment>
+                            <label className='profLabelEdit' htmlFor="editPass">Current Password</label>
+                            <input 
+                              className='input-prof' 
+                              type="password" 
+                              name="" 
+                              id="editPass" 
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                            >
+                            </input>
+                            <label className='profLabelEdit' htmlFor="editPass">Confirm Password</label>
+                            <input 
+                              className='input-prof' 
+                              type="password" 
+                              name="" 
+                              id="editPass" 
+                              value={confirmPassword} 
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                            >
+                            </input>
+                            
+                            <div className="updatePassword-btn-container" style={{ display: 'flex', justifyContent: 'center' }}>
+                              <button className='editProf-save-btn' onClick={handleUpdatePassword}>Update</button>
+                            </div>
+                          </React.Fragment>
+                        )}
+                    </div>
+                </div>
+                <div className="saveChanges-btn-container">
+                    <button className='editProf-save-btn' onClick={HandleUpdate}>Save Changes</button>
+                </div>
+            </div>
+    
+            <div className="about-user-container">
+                <h3
+                style={{
+                    borderBottom: '2px solid #f0f0f0'
+                }}>About</h3>
+                <div className="about-userInfo-container">
+                    <div>
+                        <h5 className='about-details-prof'>
+                            <img className='aboutIcons' src={ genderIcon } alt="" />
+                            Gender</h5>
+                        <h5 className='about-details-prof'>
+                            <img className='aboutIcons' src={ departmentIcon } alt="" />
+                            Department</h5>
+                        <h5 className='about-details-prof'>
+                            <img className='aboutIcons' src={ emailIcon } alt="" />
+                            Email</h5>
+                        <h5 className='about-details-prof'>
+                            <img className='aboutIcons' src={ phoneIcon } alt="" />
+                            Phone Number</h5>
+                    </div>
+                    {UserProfile && (
+                      <div>
+                        <h5 className='about-details-prof'>{UserProfile.gender}</h5>
+                        <h5 className='about-details-prof'>{departmentName}</h5>
+                        <h5 className='about-details-prof'>{UserProfile.email}</h5>
+                        <h5 className='about-details-prof'>{UserProfile.phoneNumber}</h5>
+                      </div>
+                    )}
+                    <div>
+                      {UserProfile && (
+                        (() => {
+    
+                          if (UserProfile && UserProfile.emailVerificationStatus === 2) {
+                            return (
+                              <div style={{ color: 'green', marginTop: '76px' }}>
+                                Verified
+                              </div>
+                            );
+                          } else if (UserProfile && UserProfile.emailVerificationStatus === 3 || UserProfile && UserProfile.emailVerificationStatus === 4) {
+                            return (
+                              <button
+                                onClick={handleVerifyEmail}
+                                style={{
+                                  backgroundColor: 'red',
+                                  color: 'white',
+                                  padding: '2px 8px',
+                                  border: 'none',
+                                  borderRadius: '5px',
+                                  cursor: 'pointer',
+                                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                                  transition: 'background-color 0.3s ease',
+                                  marginTop: '76px'
+                                }}
+                              >
+                                Verify Email
+                              </button>
+                            );
+                          }
+                        })()
+                      )}
+                    </div>
+            </div>
         </div>
-    </div>
+        </div>
+          )}
+      </React.Fragment>
+      
+    )
 }
 
 export default ViewCustomer_Profile

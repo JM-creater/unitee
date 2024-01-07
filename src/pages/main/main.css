@@ -66,6 +66,9 @@
     margin-left: 390px;
     width: 490px;
     background-color: white;
+    max-width: 29em !important;
+    margin-left: 81px !important;
+    margin-top: -474px !important;
   }
   
   .search-dropdown-row:hover {

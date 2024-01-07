@@ -6,7 +6,8 @@ import { toast } from "react-toastify";
 import notifEventEmitter from "../../helpers/NotifEventEmitter";
 import orderEventEmitter from "../../helpers/OrderEmitter";
 import cartEventEmitter from "../../helpers/EventEmitter";
-
+import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
+import React from "react";
 
 function Supplier_Orders () {
 
@@ -31,14 +32,15 @@ function Supplier_Orders () {
     const [departments, setDepartments] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [selectedOrders, setSelectedOrders] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // const statuses = [
-    //   { key: 'Pending', href: '#supplier-pending-order' },
-    //   { key: 'Approved', href: '#supplier-approved-order' },
-    //   { key: 'ForPickUp', href: '#supplier-forpickup-order' },
-    //   { key: 'Completed', href: '#supplier-completed-order' },
-    //   { key: 'Canceled', href: '#supplier-canceled-order' },
-    // ];
+    const statuses = [
+      { key: 'Pending', href: '#supplier-pending-order' },
+      { key: 'Approved', href: '#supplier-approved-order' },
+      { key: 'ForPickUp', href: '#supplier-forpickup-order' },
+      { key: 'Completed', href: '#supplier-completed-order' },
+      { key: 'Canceled', href: '#supplier-canceled-order' },
+    ];
 
     // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -56,12 +58,15 @@ function Supplier_Orders () {
 
     // * Get Order By Supplier from Customer
     useEffect(() => {
+      setIsLoading(true);
       const fetchOrders = async () => {
         try {
           const response = await axios.get(`https://localhost:7017/Order/BySupplier/${id}`);
           setOrders(response.data);
+          setIsLoading(false);
         } catch (error) {
           console.error(error);
+          setIsLoading(false);
         }
       };
 
@@ -227,778 +232,789 @@ function Supplier_Orders () {
     };
     
 
-    return <div className="manage-orders-main-container">
-    {/* <nav id="orders-nav" className="navbar px-3 mb-3" style={{ display:'flex', justifyContent:'end' }}>
-      <ul className="nav nav-pills">
-        {statuses.map((status) => (
-          <li key={status.key} className="nav-item supplier-nav-items">
-            <a className="nav-link" href={status.href}>
-              {status.key}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav> */}
-
-    <div className="orders-supplier-container">
-        <div data-bs-spy="scroll" data-bs-target="#orders-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true" className="scrollspy-example p-3 rounded-2" tabIndex={-1}>
-            <h4 className="order-status-label" id="supplier-pending-order">Pending Orders</h4>
-            <div className='col-md-11 pending-orders-table-wrapper table-responsive-sm' 
-              style={{ marginBottom:'25px', marginTop:'12px'}}>
-              <table className="table table-hover align-middle caption-bot table-xxl">
-                  <caption>end of list of pending orders</caption>
-                  <thead className='table align-middle'>
-                      <tr className='thead-row'>
-                          <th scope="col">Date</th>
-                          <th className="text-center" scope="col">Order No.</th>
-                          <th className="text-center" scope="col">Number of Items</th>
-                          <th className="text-center" scope="col">Total Amount</th>
-                          <th className="text-center" scope="col">Status</th>
-                      </tr>
-                  </thead>
-                  {orders.length > 0 ? (
-                    orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).map((orderItem, index) => (
-                      <tbody key={index} className="table-group-divider">
-                        <tr data-bs-toggle="modal" data-bs-target="#pendingOrderModal" onClick={() => handleOrderClick(orderItem)}>
-                          <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
-                          <td className="text-center">{orderItem.orderNumber}</td>
-                          <td className="text-center">
-                            {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
-                          </td>
-                          <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
-                          <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
-                        </tr>
-                      </tbody>
-                    ))
-                  ) : (
-                    <tbody className="table-group-divider">
-                      <tr data-bs-toggle="modal" className="text-center">
-                        <td></td>
-                        <td></td>
-                        <td>No pending orders available</td>
-                        <td></td>
-                        <td></td>
-                      </tr>
-                    </tbody>
-                  )}
-              </table>
-            </div>
-            <h4 className="order-status-label" id="supplier-approved-order">Approved Orders</h4>
-            <div className='col-md-11 approved-orders-table-wrapper table-responsive-sm' style={{ marginBottom:'25px', marginTop:'12px'}}>
-                <table className="table table-hover align-middle caption-bot table-xxl">
-                    <caption>end of list of approved orders</caption>
-                    <thead className='table align-middle'>
-                        <tr className='thead-row'>
-                            <th scope="col">Date</th>
-                            <th className="text-center" scope="col">Order No.</th>
-                            <th className="text-center" scope="col">Number of Items</th>
-                            <th className="text-center" scope="col">Total Amount</th>
-                            <th className="text-center" scope="col">Status</th>
-                        </tr>
-                    </thead>
-                    {orders.length > 0 ? (
-                      orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Approved).map((orderItem, index) => (
-                        <tbody key={index} className="table-group-divider">
-                          <tr data-bs-toggle="modal" data-bs-target="#approvedOrderModal" onClick={() => setSelectedOrders(orderItem)}>
-                            <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
-                            <td className="text-center">{orderItem.orderNumber}</td>
-                            <td className="text-center">
-                              {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}  
-                            </td>
-                            <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
-                            <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
-                          </tr>
-                        </tbody>
-                      ))
-                    ) : (
-                      <tbody className="table-group-divider">
-                        <tr data-bs-toggle="modal" className="text-center">
-                          <td></td>
-                          <td></td>
-                          <td>No approved orders available</td>
-                          <td></td>
-                          <td></td>
-                        </tr>
-                      </tbody>
-                    )}
-                </table>
-            </div>
-            <h4 className="order-status-label" id="supplier-forpickup-order">For Pick Up</h4>
-            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginBottom:'25px', marginTop:'12px'}}>
-                <table className="table table-hover align-middle caption-bot table-xxl">
-                    <caption>end of list of for pick up orders</caption>
-                    <thead className='table align-middle'>
-                        <tr className='thead-row'>
-                        <th scope="col">Date</th>
-                        <th className="text-center" scope="col">Order No.</th>
-                        <th className="text-center" scope="col">Number of Items</th>
-                        <th className="text-center" scope="col">Total Amount</th>
-                        <th className="text-center" scope="col">Status</th>
-                        </tr>
-                    </thead>
-                    {orders.length > 0 ? (
-                      orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.ForPickUp).map((orderItem, index) => (
-                        <tbody key={index} className="table-group-divider">
-                          <tr data-bs-toggle="modal" data-bs-target="#forPickUpOrderModal" onClick={() => setSelectedOrders(orderItem)}>
-                            <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
-                            <td className="text-center">{orderItem.orderNumber}</td>
-                            <td className="text-center">
-                              {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
-                            </td>
-                            <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
-                            <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
-                          </tr>
-                        </tbody>
-                      ))
-                    ) : (
-                      <tbody className="table-group-divider">
-                        <tr data-bs-toggle="modal" className="text-center">
-                          <td></td>
-                          <td></td>
-                          <td>No pick up orders available</td>
-                          <td></td>
-                          <td></td>
-                        </tr>
-                      </tbody>
-                    )}
-                </table>
-            </div>
-            <h4 className="order-status-label" id="supplier-completed-order">Completed Orders</h4>
-            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginBottom:'25px', marginTop:'12px'}}>
-                <table className="table table-hover align-middle caption-bot table-xxl">
-                    <caption>end of list of claimed orders</caption>
-                    <thead className='table align-middle'>
-                        <tr className='thead-row'>
-                        <th scope="col">Date</th>
-                        <th className="text-center" scope="col">Order No.</th>
-                        <th className="text-center" scope="col">Number of Items</th>
-                        <th className="text-center" scope="col">Total Amount</th>
-                        <th className="text-center" scope="col">Status</th>
-                        </tr>
-                    </thead>
-                    {orders.length > 0 ? (
-                      orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Completed).map((orderItem, index) => (
-                        <tbody key={index} className="table-group-divider">
-                          <tr data-bs-toggle="modal" data-bs-target="#orderCompletedOrderModal" onClick={() => setSelectedOrders(orderItem)}>
-                            <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
-                            <td className="text-center">{orderItem.orderNumber}</td>
-                            <td className="text-center">
-                              {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
-                            </td>
-                            <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
-                            <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
-                          </tr>
-                        </tbody>
-                      ))
-                    ) : (
-                      <tbody className="table-group-divider">
-                        <tr data-bs-toggle="modal" className="text-center">
-                          <td></td>
-                          <td></td>
-                          <td>No completed orders available</td>
-                          <td></td>
-                          <td></td>
-                        </tr>
-                      </tbody>
-                    )}
-                </table>
-            </div>
-            <h4 className="order-status-label" id="supplier-canceled-order">Canceled Orders</h4>
-            <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginBottom:'25px', marginTop:'12px'}}>
-                <table className="table table-hover align-middle caption-bot table-xxl">
-                    <caption>end of list of cancelled orders</caption>
-                    <thead className='table align-middle'>
-                        <tr className='thead-row'>
-                        <th scope="col">Date</th>
-                        <th className="text-center" scope="col">Order No.</th>
-                        <th className="text-center" scope="col">Number of Items</th>
-                        <th className="text-center" scope="col">Total Amount</th>
-                        <th className="text-center" scope="col">Status</th>
-                        </tr>
-                    </thead>
-                    {orders.length > 0 ? (
-                      orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Canceled).map((orderItem, index) => (
-                        <tbody key={index} className="table-group-divider">
-                          <tr data-bs-toggle="modal" data-bs-target="#canceledOrderModal" onClick={() => setSelectedOrders(orderItem)}>
-                            <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
-                            <td className="text-center">{orderItem.orderNumber}</td>
-                            <td className="text-center">
-                              {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
-                            </td>
-                            <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
-                            <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
-                          </tr>
-                        </tbody>
-                      ))
-                    ) : (
-                      <tbody className="table-group-divider">
-                        <tr data-bs-toggle="modal" className="text-center">
-                          <td></td>
-                          <td></td>
-                          <td>No canceled orders available</td>
-                          <td></td>
-                          <td></td>
-                        </tr>
-                      </tbody>
-                    )}
-                </table>
-            </div>
-        </div>
-    </div>
-
-    {/* PENDING ORDER DETAILS MODAL */}
-    <div className="modal fade" id="pendingOrderModal" tabIndex={-1} aria-labelledby="pendingOrderModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-fullscreen">
-            <div className="modal-content" style={{ padding:'20px' }}>
-                <div className="pending-header">
-                    <h1 className="modal-title" id="exampleModalLabel">Pending Order</h1>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
-                </div>
-                <div className="modal-basta-container">
-                    <span>Check pending order details</span>
-                    <div className="modal-btns-container">
-                        <button type="button" className="cancel-btn-modal" onClick={() => HandleDeniedOrders(selectedOrders.id)}>Deny</button>
-                        <button type="button" className="save-prod-btn" onClick={() => HandleApprovedOrders(selectedOrders.id)}>Approve</button>
-                    </div>
-                </div>
-                    {selectedOrders && (
-                      <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
-                        {/* CUSTOMER DETAILS */}
-                        <div>
-                            <div className="order-details-customer">
-                                <h3 className="order-details-subtitle">Customer</h3>
-                                <div className="customer-details-container">
-                                    <div className="modal-details-label">
-                                        <span className="modal-label">ID Number</span>
-                                        <span className="modal-label">First Name</span>
-                                        <span className="modal-label">Last Name</span>
-                                        <span className="modal-label">Department</span>
-                                        <span className="modal-label">Gender</span>
-                                    </div>
-                                    <div className="modal-details-info">
-                                        <span className="modal-info">{selectedOrders.user.id}</span>
-                                        <span className="modal-info">{selectedOrders.user.firstName}</span>
-                                        <span className="modal-info">{selectedOrders.user.lastName}</span>
-                                        <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
-                                        <span className="modal-info">{selectedOrders.user.gender}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* ORDER DETAILS */}
-                            <div className="modal-order-details-container">
-                                <h3 className="order-details-subtitle">Order Details</h3>
-                                <div className="order-details-container">
-                                    <div className="modal-details-label">
-                                        <span className="modal-label">Date</span>
-                                        <span className="modal-label">Order Number</span>
-                                        <span className="modal-label">Number of Items</span>
-                                        <span className="modal-label">Total Amount</span>
-                                        <span className="modal-label">Proof of Payment</span>
-                                        <span className="modal-label">Reference No.</span>
-                                        <span className="modal-label">Payment Type</span>
-                                    </div>
-                                    <div className="modal-details-info">
-                                      <span className="modal-info">{formatDate(selectedOrders.dateCreated)}</span>
-                                      <span className="modal-info">{selectedOrders.orderNumber}</span>
-                                      <span className="modal-info">{selectedOrders.orderItems.length}</span>
-                                      <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
-                                      <a 
-                                        className="modal-info" 
-                                        rel="noopener noreferrer" 
-                                        target="_blank" 
-                                        href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
-                                      >
-                                        {selectedOrders.proofOfPayment.split('\\').pop()}
-                                      </a>
-                                      <span className="modal-info">{selectedOrders.referenceId}</span>
-                                      <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {/* ITEM LIST */}
-                        <div className="modal-item-list">
-                          <h3 className="order-details-subtitle">Item List</h3>
-                          <div className="modal-item-list-table-wrapper">
-                            <table className="table">
-                              <thead className="table-primary">
-                                  <tr>
-                                    <th scope="col">Product Name</th>
-                                    <th scope="col">Product Type</th>
-                                    <th className="text-center" scope="col">Gender</th>
-                                    <th className="text-center" scope="col">Size</th>
-                                    <th className="text-center" scope="col">Quantity</th>
-                                    <th className="text-center" scope="col">Price</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                              {selectedOrders && selectedOrders.orderItems && 
-                                (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Pending) && (
-                                  selectedOrders.orderItems.map((item, index) => (
-                                    <tr key={index}>
-                                      <th scope="row">{item.product.productName}</th>
-                                      <td>{getProductTypeName(item.product.productTypeId)}</td>
-                                      <td className="text-center">{item.product.category}</td>
-                                      <td className="text-center">{item.sizeQuantity.size}</td>
-                                      <td className="text-center">{item.quantity}</td>
-                                      <td className="text-center">₱{item.product.price.toLocaleString()}</td>
-                                    </tr>
-                                  ))
-                                )
-                              }
+    return (
+      <React.Fragment>
+        {isLoading ? (
+          <div className="mainloading-screen">
+            <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
+          </div>
+        ) : (
+          <div className="manage-orders-main-container">
+          <nav id="orders-nav" className="navbar px-3 mb-3" style={{ display:'flex', justifyContent:'end' }}>
+            <ul className="nav nav-pills">
+              {statuses.map((status) => (
+                <li key={status.key} className="nav-item supplier-nav-items">
+                  <a className="nav-link" href={status.href}>
+                    {status.key}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+      
+          <div className="orders-supplier-container">
+              <div data-bs-spy="scroll" data-bs-target="#orders-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true" className="scrollspy-example p-3 rounded-2" tabIndex={-1}>
+                  <h4 className="order-status-label" id="supplier-pending-order">Pending Orders</h4>
+                  <div className='col-md-11 pending-orders-table-wrapper table-responsive-sm' 
+                    style={{ marginBottom:'25px', marginTop:'12px'}}>
+                    <table className="table table-hover align-middle caption-bot table-xxl">
+                        <caption>end of list of pending orders</caption>
+                        <thead className='table align-middle'>
+                            <tr className='thead-row'>
+                                <th scope="col">Date</th>
+                                <th className="text-center" scope="col">Order No.</th>
+                                <th className="text-center" scope="col">Number of Items</th>
+                                <th className="text-center" scope="col">Total Amount</th>
+                                <th className="text-center" scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        {orders.length > 0 ? (
+                          orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).map((orderItem, index) => (
+                            <tbody key={index} className="table-group-divider">
+                              <tr data-bs-toggle="modal" data-bs-target="#pendingOrderModal" onClick={() => handleOrderClick(orderItem)}>
+                                <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
+                                <td className="text-center">{orderItem.orderNumber}</td>
+                                <td className="text-center">
+                                  {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
+                                </td>
+                                <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
+                                <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                              </tr>
+                            </tbody>
+                          ))
+                        ) : (
+                          <tbody className="table-group-divider">
+                            <tr data-bs-toggle="modal" className="text-center">
+                              <td></td>
+                              <td></td>
+                              <td>No pending orders available</td>
+                              <td></td>
+                              <td></td>
+                            </tr>
+                          </tbody>
+                        )}
+                    </table>
+                  </div>
+                  <h4 className="order-status-label" id="supplier-approved-order">Approved Orders</h4>
+                  <div className='col-md-11 approved-orders-table-wrapper table-responsive-sm' style={{ marginBottom:'25px', marginTop:'12px'}}>
+                      <table className="table table-hover align-middle caption-bot table-xxl">
+                          <caption>end of list of approved orders</caption>
+                          <thead className='table align-middle'>
+                              <tr className='thead-row'>
+                                  <th scope="col">Date</th>
+                                  <th className="text-center" scope="col">Order No.</th>
+                                  <th className="text-center" scope="col">Number of Items</th>
+                                  <th className="text-center" scope="col">Total Amount</th>
+                                  <th className="text-center" scope="col">Status</th>
+                              </tr>
+                          </thead>
+                          {orders.length > 0 ? (
+                            orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Approved).map((orderItem, index) => (
+                              <tbody key={index} className="table-group-divider">
+                                <tr data-bs-toggle="modal" data-bs-target="#approvedOrderModal" onClick={() => setSelectedOrders(orderItem)}>
+                                  <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
+                                  <td className="text-center">{orderItem.orderNumber}</td>
+                                  <td className="text-center">
+                                    {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}  
+                                  </td>
+                                  <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
+                                  <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                                </tr>
                               </tbody>
-                            </table>
+                            ))
+                          ) : (
+                            <tbody className="table-group-divider">
+                              <tr data-bs-toggle="modal" className="text-center">
+                                <td></td>
+                                <td></td>
+                                <td>No approved orders available</td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                            </tbody>
+                          )}
+                      </table>
+                  </div>
+                  <h4 className="order-status-label" id="supplier-forpickup-order">For Pick Up</h4>
+                  <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginBottom:'25px', marginTop:'12px'}}>
+                      <table className="table table-hover align-middle caption-bot table-xxl">
+                          <caption>end of list of for pick up orders</caption>
+                          <thead className='table align-middle'>
+                              <tr className='thead-row'>
+                              <th scope="col">Date</th>
+                              <th className="text-center" scope="col">Order No.</th>
+                              <th className="text-center" scope="col">Number of Items</th>
+                              <th className="text-center" scope="col">Total Amount</th>
+                              <th className="text-center" scope="col">Status</th>
+                              </tr>
+                          </thead>
+                          {orders.length > 0 ? (
+                            orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.ForPickUp).map((orderItem, index) => (
+                              <tbody key={index} className="table-group-divider">
+                                <tr data-bs-toggle="modal" data-bs-target="#forPickUpOrderModal" onClick={() => setSelectedOrders(orderItem)}>
+                                  <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
+                                  <td className="text-center">{orderItem.orderNumber}</td>
+                                  <td className="text-center">
+                                    {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
+                                  </td>
+                                  <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
+                                  <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                                </tr>
+                              </tbody>
+                            ))
+                          ) : (
+                            <tbody className="table-group-divider">
+                              <tr data-bs-toggle="modal" className="text-center">
+                                <td></td>
+                                <td></td>
+                                <td>No pick up orders available</td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                            </tbody>
+                          )}
+                      </table>
+                  </div>
+                  <h4 className="order-status-label" id="supplier-completed-order">Completed Orders</h4>
+                  <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginBottom:'25px', marginTop:'12px'}}>
+                      <table className="table table-hover align-middle caption-bot table-xxl">
+                          <caption>end of list of claimed orders</caption>
+                          <thead className='table align-middle'>
+                              <tr className='thead-row'>
+                              <th scope="col">Date</th>
+                              <th className="text-center" scope="col">Order No.</th>
+                              <th className="text-center" scope="col">Number of Items</th>
+                              <th className="text-center" scope="col">Total Amount</th>
+                              <th className="text-center" scope="col">Status</th>
+                              </tr>
+                          </thead>
+                          {orders.length > 0 ? (
+                            orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Completed).map((orderItem, index) => (
+                              <tbody key={index} className="table-group-divider">
+                                <tr data-bs-toggle="modal" data-bs-target="#orderCompletedOrderModal" onClick={() => setSelectedOrders(orderItem)}>
+                                  <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
+                                  <td className="text-center">{orderItem.orderNumber}</td>
+                                  <td className="text-center">
+                                    {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
+                                  </td>
+                                  <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
+                                  <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                                </tr>
+                              </tbody>
+                            ))
+                          ) : (
+                            <tbody className="table-group-divider">
+                              <tr data-bs-toggle="modal" className="text-center">
+                                <td></td>
+                                <td></td>
+                                <td>No completed orders available</td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                            </tbody>
+                          )}
+                      </table>
+                  </div>
+                  <h4 className="order-status-label" id="supplier-canceled-order">Canceled Orders</h4>
+                  <div className='col-md-11 admin-orders-table-wrapper table-responsive-sm' style={{ marginBottom:'25px', marginTop:'12px'}}>
+                      <table className="table table-hover align-middle caption-bot table-xxl">
+                          <caption>end of list of cancelled orders</caption>
+                          <thead className='table align-middle'>
+                              <tr className='thead-row'>
+                              <th scope="col">Date</th>
+                              <th className="text-center" scope="col">Order No.</th>
+                              <th className="text-center" scope="col">Number of Items</th>
+                              <th className="text-center" scope="col">Total Amount</th>
+                              <th className="text-center" scope="col">Status</th>
+                              </tr>
+                          </thead>
+                          {orders.length > 0 ? (
+                            orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Canceled).map((orderItem, index) => (
+                              <tbody key={index} className="table-group-divider">
+                                <tr data-bs-toggle="modal" data-bs-target="#canceledOrderModal" onClick={() => setSelectedOrders(orderItem)}>
+                                  <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
+                                  <td className="text-center">{orderItem.orderNumber}</td>
+                                  <td className="text-center">
+                                    {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
+                                  </td>
+                                  <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
+                                  <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                                </tr>
+                              </tbody>
+                            ))
+                          ) : (
+                            <tbody className="table-group-divider">
+                              <tr data-bs-toggle="modal" className="text-center">
+                                <td></td>
+                                <td></td>
+                                <td>No canceled orders available</td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                            </tbody>
+                          )}
+                      </table>
+                  </div>
+              </div>
+          </div>
+      
+          {/* PENDING ORDER DETAILS MODAL */}
+          <div className="modal fade" id="pendingOrderModal" tabIndex={-1} aria-labelledby="pendingOrderModalLabel" aria-hidden="true">
+              <div className="modal-dialog modal-fullscreen">
+                  <div className="modal-content" style={{ padding:'20px' }}>
+                      <div className="pending-header">
+                          <h1 className="modal-title" id="exampleModalLabel">Pending Order</h1>
+                          <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
+                      </div>
+                      <div className="modal-basta-container">
+                          <span>Check pending order details</span>
+                          <div className="modal-btns-container">
+                              <button type="button" className="cancel-btn-modal" onClick={() => HandleDeniedOrders(selectedOrders.id)}>Deny</button>
+                              <button type="button" className="save-prod-btn" onClick={() => HandleApprovedOrders(selectedOrders.id)}>Approve</button>
                           </div>
-                        </div>
-                    </div>
-                    )}
-            </div>
+                      </div>
+                          {selectedOrders && (
+                            <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
+                              {/* CUSTOMER DETAILS */}
+                              <div>
+                                  <div className="order-details-customer">
+                                      <h3 className="order-details-subtitle">Customer</h3>
+                                      <div className="customer-details-container">
+                                          <div className="modal-details-label">
+                                              <span className="modal-label">ID Number</span>
+                                              <span className="modal-label">First Name</span>
+                                              <span className="modal-label">Last Name</span>
+                                              <span className="modal-label">Department</span>
+                                              <span className="modal-label">Gender</span>
+                                          </div>
+                                          <div className="modal-details-info">
+                                              <span className="modal-info">{selectedOrders.user.id}</span>
+                                              <span className="modal-info">{selectedOrders.user.firstName}</span>
+                                              <span className="modal-info">{selectedOrders.user.lastName}</span>
+                                              <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
+                                              <span className="modal-info">{selectedOrders.user.gender}</span>
+                                          </div>
+                                      </div>
+                                  </div>
+      
+                                  {/* ORDER DETAILS */}
+                                  <div className="modal-order-details-container">
+                                      <h3 className="order-details-subtitle">Order Details</h3>
+                                      <div className="order-details-container">
+                                          <div className="modal-details-label">
+                                              <span className="modal-label">Date</span>
+                                              <span className="modal-label">Order Number</span>
+                                              <span className="modal-label">Number of Items</span>
+                                              <span className="modal-label">Total Amount</span>
+                                              <span className="modal-label">Proof of Payment</span>
+                                              <span className="modal-label">Reference No.</span>
+                                              <span className="modal-label">Payment Type</span>
+                                          </div>
+                                          <div className="modal-details-info">
+                                            <span className="modal-info">{formatDate(selectedOrders.dateCreated)}</span>
+                                            <span className="modal-info">{selectedOrders.orderNumber}</span>
+                                            <span className="modal-info">{selectedOrders.orderItems.length}</span>
+                                            <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
+                                            <a 
+                                              className="modal-info" 
+                                              rel="noopener noreferrer" 
+                                              target="_blank" 
+                                              href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
+                                            >
+                                              {selectedOrders.proofOfPayment.split('\\').pop()}
+                                            </a>
+                                            <span className="modal-info">{selectedOrders.referenceId}</span>
+                                            <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              
+                              {/* ITEM LIST */}
+                              <div className="modal-item-list">
+                                <h3 className="order-details-subtitle">Item List</h3>
+                                <div className="modal-item-list-table-wrapper">
+                                  <table className="table">
+                                    <thead className="table-primary">
+                                        <tr>
+                                          <th scope="col">Product Name</th>
+                                          <th scope="col">Product Type</th>
+                                          <th className="text-center" scope="col">Gender</th>
+                                          <th className="text-center" scope="col">Size</th>
+                                          <th className="text-center" scope="col">Quantity</th>
+                                          <th className="text-center" scope="col">Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {selectedOrders && selectedOrders.orderItems && 
+                                      (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Pending) && (
+                                        selectedOrders.orderItems.map((item, index) => (
+                                          <tr key={index}>
+                                            <th scope="row">{item.product.productName}</th>
+                                            <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                            <td className="text-center">{item.product.category}</td>
+                                            <td className="text-center">{item.sizeQuantity.size}</td>
+                                            <td className="text-center">{item.quantity}</td>
+                                            <td className="text-center">₱{item.product.price.toLocaleString()}</td>
+                                          </tr>
+                                        ))
+                                      )
+                                    }
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                          </div>
+                          )}
+                  </div>
+              </div>
+          </div>
+          
+          {/* APPROVED ORDER DETAILS MODAL */}
+          <div className="modal fade" id="approvedOrderModal" tabIndex={-1} aria-labelledby="approvedOrderModalLabel" aria-hidden="true">
+              <div className="modal-dialog modal-fullscreen">
+                  <div className="modal-content" style={{ padding:'20px' }}>
+                      <div className="pending-header">
+                          <h1 className="modal-title" id="exampleModalLabel">Approved Order</h1>
+                          <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
+                      </div>
+                      <div className="modal-basta-container">
+                          <span>Check approved order details</span>
+                          <div className="modal-btns-container">
+                              <button type="button" className="save-prod-btn" onClick={() => HandleForPickUpOrders(selectedOrders.id)}>For Pick Up</button>
+                          </div>
+                      </div>
+                          {selectedOrders && (
+                            <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
+                              {/* CUSTOMER DETAILS */}
+                              <div>
+                                  <div className="order-details-customer">
+                                      <h3 className="order-details-subtitle">Customer</h3>
+                                      <div className="customer-details-container">
+                                          <div className="modal-details-label">
+                                              <span className="modal-label">ID Number</span>
+                                              <span className="modal-label">First Name</span>
+                                              <span className="modal-label">Last Name</span>
+                                              <span className="modal-label">Department</span>
+                                              <span className="modal-label">Gender</span>
+                                          </div>
+                                          <div className="modal-details-info">
+                                              <span className="modal-info">{selectedOrders.user.id}</span>
+                                              <span className="modal-info">{selectedOrders.user.firstName}</span>
+                                              <span className="modal-info">{selectedOrders.user.lastName}</span>
+                                              <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
+                                              <span className="modal-info">{selectedOrders.user.gender}</span>
+                                          </div>
+                                      </div>
+                                  </div>
+      
+                                  {/* ORDER DETAILS */}
+                                  <div className="modal-order-details-container">
+                                      <h3 className="order-details-subtitle">Order Details</h3>
+                                      <div className="order-details-container">
+                                          <div className="modal-details-label">
+                                              <span className="modal-label">Date</span>
+                                              <span className="modal-label">Order Number</span>
+                                              <span className="modal-label">Number of Items</span>
+                                              <span className="modal-label">Total Amount</span>
+                                              <span className="modal-label">Proof of Payment</span>
+                                              <span className="modal-label">Reference No.</span>
+                                              <span className="modal-label">Payment Type</span>
+                                          </div>
+                                          <div className="modal-details-info">
+                                            <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
+                                            <span className="modal-info">{selectedOrders.orderNumber}</span>
+                                            <span className="modal-info">{selectedOrders.orderItems.length}</span>
+                                            <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
+                                            <a 
+                                              className="modal-info" 
+                                              rel="noopener noreferrer" 
+                                              target="_blank" 
+                                              href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
+                                            >
+                                              {selectedOrders.proofOfPayment.split('\\').pop()}
+                                            </a>
+                                            <span className="modal-info">{selectedOrders.referenceId}</span>
+                                            <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              
+                              {/* ITEM LIST */}
+                              <div className="modal-item-list">
+                                <h3 className="order-details-subtitle">Item List</h3>
+                                <div className="modal-item-list-table-wrapper">
+                                  <table className="table">
+                                    <thead className="table-primary">
+                                        <tr>
+                                          <th scope="col">Product Name</th>
+                                          <th scope="col">Product Type</th>
+                                          <th className="text-center" scope="col">Gender</th>
+                                          <th className="text-center" scope="col">Size</th>
+                                          <th className="text-center" scope="col">Quantity</th>
+                                          <th className="text-center" scope="col">Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {selectedOrders && selectedOrders.orderItems && 
+                                      (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Approved) && (
+                                        selectedOrders.orderItems.map((item, index) => (
+                                          <tr key={index}>
+                                            <th scope="row">{item.product.productName}</th>
+                                            <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                            <td className="text-center">{item.product.category}</td>
+                                            <td className="text-center">{item.sizeQuantity.size}</td>
+                                            <td className="text-center">{item.quantity}</td>
+                                            <td className="text-center">₱{item.product.price.toLocaleString()}</td>
+                                          </tr>
+                                        ))
+                                      )
+                                    }
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                          </div>
+                          )}
+                  </div>
+              </div>
+          </div>
+      
+          {/* FOR PICK UP ORDER DETAILS MODAL */}
+          <div className="modal fade" id="forPickUpOrderModal" tabIndex={-1} aria-labelledby="forPickUpOrderModalLabel" aria-hidden="true">
+              <div className="modal-dialog modal-fullscreen">
+                  <div className="modal-content" style={{ padding:'20px' }}>
+                      <div className="pending-header">
+                          <h1 className="modal-title" id="exampleModalLabel">For Pick Up Orders</h1>
+                          <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
+                      </div>
+                      <div className="modal-basta-container">
+                          <span>Check for pick up orders details</span>
+                          <div className="modal-btns-container">
+                              <button type="button" className="save-prod-btn" onClick={() => HandleOrderCompleted(selectedOrders.id)}>Completed</button>
+                          </div>
+                      </div>
+                          {selectedOrders && (
+                            <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
+                              {/* CUSTOMER DETAILS */}
+                              <div>
+                                  <div className="order-details-customer">
+                                      <h3 className="order-details-subtitle">Customer</h3>
+                                      <div className="customer-details-container">
+                                          <div className="modal-details-label">
+                                              <span className="modal-label">ID Number</span>
+                                              <span className="modal-label">First Name</span>
+                                              <span className="modal-label">Last Name</span>
+                                              <span className="modal-label">Department</span>
+                                              <span className="modal-label">Gender</span>
+                                          </div>
+                                          <div className="modal-details-info">
+                                              <span className="modal-info">{selectedOrders.user.id}</span>
+                                              <span className="modal-info">{selectedOrders.user.firstName}</span>
+                                              <span className="modal-info">{selectedOrders.user.lastName}</span>
+                                              <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
+                                              <span className="modal-info">{selectedOrders.user.gender}</span>
+                                          </div>
+                                      </div>
+                                  </div>
+      
+                                  {/* ORDER DETAILS */}
+                                  <div className="modal-order-details-container">
+                                      <h3 className="order-details-subtitle">Order Details</h3>
+                                      <div className="order-details-container">
+                                          <div className="modal-details-label">
+                                              <span className="modal-label">Date</span>
+                                              <span className="modal-label">Order Number</span>
+                                              <span className="modal-label">Number of Items</span>
+                                              <span className="modal-label">Total Amount</span>
+                                              <span className="modal-label">Proof of Payment</span>
+                                              <span className="modal-label">Reference No.</span>
+                                              <span className="modal-label">Payment Type</span>
+                                          </div>
+                                          <div className="modal-details-info">
+                                            <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
+                                            <span className="modal-info">{selectedOrders.orderNumber}</span>
+                                            <span className="modal-info">{selectedOrders.orderItems.length}</span>
+                                            <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
+                                            <a 
+                                              className="modal-info" 
+                                              rel="noopener noreferrer" 
+                                              target="_blank" 
+                                              href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
+                                            >
+                                              {selectedOrders.proofOfPayment.split('\\').pop()}
+                                            </a>
+                                            <span className="modal-info">{selectedOrders.referenceId}</span>
+                                            <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              
+                              {/* ITEM LIST */}
+                              <div className="modal-item-list">
+                                <h3 className="order-details-subtitle">Item List</h3>
+                                <div className="modal-item-list-table-wrapper">
+                                  <table className="table">
+                                    <thead className="table-primary">
+                                        <tr>
+                                        <th scope="col">Product Name</th>
+                                        <th scope="col">Product Type</th>
+                                        <th className="text-center" scope="col">Gender</th>
+                                        <th className="text-center" scope="col">Size</th>
+                                        <th className="text-center" scope="col">Quantity</th>
+                                        <th className="text-center" scope="col">Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {selectedOrders && selectedOrders.orderItems && 
+                                      (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.ForPickUp) && (
+                                        selectedOrders.orderItems.map((item, index) => (
+                                          <tr key={index}>
+                                            <th scope="row">{item.product.productName}</th>
+                                            <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                            <td className="text-center">{item.product.category}</td>
+                                            <td className="text-center">{item.sizeQuantity.size}</td>
+                                            <td className="text-center">{item.quantity}</td>
+                                            <td className="text-center">₱{item.product.price.toLocaleString()}</td>
+                                          </tr>
+                                        ))
+                                      )
+                                    }
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                          </div>
+                          )}
+                  </div>
+              </div>
+          </div>
+      
+          {/* COMPLETED ORDER DETAILS MODAL */}
+          <div className="modal fade" id="orderCompletedOrderModal" tabIndex={-1} aria-labelledby="orderCompletedOrderModalLabel" aria-hidden="true">
+              <div className="modal-dialog modal-fullscreen">
+                  <div className="modal-content" style={{ padding:'20px' }}>
+                      <div className="pending-header">
+                          <h1 className="modal-title" id="exampleModalLabel">Completed Orders</h1>
+                          <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
+                      </div>
+                      <div className="modal-basta-container">
+                          <span>Check for pick up orders details</span>
+                      </div>
+                          {selectedOrders && (
+                            <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
+                              {/* CUSTOMER DETAILS */}
+                              <div>
+                                  <div className="order-details-customer">
+                                      <h3 className="order-details-subtitle">Customer</h3>
+                                      <div className="customer-details-container">
+                                          <div className="modal-details-label">
+                                              <span className="modal-label">ID Number</span>
+                                              <span className="modal-label">First Name</span>
+                                              <span className="modal-label">Last Name</span>
+                                              <span className="modal-label">Department</span>
+                                              <span className="modal-label">Gender</span>
+                                          </div>
+                                          <div className="modal-details-info">
+                                              <span className="modal-info">{selectedOrders.user.id}</span>
+                                              <span className="modal-info">{selectedOrders.user.firstName}</span>
+                                              <span className="modal-info">{selectedOrders.user.lastName}</span>
+                                              <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
+                                              <span className="modal-info">{selectedOrders.user.gender}</span>
+                                          </div>
+                                      </div>
+                                  </div>
+      
+                                  {/* ORDER DETAILS */}
+                                  <div className="modal-order-details-container">
+                                      <h3 className="order-details-subtitle">Order Details</h3>
+                                      <div className="order-details-container">
+                                          <div className="modal-details-label">
+                                              <span className="modal-label">Date</span>
+                                              <span className="modal-label">Order Number</span>
+                                              <span className="modal-label">Number of Items</span>
+                                              <span className="modal-label">Total Amount</span>
+                                              <span className="modal-label">Proof of Payment</span>
+                                              <span className="modal-label">Reference No.</span>
+                                              <span className="modal-label">Payment Type</span>
+                                          </div>
+                                          <div className="modal-details-info">
+                                            <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
+                                            <span className="modal-info">{selectedOrders.orderNumber}</span>
+                                            <span className="modal-info">{selectedOrders.orderItems.length}</span>
+                                            <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
+                                            <a 
+                                              className="modal-info" 
+                                              rel="noopener noreferrer" 
+                                              target="_blank" 
+                                              href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
+                                            >
+                                              {selectedOrders.proofOfPayment.split('\\').pop()}
+                                            </a>
+                                            <span className="modal-info">{selectedOrders.referenceId}</span>
+                                            <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              
+                              {/* ITEM LIST */}
+                              <div className="modal-item-list">
+                                <h3 className="order-details-subtitle">Item List</h3>
+                                <div className="modal-item-list-table-wrapper">
+                                  <table className="table">
+                                    <thead className="table-primary">
+                                        <tr>
+                                        <th scope="col">Product Name</th>
+                                        <th scope="col">Product Type</th>
+                                        <th className="text-center" scope="col">Gender</th>
+                                        <th className="text-center" scope="col">Size</th>
+                                        <th className="text-center" scope="col">Quantity</th>
+                                        <th className="text-center" scope="col">Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {selectedOrders && selectedOrders.orderItems && 
+                                      (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Completed) && (
+                                        selectedOrders.orderItems.map((item, index) => (
+                                          <tr key={index}>
+                                            <th scope="row">{item.product.productName}</th>
+                                            <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                            <td className="text-center">{item.product.category}</td>
+                                            <td className="text-center">{item.sizeQuantity.size}</td>
+                                            <td className="text-center">{item.quantity}</td>
+                                            <td className="text-center">₱{item.product.price.toLocaleString()}</td>
+                                          </tr>
+                                        ))
+                                      )
+                                    }
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                          </div>
+                          )}
+                  </div>
+              </div>
+          </div>   
+      
+          {/* COMPLETED ORDER DETAILS MODAL */}                            
+          <div className="modal fade" id="canceledOrderModal" tabIndex={-1} aria-labelledby="canceledOrderModalLabel" aria-hidden="true">
+              <div className="modal-dialog modal-fullscreen">
+                  <div className="modal-content" style={{ padding:'20px' }}>
+                      <div className="pending-header">
+                          <h1 className="modal-title" id="exampleModalLabel">Canceled Orders</h1>
+                          <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
+                      </div>
+                      <div className="modal-basta-container">
+                          <span>Check for pick up orders details</span>
+                      </div>
+                          {selectedOrders && (
+                            <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
+                              {/* CUSTOMER DETAILS */}
+                              <div>
+                                  <div className="order-details-customer">
+                                      <h3 className="order-details-subtitle">Customer</h3>
+                                      <div className="customer-details-container">
+                                          <div className="modal-details-label">
+                                              <span className="modal-label">ID Number</span>
+                                              <span className="modal-label">First Name</span>
+                                              <span className="modal-label">Last Name</span>
+                                              <span className="modal-label">Department</span>
+                                              <span className="modal-label">Gender</span>
+                                          </div>
+                                          <div className="modal-details-info">
+                                              <span className="modal-info">{selectedOrders.user.id}</span>
+                                              <span className="modal-info">{selectedOrders.user.firstName}</span>
+                                              <span className="modal-info">{selectedOrders.user.lastName}</span>
+                                              <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
+                                              <span className="modal-info">{selectedOrders.user.gender}</span>
+                                          </div>
+                                      </div>
+                                  </div>
+      
+                                  {/* ORDER DETAILS */}
+                                  <div className="modal-order-details-container">
+                                      <h3 className="order-details-subtitle">Order Details</h3>
+                                      <div className="order-details-container">
+                                          <div className="modal-details-label">
+                                              <span className="modal-label">Date</span>
+                                              <span className="modal-label">Order Number</span>
+                                              <span className="modal-label">Number of Items</span>
+                                              <span className="modal-label">Total Amount</span>
+                                              <span className="modal-label">Proof of Payment</span>
+                                              <span className="modal-label">Reference No.</span>
+                                              <span className="modal-label">Payment Type</span>
+                                              <span className="modal-label">Cancellation Reason</span>
+                                          </div>
+                                          <div className="modal-details-info">
+                                            <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
+                                            <span className="modal-info">{selectedOrders.orderNumber}</span>
+                                            <span className="modal-info">{selectedOrders.orderItems.length}</span>
+                                            <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
+                                            <a 
+                                              className="modal-info" 
+                                              rel="noopener noreferrer" 
+                                              target="_blank" 
+                                              href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
+                                            >
+                                              {selectedOrders.proofOfPayment.split('\\').pop()}
+                                            </a>
+                                            <span className="modal-info">{selectedOrders.referenceId}</span>
+                                            <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
+                                            <span className="modal-info">{selectedOrders.cancellationReason}</span>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              
+                              {/* ITEM LIST */}
+                              <div className="modal-item-list">
+                                <h3 className="order-details-subtitle">Item List</h3>
+                                <div className="modal-item-list-table-wrapper">
+                                  <table className="table">
+                                    <thead className="table-primary">
+                                        <tr>
+                                        <th scope="col">Product Name</th>
+                                        <th scope="col">Product Type</th>
+                                        <th className="text-center" scope="col">Gender</th>
+                                        <th className="text-center" scope="col">Size</th>
+                                        <th className="text-center" scope="col">Quantity</th>
+                                        <th className="text-center" scope="col">Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {selectedOrders && selectedOrders.orderItems && 
+                                      (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Canceled) && (
+                                        selectedOrders.orderItems.map((item, index) => (
+                                          <tr key={index}>
+                                            <th scope="row">{item.product.productName}</th>
+                                            <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                            <td className="text-center">{item.product.category}</td>
+                                            <td className="text-center">{item.sizeQuantity.size}</td>
+                                            <td className="text-center">{item.quantity}</td>
+                                            <td className="text-center">₱{item.product.price.toLocaleString()}</td>
+                                          </tr>
+                                        ))
+                                      )
+                                    }
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                          </div>
+                          )}
+                  </div>
+              </div>
+          </div>   
+      
         </div>
-    </div>
+        )}
+      </React.Fragment>
     
-    {/* APPROVED ORDER DETAILS MODAL */}
-    <div className="modal fade" id="approvedOrderModal" tabIndex={-1} aria-labelledby="approvedOrderModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-fullscreen">
-            <div className="modal-content" style={{ padding:'20px' }}>
-                <div className="pending-header">
-                    <h1 className="modal-title" id="exampleModalLabel">Approved Order</h1>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
-                </div>
-                <div className="modal-basta-container">
-                    <span>Check approved order details</span>
-                    <div className="modal-btns-container">
-                        <button type="button" className="save-prod-btn" onClick={() => HandleForPickUpOrders(selectedOrders.id)}>For Pick Up</button>
-                    </div>
-                </div>
-                    {selectedOrders && (
-                      <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
-                        {/* CUSTOMER DETAILS */}
-                        <div>
-                            <div className="order-details-customer">
-                                <h3 className="order-details-subtitle">Customer</h3>
-                                <div className="customer-details-container">
-                                    <div className="modal-details-label">
-                                        <span className="modal-label">ID Number</span>
-                                        <span className="modal-label">First Name</span>
-                                        <span className="modal-label">Last Name</span>
-                                        <span className="modal-label">Department</span>
-                                        <span className="modal-label">Gender</span>
-                                    </div>
-                                    <div className="modal-details-info">
-                                        <span className="modal-info">{selectedOrders.user.id}</span>
-                                        <span className="modal-info">{selectedOrders.user.firstName}</span>
-                                        <span className="modal-info">{selectedOrders.user.lastName}</span>
-                                        <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
-                                        <span className="modal-info">{selectedOrders.user.gender}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* ORDER DETAILS */}
-                            <div className="modal-order-details-container">
-                                <h3 className="order-details-subtitle">Order Details</h3>
-                                <div className="order-details-container">
-                                    <div className="modal-details-label">
-                                        <span className="modal-label">Date</span>
-                                        <span className="modal-label">Order Number</span>
-                                        <span className="modal-label">Number of Items</span>
-                                        <span className="modal-label">Total Amount</span>
-                                        <span className="modal-label">Proof of Payment</span>
-                                        <span className="modal-label">Reference No.</span>
-                                        <span className="modal-label">Payment Type</span>
-                                    </div>
-                                    <div className="modal-details-info">
-                                      <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
-                                      <span className="modal-info">{selectedOrders.orderNumber}</span>
-                                      <span className="modal-info">{selectedOrders.orderItems.length}</span>
-                                      <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
-                                      <a 
-                                        className="modal-info" 
-                                        rel="noopener noreferrer" 
-                                        target="_blank" 
-                                        href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
-                                      >
-                                        {selectedOrders.proofOfPayment.split('\\').pop()}
-                                      </a>
-                                      <span className="modal-info">{selectedOrders.referenceId}</span>
-                                      <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {/* ITEM LIST */}
-                        <div className="modal-item-list">
-                          <h3 className="order-details-subtitle">Item List</h3>
-                          <div className="modal-item-list-table-wrapper">
-                            <table className="table">
-                              <thead className="table-primary">
-                                  <tr>
-                                    <th scope="col">Product Name</th>
-                                    <th scope="col">Product Type</th>
-                                    <th className="text-center" scope="col">Gender</th>
-                                    <th className="text-center" scope="col">Size</th>
-                                    <th className="text-center" scope="col">Quantity</th>
-                                    <th className="text-center" scope="col">Price</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                              {selectedOrders && selectedOrders.orderItems && 
-                                (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Approved) && (
-                                  selectedOrders.orderItems.map((item, index) => (
-                                    <tr key={index}>
-                                      <th scope="row">{item.product.productName}</th>
-                                      <td>{getProductTypeName(item.product.productTypeId)}</td>
-                                      <td className="text-center">{item.product.category}</td>
-                                      <td className="text-center">{item.sizeQuantity.size}</td>
-                                      <td className="text-center">{item.quantity}</td>
-                                      <td className="text-center">₱{item.product.price.toLocaleString()}</td>
-                                    </tr>
-                                  ))
-                                )
-                              }
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                    </div>
-                    )}
-            </div>
-        </div>
-    </div>
-
-    {/* FOR PICK UP ORDER DETAILS MODAL */}
-    <div className="modal fade" id="forPickUpOrderModal" tabIndex={-1} aria-labelledby="forPickUpOrderModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-fullscreen">
-            <div className="modal-content" style={{ padding:'20px' }}>
-                <div className="pending-header">
-                    <h1 className="modal-title" id="exampleModalLabel">For Pick Up Orders</h1>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
-                </div>
-                <div className="modal-basta-container">
-                    <span>Check for pick up orders details</span>
-                    <div className="modal-btns-container">
-                        <button type="button" className="save-prod-btn" onClick={() => HandleOrderCompleted(selectedOrders.id)}>Completed</button>
-                    </div>
-                </div>
-                    {selectedOrders && (
-                      <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
-                        {/* CUSTOMER DETAILS */}
-                        <div>
-                            <div className="order-details-customer">
-                                <h3 className="order-details-subtitle">Customer</h3>
-                                <div className="customer-details-container">
-                                    <div className="modal-details-label">
-                                        <span className="modal-label">ID Number</span>
-                                        <span className="modal-label">First Name</span>
-                                        <span className="modal-label">Last Name</span>
-                                        <span className="modal-label">Department</span>
-                                        <span className="modal-label">Gender</span>
-                                    </div>
-                                    <div className="modal-details-info">
-                                        <span className="modal-info">{selectedOrders.user.id}</span>
-                                        <span className="modal-info">{selectedOrders.user.firstName}</span>
-                                        <span className="modal-info">{selectedOrders.user.lastName}</span>
-                                        <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
-                                        <span className="modal-info">{selectedOrders.user.gender}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* ORDER DETAILS */}
-                            <div className="modal-order-details-container">
-                                <h3 className="order-details-subtitle">Order Details</h3>
-                                <div className="order-details-container">
-                                    <div className="modal-details-label">
-                                        <span className="modal-label">Date</span>
-                                        <span className="modal-label">Order Number</span>
-                                        <span className="modal-label">Number of Items</span>
-                                        <span className="modal-label">Total Amount</span>
-                                        <span className="modal-label">Proof of Payment</span>
-                                        <span className="modal-label">Reference No.</span>
-                                        <span className="modal-label">Payment Type</span>
-                                    </div>
-                                    <div className="modal-details-info">
-                                      <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
-                                      <span className="modal-info">{selectedOrders.orderNumber}</span>
-                                      <span className="modal-info">{selectedOrders.orderItems.length}</span>
-                                      <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
-                                      <a 
-                                        className="modal-info" 
-                                        rel="noopener noreferrer" 
-                                        target="_blank" 
-                                        href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
-                                      >
-                                        {selectedOrders.proofOfPayment.split('\\').pop()}
-                                      </a>
-                                      <span className="modal-info">{selectedOrders.referenceId}</span>
-                                      <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {/* ITEM LIST */}
-                        <div className="modal-item-list">
-                          <h3 className="order-details-subtitle">Item List</h3>
-                          <div className="modal-item-list-table-wrapper">
-                            <table className="table">
-                              <thead className="table-primary">
-                                  <tr>
-                                  <th scope="col">Product Name</th>
-                                  <th scope="col">Product Type</th>
-                                  <th className="text-center" scope="col">Gender</th>
-                                  <th className="text-center" scope="col">Size</th>
-                                  <th className="text-center" scope="col">Quantity</th>
-                                  <th className="text-center" scope="col">Price</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                              {selectedOrders && selectedOrders.orderItems && 
-                                (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.ForPickUp) && (
-                                  selectedOrders.orderItems.map((item, index) => (
-                                    <tr key={index}>
-                                      <th scope="row">{item.product.productName}</th>
-                                      <td>{getProductTypeName(item.product.productTypeId)}</td>
-                                      <td className="text-center">{item.product.category}</td>
-                                      <td className="text-center">{item.sizeQuantity.size}</td>
-                                      <td className="text-center">{item.quantity}</td>
-                                      <td className="text-center">₱{item.product.price.toLocaleString()}</td>
-                                    </tr>
-                                  ))
-                                )
-                              }
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                    </div>
-                    )}
-            </div>
-        </div>
-    </div>
-
-    {/* COMPLETED ORDER DETAILS MODAL */}
-    <div className="modal fade" id="orderCompletedOrderModal" tabIndex={-1} aria-labelledby="orderCompletedOrderModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-fullscreen">
-            <div className="modal-content" style={{ padding:'20px' }}>
-                <div className="pending-header">
-                    <h1 className="modal-title" id="exampleModalLabel">Completed Orders</h1>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
-                </div>
-                <div className="modal-basta-container">
-                    <span>Check for pick up orders details</span>
-                </div>
-                    {selectedOrders && (
-                      <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
-                        {/* CUSTOMER DETAILS */}
-                        <div>
-                            <div className="order-details-customer">
-                                <h3 className="order-details-subtitle">Customer</h3>
-                                <div className="customer-details-container">
-                                    <div className="modal-details-label">
-                                        <span className="modal-label">ID Number</span>
-                                        <span className="modal-label">First Name</span>
-                                        <span className="modal-label">Last Name</span>
-                                        <span className="modal-label">Department</span>
-                                        <span className="modal-label">Gender</span>
-                                    </div>
-                                    <div className="modal-details-info">
-                                        <span className="modal-info">{selectedOrders.user.id}</span>
-                                        <span className="modal-info">{selectedOrders.user.firstName}</span>
-                                        <span className="modal-info">{selectedOrders.user.lastName}</span>
-                                        <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
-                                        <span className="modal-info">{selectedOrders.user.gender}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* ORDER DETAILS */}
-                            <div className="modal-order-details-container">
-                                <h3 className="order-details-subtitle">Order Details</h3>
-                                <div className="order-details-container">
-                                    <div className="modal-details-label">
-                                        <span className="modal-label">Date</span>
-                                        <span className="modal-label">Order Number</span>
-                                        <span className="modal-label">Number of Items</span>
-                                        <span className="modal-label">Total Amount</span>
-                                        <span className="modal-label">Proof of Payment</span>
-                                        <span className="modal-label">Reference No.</span>
-                                        <span className="modal-label">Payment Type</span>
-                                    </div>
-                                    <div className="modal-details-info">
-                                      <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
-                                      <span className="modal-info">{selectedOrders.orderNumber}</span>
-                                      <span className="modal-info">{selectedOrders.orderItems.length}</span>
-                                      <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
-                                      <a 
-                                        className="modal-info" 
-                                        rel="noopener noreferrer" 
-                                        target="_blank" 
-                                        href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
-                                      >
-                                        {selectedOrders.proofOfPayment.split('\\').pop()}
-                                      </a>
-                                      <span className="modal-info">{selectedOrders.referenceId}</span>
-                                      <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {/* ITEM LIST */}
-                        <div className="modal-item-list">
-                          <h3 className="order-details-subtitle">Item List</h3>
-                          <div className="modal-item-list-table-wrapper">
-                            <table className="table">
-                              <thead className="table-primary">
-                                  <tr>
-                                  <th scope="col">Product Name</th>
-                                  <th scope="col">Product Type</th>
-                                  <th className="text-center" scope="col">Gender</th>
-                                  <th className="text-center" scope="col">Size</th>
-                                  <th className="text-center" scope="col">Quantity</th>
-                                  <th className="text-center" scope="col">Price</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                              {selectedOrders && selectedOrders.orderItems && 
-                                (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Completed) && (
-                                  selectedOrders.orderItems.map((item, index) => (
-                                    <tr key={index}>
-                                      <th scope="row">{item.product.productName}</th>
-                                      <td>{getProductTypeName(item.product.productTypeId)}</td>
-                                      <td className="text-center">{item.product.category}</td>
-                                      <td className="text-center">{item.sizeQuantity.size}</td>
-                                      <td className="text-center">{item.quantity}</td>
-                                      <td className="text-center">₱{item.product.price.toLocaleString()}</td>
-                                    </tr>
-                                  ))
-                                )
-                              }
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                    </div>
-                    )}
-            </div>
-        </div>
-    </div>   
-
-    {/* COMPLETED ORDER DETAILS MODAL */}                            
-    <div className="modal fade" id="canceledOrderModal" tabIndex={-1} aria-labelledby="canceledOrderModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-fullscreen">
-            <div className="modal-content" style={{ padding:'20px' }}>
-                <div className="pending-header">
-                    <h1 className="modal-title" id="exampleModalLabel">Canceled Orders</h1>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" onClick={handleCloseButton}></button>
-                </div>
-                <div className="modal-basta-container">
-                    <span>Check for pick up orders details</span>
-                </div>
-                    {selectedOrders && (
-                      <div className="modal-body" style={{ display:'flex', flexFlow:'row', gap:'20px' }}>
-                        {/* CUSTOMER DETAILS */}
-                        <div>
-                            <div className="order-details-customer">
-                                <h3 className="order-details-subtitle">Customer</h3>
-                                <div className="customer-details-container">
-                                    <div className="modal-details-label">
-                                        <span className="modal-label">ID Number</span>
-                                        <span className="modal-label">First Name</span>
-                                        <span className="modal-label">Last Name</span>
-                                        <span className="modal-label">Department</span>
-                                        <span className="modal-label">Gender</span>
-                                    </div>
-                                    <div className="modal-details-info">
-                                        <span className="modal-info">{selectedOrders.user.id}</span>
-                                        <span className="modal-info">{selectedOrders.user.firstName}</span>
-                                        <span className="modal-info">{selectedOrders.user.lastName}</span>
-                                        <span className="modal-info">{getDepartmentName(selectedOrders.user.departmentId)}</span>
-                                        <span className="modal-info">{selectedOrders.user.gender}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* ORDER DETAILS */}
-                            <div className="modal-order-details-container">
-                                <h3 className="order-details-subtitle">Order Details</h3>
-                                <div className="order-details-container">
-                                    <div className="modal-details-label">
-                                        <span className="modal-label">Date</span>
-                                        <span className="modal-label">Order Number</span>
-                                        <span className="modal-label">Number of Items</span>
-                                        <span className="modal-label">Total Amount</span>
-                                        <span className="modal-label">Proof of Payment</span>
-                                        <span className="modal-label">Reference No.</span>
-                                        <span className="modal-label">Payment Type</span>
-                                        <span className="modal-label">Cancellation Reason</span>
-                                    </div>
-                                    <div className="modal-details-info">
-                                      <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
-                                      <span className="modal-info">{selectedOrders.orderNumber}</span>
-                                      <span className="modal-info">{selectedOrders.orderItems.length}</span>
-                                      <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
-                                      <a 
-                                        className="modal-info" 
-                                        rel="noopener noreferrer" 
-                                        target="_blank" 
-                                        href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
-                                      >
-                                        {selectedOrders.proofOfPayment.split('\\').pop()}
-                                      </a>
-                                      <span className="modal-info">{selectedOrders.referenceId}</span>
-                                      <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
-                                      <span className="modal-info">{selectedOrders.cancellationReason}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {/* ITEM LIST */}
-                        <div className="modal-item-list">
-                          <h3 className="order-details-subtitle">Item List</h3>
-                          <div className="modal-item-list-table-wrapper">
-                            <table className="table">
-                              <thead className="table-primary">
-                                  <tr>
-                                  <th scope="col">Product Name</th>
-                                  <th scope="col">Product Type</th>
-                                  <th className="text-center" scope="col">Gender</th>
-                                  <th className="text-center" scope="col">Size</th>
-                                  <th className="text-center" scope="col">Quantity</th>
-                                  <th className="text-center" scope="col">Price</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                              {selectedOrders && selectedOrders.orderItems && 
-                                (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Canceled) && (
-                                  selectedOrders.orderItems.map((item, index) => (
-                                    <tr key={index}>
-                                      <th scope="row">{item.product.productName}</th>
-                                      <td>{getProductTypeName(item.product.productTypeId)}</td>
-                                      <td className="text-center">{item.product.category}</td>
-                                      <td className="text-center">{item.sizeQuantity.size}</td>
-                                      <td className="text-center">{item.quantity}</td>
-                                      <td className="text-center">₱{item.product.price.toLocaleString()}</td>
-                                    </tr>
-                                  ))
-                                )
-                              }
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                    </div>
-                    )}
-            </div>
-        </div>
-    </div>   
-
-</div>
+  )
 }
 
 export default Supplier_Orders

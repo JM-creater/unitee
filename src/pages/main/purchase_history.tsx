@@ -8,6 +8,7 @@ import React from 'react';
 import submitRatingEventEmitter from '../../helpers/SubmitRatingEventEmitter';
 import orderEventEmitter from '../../helpers/OrderEmitter';
 import { Rating } from '../../components/common/rate';
+import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 
 function Purchase_History () {
 
@@ -30,6 +31,7 @@ function Purchase_History () {
     const [purchases, setPurchases] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [selectedPurchases, setSelectedPurchases] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [ratingProduct, setRatingProduct] = useState(0);
     const [ratingSupplier, setRatingSupplier] = useState(0);
     const [ratedPurchases, setRatedPurchases] = useState(new Set());
@@ -102,12 +104,15 @@ function Purchase_History () {
 
     // * Get Order By User Id
     useEffect(() => {
+        setIsLoading(true);
         const fetchOrders = async () => {
             try {
                 const response = await axios.get(`https://localhost:7017/Order/${userId}`);
                 setPurchases(response.data);
+                setIsLoading(false);
             } catch (error) {
                 console.error(error);
+                setIsLoading(false);
             }
         };
 
@@ -213,219 +218,229 @@ function Purchase_History () {
     }, [userId]);
 
 
-    return <div className="purchase-history-main-container">
-        <div className='col-md-12 purchase-title-container'>
-        <h1 className='history-title'>Purchase History</h1>
-            <div className="col-md-10 search-date-container row" style={{ gap:'10px', marginTop:'20px'}}>
-                <div className='col-md-4 history-search-container' style={{  display:'flex', flexFlow:'row', paddingLeft:'20px'}}>
-                    <input className="form-control me-2" type="search" placeholder="Search by Order No." aria-label="Search"/>
-                    <button className="col-md-3 btn btn-outline-primary" type="submit">Search</button>
+    return (
+        <React.Fragment>
+            {isLoading ? (
+                <div className="mainloading-screen">
+                    <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
                 </div>
-            </div>
-        </div>
-        
-        <div className='col-md-12 history-table-container'>
-            <div className='col-md-10 history-table-wrapper table-responsive'>
-                <table className="purchase-table table table-hover table-striped align-middle caption-bot table-xxl">
-                    <caption>end of list of purchase history</caption>
-                    <thead className='table-dark align-middle'>
-                        <tr className='thead-row'>
-                            <th scope="col">Date</th>
-                            <th className="text-center" scope="col">Order No.</th>
-                            <th className="text-center" scope="col">Shop</th>
-                            <th className="text-center" scope="col">Number of Items</th>
-                            <th className="text-center" scope="col">Total Amount</th>
-                        </tr>
-                    </thead>
-                    {purchases.length > 0 ? (
-                        purchases.filter(purchase => Status[Object.keys(Status)[purchase.status - 1]] === Status.Completed ||
-                            Status[Object.keys(Status)[purchase.status - 1]] === Status.Completed).map((purchaseItem, index) => (
-                            <tbody key={index} className="table-group-divider">
-                                <tr className='align-middle' data-bs-toggle="modal" data-bs-target="#purchaseHistoryModal" onClick={() => setSelectedPurchases(purchaseItem)}>
-                                    <th scope="row">{formatDate(purchaseItem.dateCreated)}</th>
-                                    <td className="text-center">{purchaseItem.orderNumber}</td>
-                                    <td className="text-center">{purchaseItem.cart.supplier.shopName}</td>
-                                    <td className="text-center">{purchaseItem.orderItems.length}</td>
-                                    <td className="text-center">₱{purchaseItem.total.toLocaleString()}</td>
+            ) : (
+                <div className="purchase-history-main-container">
+                <div className='col-md-12 purchase-title-container'>
+                <h1 className='history-title'>Purchase History</h1>
+                    <div className="col-md-10 search-date-container row" style={{ gap:'10px', marginTop:'20px'}}>
+                        <div className='col-md-4 history-search-container' style={{  display:'flex', flexFlow:'row', paddingLeft:'20px'}}>
+                            <input className="form-control me-2" type="search" placeholder="Search by Order No." aria-label="Search"/>
+                            <button className="col-md-3 btn btn-outline-primary" type="submit">Search</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div className='col-md-12 history-table-container'>
+                    <div className='col-md-10 history-table-wrapper table-responsive'>
+                        <table className="purchase-table table table-hover table-striped align-middle caption-bot table-xxl">
+                            <caption>end of list of purchase history</caption>
+                            <thead className='table-dark align-middle'>
+                                <tr className='thead-row'>
+                                    <th scope="col">Date</th>
+                                    <th className="text-center" scope="col">Order No.</th>
+                                    <th className="text-center" scope="col">Shop</th>
+                                    <th className="text-center" scope="col">Number of Items</th>
+                                    <th className="text-center" scope="col">Total Amount</th>
                                 </tr>
-                            </tbody>
-                        ))
-                        ) : (
-                        <tbody className="table-group-divider">
-                            <tr data-bs-toggle="modal" className="text-center">
-                                <td></td>
-                                <td></td>
-                                <td>No purchase history available</td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    )}
-                </table>
-            </div>
-        </div>
-
-    <div className="purchase-history-modal modal fade" id="purchaseHistoryModal" tabIndex={-1} aria-labelledby="purchaseHistoryModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-dialog-centered modal-xl">
-            <div className="orders-modal-content modal-content" style={{ backgroundColor:'#fff' }}>
-                <div className="modal-header">
-                    <h3 className='modal-order-title'>Order Details</h3>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" ></button>
-                </div>
-                <div className='col-md-12 row' style={{ display:'flex', justifyContent:'space-between', padding:'15px' }}>
-                {selectedPurchases && (
-                    <div className="modal-body">
-                    <div style={{ display:'flex', flexFlow:'row', gap:'50px' }}>
-                        <div className='col-md-3 product-details-container'>
-
-                            <div className='customer-details-content'>
-                                <h3 className='order-details-titles'>Customer Details</h3>
-                                <span className="customer-details-text">First Name: <p className="customer-details-input">{selectedPurchases.user.firstName}</p></span>
-                                <span className="customer-details-text">Last Name: <p className="customer-details-input">{selectedPurchases.user.lastName}</p></span>
-                                <span className="customer-details-text">ID Number: <p className="customer-details-input">{selectedPurchases.user.id}</p></span>
-                                <span className="customer-details-text">Phone Number: <p className="customer-details-input">{selectedPurchases.user.phoneNumber}</p></span>
-                            </div>
-
-                            <div className='order-details-content'>
-                                <h3 className='order-details-titles'>Order Details</h3>
-                                <span className="order-details-text">Order Date: <p className="order-details-input">{formatDate(selectedPurchases.dateCreated)}</p></span>
-                                <span className="order-details-text">Order No: <p className="order-details-input">{selectedPurchases.orderNumber}</p></span>
-                                <span className="order-details-text">Number of Items: <p className="order-details-input">{selectedPurchases.orderItems.length}</p></span>
-                                <span className="order-details-text">Payment option: <p className="order-details-input">{PaymentType[Object.keys(PaymentType)[selectedPurchases.paymentType - 1]]}</p></span>
-                            </div>
-                            
-                            <div className='payment-details-content'>
-                                <h3 className='order-details-titles'>Payment Details</h3>
-                                <p style={{ fontSize: "15px" }}>Total Amount: ₱{selectedPurchases.total.toLocaleString()}</p>
-                                <span className="order-details-text">Proof of payment:</span>
-                                <a 
-                                    className="modal-info" 
-                                    rel="noopener noreferrer" 
-                                    target="_blank" 
-                                    href={`https://localhost:7017/${selectedPurchases.proofOfPayment}`} 
-                                >
-                                    {selectedPurchases.proofOfPayment.split('\\').pop()}
-                                </a>
-                            </div>
-
-                            <div className="claimed-details-container">
-                                <h3 style={{ fontSize: "15px" }}>Status: {Status[Object.keys(Status)[selectedPurchases.status - 1]]}</h3>
-                                <p style={{ fontSize: "15px" }}>Date Claimed: {formatDate(selectedPurchases.dateUpdated)}</p>
-                                <p style={{ fontSize: "15px" }}>Receiver: {selectedPurchases.user.firstName} {selectedPurchases.user.lastName}</p>
-                            </div>
-                        </div>
-
-                        <div className='col-md-8 item-details-container'>
-                        <h3>Item Details:</h3>
-                        <div className='order-table-wrapper table-responsive-sm'>
-                            <table className="table table-hover align-middle caption-bot table-xl">
-                                <caption>end of list</caption>
-                                <thead className='table-dark align-middle'>
-                                    <tr className='thead-row'>
-                                        <th className="order-table-header" scope="col">Product Name</th>
-                                        <th className="order-table-header text-center" scope="col">Product Type</th>
-                                        <th className="order-table-header text-center" scope="col">Gender</th>
-                                        <th className="order-table-header text-center" scope="col">Size</th>
-                                        <th className="order-table-header text-center" scope="col">Quantity</th>
-                                        <th className="order-table-header text-center" scope="col">Price</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="table-group-divider">
-                                {selectedPurchases && selectedPurchases.orderItems && 
-                                    (Status[Object.keys(Status)[selectedPurchases.status - 1]] === Status.Completed) && (
-                                        selectedPurchases.orderItems.map((item, index) => (
-                                        <tr key={index}>
-                                            <th scope="row">{item.product.productName}</th>
-                                            <td>{getProductTypeName(item.product.productTypeId)}</td>
-                                            <td className="text-center">{item.product.category}</td>
-                                            <td className="text-center">{item.sizeQuantity.size}</td>
-                                            <td className="text-center">{item.quantity}</td>
-                                            <td className="text-center">₱{item.product.price.toLocaleString()}</td>
+                            </thead>
+                            {purchases.length > 0 ? (
+                                purchases.filter(purchase => Status[Object.keys(Status)[purchase.status - 1]] === Status.Completed ||
+                                    Status[Object.keys(Status)[purchase.status - 1]] === Status.Completed).map((purchaseItem, index) => (
+                                    <tbody key={index} className="table-group-divider">
+                                        <tr className='align-middle' data-bs-toggle="modal" data-bs-target="#purchaseHistoryModal" onClick={() => setSelectedPurchases(purchaseItem)}>
+                                            <th scope="row">{formatDate(purchaseItem.dateCreated)}</th>
+                                            <td className="text-center">{purchaseItem.orderNumber}</td>
+                                            <td className="text-center">{purchaseItem.cart.supplier.shopName}</td>
+                                            <td className="text-center">{purchaseItem.orderItems.length}</td>
+                                            <td className="text-center">₱{purchaseItem.total.toLocaleString()}</td>
                                         </tr>
-                                    ))
-                                )}
+                                    </tbody>
+                                ))
+                                ) : (
+                                <tbody className="table-group-divider">
+                                    <tr data-bs-toggle="modal" className="text-center">
+                                        <td></td>
+                                        <td></td>
+                                        <td>No purchase history available</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
                                 </tbody>
-                            </table>
+                            )}
+                        </table>
+                    </div>
+                </div>
+        
+            <div className="purchase-history-modal modal fade" id="purchaseHistoryModal" tabIndex={-1} aria-labelledby="purchaseHistoryModalLabel" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered modal-xl">
+                    <div className="orders-modal-content modal-content" style={{ backgroundColor:'#fff' }}>
+                        <div className="modal-header">
+                            <h3 className='modal-order-title'>Order Details</h3>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose" ></button>
                         </div>
-                        {!ratedPurchases.has(selectedPurchases.id) ? (
-                            <div className='rating-container'>
-                               {/* Product Rating */}
-                                <div className="prod-rating">
-                                    <h3 className='order-details-titles'>Product Rating:</h3>
-                                    <Rating 
-                                        activeColor="#ffd700" 
-                                        count={5} 
-                                        size={45} 
-                                        value={ratingProduct}  
-                                        onChange={(rating) => setRatingProduct(rating)} 
-                                    />
+                        <div className='col-md-12 row' style={{ display:'flex', justifyContent:'space-between', padding:'15px' }}>
+                        {selectedPurchases && (
+                            <div className="modal-body">
+                            <div style={{ display:'flex', flexFlow:'row', gap:'50px' }}>
+                                <div className='col-md-3 product-details-container'>
+        
+                                    <div className='customer-details-content'>
+                                        <h3 className='order-details-titles'>Customer Details</h3>
+                                        <span className="customer-details-text">First Name: <p className="customer-details-input">{selectedPurchases.user.firstName}</p></span>
+                                        <span className="customer-details-text">Last Name: <p className="customer-details-input">{selectedPurchases.user.lastName}</p></span>
+                                        <span className="customer-details-text">ID Number: <p className="customer-details-input">{selectedPurchases.user.id}</p></span>
+                                        <span className="customer-details-text">Phone Number: <p className="customer-details-input">{selectedPurchases.user.phoneNumber}</p></span>
+                                    </div>
+        
+                                    <div className='order-details-content'>
+                                        <h3 className='order-details-titles'>Order Details</h3>
+                                        <span className="order-details-text">Order Date: <p className="order-details-input">{formatDate(selectedPurchases.dateCreated)}</p></span>
+                                        <span className="order-details-text">Order No: <p className="order-details-input">{selectedPurchases.orderNumber}</p></span>
+                                        <span className="order-details-text">Number of Items: <p className="order-details-input">{selectedPurchases.orderItems.length}</p></span>
+                                        <span className="order-details-text">Payment option: <p className="order-details-input">{PaymentType[Object.keys(PaymentType)[selectedPurchases.paymentType - 1]]}</p></span>
+                                    </div>
+                                    
+                                    <div className='payment-details-content'>
+                                        <h3 className='order-details-titles'>Payment Details</h3>
+                                        <p style={{ fontSize: "15px" }}>Total Amount: ₱{selectedPurchases.total.toLocaleString()}</p>
+                                        <span className="order-details-text">Proof of payment:</span>
+                                        <a 
+                                            className="modal-info" 
+                                            rel="noopener noreferrer" 
+                                            target="_blank" 
+                                            href={`https://localhost:7017/${selectedPurchases.proofOfPayment}`} 
+                                        >
+                                            {selectedPurchases.proofOfPayment.split('\\').pop()}
+                                        </a>
+                                    </div>
+        
+                                    <div className="claimed-details-container">
+                                        <h3 style={{ fontSize: "15px" }}>Status: {Status[Object.keys(Status)[selectedPurchases.status - 1]]}</h3>
+                                        <p style={{ fontSize: "15px" }}>Date Claimed: {formatDate(selectedPurchases.dateUpdated)}</p>
+                                        <p style={{ fontSize: "15px" }}>Receiver: {selectedPurchases.user.firstName} {selectedPurchases.user.lastName}</p>
+                                    </div>
                                 </div>
-
-                                {/* Supplier Rating */}
-                                <div className="prod-rating">
-                                    <h3 className='order-details-titles'>Supplier Rating:</h3>
-                                        <Rating 
-                                            activeColor="#ffd700" 
-                                            count={5} 
-                                            size={45} 
-                                            value={ratingSupplier}
-                                            onChange={(rating) => setRatingSupplier(rating)} 
-                                        />
+        
+                                <div className='col-md-8 item-details-container'>
+                                <h3>Item Details:</h3>
+                                <div className='order-table-wrapper table-responsive-sm'>
+                                    <table className="table table-hover align-middle caption-bot table-xl">
+                                        <caption>end of list</caption>
+                                        <thead className='table-dark align-middle'>
+                                            <tr className='thead-row'>
+                                                <th className="order-table-header" scope="col">Product Name</th>
+                                                <th className="order-table-header text-center" scope="col">Product Type</th>
+                                                <th className="order-table-header text-center" scope="col">Gender</th>
+                                                <th className="order-table-header text-center" scope="col">Size</th>
+                                                <th className="order-table-header text-center" scope="col">Quantity</th>
+                                                <th className="order-table-header text-center" scope="col">Price</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="table-group-divider">
+                                        {selectedPurchases && selectedPurchases.orderItems && 
+                                            (Status[Object.keys(Status)[selectedPurchases.status - 1]] === Status.Completed) && (
+                                                selectedPurchases.orderItems.map((item, index) => (
+                                                <tr key={index}>
+                                                    <th scope="row">{item.product.productName}</th>
+                                                    <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                                    <td className="text-center">{item.product.category}</td>
+                                                    <td className="text-center">{item.sizeQuantity.size}</td>
+                                                    <td className="text-center">{item.quantity}</td>
+                                                    <td className="text-center">₱{item.product.price.toLocaleString()}</td>
+                                                </tr>
+                                            ))
+                                        )}
+                                        </tbody>
+                                    </table>
                                 </div>
-
-                            </div>
-                        ) : (
-                            <div className="rating-complete-message">
-                                <p className="thank-you-message">Thank you for rating!</p>
-                                <p className="follow-up-message">Based on your previous purchases, we recommend the following products for you. If you wish to buy again, just click the 'buy again' button below of the modal.</p>
-                                <div className="recommendation-section">
-                                    {recommendationProducts.map((product, index) => (
-                                        <div key={index} className="recommendation-card">
-                                            <img src={`https://localhost:7017/${product.image}`} alt={product.productName} className="product-image" />
-                                            <div className="product-details">
-                                                <h4 className="product-name">{product.productName}</h4>
-                                                <p className="product-description">{product.description}</p>
-                                                <p className="product-price">₱{product.price.toLocaleString()}</p>
-                                            </div>
-                                            <button className="go-to-shop-button">Go to Shop</button>
+                                {!ratedPurchases.has(selectedPurchases.id) ? (
+                                    <div className='rating-container'>
+                                       {/* Product Rating */}
+                                        <div className="prod-rating">
+                                            <h3 className='order-details-titles'>Product Rating:</h3>
+                                            <Rating 
+                                                activeColor="#ffd700" 
+                                                count={5} 
+                                                size={45} 
+                                                value={ratingProduct}  
+                                                onChange={(rating) => setRatingProduct(rating)} 
+                                            />
                                         </div>
-                                    ))}
+        
+                                        {/* Supplier Rating */}
+                                        <div className="prod-rating">
+                                            <h3 className='order-details-titles'>Supplier Rating:</h3>
+                                                <Rating 
+                                                    activeColor="#ffd700" 
+                                                    count={5} 
+                                                    size={45} 
+                                                    value={ratingSupplier}
+                                                    onChange={(rating) => setRatingSupplier(rating)} 
+                                                />
+                                        </div>
+        
+                                    </div>
+                                ) : (
+                                    <div className="rating-complete-message">
+                                        <p className="thank-you-message">Thank you for rating!</p>
+                                        <p className="follow-up-message">Based on your previous purchases, we recommend the following products for you. If you wish to buy again, just click the 'buy again' button below of the modal.</p>
+                                        <div className="recommendation-section">
+                                            {recommendationProducts.map((product, index) => (
+                                                <div key={index} className="recommendation-card">
+                                                    <img src={`https://localhost:7017/${product.image}`} alt={product.productName} className="product-image" />
+                                                    <div className="product-details">
+                                                        <h4 className="product-name">{product.productName}</h4>
+                                                        <p className="product-description">{product.description}</p>
+                                                        <p className="product-price">₱{product.price.toLocaleString()}</p>
+                                                    </div>
+                                                    <button className="go-to-shop-button">Go to Shop</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}    
+        
+                                {!ratedPurchases.has(selectedPurchases.id) && (
+                                    <React.Fragment>
+                                        <button 
+                                            className="proceed-Btn" 
+                                            style={{ background: '#FFAA00', marginTop: '50px' }}
+                                            onClick={() => HandleSubmitRatings(selectedPurchases.id, selectedPurchases.cart.items[0].product.productId, 
+                                                                        selectedPurchases.cart.items[0].product.supplierId, 
+                                                                        ratingProduct, 
+                                                                        ratingSupplier)}>
+                                            Submit
+                                        </button>
+                                    </React.Fragment>
+                                )}
+        
                                 </div>
                             </div>
-                        )}    
-
-                        {!ratedPurchases.has(selectedPurchases.id) && (
-                            <React.Fragment>
-                                <button 
-                                    className="proceed-Btn" 
-                                    style={{ background: '#FFAA00', marginTop: '50px' }}
-                                    onClick={() => HandleSubmitRatings(selectedPurchases.id, selectedPurchases.cart.items[0].product.productId, 
-                                                                selectedPurchases.cart.items[0].product.supplierId, 
-                                                                ratingProduct, 
-                                                                ratingSupplier)}>
-                                    Submit
-                                </button>
-                            </React.Fragment>
-                        )}
-
                         </div>
+                        )}
+                        </div>
+                        {selectedPurchases && (
+                            <div className="modal-footer">
+                                <Link to={`/shop/${userId}/visit_shop/${selectedPurchases.cart.supplier.id}`}>
+                                    <button className="proceed-Btn" onClick={handleCLose}>
+                                        Buy Again
+                                    </button>
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 </div>
-                )}
-                </div>
-                {selectedPurchases && (
-                    <div className="modal-footer">
-                        <Link to={`/shop/${userId}/visit_shop/${selectedPurchases.cart.supplier.id}`}>
-                            <button className="proceed-Btn" onClick={handleCLose}>
-                                Buy Again
-                            </button>
-                        </Link>
-                    </div>
-                )}
             </div>
         </div>
-    </div>
-</div>
+            )}
+        </React.Fragment>
+    )
 }
 
 export default Purchase_History

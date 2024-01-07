@@ -1,6 +1,7 @@
 import './admin_reports.css'
 import totalOrdersIcon from "../../assets/images/icons/order-2.png"
 import salesIcon from "../../assets/images/icons/sales.png"
+import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 import ExcelJS from "exceljs"
 import {
     Chart as ChartJS,
@@ -16,6 +17,7 @@ import { Bar, Pie } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import orderEventEmitter from '../../helpers/OrderEmitter';
+import React from 'react';
 
 ChartJS.register(
     BarElement,
@@ -36,6 +38,7 @@ function Admin_Reports () {
     const [selectedShop, setSelectedShop] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('');
     const [supplierOrderCounts, setSupplierOrderCounts] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
 
     // * Get the Sales by Weekly, Monthly, Yearly
     useEffect(() => {
@@ -95,12 +98,15 @@ function Admin_Reports () {
 
     // * Fetch Data of All Orders
     useEffect(() => {
+        setIsLoading(true);
         const fetchOrders = async () => {
             try {
-                const res = await axios.get('https://localhost:7017/Order');
-                setOrders(res.data);
+                const response = await axios.get('https://localhost:7017/Order');
+                setOrders(response.data);
+                setIsLoading(false);
             } catch (error) {
                 console.error("Error fetching orders: ", error);
+                setIsLoading(false);
             }
         };
 
@@ -341,187 +347,197 @@ function Admin_Reports () {
 
     const options = {}
 
-    return <div className="admin-reports-main-container">
-        <h3 style={{ marginBottom:'20px', color:'#020654', fontWeight:'600' }}>Reports</h3>
-        <div className='admin-reports-header'>
-            {/* HEADER CARDS */}
-            <div className='admin-reports-allOrders-card'>
-                <div className='col-md-9'>
-                    <h5 className='header-adminSales-label'>Total Orders</h5>
-                    <h3>{orders ? orders.length : 0}</h3>
-                    <ul className="nav nav-pills"
-                    style={{
-                        display:'flex',
-                        justifyContent:'center',
-                        borderRadius:'20px',
-                        border:'solid 1px black' }}>
-                        <a 
-                            className="nav-link view-allOrders-btn-admin" 
-                            href="#orderListAdmin" 
-                            id="navbar-ordersList"
-                        >
-                            View all orders
-                        </a>
-                    </ul>
-
-                </div>
-                    <img className='admin-reports-headerIcons' src={ totalOrdersIcon } alt="" />
-                <div>
-
-                </div>
-            </div>
-
-            <div className='admin-salesCards-container'>
-                <div className='admin-sales-card'>
-                    {/* WEEKLY */}
-                    <div className='col-md-9'>
-                        <h5 className='header-adminSales-label'>Weekly Sales</h5>
-                        <h3>₱{weeklySales.length > 0 ? weeklySales.reduce((a, b) => a + b).toLocaleString() : 0}</h3>
+    return (
+        <React.Fragment>
+            {isLoading ? (
+                    <div className="mainloading-screen">
+                        <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
                     </div>
-                    <img className='admin-reports-headerIcons' src={ salesIcon }/>
-                </div>
-
-                {/* MONTHLY */}
-                <div className='admin-sales-card'>
-                    <div className='col-md-9'>
-                        <h5 className='header-adminSales-label'>Monthly Sales</h5>
-                        <h3>₱{monthlySales.length > 0 ? monthlySales.reduce((a, b) => a + b).toLocaleString() : 0}</h3>
+            ) : (
+                <div className="admin-reports-main-container">
+                <h3 style={{ marginBottom:'20px', color:'#020654', fontWeight:'600' }}>Reports</h3>
+                <div className='admin-reports-header'>
+                    {/* HEADER CARDS */}
+                    <div className='admin-reports-allOrders-card'>
+                        <div className='col-md-9'>
+                            <h5 className='header-adminSales-label'>Total Orders</h5>
+                            <h3>{orders ? orders.length : 0}</h3>
+                            <ul className="nav nav-pills"
+                            style={{
+                                display:'flex',
+                                justifyContent:'center',
+                                borderRadius:'20px',
+                                border:'solid 1px black' }}>
+                                <a 
+                                    className="nav-link view-allOrders-btn-admin" 
+                                    href="#orderListAdmin" 
+                                    id="navbar-ordersList"
+                                >
+                                    View all orders
+                                </a>
+                            </ul>
+        
+                        </div>
+                            <img className='admin-reports-headerIcons' src={ totalOrdersIcon } alt="" />
+                        <div>
+        
+                        </div>
                     </div>
-                    <img className='admin-reports-headerIcons' src={ salesIcon }/>
-                </div>
-
-                {/* YEARLY */}
-                <div className='admin-sales-card'>
-                    <div className='col-md-9'>
-                        <h5 className='header-adminSales-label'>Yearly Sales</h5>
-                        <h3>₱{yearlySales.length > 0 ? yearlySales.reduce((a, b) => a + b).toLocaleString() : 0}</h3>
+        
+                    <div className='admin-salesCards-container'>
+                        <div className='admin-sales-card'>
+                            {/* WEEKLY */}
+                            <div className='col-md-9'>
+                                <h5 className='header-adminSales-label'>Weekly Sales</h5>
+                                <h3>₱{weeklySales.length > 0 ? weeklySales.reduce((a, b) => a + b).toLocaleString() : 0}</h3>
+                            </div>
+                            <img className='admin-reports-headerIcons' src={ salesIcon }/>
+                        </div>
+        
+                        {/* MONTHLY */}
+                        <div className='admin-sales-card'>
+                            <div className='col-md-9'>
+                                <h5 className='header-adminSales-label'>Monthly Sales</h5>
+                                <h3>₱{monthlySales.length > 0 ? monthlySales.reduce((a, b) => a + b).toLocaleString() : 0}</h3>
+                            </div>
+                            <img className='admin-reports-headerIcons' src={ salesIcon }/>
+                        </div>
+        
+                        {/* YEARLY */}
+                        <div className='admin-sales-card'>
+                            <div className='col-md-9'>
+                                <h5 className='header-adminSales-label'>Yearly Sales</h5>
+                                <h3>₱{yearlySales.length > 0 ? yearlySales.reduce((a, b) => a + b).toLocaleString() : 0}</h3>
+                            </div>
+                            <img className='admin-reports-headerIcons' src={ salesIcon }/>
+                        </div>
                     </div>
-                    <img className='admin-reports-headerIcons' src={ salesIcon }/>
+                    {/* GENERATE REPORT BUTTON */}
+                    <button className='admin-generate-report-btn' onClick={HandleExportToExcel}>Generate Report</button>
                 </div>
-            </div>
-            {/* GENERATE REPORT BUTTON */}
-            <button className='admin-generate-report-btn' onClick={HandleExportToExcel}>Generate Report</button>
-        </div>
-
-        <div 
-        style={{ display:'flex', flexFlow:'row', justifyContent:'space-evenly' }}>
-            {/* SALES REVIEW BAR CHART */}
-        <div className='monthly-sales-chart-container'
-                    style={{ width:'51.7rem',
-                    border:'solid 5px white',
-                    marginTop:'20px',
-                    padding:'20px',
-                    borderRadius:'10px'}}>
-                    
-                    <h1 style={{ color:'#020654' }}>Sales Review</h1>
-                    
-                    <Bar
-                        style={{ marginTop:'15px' }}
-                        data= { data }
-                        options= { options }
-                    ></Bar>
-            </div>
-
-            {/* ORDERS REVIEW PIE CHART */}
-            <div style={{ 
-                marginTop:'20px',
-                border: 'solid 5px white',
-                borderRadius: '10px',
-                padding: '20px',
-                width:'500px'
-            }}>
-                <div
-                    style={{ 
-                        width: '300px',
-                        height: '300px'
+        
+                <div 
+                style={{ display:'flex', flexFlow:'row', justifyContent:'space-evenly' }}>
+                    {/* SALES REVIEW BAR CHART */}
+                <div className='monthly-sales-chart-container'
+                            style={{ width:'51.7rem',
+                            border:'solid 5px white',
+                            marginTop:'20px',
+                            padding:'20px',
+                            borderRadius:'10px'}}>
+                            
+                            <h1 style={{ color:'#020654' }}>Sales Review</h1>
+                            
+                            <Bar
+                                style={{ marginTop:'15px' }}
+                                data= { data }
+                                options= { options }
+                            ></Bar>
+                    </div>
+        
+                    {/* ORDERS REVIEW PIE CHART */}
+                    <div style={{ 
+                        marginTop:'20px',
+                        border: 'solid 5px white',
+                        borderRadius: '10px',
+                        padding: '20px',
+                        width:'500px'
                     }}>
-                        <h1 style={{ color:'#020654' }}>Orders Review</h1>
-                        <Pie data={pieChartData} options={options} />
+                        <div
+                            style={{ 
+                                width: '300px',
+                                height: '300px'
+                            }}>
+                                <h1 style={{ color:'#020654' }}>Orders Review</h1>
+                                <Pie data={pieChartData} options={options} />
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    
-        <div data-bs-spy="scroll"
-            data-bs-target="#navbar-ordersList" 
-            data-bs-root-margin="0px 0px -40%" 
-            data-bs-smooth-scroll="true" 
-            className="scrollspy-example bg-body-tertiary p-3 rounded-2 orderList-admin-container" 
-            tabIndex={0}>
-            <h1 id="orderListAdmin" style={{ color:'#020654' }}>Order List</h1>
-            {/* FILTER */}
-            <div className='admin-listOrders-filter-container'>
-                <h4>Sort by</h4>
-                <div>
-                    <label style={{ marginRight:'10px' }} htmlFor="statusOrderFilter">Order Status: </label>
-                    <select style={{ padding: '10px', border: '2px solid white' }} name="order-status-filter-admin" id="statusOrderFilter" onChange={(e) => setSelectedStatus(e.target.value)}>
-                        <option value="" disabled hidden selected>Select an order status</option>
-                        <option value="All" >All</option>
-                        <option value="1">Order Placed</option>
-                        <option value="2">Pending</option>
-                        <option value="3">Approved</option>
-                        <option value="4">For Pick Up</option>
-                        <option value="5">Completed</option>
-                        <option value="6">Canceled</option>
-                        <option value="7">Denied</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label style={{ marginRight:'10px' }} htmlFor="supplierFilter">Shop</label>
-                    <select 
-                        style={{ padding: '10px', border: '2px solid white' }} 
-                        name="order-status-filter-admin" 
-                        id="supplierFilter" 
-                        onChange={(e) => setSelectedShop(e.target.value)}
-                    >
-                        <option value="" disabled hidden selected>Select a shop</option>
-                        <option value="All">All</option>
-                        {shops.map((shop) => 
-                            shop.role === 2 ? (
-                                <option key={shop.id} value={shop.id}>{shop.shopName}</option>
-                            ) : null
+            
+                <div data-bs-spy="scroll"
+                    data-bs-target="#navbar-ordersList" 
+                    data-bs-root-margin="0px 0px -40%" 
+                    data-bs-smooth-scroll="true" 
+                    className="scrollspy-example bg-body-tertiary p-3 rounded-2 orderList-admin-container" 
+                    tabIndex={0}>
+                    <h1 id="orderListAdmin" style={{ color:'#020654' }}>Order List</h1>
+                    {/* FILTER */}
+                    <div className='admin-listOrders-filter-container'>
+                        <h4>Sort by</h4>
+                        <div>
+                            <label style={{ marginRight:'10px' }} htmlFor="statusOrderFilter">Order Status: </label>
+                            <select style={{ padding: '10px', border: '2px solid white' }} name="order-status-filter-admin" id="statusOrderFilter" onChange={(e) => setSelectedStatus(e.target.value)}>
+                                <option value="" disabled hidden selected>Select an order status</option>
+                                <option value="All" >All</option>
+                                <option value="1">Order Placed</option>
+                                <option value="2">Pending</option>
+                                <option value="3">Approved</option>
+                                <option value="4">For Pick Up</option>
+                                <option value="5">Completed</option>
+                                <option value="6">Canceled</option>
+                                <option value="7">Denied</option>
+                            </select>
+                        </div>
+        
+                        <div>
+                            <label style={{ marginRight:'10px' }} htmlFor="supplierFilter">Shop</label>
+                            <select 
+                                style={{ padding: '10px', border: '2px solid white' }} 
+                                name="order-status-filter-admin" 
+                                id="supplierFilter" 
+                                onChange={(e) => setSelectedShop(e.target.value)}
+                            >
+                                <option value="" disabled hidden selected>Select a shop</option>
+                                <option value="All">All</option>
+                                {shops.map((shop) => 
+                                    shop.role === 2 ? (
+                                        <option key={shop.id} value={shop.id}>{shop.shopName}</option>
+                                    ) : null
+                                )}
+                            </select>
+                        </div>
+                    </div>
+        
+                    {/* TABLE */}
+                    <table className="table">
+                        <thead>
+                            <tr>
+                            <th scope="col">Order No.</th>
+                            <th className='text-center' scope="col">Shop</th>
+                            <th className='text-center' scope="col">Customer</th>
+                            <th className='text-center' scope="col">Number of Items</th>
+                            <th className='text-center' scope="col">Total Amount</th>
+                            <th className='text-center' scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {filteredOrders.map((ord) => 
+                            <tr key={ord.id}>
+                                <th scope="row">{ord.orderNumber}</th>
+                                <td className='text-center'>{ord.cart.supplier.shopName}</td>
+                                <td className='text-center'>{ord.user.firstName} {ord.user.lastName}</td>
+                                <td className='text-center'>{ord.orderItems.reduce((total, item) => total + item.quantity, 0)}</td>
+                                <td className='text-center'>{ord.total.toLocaleString()}</td>
+                                <td className='text-center'>
+                                    {
+                                        ord.status === 1 ? 'Order Placed' : 
+                                        ord.status === 2 ? 'Pending' : 
+                                        ord.status === 3 ? 'Approved' : 
+                                        ord.status === 4 ? 'For Pick Up' : 
+                                        ord.status === 5 ? 'Completed' : 
+                                        ord.status === 6 ? 'Canceled' : 
+                                        ord.status === 7 ? 'Denied' : 'Unavailable' 
+                                    }
+                                </td>
+                            </tr>
                         )}
-                    </select>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-            {/* TABLE */}
-            <table className="table">
-                <thead>
-                    <tr>
-                    <th scope="col">Order No.</th>
-                    <th className='text-center' scope="col">Shop</th>
-                    <th className='text-center' scope="col">Customer</th>
-                    <th className='text-center' scope="col">Number of Items</th>
-                    <th className='text-center' scope="col">Total Amount</th>
-                    <th className='text-center' scope="col">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {filteredOrders.map((ord) => 
-                    <tr key={ord.id}>
-                        <th scope="row">{ord.orderNumber}</th>
-                        <td className='text-center'>{ord.cart.supplier.shopName}</td>
-                        <td className='text-center'>{ord.user.firstName} {ord.user.lastName}</td>
-                        <td className='text-center'>{ord.orderItems.reduce((total, item) => total + item.quantity, 0)}</td>
-                        <td className='text-center'>{ord.total.toLocaleString()}</td>
-                        <td className='text-center'>
-                            {
-                                ord.status === 1 ? 'Order Placed' : 
-                                ord.status === 2 ? 'Pending' : 
-                                ord.status === 3 ? 'Approved' : 
-                                ord.status === 4 ? 'For Pick Up' : 
-                                ord.status === 5 ? 'Completed' : 
-                                ord.status === 6 ? 'Canceled' : 
-                                ord.status === 7 ? 'Denied' : 'Unavailable' 
-                            }
-                        </td>
-                    </tr>
-                )}
-                </tbody>
-            </table>
-        </div>
-    </div>
+            )}
+        </React.Fragment>
+    )
 }
 
 export default Admin_Reports

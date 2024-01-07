@@ -36,7 +36,7 @@ function Confirmation_Code() {
 
     // * Confirm Email
     const handleConfirmEmail = async () => {
-        const id = localStorage.getItem("Id");
+        //const id = localStorage.getItem("Id");
         if (!confirmEmail) {
             toast.error("Confirmation code is required.");
             return;
@@ -61,12 +61,12 @@ function Confirmation_Code() {
                         case 1:
                             setIsLoading(true);
                             await sleep(500);
-                            navigate(`/shop/${id}`);
+                            navigate(`/shop/${data.id}`);
                             break;
                         case 2:
                             setIsLoading(true);
                             await sleep(500);
-                            navigate(`/supplier_dashboard/${id}`);
+                            navigate(`/supplier_dashboard/${data.id}`);
                             break;
                         default:
                             toast.error("Unknown user role.");
