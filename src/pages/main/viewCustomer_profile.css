@@ -104,3 +104,11 @@
     padding: 5px;
     border-radius: 5px;
 }
+
+.input-prof:disabled {
+    background-color: #f2f2f2;
+    color: #888;
+    border: 1px solid #ccc; 
+    cursor: not-allowed; 
+    box-shadow: none; 
+}

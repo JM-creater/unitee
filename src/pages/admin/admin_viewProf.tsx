@@ -1,20 +1,19 @@
 import "./admin_viewProf.css";
 import editProfIcon from "../../assets/images/icons/editing.png";
-import genderIcon from "../../assets/images/icons/gender-fluid.png";
 import emailIcon from "../../assets/images/icons/mail-2.png";
 import phoneIcon from "../../assets/images/icons/smartphone-call.png";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
+import uploadimage from "../../assets/images/icons/uploadimage.png"
+import React from "react";
 
 type ValidationErrors = {
   firstName?: string;
   lastName?: string;
   email?: string;
   phoneNumber?: string;
-  gender?: string;
-  departmentId?: string;
 };
 
 type UserProfileType = {
@@ -23,11 +22,6 @@ type UserProfileType = {
   email: string;
   phoneNumber: string;
   password: string;
-  departmentId: string;
-  department: {
-    department_Name: string;
-  };
-  gender: string;
   image: string;
 };
 
@@ -37,11 +31,42 @@ function Admin_viewProf() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [gender, setGender] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
   const { id } = useParams();
 
   // * For Delay
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+   // * toggle input
+   const toggleInput = () => {
+    setIsDisabled(!isDisabled);
+    setPassword(''); 
+    setConfirmPassword('');
+  }
+
+  // * Show the inputs
+  const handleEditProfileClick = () => {
+    setIsEditing(!isEditing); 
+  };
+
+  // * Handle Upload Image
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+    if (file) {
+      setImage(file);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const newImageUrl = event.target?.result as string;
+        setImagePreviewUrl(newImageUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // * Handle Phone Number
   const handlePhoneNumber = (value) => {
@@ -62,9 +87,6 @@ function Admin_viewProf() {
         setLastName(response.data.lastName);
         setEmail(response.data.email);
         setPhoneNumber(response.data.phoneNumber);
-        setGender(response.data.gender);
-
-        console.log(response.data.gender);
       } catch (error) {
         console.error(error);
       }
@@ -104,11 +126,6 @@ function Admin_viewProf() {
       toast.error(errors.phoneNumber);
     }
 
-    if (!gender) {
-      errors.gender = "Please select a gender.";
-      toast.error(errors.gender);
-    }
-
     return errors;
   };
 
@@ -122,27 +139,25 @@ function Admin_viewProf() {
       formData.append("firstName", firstName);
       formData.append("lastName", lastName);
       formData.append("email", email);
-      formData.append("gender", gender);
       formData.append("phoneNumber", phoneNumber);
+      formData.append("image", image);
 
       try {
-        const productResponse = await axios.put(
-          `https://localhost:7017/Users/updateProfileAdmin/${id}`,
-          formData,
-          {
+        const response = await axios.put(
+          `https://localhost:7017/Users/updateProfileAdmin/${id}`, formData, {
             headers: {
-              "Content-Type": "application/json-patch+json",
+              "Content-Type": "multipart/form-data",
             },
           }
         );
 
-        if (productResponse.status == 200) {
+        if (response.status == 200) {
           toast.success("Successfully Updated.");
           await sleep(1000);
 
           window.location.reload();
         } else {
-          toast.error(productResponse.data);
+          toast.error(response.data);
         }
       } catch (error) {
         console.error(error);
@@ -151,21 +166,94 @@ function Admin_viewProf() {
     }
   };
   
+
+  // * Handle update password
+  const handleUpdatePassword = async () => {
+    let errorFound = false;
+
+    if (!password) {
+      toast.error("Password is required.");
+      errorFound = true;
+    } else if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long.");
+      errorFound = true;
+    } else if (!/^[a-zA-Z0-9]*$/.test(password)) {
+      toast.error("Password must be alphanumeric.");
+      errorFound = true;
+    }
+
+    if (!confirmPassword) {
+      toast.error("Confirm Password is required.");
+      errorFound = true;
+    } else if (password !== confirmPassword) {
+      toast.error("Passwords did not match.");
+      errorFound = true;
+    }
+
+    if (errorFound) return;
+
+    try {
+      const response = await axios.put(
+        `https://localhost:7017/Users/updateAdminPassword/${id}`, { password: password }
+      );
+
+      if (response.status === 200) {
+        await sleep(100);
+        window.location.reload();
+        toast.success('Password updated successfully.');
+        setPassword(''); 
+        setConfirmPassword(''); 
+      } else {
+        toast.error('Failed to update password. Please try again later.');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('An error occurred while updating the password.');
+    }
+  };
+
+
   return (
     <div className="viewProfile-customer-main-container">
       <div className="profile-details-container">
         {UserProfile && (
           <div className="user-details-viewProfile">
-            <img
-              className="profileImg"
-              src={`https://localhost:7017/${UserProfile.image}`}
-              alt=""
-            />
+            {isEditing && (
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                id="imageUploadInput"
+                onChange={handleImageUpload}
+              />
+            )}
+            <label htmlFor="imageUploadInput" style={{ position: 'relative', display: 'inline-block' }}>
+              <img
+                className='profileImg'
+                src={imagePreviewUrl || `https://localhost:7017/${UserProfile.image}`}
+                alt="Profile"
+                style={{ width: '200px', height: '200px'}}
+              />
+              {isEditing && (
+                <img 
+                  src={uploadimage}
+                  alt="Upload Icon" 
+                  style={{ 
+                    position: 'absolute', 
+                    bottom: '-5px', 
+                    right: '20px',
+                    cursor: 'pointer',
+                    width: '40px',
+                    height: '40px'
+                  }} 
+                />
+              )}
+            </label>
             <div className="username-id-container">
               <h1 className="acc-name">
                 {UserProfile.firstName + " " + UserProfile.lastName}
               </h1>
-              <p className="id-number-profile">#{id}</p>
+              <p className="id-number-profile">{id}</p>
             </div>
           </div>
         )}
@@ -177,6 +265,7 @@ function Admin_viewProf() {
           data-bs-target="#editProfCollapse"
           aria-expanded="false"
           aria-controls="editProfCollapse"
+          onClick={handleEditProfileClick}
         >
           <img className="editIconProf" src={editProfIcon} alt="" />
           Edit Profile
@@ -208,6 +297,7 @@ function Admin_viewProf() {
               id="profFirstName"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
+              disabled={isDisabled}
             ></input>
 
             <label className="profLabelEdit" htmlFor="profLastName">
@@ -219,23 +309,8 @@ function Admin_viewProf() {
               id="profLastName"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
+              disabled={isDisabled}
             ></input>
-            <label className="profLabelEdit" htmlFor="profGender">
-              Gender
-            </label>
-            <select
-              name="genderProf"
-              id="profGender"
-              style={{ padding: "10px", border: "2px solid white" }}
-              onChange={(e) => setGender(e.target.value)}
-            >
-              <option value="Male" selected={gender == "Male"}>
-                Male
-              </option>
-              <option value="Female" selected={gender == "Female"}>
-                Female
-              </option>
-            </select>
           </div>
 
           <div className="editProf-details-2">
@@ -248,6 +323,7 @@ function Admin_viewProf() {
               id="profEmail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isDisabled}
             ></input>
 
             <label className="profLabelEdit" htmlFor="profPhone">
@@ -260,7 +336,40 @@ function Admin_viewProf() {
               value={phoneNumber}
               onChange={(e) => handlePhoneNumber(e.target.value)}
               maxLength={11}
+              disabled={isDisabled}
             ></input>
+              <label className='profLabelEdit' htmlFor="editPass">Password</label>
+              <button onClick={toggleInput}>
+                {isDisabled ? 'Hide Input Password' : 'Edit Password'}
+              </button>
+              {isDisabled && (
+                <React.Fragment>
+                  <label className='profLabelEdit' htmlFor="editPass">Current Password</label>
+                  <input 
+                    className='input-prof' 
+                    type="password" 
+                    name="" 
+                    id="editPass" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  >
+                  </input>
+                  <label className='profLabelEdit' htmlFor="editPass">Confirm Password</label>
+                  <input 
+                    className='input-prof' 
+                    type="password" 
+                    name="" 
+                    id="editPass" 
+                    value={confirmPassword} 
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  >
+                  </input>
+                  
+                  <div className="updatePassword-btn-container" style={{ display: 'flex', justifyContent: 'center' }}>
+                    <button className='editProf-save-btn' onClick={handleUpdatePassword}>Update</button>
+                  </div>
+                </React.Fragment>
+              )}    
           </div>
         </div>
         <div className="saveChanges-btn-container">
@@ -281,10 +390,6 @@ function Admin_viewProf() {
         <div className="about-userInfo-container">
           <div>
             <h5 className="about-details-prof">
-              <img className="aboutIcons" src={genderIcon} alt="" />
-              Gender
-            </h5>
-            <h5 className="about-details-prof">
               <img className="aboutIcons" src={emailIcon} alt="" />
               Email
             </h5>
@@ -295,7 +400,6 @@ function Admin_viewProf() {
           </div>
           {UserProfile && (
             <div>
-              <h5 className="about-details-prof">{UserProfile.gender}</h5>
               <h5 className="about-details-prof">{UserProfile.email}</h5>
               <h5 className="about-details-prof">{UserProfile.phoneNumber}</h5>
             </div>
