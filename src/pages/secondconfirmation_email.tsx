@@ -1,5 +1,5 @@
 import "./login.css";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import illustration from "../../src/assets/images/loginPic.png";
 import logo from "../../src/assets/images/unitee.png";
 import { toast } from "react-toastify";
@@ -27,18 +27,19 @@ function Confirmation_Code() {
     };
 
     // * Check if the email is confirmed
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            navigate('/');
-        }
-    }, [navigate]);
+    // useEffect(() => {
+    //     const token = localStorage.getItem('token');
+    //     if (!token) {
+    //         navigate('/');
+    //     }
+    // }, [navigate]);
 
     // * Confirm Email
     const handleConfirmEmail = async () => {
+        const id = localStorage.getItem("Id");
         if (!confirmEmail) {
-        toast.error("Confirmation code is required.");
-        return;
+            toast.error("Confirmation code is required.");
+            return;
         }
 
         try {
@@ -48,20 +49,35 @@ function Confirmation_Code() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ ConfirmationCode: confirmEmail }),
-            }
-        );
+            });
 
         if (response.ok) {
             try {
                 const data = await response.json();
                 toast.success("Confirmation Successful.", data);
+
+                if (data && data.role) {
+                    switch (data.role) {
+                        case 1:
+                            setIsLoading(true);
+                            await sleep(500);
+                            navigate(`/shop/${id}`);
+                            break;
+                        case 2:
+                            setIsLoading(true);
+                            await sleep(500);
+                            navigate(`/supplier_dashboard/${id}`);
+                            break;
+                        default:
+                            toast.error("Unknown user role.");
+                            break;
+                    }
+                } else {
+                    toast.error("User role not provided.");
+                }
             } catch (e) {
                 toast.success("Confirmation Successful.");
             }
-            localStorage.removeItem('token');
-            setIsLoading(true);
-            await sleep(500);
-            navigate("/");
         } else {
             try {
                 const errorData = await response.json();
@@ -75,6 +91,7 @@ function Confirmation_Code() {
             toast.error("An error occurred while confirming email.");
         }
     };
+
 
     return (
         <React.Fragment>

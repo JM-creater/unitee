@@ -4,7 +4,7 @@ import validIcon from "../../assets/images/icons/accept.png";
 import invalidIcon from "../../assets/images/icons/remove.png";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import validationEventEmitter from "../../helpers/ValidationEmitter";
 import registerUsersEventEmitter from "../../helpers/RegisterUsersEmitter";
 
