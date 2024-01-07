@@ -171,14 +171,12 @@ function Purchase_History () {
     };
 
     // * Format Date
-    const formatDate = (dateString) => {
+    const formatDate= (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0'); 
         const year = date.getFullYear();
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        return `${month}/${day}/${year} ${hours}:${minutes}`;
+        return `${month}/${day}/${year}`;
     };
 
     // * Update the Product Details Modal
@@ -322,7 +320,7 @@ function Purchase_History () {
         
                                     <div className="claimed-details-container">
                                         <h3 style={{ fontSize: "15px" }}>Status: {Status[Object.keys(Status)[selectedPurchases.status - 1]]}</h3>
-                                        <p style={{ fontSize: "15px" }}>Date Claimed: {formatDate(selectedPurchases.dateUpdated)}</p>
+                                        <p style={{ fontSize: "15px" }}>Date Claimed: {formatDate(selectedPurchases.estimatedDate)}</p>
                                         <p style={{ fontSize: "15px" }}>Receiver: {selectedPurchases.user.firstName} {selectedPurchases.user.lastName}</p>
                                     </div>
                                 </div>
