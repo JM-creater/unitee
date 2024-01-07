@@ -439,6 +439,8 @@
   border: #f0f0f0 solid 1px;
   border-top: none;
   transition: background-color 0.3s ease; 
+  z-index: 999999 !important;
+    position: absolute;
 }
 
 .search-dropdown-row:hover {

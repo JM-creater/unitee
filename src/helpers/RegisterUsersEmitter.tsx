@@ -15,7 +15,6 @@ class EventEmitter {
     }
 
     emit(event: string, ...args: unknown[]): void {
-        console.log(`Emitting event: ${event}`);
         if (this.events[event]) {
             this.events[event].forEach(listener => listener(...args));
         }

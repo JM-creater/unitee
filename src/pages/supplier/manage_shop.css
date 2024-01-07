@@ -67,11 +67,11 @@
 }
 
 .add-prod-btn-container {
-   height: fit-content;
-   display: flex;
-   justify-content: space-between;
-   width: 82vw;
-   align-items: center;
+    height: fit-content;
+    display: flex;
+    justify-content: space-between;
+    width: 82vw;
+    align-items: center;
 }
 
 .addbtnIcon {
