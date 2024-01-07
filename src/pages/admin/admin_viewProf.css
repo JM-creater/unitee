@@ -1,5 +1,5 @@
 .viewProfile-admin-main-container {
-    height: 92vh;
+    max-height: 92vh;
     width: 85vw;
     padding: 30px;
     flex-wrap: wrap;

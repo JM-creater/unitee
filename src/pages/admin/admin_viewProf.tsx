@@ -152,7 +152,7 @@ function Admin_viewProf() {
   };
   
   return (
-    <div className="viewProfile-customer-main-container">
+    <div className="viewProfile-admin-main-container">
       <div className="profile-details-container">
         {UserProfile && (
           <div className="user-details-viewProfile">
