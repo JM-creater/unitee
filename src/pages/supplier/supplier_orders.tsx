@@ -825,6 +825,7 @@ function Supplier_Orders () {
                                               <span className="modal-label">Proof of Payment</span>
                                               <span className="modal-label">Reference No.</span>
                                               <span className="modal-label">Payment Type</span>
+                                              <span className="modal-label">Received</span>
                                           </div>
                                           <div className="modal-details-info">
                                             <span className="modal-info">{formatDate(selectedOrders.dateUpdated)}</span>
@@ -841,6 +842,9 @@ function Supplier_Orders () {
                                             </a>
                                             <span className="modal-info">{selectedOrders.referenceId}</span>
                                             <span className="modal-info">{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
+                                            <span className="modal-info">
+                                              {selectedOrders.isReceived ? 'Received' : 'Not Received'}
+                                            </span>
                                           </div>
                                       </div>
                                   </div>
@@ -886,7 +890,7 @@ function Supplier_Orders () {
               </div>
           </div>   
       
-          {/* COMPLETED ORDER DETAILS MODAL */}                            
+          {/* CANCELED ORDER DETAILS MODAL */}                            
           <div className="modal fade" id="canceledOrderModal" tabIndex={-1} aria-labelledby="canceledOrderModalLabel" aria-hidden="true">
               <div className="modal-dialog modal-fullscreen">
                   <div className="modal-content" style={{ padding:'20px' }}>

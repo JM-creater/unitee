@@ -25,7 +25,7 @@ function Notif() {
 
   const [orders, setOrders] = useState([]);
   const [notification, setNotification] = useState([]);
-  const [buttonClicked, setButtonClicked] = useState(false);
+  const [disabledButtons, setDisabledButtons] = useState(new Map());
   const [showAllNotifications, setShowAllNotifications] = useState(false);
   const [selectedOrderReceipt, setSelectedOrderReceipt] = useState(null);
   const [selectedReason, setSelectedReason] = useState("");
@@ -239,21 +239,25 @@ function Notif() {
     const handleOrderReceived = (orderId) => {
       axios.put(`https://localhost:7017/Order/orderReceived/${orderId}`)
         .then(() => {
-          setButtonClicked(true);
-          localStorage.setItem('clickReceived', 'true');
+          // * Update the state to disable this specific button
+          setDisabledButtons(prevState => new Map(prevState).set(orderId, true));
+          localStorage.setItem(`clickReceived_${orderId}`, 'true');
           toast.success("Order Received");
         })
         .catch((error) => {
           console.error(error);
         });
     };
-
+  
+    // * useEffect to set the initial state of buttons
     useEffect(() => {
-      const isButtonClicked = localStorage.getItem('clickReceived') === 'true';
-      if (isButtonClicked) {
-        setButtonClicked(true);
-      }
-    }, []);
+      const initialState = new Map();
+      notification.forEach(item => {
+        const isButtonClicked = localStorage.getItem(`clickReceived_${item.orderId}`) === 'true';
+        initialState.set(item.orderId, isButtonClicked);
+      });
+      setDisabledButtons(initialState);
+    }, [notification]);
 
   // * Handle close button
   const HandleCloseButton = () => {
@@ -923,11 +927,18 @@ function Notif() {
                   Cancel Order
                 </button>
                 <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal" onClick={() => setSelectedOrderReceipt(notificationItem)}>View Order Receipt</button>
-                {!buttonClicked && (
-                  <button className='view-receipt-received-btn' onClick={() => handleOrderReceived(notificationItem.orderId)}>
+                <button 
+                    className='view-receipt-received-btn' 
+                    onClick={() => handleOrderReceived(notificationItem.orderId)}
+                    disabled={disabledButtons.get(notificationItem.orderId)}
+                    style={{
+                      backgroundColor: disabledButtons.get(notificationItem.orderId) ? 'grey' : 'red',
+                      color: disabledButtons.get(notificationItem.orderId) ? 'darkgray' : 'white',
+                      cursor: 'not-allowed'
+                    }}
+                  >
                     Order Received
-                  </button>
-                )}
+                </button>
                 </div>
               </div>
               );
@@ -1271,7 +1282,6 @@ function Notif() {
       </div>
       )}
     </React.Fragment>
-   
   )
 }
 export default Notif;
