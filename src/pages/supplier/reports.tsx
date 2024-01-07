@@ -1,5 +1,6 @@
 import "./supplier_dashboard.css";
 import totalSalesIcon from "../../assets/images/icons/dollar.png";
+import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 import {
   Chart as ChartJS,
   BarElement,
@@ -14,6 +15,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import axios from "axios";
 import orderEventEmitter from "../../helpers/OrderEmitter";
+import React from "react";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -22,6 +24,7 @@ function Supplier() {
   const [weeklySales, setWeeklySales] = useState([]);
   const [monthlySales, setMonthlySales] = useState([]);
   const [yearlySales, setYearlySales] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [topSellingProducts, setTopSellingProducts] = useState([]);
   const { id } = useParams();
@@ -162,12 +165,15 @@ function Supplier() {
 
   // * Fetch Data of All Orders
   useEffect(() => {
+    setIsLoading(true);
     const fetchOrders = async () => {
       try {
         const response = await axios.get("https://localhost:7017/Order");
         setOrders(response.data);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching orders: ", error);
+        setIsLoading(false);
       }
     };
 
@@ -333,243 +339,251 @@ function Supplier() {
   const options = {};
 
   return (
-    <div className="report-main-container">
-      <div className="row">
-        <div className="col-md-7">
-          <h3
-            style={{
-              marginBottom: "20px",
-              color: "#020654",
-              fontWeight: "600",
-              textAlign: "justify",
-            }}
-          >
-            Reports
-          </h3>
-          <div className="dash-supplier-container">
-            <div className="card-content-container">
-              <div className="col-md-9 dash-card">
-                <span>Weekly Sales</span>
-                <h1 className="col-md-11 number-dash">
-                  ₱ 
-                  {weeklySales.length > 0
-                    ? weeklySales.reduce((a, b) => a + b).toLocaleString()
-                    : 0}
-                </h1>
-              </div>
-              <img
-                className="dash-card-icon"
-                src={totalSalesIcon}
-                alt="Total Sales Icon"
-              />
-            </div>
-            <div className="card-content-container">
-              <div className="col-md-9 dash-card">
-                <span>Monthly Sales</span>
-                <h1 className="col-md-11 number-dash">
-                  ₱ 
-                  {monthlySales.length > 0
-                    ? monthlySales.reduce((a, b) => a + b).toLocaleString()
-                    : 0}
-                </h1>
-              </div>
-              <img
-                className="dash-card-icon"
-                src={totalSalesIcon}
-                alt="Total Orders Icon"
-              />
-            </div>
-            <div className="card-content-container">
-              <div className="col-md-9 dash-card">
-                <span>Yearly Sales</span>
-                <h1 className="col-md-11 number-dash">
-                  ₱ 
-                  {yearlySales.length > 0
-                    ? yearlySales.reduce((a, b) => a + b).toLocaleString()
-                    : 0}
-                </h1>
-              </div>
-              <img
-                className="dash-card-icon"
-                src={totalSalesIcon}
-                alt="Total Products Icon"
-              />
-            </div>
-          </div>
-
-          {/* SALES REVIEW CHART */}
-          <div
-            className="monthly-sales-chart-container"
-            style={{
-              width: "51.7rem",
-              border: "solid 5px white",
-              marginTop: "20px",
-              padding: "20px",
-              borderRadius: "10px",
-            }}
-          >
-            <h1 style={{ color: "#020654" }}>Sales Review</h1>
-            <Bar
-              style={{ marginTop: "15px" }}
-              data={data}
-              options={options}
-            ></Bar>
-          </div>
-
-          <div
-            style={{
-              width: "51.7rem",
-              marginTop: "10px",
-              justifyContent: "center",
-              display: "flex",
-            }}
-          >
-            <button className="generate-report-btn" onClick={HandleExportToExcel}>Generate Report</button>
-          </div>
+    <React.Fragment>
+      {isLoading ? (
+        <div className="mainloading-screen">
+          <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
         </div>
-        <div className="col-md-4 top-selling-prods-ReportsContainer">
-          <h3 className="top-selling-prods-title">Top Selling Products</h3>
-          {topSellingProducts.length > 0 ? (
-            topSellingProducts.slice(0, 5).map((product) => (
-              <div key={product.productId} className="top-prods-container">
+      ) : (
+        <div className="report-main-container">
+        <div className="row">
+          <div className="col-md-7">
+            <h3
+              style={{
+                marginBottom: "20px",
+                color: "#020654",
+                fontWeight: "600",
+                textAlign: "justify",
+              }}
+            >
+              Reports
+            </h3>
+            <div className="dash-supplier-container">
+              <div className="card-content-container">
+                <div className="col-md-9 dash-card">
+                  <span>Weekly Sales</span>
+                  <h1 className="col-md-11 number-dash">
+                    ₱ 
+                    {weeklySales.length > 0
+                      ? weeklySales.reduce((a, b) => a + b).toLocaleString()
+                      : 0}
+                  </h1>
+                </div>
                 <img
-                  className="top-prod-img"
-                  src={`https://localhost:7017/${product.image}`}
-                  alt={product.productName}
+                  className="dash-card-icon"
+                  src={totalSalesIcon}
+                  alt="Total Sales Icon"
                 />
-                <span className="top-prod-name">{product.productName}</span>
-                <span className="top-prod-price">₱{product.price.toLocaleString()}</span>
               </div>
-            ))
-          ) : (
-            <span>No Top Selling Products Found</span>
-          )}
-        </div>
-      </div>
-      <div
-        data-bs-spy="scroll"
-        data-bs-target="#navbar-ordersList"
-        data-bs-root-margin="0px 0px -40%"
-        data-bs-smooth-scroll="true"
-        className="scrollspy-example bg-body-tertiary p-3 rounded-2 orderList-admin-container"
-        tabIndex={0}
-      >
-        <h1 id="orderListAdmin" style={{ color: "#020654" }}>
-          Order List
-        </h1>
-        {/* FILTER */}
-        <div className="admin-listOrders-filter-container">
-          <h4>Sort by</h4>
-          <div>
-            <label style={{ marginRight: "10px" }} htmlFor="statusOrderFilter">
-              Order Status:{" "}
-            </label>
-            <select
-              style={{ padding: "10px", border: "2px solid white" }}
-              name="order-status-filter-admin"
-              id="statusOrderFilter"
-              onChange={(e) => setSelectedStatus(e.target.value)}
+              <div className="card-content-container">
+                <div className="col-md-9 dash-card">
+                  <span>Monthly Sales</span>
+                  <h1 className="col-md-11 number-dash">
+                    ₱ 
+                    {monthlySales.length > 0
+                      ? monthlySales.reduce((a, b) => a + b).toLocaleString()
+                      : 0}
+                  </h1>
+                </div>
+                <img
+                  className="dash-card-icon"
+                  src={totalSalesIcon}
+                  alt="Total Orders Icon"
+                />
+              </div>
+              <div className="card-content-container">
+                <div className="col-md-9 dash-card">
+                  <span>Yearly Sales</span>
+                  <h1 className="col-md-11 number-dash">
+                    ₱ 
+                    {yearlySales.length > 0
+                      ? yearlySales.reduce((a, b) => a + b).toLocaleString()
+                      : 0}
+                  </h1>
+                </div>
+                <img
+                  className="dash-card-icon"
+                  src={totalSalesIcon}
+                  alt="Total Products Icon"
+                />
+              </div>
+            </div>
+  
+            {/* SALES REVIEW CHART */}
+            <div
+              className="monthly-sales-chart-container"
+              style={{
+                width: "51.7rem",
+                border: "solid 5px white",
+                marginTop: "20px",
+                padding: "20px",
+                borderRadius: "10px",
+              }}
             >
-              <option value="" disabled hidden selected>
-                Select an order status
-              </option>
-              <option value="All">All</option>
-              <option value="1">Order Placed</option>
-              <option value="2">Pending</option>
-              <option value="3">Approved</option>
-              <option value="4">For Pick Up</option>
-              <option value="5">Completed</option>
-              <option value="6">Canceled</option>
-              <option value="7">Denied</option>
-            </select>
+              <h1 style={{ color: "#020654" }}>Sales Review</h1>
+              <Bar
+                style={{ marginTop: "15px" }}
+                data={data}
+                options={options}
+              ></Bar>
+            </div>
+  
+            <div
+              style={{
+                width: "51.7rem",
+                marginTop: "10px",
+                justifyContent: "center",
+                display: "flex",
+              }}
+            >
+              <button className="generate-report-btn" onClick={HandleExportToExcel}>Generate Report</button>
+            </div>
           </div>
-
-          {/* <div>
-            <label style={{ marginRight: "10px" }} htmlFor="supplierFilter">
-              Shop
-            </label>
-            <select
-              style={{ padding: "10px", border: "2px solid white" }}
-              name="order-status-filter-admin"
-              id="supplierFilter"
-              //onChange={(e) => setSelectedShop(e.target.value)}
-            >
-              <option value="" disabled hidden selected>
-                Select a shop
-              </option>
-              <option value="All">All</option>
-              {topSellingProducts.map((shop) =>
-                shop.role === 2 ? (
-                  <option key={shop.id} value={shop.id}>
-                    {shop.shopName}
-                  </option>
-                ) : null
-              )}
-            </select>
-          </div> */}
+          <div className="col-md-4 top-selling-prods-ReportsContainer">
+            <h3 className="top-selling-prods-title">Top Selling Products</h3>
+            {topSellingProducts.length > 0 ? (
+              topSellingProducts.slice(0, 5).map((product) => (
+                <div key={product.productId} className="top-prods-container">
+                  <img
+                    className="top-prod-img"
+                    src={`https://localhost:7017/${product.image}`}
+                    alt={product.productName}
+                  />
+                  <span className="top-prod-name">{product.productName}</span>
+                  <span className="top-prod-price">₱{product.price.toLocaleString()}</span>
+                </div>
+              ))
+            ) : (
+              <span>No Top Selling Products Found</span>
+            )}
+          </div>
         </div>
-
-        {/* TABLE */}
-        <table className="table">
-          <thead>
-            <tr>
-              <th scope="col">Order No.</th>
-              {/* <th className="text-center" scope="col">
+        <div
+          data-bs-spy="scroll"
+          data-bs-target="#navbar-ordersList"
+          data-bs-root-margin="0px 0px -40%"
+          data-bs-smooth-scroll="true"
+          className="scrollspy-example bg-body-tertiary p-3 rounded-2 orderList-admin-container"
+          tabIndex={0}
+        >
+          <h1 id="orderListAdmin" style={{ color: "#020654" }}>
+            Order List
+          </h1>
+          {/* FILTER */}
+          <div className="admin-listOrders-filter-container">
+            <h4>Sort by</h4>
+            <div>
+              <label style={{ marginRight: "10px" }} htmlFor="statusOrderFilter">
+                Order Status:{" "}
+              </label>
+              <select
+                style={{ padding: "10px", border: "2px solid white" }}
+                name="order-status-filter-admin"
+                id="statusOrderFilter"
+                onChange={(e) => setSelectedStatus(e.target.value)}
+              >
+                <option value="" disabled hidden selected>
+                  Select an order status
+                </option>
+                <option value="All">All</option>
+                <option value="1">Order Placed</option>
+                <option value="2">Pending</option>
+                <option value="3">Approved</option>
+                <option value="4">For Pick Up</option>
+                <option value="5">Completed</option>
+                <option value="6">Canceled</option>
+                <option value="7">Denied</option>
+              </select>
+            </div>
+  
+            {/* <div>
+              <label style={{ marginRight: "10px" }} htmlFor="supplierFilter">
                 Shop
-              </th> */}
-              <th className="text-center" scope="col">
-                Customer
-              </th>
-              <th className="text-center" scope="col">
-                Number of Items
-              </th>
-              <th className="text-center" scope="col">
-                Total Amount
-              </th>
-              <th className="text-center" scope="col">
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredOrders.map((ord) => (
-              <tr key={ord.id}>
-                <th scope="row">{ord.orderNumber}</th>
-                <td className="text-center">
-                  {ord.user.firstName} {ord.user.lastName}
-                </td>
-                <td className="text-center">
-                  {ord.orderItems.reduce(
-                    (total, item) => total + item.quantity,
-                    0
-                  )}
-                </td>
-                <td className="text-center">₱{ord.total.toLocaleString()}</td>
-                <td className="text-center">
-                  {
-                    ord.status === 1
-                    ? "Order Placed"
-                    : ord.status === 2
-                    ? "Pending"
-                    : ord.status === 3
-                    ? "Approved"
-                    : ord.status === 4
-                    ? "For Pick Up"
-                    : ord.status === 5
-                    ? "Completed"
-                    : ord.status === 6
-                    ? "Canceled"
-                    : ord.status === 7
-                    ? "Denied"
-                    : "Unavailable"
-                  }
-                </td>
+              </label>
+              <select
+                style={{ padding: "10px", border: "2px solid white" }}
+                name="order-status-filter-admin"
+                id="supplierFilter"
+                //onChange={(e) => setSelectedShop(e.target.value)}
+              >
+                <option value="" disabled hidden selected>
+                  Select a shop
+                </option>
+                <option value="All">All</option>
+                {topSellingProducts.map((shop) =>
+                  shop.role === 2 ? (
+                    <option key={shop.id} value={shop.id}>
+                      {shop.shopName}
+                    </option>
+                  ) : null
+                )}
+              </select>
+            </div> */}
+          </div>
+  
+          {/* TABLE */}
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">Order No.</th>
+                {/* <th className="text-center" scope="col">
+                  Shop
+                </th> */}
+                <th className="text-center" scope="col">
+                  Customer
+                </th>
+                <th className="text-center" scope="col">
+                  Number of Items
+                </th>
+                <th className="text-center" scope="col">
+                  Total Amount
+                </th>
+                <th className="text-center" scope="col">
+                  Status
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredOrders.map((ord) => (
+                <tr key={ord.id}>
+                  <th scope="row">{ord.orderNumber}</th>
+                  <td className="text-center">
+                    {ord.user.firstName} {ord.user.lastName}
+                  </td>
+                  <td className="text-center">
+                    {ord.orderItems.reduce(
+                      (total, item) => total + item.quantity,
+                      0
+                    )}
+                  </td>
+                  <td className="text-center">₱{ord.total.toLocaleString()}</td>
+                  <td className="text-center">
+                    {
+                      ord.status === 1
+                      ? "Order Placed"
+                      : ord.status === 2
+                      ? "Pending"
+                      : ord.status === 3
+                      ? "Approved"
+                      : ord.status === 4
+                      ? "For Pick Up"
+                      : ord.status === 5
+                      ? "Completed"
+                      : ord.status === 6
+                      ? "Canceled"
+                      : ord.status === 7
+                      ? "Denied"
+                      : "Unavailable"
+                    }
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+      )}
+    </React.Fragment>
   );
 }
 

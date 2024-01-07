@@ -8,8 +8,6 @@ import Main from "./pages/main/main";
 import Shop from "./pages/main/shop";
 import Search_Product from "./pages/main/search_product";
 import Cart from "./pages/main/cart";
-import Order_Tracking from "./pages/main/order_tracking";
-import User_Profile from "./pages/main/user_profile";
 import Visit_Shop from "./pages/main/visit_shop";
 import ViewCustomer_Profile from "./pages/main/viewCustomer_profile";
 //import Supplier from './pages/supplier/supplier_items'
@@ -77,9 +75,7 @@ function App() {
                 <Route path="visit_shop/:id" element={<Visit_Shop />} />
                 <Route path="cart" element={<Cart />} />
                 <Route path="search_product" element={<Search_Product />} />
-                <Route path="user_profile/:id" element={<User_Profile />}></Route>
                 <Route path="notif" element={<Notif />}></Route>
-                <Route path="order_tracking" element={<Order_Tracking />}></Route>
                 <Route path="viewCustomer_profile" element={<ViewCustomer_Profile />}/>
                 <Route path="purchase_history" element={<Purchase_History />}></Route>
               </Route>

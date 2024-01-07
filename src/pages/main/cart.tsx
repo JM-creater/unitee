@@ -10,6 +10,7 @@ import Modal from "bootstrap/js/dist/modal";
 import notifEventEmitter from "../../helpers/NotifEventEmitter";
 import orderEventEmitter from "../../helpers/OrderEmitter";
 import emptyCartImg from "../../assets/images/icons/empty-cart.png";
+import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const showToast = (message: string, type: number) => {
@@ -41,6 +42,7 @@ function Cart() {
   const [selectedPhoneShop, setSelectedPhoneShop] = useState("");
   const [, setSelectedShopId] = useState(null);
   const [lastErrorMessage, setLastErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const { userId } = useParams();
   const fileInputRef = useRef(null);
   const [, setSelectedShopIndex] = useState(null);
@@ -58,14 +60,17 @@ function Cart() {
 
   // * Get Cart
   useEffect(() => {
+    setIsLoading(true);
     const fetchCart = async () => {
       try {
         const response = await axios.get(
           `https://localhost:7017/Cart/myCart/${userId}`
         );
         setCart(response.data);
+        setIsLoading(false);
       } catch (error) {
         console.error(error);
+        setIsLoading(false);
       }
     };
 
@@ -514,277 +519,286 @@ function Cart() {
   };
 
   return (
-    <div className="cart-container row">
-      <Toaster position="bottom-center" reverseOrder={false} />
-      <div className="col-md-10 cart-title-container">
-        <h1 className="cart-title">Shopping Cart</h1>
-        <div className="cart-remove-btn-container">
-          <button
-            type="button"
-            className="btn btn-outline-primary"
-            onClick={handleRemoveCartPrompt}
-          >
-            <img style={{ width: "20%", marginRight: "5px" }} src={remove} />
-            Remove
-          </button>
+    <React.Fragment>
+      {isLoading ? (
+        <div className="mainloading-screen">
+          <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
         </div>
-      </div>
-
-      {/* SHOP CONTAINER */}
-      <div className="SHOP-CART-MAIN-CONTAINER">
-        <div className="SHOPS-MAIN-CONTAINER">
-          {cart.length === 0 ? (
-            <div className="empty-cart-message">
-              <img className="empty-cart-img" src={emptyCartImg} />
-              Your cart is currently empty. Start shopping now!
-            </div>
-          ) : (
-            cart.map((cartItem, index) => (
-              <div key={index} className="shop-cart-container">
-                {/* Displaying Shop Details */}
-                <div className="col-md-12 shop-title-container">
-                  <h4 className="shop-name-cart">
-                    <input
-                      className="form-check-input shop-radio"
-                      type="checkbox"
-                      name="shopRadio"
-                      id={`shopRadio-${cartItem.supplierId}`}
-                      onChange={() => handleShopCheckboxChange(index)}
-                    />
-                    <img
-                      className="shopIcon-img"
-                      src={`https://localhost:7017/${cartItem.supplier.image}`}
-                      alt="Shop Logo"
-                    />
-                    <Link
-                      to={`/shop/${userId}/visit_shop/${cartItem.supplierId}`}
-                      className="plain-link-shop"
-                    >
-                      {cartItem.supplier.shopName}
-                    </Link>
-                  </h4>
-                </div>
-
-                {cartItem.items.map((item, itemIndex) => (
-                  <div key={item.id} className="prod-main-container">
-                    <input
-                      style={{ marginRight: "840px", height: "20px" }}
-                      className="form-check-input prod-cart-checkBox"
-                      type="checkbox"
-                      value=""
-                      id={`prodCheckbox-${item.id}`}
-                      onChange={() =>
-                        handleProductCheckboxChange(index, item.id)
-                      }
-                    />
-                    <div className="col-md-11 prod-cart-container">
-                      <img
-                        className="prod-img-cart"
-                        src={`https://localhost:7017/${item.product.image}`}
-                        alt="Product"
+      ) : (
+        <div className="cart-container row">
+        <Toaster position="bottom-center" reverseOrder={false} />
+        <div className="col-md-10 cart-title-container">
+          <h1 className="cart-title">Shopping Cart</h1>
+          <div className="cart-remove-btn-container">
+            <button
+              type="button"
+              className="btn btn-outline-primary"
+              onClick={handleRemoveCartPrompt}
+            >
+              <img style={{ width: "20%", marginRight: "5px" }} src={remove} />
+              Remove
+            </button>
+          </div>
+        </div>
+  
+        {/* SHOP CONTAINER */}
+        <div className="SHOP-CART-MAIN-CONTAINER">
+          <div className="SHOPS-MAIN-CONTAINER">
+            {cart.length === 0 ? (
+              <div className="empty-cart-message">
+                <img className="empty-cart-img" src={emptyCartImg} />
+                Your cart is currently empty. Start shopping now!
+              </div>
+            ) : (
+              cart.map((cartItem, index) => (
+                <div key={index} className="shop-cart-container">
+                  {/* Displaying Shop Details */}
+                  <div className="col-md-12 shop-title-container">
+                    <h4 className="shop-name-cart">
+                      <input
+                        className="form-check-input shop-radio"
+                        type="checkbox"
+                        name="shopRadio"
+                        id={`shopRadio-${cartItem.supplierId}`}
+                        onChange={() => handleShopCheckboxChange(index)}
                       />
-
-                      <div className="col-md-3 prodName-container">
-                        <Link
-                          to={`/shop/${userId}/visit_shop/${cartItem.supplierId}`}
-                          className="plain-link-shop"
-                        >
-                          <h3 className="prod-name-cart">
-                            {item.product.productName}
-                          </h3>
-                        </Link>
-                      </div>
-
-                      {/* Sizes */}
-                      <div className="col-md-3 sizeProd-container">
-                        <label
-                          className="sizeCart-label"
-                          htmlFor={`size-${item.id}`}
-                        >
-                          Size:
-                        </label>
-                        <select
-                          className="size-select"
-                          name="size"
-                          id={`size-${item.id}`}
-                          onChange={(e) =>
-                            handleSizeChange(index, itemIndex, e.target.value)
-                          }
-                        >
-                          {item.product.sizes.map((sizeItem) => (
-                            <option
-                              key={sizeItem.id}
-                              value={sizeItem.id}
-                              selected={item.sizeQuantityId === sizeItem.id}
-                            >
-                              {sizeItem.size}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      {/* Quantity */}
-                      <div className="qua-container">
-                        <button
-                          className="minus-quantity-btn"
-                          onClick={() => HandleMinusQuantity(index, itemIndex)}
-                        >
-                          -
-                        </button>
-                        <input
-                          className="quanti-input"
-                          type="text"
-                          value={item.quantity}
-                          readOnly
+                      <img
+                        className="shopIcon-img"
+                        src={`https://localhost:7017/${cartItem.supplier.image}`}
+                        alt="Shop Logo"
+                      />
+                      <Link
+                        to={`/shop/${userId}/visit_shop/${cartItem.supplierId}`}
+                        className="plain-link-shop"
+                      >
+                        {cartItem.supplier.shopName}
+                      </Link>
+                    </h4>
+                  </div>
+  
+                  {cartItem.items.map((item, itemIndex) => (
+                    <div key={item.id} className="prod-main-container">
+                      <input
+                        style={{ marginRight: "840px", height: "20px" }}
+                        className="form-check-input prod-cart-checkBox"
+                        type="checkbox"
+                        value=""
+                        id={`prodCheckbox-${item.id}`}
+                        onChange={() =>
+                          handleProductCheckboxChange(index, item.id)
+                        }
+                      />
+                      <div className="col-md-11 prod-cart-container">
+                        <img
+                          className="prod-img-cart"
+                          src={`https://localhost:7017/${item.product.image}`}
+                          alt="Product"
                         />
-                        <button
-                          className="plus-quantity-btn"
-                          onClick={() => HandlePlusQuantity(index, itemIndex)}
-                        >
-                          +
-                        </button>
+  
+                        <div className="col-md-3 prodName-container">
+                          <Link
+                            to={`/shop/${userId}/visit_shop/${cartItem.supplierId}`}
+                            className="plain-link-shop"
+                          >
+                            <h3 className="prod-name-cart">
+                              {item.product.productName}
+                            </h3>
+                          </Link>
+                        </div>
+  
+                        {/* Sizes */}
+                        <div className="col-md-3 sizeProd-container">
+                          <label
+                            className="sizeCart-label"
+                            htmlFor={`size-${item.id}`}
+                          >
+                            Size:
+                          </label>
+                          <select
+                            className="size-select"
+                            name="size"
+                            id={`size-${item.id}`}
+                            onChange={(e) =>
+                              handleSizeChange(index, itemIndex, e.target.value)
+                            }
+                          >
+                            {item.product.sizes.map((sizeItem) => (
+                              <option
+                                key={sizeItem.id}
+                                value={sizeItem.id}
+                                selected={item.sizeQuantityId === sizeItem.id}
+                              >
+                                {sizeItem.size}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        {/* Quantity */}
+                        <div className="qua-container">
+                          <button
+                            className="minus-quantity-btn"
+                            onClick={() => HandleMinusQuantity(index, itemIndex)}
+                          >
+                            -
+                          </button>
+                          <input
+                            className="quanti-input"
+                            type="text"
+                            value={item.quantity}
+                            readOnly
+                          />
+                          <button
+                            className="plus-quantity-btn"
+                            onClick={() => HandlePlusQuantity(index, itemIndex)}
+                          >
+                            +
+                          </button>
+                        </div>
+                        {/* Price */}
+                        <div className="col-md-2 prodPrice-container">
+                          <h3 className="cartProd-price">
+                            ₱
+                            {(item.product.price * item.quantity).toLocaleString(
+                              "en-US",
+                              { maximumFractionDigits: 2 }
+                            )}
+                          </h3>
+                        </div>
                       </div>
-                      {/* Price */}
-                      <div className="col-md-2 prodPrice-container">
-                        <h3 className="cartProd-price">
-                          ₱
-                          {(item.product.price * item.quantity).toLocaleString(
-                            "en-US",
-                            { maximumFractionDigits: 2 }
-                          )}
-                        </h3>
+                    </div>
+                  ))}
+                </div>
+              ))
+            )}
+          </div>
+  
+          {/* PAYMENT SUMMARY */}
+          <div className="col-md-3">
+            <div className="summary-container">
+              <div className="summary-details-container">
+                <h1 className="summary-title">Summary</h1>
+                <span className="payment-option-sub">Payment Method</span>
+                <div className="payment-option-container">
+                  <div
+                    className="payment-option-radio"
+                    style={{ display: "flex", alignItems: "center" }}
+                  >
+                    <img
+                      className="payment-option"
+                      src={gcash}
+                      alt="GCash logo"
+                    />
+                  </div>
+                  <div className="account-details-container">
+                    <div className="account-details">
+                      <div className="account-details">
+                        {selectedPhoneShop ? (
+                          <React.Fragment>
+                            <span className="details">GCash:</span>
+                            <span className="acc-number">
+                              {selectedPhoneShop}
+                            </span>
+                          </React.Fragment>
+                        ) : (
+                          <span className="acc-number">No shop selected</span>
+                        )}
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* PAYMENT SUMMARY */}
-        <div className="col-md-3">
-          <div className="summary-container">
-            <div className="summary-details-container">
-              <h1 className="summary-title">Summary</h1>
-              <span className="payment-option-sub">Payment Method</span>
-              <div className="payment-option-container">
-                <div
-                  className="payment-option-radio"
-                  style={{ display: "flex", alignItems: "center" }}
-                >
-                  <img
-                    className="payment-option"
-                    src={gcash}
-                    alt="GCash logo"
+                </div>
+                <div className="amount-details">
+                  <h2 className="total-item-text">
+                    Total Items: {totalItemsChecked}
+                  </h2>
+                  <h2 className="total-amount-text">Total amount:</h2>
+                  <span className="total-amount-num">
+                    ₱
+                    {totalAmount.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
+                  <h2 className="total-amount-text">Upload Proof of Payment:</h2>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="proof-payment-img"
+                    accept="image/png, image/gif, image/jpeg"
+                    onChange={handleProofOfPaymentChange}
+                  />
+                  <h2 className="total-amount-text">Reference Id (GCash):</h2>
+                  <input
+                    type="text"
+                    style={{ borderRadius: "5px" }}
+                    className="proof-payment-img"
+                    value={referenceId}
+                    onChange={(e) => handleReferenceId(e.target.value)}
+                    maxLength={13}
                   />
                 </div>
-                <div className="account-details-container">
-                  <div className="account-details">
-                    <div className="account-details">
-                      {selectedPhoneShop ? (
-                        <React.Fragment>
-                          <span className="details">GCash:</span>
-                          <span className="acc-number">
-                            {selectedPhoneShop}
-                          </span>
-                        </React.Fragment>
-                      ) : (
-                        <span className="acc-number">No shop selected</span>
-                      )}
-                    </div>
-                  </div>
+                <div className="btn-container">
+                  <button className="place-order" onClick={HandleOrderPlace}>
+                    <span className="circle" aria-hidden="true">
+                      <span className="icon arrow"></span>
+                    </span>
+                    <span className="place-button-text">Place Order</span>
+                  </button>
                 </div>
               </div>
-              <div className="amount-details">
-                <h2 className="total-item-text">
-                  Total Items: {totalItemsChecked}
-                </h2>
-                <h2 className="total-amount-text">Total amount:</h2>
-                <span className="total-amount-num">
-                  ₱
-                  {totalAmount.toLocaleString("en-US", {
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-                <h2 className="total-amount-text">Upload Proof of Payment:</h2>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  className="proof-payment-img"
-                  accept="image/png, image/gif, image/jpeg"
-                  onChange={handleProofOfPaymentChange}
-                />
-                <h2 className="total-amount-text">Reference Id (GCash):</h2>
-                <input
-                  type="text"
-                  style={{ borderRadius: "5px" }}
-                  className="proof-payment-img"
-                  value={referenceId}
-                  onChange={(e) => handleReferenceId(e.target.value)}
-                  maxLength={13}
-                />
+            </div>
+          </div>
+        </div>
+  
+        <div
+          className="modal fade"
+          id="removeCartConfirmationModal"
+          tabIndex={-1}
+          aria-labelledby="removeCartConfirmationModalLabel"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="removeCartConfirmationModalLabel">
+                  Remove items from cart
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
               </div>
-              <div className="btn-container">
-                <button className="place-order" onClick={HandleOrderPlace}>
-                  <span className="circle" aria-hidden="true">
-                    <span className="icon arrow"></span>
-                  </span>
-                  <span className="place-button-text">Place Order</span>
+              <div className="modal-body">
+                <h5>
+                  {" "}
+                  Are you sure you want to remove the selected items from the
+                  cart?{" "}
+                </h5>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  data-bs-dismiss="modal"
+                  onClick={handleRemoveCart}
+                >
+                  Remove
                 </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      <div
-        className="modal fade"
-        id="removeCartConfirmationModal"
-        tabIndex={-1}
-        aria-labelledby="removeCartConfirmationModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="removeCartConfirmationModalLabel">
-                Remove items from cart
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body">
-              <h5>
-                {" "}
-                Are you sure you want to remove the selected items from the
-                cart?{" "}
-              </h5>
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="btn btn-danger"
-                data-bs-dismiss="modal"
-                onClick={handleRemoveCart}
-              >
-                Remove
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      )}
+    </React.Fragment>
+    
   );
 }
 
