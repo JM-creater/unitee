@@ -130,6 +130,7 @@
     align-items: start;
     flex-wrap: wrap;
     margin-top: 45px;
+    max-height: fit-content;
 }
 
 .dash-pending-ords-container {

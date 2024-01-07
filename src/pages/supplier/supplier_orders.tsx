@@ -6,8 +6,6 @@ import { toast } from "react-toastify";
 import notifEventEmitter from "../../helpers/NotifEventEmitter";
 import orderEventEmitter from "../../helpers/OrderEmitter";
 import cartEventEmitter from "../../helpers/EventEmitter";
-import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
-import React from "react";
 
 function Supplier_Orders () {
 
@@ -32,7 +30,6 @@ function Supplier_Orders () {
     const [departments, setDepartments] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [selectedOrders, setSelectedOrders] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
 
     const statuses = [
       { key: 'Pending', href: '#supplier-pending-order' },
@@ -58,15 +55,12 @@ function Supplier_Orders () {
 
     // * Get Order By Supplier from Customer
     useEffect(() => {
-      setIsLoading(true);
       const fetchOrders = async () => {
         try {
           const response = await axios.get(`https://localhost:7017/Order/BySupplier/${id}`);
           setOrders(response.data);
-          setIsLoading(false);
         } catch (error) {
           console.error(error);
-          setIsLoading(false);
         }
       };
 
@@ -216,7 +210,7 @@ function Supplier_Orders () {
             window.location.reload();
         })
         .catch(error => {
-          console.error(error);
+          console.error(error.response.data.message);
         });
     };
 
@@ -231,12 +225,6 @@ function Supplier_Orders () {
     
 
     return (
-      <React.Fragment>
-        {isLoading ? (
-          <div className="mainloading-screen">
-            <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
-          </div>
-        ) : (
           <div className="manage-orders-main-container">
           <nav id="orders-nav" className="navbar px-3 mb-3" style={{ display:'flex', justifyContent:'end' }}>
             <ul className="nav nav-pills">
@@ -1009,9 +997,6 @@ function Supplier_Orders () {
           </div>   
       
         </div>
-        )}
-      </React.Fragment>
-    
   )
 }
 

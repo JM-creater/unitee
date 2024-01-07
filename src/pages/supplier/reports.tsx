@@ -551,10 +551,7 @@ function Supplier() {
                     {ord.user.firstName} {ord.user.lastName}
                   </td>
                   <td className="text-center">
-                    {ord.orderItems.reduce(
-                      (total, item) => total + item.quantity,
-                      0
-                    )}
+                    {ord.orderItems.length}
                   </td>
                   <td className="text-center">₱{ord.total.toLocaleString()}</td>
                   <td className="text-center">
