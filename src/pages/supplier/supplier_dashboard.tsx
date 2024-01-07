@@ -142,7 +142,7 @@ function Supplier (){
                             </div>
                         )}
                     </div>
-
+                    {/* max-height: fit-content */}
 
                 </div>
                 <div className="pending-topRated-main-container">

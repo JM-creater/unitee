@@ -399,7 +399,7 @@ function Cart() {
             "Content-Type": "multipart/form-data",
           },
         });
-        axios.delete(`https://localhost:7017/Cart/deleteCart/${cartItem.id}`);
+        //axios.delete(`https://localhost:7017/Cart/deleteCart/${cartItem.id}`);
         toast.success("Successfully Ordered");
       } catch (error) {
         if (error.response && error.response.status === 400) {

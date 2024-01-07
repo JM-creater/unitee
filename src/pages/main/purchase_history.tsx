@@ -228,8 +228,8 @@ function Purchase_History () {
                 <h1 className='history-title'>Purchase History</h1>
                     <div className="col-md-10 search-date-container row" style={{ gap:'10px', marginTop:'20px'}}>
                         <div className='col-md-4 history-search-container' style={{  display:'flex', flexFlow:'row', paddingLeft:'20px'}}>
-                            <input className="form-control me-2" type="search" placeholder="Search by Order No." aria-label="Search"/>
-                            <button className="col-md-3 btn btn-outline-primary" type="submit">Search</button>
+                            {/* <input className="form-control me-2" type="search" placeholder="Search by Order No." aria-label="Search"/>
+                            <button className="col-md-3 btn btn-outline-primary" type="submit">Search</button> */}
                         </div>
                     </div>
                 </div>
