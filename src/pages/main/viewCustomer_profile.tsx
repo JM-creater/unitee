@@ -377,8 +377,8 @@ function ViewCustomer_Profile () {
                         </input>
     
                         <label className='profLabelEdit' htmlFor="editPass">Password</label>
-                        <button onClick={toggleInput}>
-                          {isDisabled ? 'Hide Input Password' : 'Edit Password'}
+                        <button className='changePass-btn-prof' onClick={toggleInput}>
+                          {isDisabled ? 'Hide Input Password' : 'Change Password'}
                         </button>
                         {isDisabled && (
                           <React.Fragment>
