@@ -539,7 +539,7 @@ function Register() {
 
               <div className="register-supplier-btn-container">
                 <button
-                  className="btn registerCustomer-btn btn-lg btn-primary"
+                  className="registerCustomer-btn"
                   style={{ borderRadius: "20px" }}
                   type="submit"
                 >

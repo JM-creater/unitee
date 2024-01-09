@@ -128,10 +128,6 @@ display: flex;
 justify-content: center;
 }
 
-.register-btn {
-  width: 14em;
-}
-
 .back-to-loginBTN {
   margin-top: 20px;
   padding: 5px;
