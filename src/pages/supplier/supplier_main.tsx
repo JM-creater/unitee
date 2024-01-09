@@ -228,10 +228,34 @@ function Supplier_Main (){
                             <img className="supplier-nav-icon" src={ dashboardSupplierIcon }/>
                             <span className="supplier-nav-text">Dashboard</span>
                         </Link>
-                        <Link to='supplier_orders' className="supplier-nav-link" onClick={handleNotificationClick}>
+                        {/* <Link to='supplier_orders' className="supplier-nav-link" onClick={handleNotificationClick}>
                             <img className="supplier-nav-icon" src={ ordersSupplierIcon }/>
                             <span className="supplier-nav-text">Orders {notifItem.length > 0 && <span className='notifOrder-count'>{notifItem.length}</span>}</span>
-                        </Link>
+                        </Link> */}
+                        <div className="supplier-nav-link" data-bs-toggle="collapse" href="#orderStatusCollapse" role="button" aria-expanded="false" aria-controls="orderStatusCollapse">
+                            <img className="supplier-nav-icon" src={ ordersSupplierIcon }/>
+                            <span className="order-status-collapse">Orders</span>
+                        </div>
+                        <div className="collapse" id="orderStatusCollapse">
+                            <div className="orders-collapse-container"
+                            style={{ backgroundColor: "#020654" }}>
+                                <Link className="supplier-collapse-orders-link" to="pending_orders">
+                                    <span className="supplier-nav-text-collapse">Pending</span>
+                                </Link>
+                                <Link className="supplier-collapse-orders-link" to="approved_orders">
+                                    <span className="supplier-nav-text-collapse">Approved</span>
+                                </Link>
+                                <Link className="supplier-collapse-orders-link" to="pickUp_orders">
+                                    <span className="supplier-nav-text-collapse">For Pick Up</span>
+                                </Link>
+                                <Link className="supplier-collapse-orders-link" to="completed_orders">
+                                    <span className="supplier-nav-text-collapse">Completed</span>
+                                </Link>
+                                <Link className="supplier-collapse-orders-link" to="canceled_orders">
+                                    <span className="supplier-nav-text-collapse">Canceled</span>
+                                </Link>
+                            </div>
+                        </div>
                         <Link to='manage_shop' className="supplier-nav-link">
                             <img className="supplier-nav-icon" src={ shopIcon }/>
                             <span className="supplier-nav-text">Shop</span>

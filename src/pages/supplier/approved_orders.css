@@ -1,0 +1,13 @@
+.approved-orders-main-container {
+    width: 85vw;
+    padding: 10px;
+    background-color: #f0f0f0;
+    height: 92vh;
+    flex-wrap: wrap;
+}
+
+.approved-table-container {
+    max-height: 75vh;
+    scroll-behavior: smooth;
+    overflow: auto;
+}

@@ -647,10 +647,11 @@ function Cart() {
                       <div className="col-md-2 prodPrice-container">
                         <h3 className="cartProd-price">
                           ₱
-                          {(item.product.price * item.quantity).toLocaleString(
+                          {/* {(item.product.price * item.quantity).toLocaleString(
                             "en-US",
                             { maximumFractionDigits: 2 }
-                          )}
+                          )} */}
+                          {(item.product.price * item.quantity).toFixed(2)}
                         </h3>
                       </div>
                     </div>

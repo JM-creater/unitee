@@ -460,7 +460,7 @@ function Search_Product() {
                         {product.productName}
                         </h4>
                         <h3 className="visitShop-prodPrice">
-                        ₱{product.price.toLocaleString()}
+                        ₱{product.price.toFixed(2)}
                         </h3>
                         {!product.isActive && (
                         <span className="badge badge-danger">Inactive</span>
@@ -567,7 +567,7 @@ function Search_Product() {
                                 {selectedProduct.category}
                             </h5>
                             <h1 className="prodModal-Price">
-                                ₱{selectedProduct.price.toLocaleString()}
+                                ₱{selectedProduct.price.toFixed(2)}
                             </h1>
                             <div className="prodModal-SizeGuide">
                                 <h5 className="prodModal-text">

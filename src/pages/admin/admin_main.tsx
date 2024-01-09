@@ -61,27 +61,15 @@ function Admin_Main() {
                 <span className="admin-nav-text">Shops</span>
               </Link>
 
-              <div
-                className="admin-nav-link"
-                data-bs-toggle="collapse"
-                href="#usersTypeCollapse"
-                role="button"
-                aria-expanded="false"
-                aria-controls="usersTypeCollapse"
-              >
+              <div className="admin-nav-link" data-bs-toggle="collapse" href="#usersTypeCollapse" role="button" aria-expanded="false" aria-controls="usersTypeCollapse">
                 <img className="admin-nav-icon" src={usersIcon} alt="" />
                 <span className="users-type-collapse">Users</span>
               </div>
 
               <div className="collapse" id="usersTypeCollapse">
-                <div
-                  className="users-collapse-container"
-                  style={{ backgroundColor: "#020654" }}
-                >
-                  <Link
-                    className="admin-collapse-users-link"
-                    to="view_customers"
-                  >
+                <div className="users-collapse-container"
+                  style={{ backgroundColor: "#020654" }}>
+                  <Link className="admin-collapse-users-link" to="view_customers">
                     <span className="admin-nav-text-collapse">Customers</span>
                   </Link>
                   <Link className="admin-collapse-users-link" to="suppliers">

@@ -503,7 +503,7 @@ function Notif() {
                   </div>
                   <div className="d-flex flex-column text-sm-left">
                     <p>
-                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
+                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toFixed(2)}</span>
                     </p>
                     <p>
                       <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
@@ -1132,7 +1132,7 @@ function Notif() {
                         <h4 className='totalAmount-receipt'>Total Amount</h4>
                       </div>
                       <div className='total-amount-receipt'>
-                        <h4 className='receipt-amount'>₱{selectedOrderReceipt.order.total.toLocaleString()}</h4>
+                        <h4 className='receipt-amount'>₱{selectedOrderReceipt.order.total.toFixed(2)}</h4>
                       </div>
                     </div>
                   </div> 
@@ -1151,10 +1151,10 @@ function Notif() {
                       <tbody>
                         {selectedOrderReceipt && selectedOrderReceipt.order && selectedOrderReceipt.order.orderItems.map((item, index) => ( 
                           <tr key={index}>
-                            {/* <th scope="row">{item.product.productName}</th> */}
+                            <th scope="row">{item.product.productName}</th>
                             <td className='text-center'>{item.sizeQuantity.size}</td>
                             <td className='text-center'>{item.quantity}</td>
-                            <td className='text-center'>₱{item.product.price.toLocaleString()}</td>
+                            <td className='text-center'>₱{item.product.price.toFixed(2)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1273,8 +1273,10 @@ function Notif() {
                 </div>
               )}
   
-              <button type="submit" className="btn btn-primary btn-block" onClick={submitCancellation}>Cancel Order</button>
-              <button type="submit" className="btn btn-danger btn-block" data-bs-dismiss="modal" onClick={HandleCloseButton}>NOT NOW</button>
+              <div className="cancel-orders-btn-container">
+                <button type="submit" className="approve-btn" onClick={submitCancellation}>Cancel Order</button>
+                <button type="submit" className="deny-btn" data-bs-dismiss="modal" onClick={HandleCloseButton}>NOT NOW</button>
+              </div>
             </div>
           </div>
         </div>

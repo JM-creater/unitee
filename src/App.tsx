@@ -41,6 +41,13 @@ import PrivateRoute from "./utils/private_route";
 //import Internal_Error from './pages/common/internal_error'
 //import Bad_Request from './pages/common/bad_request'
 
+//ORDER STATUS
+import Pending_Orders from "./pages/supplier/pending_orders";
+import Approved_Orders from "./pages/supplier/approved_orders";
+import PickUp_Orders from "./pages/supplier/pickUp_orders";
+import Completed_Orders from "./pages/supplier/completed_orders";
+import Canceled_Orders from "./pages/supplier/canceled_orders";
+
 function App() {
   return (
     <div>
@@ -95,6 +102,11 @@ function App() {
               <Route path="supplier_dashboard/:id" element={ <PrivateRoute> <Supplier_Main /> </PrivateRoute> }>
                 <Route index element={<Supplier />} />
                 <Route path="supplier_orders" element={<Supplier_Order />} />
+                <Route path="pending_orders" element={<Pending_Orders />} />
+                <Route path="approved_orders" element={<Approved_Orders />} />
+                <Route path="pickUp_orders" element={<PickUp_Orders />} />
+                <Route path="completed_orders" element={<Completed_Orders />} />
+                <Route path="canceled_orders" element={<Canceled_Orders />} />
                 <Route path="manage_shop" element={<Manage_Shop />} />
                 <Route path="supplier_viewProf/:id" element={<Supplier_ViewProf />} />
                 <Route path="reports" element={<Reports />} />

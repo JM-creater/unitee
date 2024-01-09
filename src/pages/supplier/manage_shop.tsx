@@ -809,7 +809,7 @@ function Manage_Shop() {
                     className="col-md-2 supplier-prod-price"
                     style={{ color: productItem.isActive ? "" : "black" }}
                   >
-                    ₱{productItem.price.toLocaleString()}
+                    ₱{productItem.price.toFixed(2)}
                   </h4>
                 </div>
               </div>

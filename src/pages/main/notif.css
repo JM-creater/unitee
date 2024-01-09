@@ -34,6 +34,14 @@ body {
     margin: 8px;
 }
 
+.cancel-orders-btn-container {
+    display: flex;
+    width: 40em;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
 .top {
     padding-top: 40px;
     padding-left: 13% !important;

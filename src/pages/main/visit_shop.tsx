@@ -580,7 +580,7 @@ function Visit_Shop () {
                         <img className="visitShopProdImg" src={`https://localhost:7017/${product.image}`} alt={product.productName}/>
                         <div className="col-md-12 shop-prodDetails-container">
                             <h4 className="col-md-8 visitShop-prodName">{product.productName}</h4>
-                            <h3 className="visitShop-prodPrice">₱{product.price.toLocaleString()}</h3>
+                            <h3 className="visitShop-prodPrice">₱{product.price.toFixed(2)}</h3>
                             {!product.isActive && <span className="badge badge-danger">Inactive</span>}
                         </div>
                     </div>

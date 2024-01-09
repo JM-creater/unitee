@@ -263,7 +263,7 @@ function Supplier_Orders () {
                                 <td className="text-center">
                                   {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                                 </td>
-                                <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
+                                <td className="text-center">₱{orderItem.total.toFixed(2)}</td>
                                 <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                               </tr>
                             </tbody>
@@ -303,7 +303,7 @@ function Supplier_Orders () {
                                   <td className="text-center">
                                     {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}  
                                   </td>
-                                  <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
+                                  <td className="text-center">₱{orderItem.total.toFixed(2)}</td>
                                   <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                                 </tr>
                               </tbody>
@@ -343,7 +343,7 @@ function Supplier_Orders () {
                                   <td className="text-center">
                                     {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                                   </td>
-                                  <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
+                                  <td className="text-center">₱{orderItem.total.toFixed(2)}</td>
                                   <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                                 </tr>
                               </tbody>
@@ -383,7 +383,7 @@ function Supplier_Orders () {
                                   <td className="text-center">
                                     {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                                   </td>
-                                  <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
+                                  <td className="text-center">₱{orderItem.total.toFixed(2)}</td>
                                   <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                                 </tr>
                               </tbody>
@@ -423,7 +423,7 @@ function Supplier_Orders () {
                                   <td className="text-center">
                                     {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                                   </td>
-                                  <td className="text-center">₱{orderItem.total.toLocaleString()}</td>
+                                  <td className="text-center">₱{orderItem.total.toFixed(2)}</td>
                                   <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
                                 </tr>
                               </tbody>
@@ -500,7 +500,7 @@ function Supplier_Orders () {
                                             <span className="modal-info">{formatDate(selectedOrders.dateCreated)}</span>
                                             <span className="modal-info">{selectedOrders.orderNumber}</span>
                                             <span className="modal-info">{selectedOrders.orderItems.length}</span>
-                                            <span className="modal-info">₱{selectedOrders.total.toLocaleString()}</span>
+                                            <span className="modal-info">₱{selectedOrders.total.toFixed(2)}</span>
                                             <a 
                                               className="modal-info" 
                                               rel="noopener noreferrer" 

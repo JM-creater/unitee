@@ -17,6 +17,55 @@
     gap: 30px;
 }
 
+.supplier-nav-link:hover, .supplier-nav-link-users:hover {
+    text-decoration: none;
+    background-color: #020654;
+}
+
+.supplier-nav-text, .supplier-nav-text-collapse, .order-status-collapse {
+    color: white;
+    font-size: 15px;
+}
+
+.supplier-nav-link {
+    padding: 12px;
+    gap: 10px;
+    align-items: center;
+    text-decoration: none;
+    width: 14vw;
+    border-radius: 5px;
+    display: flex;
+    justify-content: start;
+}
+
+.supplier-collapse-orders-link {
+    text-decoration: none;
+    border-radius: 5px;
+    padding: 10px 20px 10px 20px;
+}
+
+.supplier-collapse-orders-link:hover {
+    text-decoration: none;
+}
+
+.supplier-collapse-orders-link:hover {
+    background-color: #004AAD;
+    text-decoration: none;
+}
+
+.supplier-nav-text-collapse {
+    margin-left: 2.5rem;
+}
+
+.orders-collapse-container {
+    width: 17rem;
+    display: flex;
+    flex-flow: column;
+    background-color: #020654;
+    padding: 5px;
+    border-radius: 5px;
+}
+
 .second-nav-container {
     height: 8vh;
     display: flex;

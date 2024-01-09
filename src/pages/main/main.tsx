@@ -420,7 +420,7 @@ function Main() {
                                       {item.product.productName}
                                     </span>
                                     <span className="dropdown-price">
-                                      ₱{item.product.price}
+                                      ₱{item.product.price.toFixed(2)}
                                     </span>
                                   </div>
                                 </Link>

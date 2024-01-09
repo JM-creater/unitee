@@ -270,10 +270,10 @@ function Register() {
               <div className="inputs-container">
                 <div
                   className="col-md-5 input-container-withErrorMessage"
-                  style={{ marginLeft: "45px" }}
-                >
-                  <span>This is your ID Number:</span>
+                  style={{ marginLeft: "45px"}}>
+                  <span>Supplier ID Number:</span>
                   <input
+                    style={{ fontWeight:'700', fontSize:'18px'  }}
                     className="input-register"
                     type="text"
                     placeholder="Store ID"
