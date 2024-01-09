@@ -391,7 +391,7 @@ function Purchase_History () {
                                         <div className="recommendation-section">
                                             {recommendationProducts.map((product, index) => (
                                                 <div key={index} className="recommendation-card">
-                                                    <img src={`https://localhost:7017/${product.image}`}className="product-image" />
+                                                    <img src={`https://localhost:7017/${product.image}`}className="purchHistory-product-image" />
                                                     <div className="product-details">
                                                         <h4 className="product-name">{product.productName}</h4>
                                                         <p className="product-description">{product.description}</p>
