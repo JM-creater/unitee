@@ -34,8 +34,9 @@
 }
 
 .supplier-shop-prod-image {
-    width: 100%;
+    width: 80px;
     max-width: 80px;
+    max-height: 80px !important;
 }
 
 .prod-shop-details {
@@ -101,6 +102,7 @@
     max-width: 300px;
     cursor: pointer;
     filter: brightness(0.4);
+    max-height: 300px
 }
 
 .thumbnail-container, .supplier-prod-status {

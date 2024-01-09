@@ -9,6 +9,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import addProductEventEmitter from "../../helpers/AddProductEventEmitter";
 import React from "react";
+import { format } from "date-fns";
 
 function Manage_Shop() {
   interface Department {
@@ -809,7 +810,7 @@ function Manage_Shop() {
                     className="col-md-2 supplier-prod-price"
                     style={{ color: productItem.isActive ? "" : "black" }}
                   >
-                    ₱{productItem.price.toLocaleString()}
+                    ₱{productItem.price.toLocaleString(2)}
                   </h4>
                 </div>
               </div>
