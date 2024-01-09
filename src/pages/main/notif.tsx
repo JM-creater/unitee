@@ -1151,7 +1151,7 @@ function Notif() {
                       <tbody>
                         {selectedOrderReceipt && selectedOrderReceipt.order && selectedOrderReceipt.order.orderItems.map((item, index) => ( 
                           <tr key={index}>
-                            <th scope="row">{item.product.productName}</th>
+                            <td className='row' style={{ padding: '16px' }}>{item.product.productName}</td>
                             <td className='text-center'>{item.sizeQuantity.size}</td>
                             <td className='text-center'>{item.quantity}</td>
                             <td className='text-center'>₱{item.product.price.toFixed(2)}</td>
