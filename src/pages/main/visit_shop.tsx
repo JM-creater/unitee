@@ -389,7 +389,7 @@ function Visit_Shop () {
                     
                     {/* Filter */}
                     <div className="prodFilter-container">
-                        <h4>Filter</h4>
+                        <h4 className="filter-text">Filter</h4>
     
                         {/* product type filter */}
                         <div className="prod-type-filter-container row">

@@ -30,6 +30,7 @@
     align-items: center;
     padding: 15px;
     height: fit-content;
+    min-width: fit-content;
 }
 
 .visitShop-Name {
@@ -79,7 +80,14 @@
 
 .prodType-filter-title {
     font-size: 15px;
-    font-weight: 700;    
+    font-weight: 700;
+}
+
+.filter-text {
+    font-size: 30px;
+    width: 8em;
+    padding-top: 10px;
+    margin-bottom: 10px;
 }
 
 .prod-cart-checkBox {
@@ -95,20 +103,24 @@
     display: flex;
     flex-wrap: wrap; 
     justify-content: flex-start; 
-    gap: 20px; 
 }
 
 .prodShop-card {
     width: 210px;
     height: 245px;
-    background-color: #F0F0F0;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 10px;
     flex-flow: column;
-    margin-right: 40px;
+    margin-right: 10px;
     cursor: pointer;
+    transition: all .3s;
+    box-shadow: 4px 6px 14px #00000036;
+}
+
+.prodShop-card:hover {
+    margin-top: -10px;
 }
 
 .visitShopProdImg {
