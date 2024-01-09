@@ -144,12 +144,12 @@ function Canceled_Orders () {
         <div className="canceled-table-container">
             <table className='table table-hover'>
                 <thead className='table-dark'>
-                    <tr>
+                <tr>
                         <th scope='col'>Date</th>
-                        <th scope='col'>Order no.</th>
-                        <th scope='col'>Number of Items</th>
-                        <th scope='col'>Customer</th>
-                        <th scope='col'>Total Amount</th>
+                        <th className="text-center" scope='col'>Order no.</th>
+                        <th className="text-center" scope='col'>Number of Items</th>
+                        <th className="text-center" scope='col'>Customer</th>
+                        <th className="text-center" scope='col'>Total Amount</th>
                     </tr>
                 </thead>
                 {orders.length > 0 ? (
@@ -253,11 +253,11 @@ function Canceled_Orders () {
                                 <thead className='table-dark'>
                                     <tr>
                                         <th scope='col'>Product Name</th>
-                                        <th scope='col'>Type</th>
-                                        <th scope='col'>Gender</th>
-                                        <th scope='col'>Size</th>
-                                        <th scope='col'>Quantity</th>
-                                        <th scope='col'>Price</th>
+                                        <th className='text-center' scope='col'>Type</th>
+                                        <th className='text-center' scope='col'>Gender</th>
+                                        <th className='text-center' scope='col'>Size</th>
+                                        <th className='text-center' scope='col'>Quantity</th>
+                                        <th className='text-center' scope='col'>Price</th>
                                     </tr>
                                 </thead>
                                 <tbody>

@@ -186,12 +186,12 @@ function Pending_Orders (){
         <div className="pending-table-container">
             <table className='table table-hover'>
                 <thead className='table-dark'>
-                    <tr>
+                <tr>
                         <th scope='col'>Date</th>
-                        <th scope='col'>Order no.</th>
-                        <th scope='col'>Number of Items</th>
-                        <th scope='col'>Customer</th>
-                        <th scope='col'>Total Amount</th>
+                        <th className="text-center" scope='col'>Order no.</th>
+                        <th className="text-center" scope='col'>Number of Items</th>
+                        <th className="text-center" scope='col'>Customer</th>
+                        <th className="text-center" scope='col'>Total Amount</th>
                     </tr>
                 </thead>
                 {orders.length > 0 ? (
