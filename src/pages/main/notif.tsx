@@ -932,9 +932,8 @@ function Notif() {
                     onClick={() => handleOrderReceived(notificationItem.orderId)}
                     disabled={disabledButtons.get(notificationItem.orderId)}
                     style={{
-                      backgroundColor: disabledButtons.get(notificationItem.orderId) ? 'grey' : 'red',
-                      color: disabledButtons.get(notificationItem.orderId) ? 'darkgray' : 'white',
-                      cursor: 'not-allowed'
+                      backgroundColor: disabledButtons.get(notificationItem.orderId) ? '#9FA5AA' : 'red',
+                      color: disabledButtons.get(notificationItem.orderId) ? 'white' : 'white'
                     }}
                   >
                     Order Received

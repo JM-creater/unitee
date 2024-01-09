@@ -285,6 +285,10 @@ body {
     cursor: pointer;
 }
 
+.view-receipt-received-btn:disabled {
+    cursor: 'not-allowed'
+}
+
 .view-receipt-received-btn:hover {
     background-color: red; 
 }

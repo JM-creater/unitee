@@ -1,8 +1,183 @@
 import './pending_orders.css'
-//images
 import uniteeLogo from '../../assets/images/unitee.png'
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import notifEventEmitter from '../../helpers/NotifEventEmitter';
+import orderEventEmitter from '../../helpers/OrderEmitter';
+import axios from 'axios';
+import cartEventEmitter from '../../helpers/EventEmitter';
 
 function Pending_Orders (){
+
+    // * Payment Type and Status
+    const PaymentType = {
+        EMoney: 'E-Money',
+        Cash: 'Cash'
+    };
+
+    const Status = {
+        OrderPlaced: 'OrderPlaced',
+        Pending: 'Pending',
+        Approved: 'Approved',
+        ForPickUp: 'ForPickUp',
+        Completed: 'Completed',
+        Canceled: 'Canceled',
+        Denied: 'Denied',
+    };
+
+    const { id } = useParams();
+    const [orders, setOrders] = useState([]);
+    const [departments, setDepartments] = useState([]);
+    const [productTypes, setProductTypes] = useState([]);
+    const [selectedOrders, setSelectedOrders] = useState(null);
+
+    // * For Delay
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    // * Handle Close Button s
+    const handleCloseButton = async () => {
+        await sleep(50);
+        window.location.reload();
+    };  
+
+    // * Handle Order Click
+    const handleOrderClick = (orderItem) => {
+        setSelectedOrders(orderItem);
+    };
+
+    // * Get Order By Supplier from Customer
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7017/Order/BySupplier/${id}`);
+                setOrders(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        const validationListener = () => {
+            fetchOrders();
+        }
+
+        cartEventEmitter.on("itemAddedToCart", validationListener);
+        validationListener();
+
+        return () => {
+            cartEventEmitter.off("itemAddedToCart", validationListener);
+        };
+    }, [id])
+
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+                const response = await axios.get(`https://localhost:7017/Order/BySupplier/${id}`);
+                setOrders(response.data);
+            } catch (error) {
+                console.error('Network error or server not responding');
+            }
+        };
+
+        const handleFocus = () => {
+            fetchData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [id])
+
+    // * Get All Departments
+    useEffect(() => {
+        const fetchDepartments = async () => {
+            try {
+                const response = await axios.get("https://localhost:7017/Department");
+                setDepartments(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchDepartments();
+    }, []);
+
+    // * Get Department Names
+    const getDepartmentName = (departmentId) => {
+        const department = departments.find(d => d.departmentId === departmentId);
+        return department ? department.department_Name : 'Unknown Department';
+    };
+
+    // * Get All Product Types
+    useEffect(() => {
+        const fetchProductTypes = async () => {
+            try {
+                const response = await axios.get('https://localhost:7017/ProductType');
+                setProductTypes(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchProductTypes();
+    }, []);
+    
+    // * Get Product Type Name
+    const getProductTypeName = (productTypeId) => {
+        const productType = productTypes.find(p => p.productTypeId === productTypeId);
+        return productType ? productType.product_Type : 'Unknown Type';
+    };
+
+    // * Handle Approved Orders
+    const HandleApprovedOrders = (orderId) => {
+        axios.put(`https://localhost:7017/Order/approvedOrder/${orderId}`)
+        .then(async response => {
+            const updatedOrders = orders.map(order => {
+                if (order.Id === response.data.Id) {
+                    return response.data;
+                }
+                return order;
+            });
+            setOrders(updatedOrders);
+            
+            toast.success("Order approved successfully");
+            notifEventEmitter.emit("notifAdded");
+            orderEventEmitter.emit("statusUpdate");
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    };
+
+    // * Handle Denied Orders
+    const HandleDeniedOrders = (orderId) => {
+        axios.put(`https://localhost:7017/Order/deniedOrder/${orderId}`)
+        .then(async response => {
+            const updatedOrder = orders.find(order => order.Id === response.data.Id);
+            if (updatedOrder) {
+                Object.assign(updatedOrder, response.data);
+            }
+            toast.success("Order denied successfully");
+            notifEventEmitter.emit("notifAdded");
+            orderEventEmitter.emit("statusUpdate");
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    };
+
+    // * Format Date
+    const formatDate= (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); 
+        const year = date.getFullYear();
+        return `${month}/${day}/${year}`;
+    };
+
     return <div className="pending-orders-main-container">
             <header className='order-header'>
                 <h1>Pending Orders</h1>
@@ -19,15 +194,31 @@ function Pending_Orders (){
                         <th scope='col'>Total Amount</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr data-bs-toggle="modal" data-bs-target="#orderDetailsModal">
-                        <th scope='row'>1/09/2024</th>
-                        <td>123543</td>
-                        <td>5</td>
-                        <td>Racel Anne</td>
-                        <td>1,235.00</td>
+                {orders.length > 0 ? (
+                    orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).map((orderItem, index) => (
+                    <tbody key={index} className="table-group-divider">
+                        <tr data-bs-toggle="modal" data-bs-target="#orderDetailsModal" onClick={() => handleOrderClick(orderItem)}>
+                            <th scope="row">{formatDate(orderItem.dateUpdated)}</th>
+                            <td className="text-center">{orderItem.orderNumber}</td>
+                            <td className="text-center">
+                                {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
+                            </td>
+                            <td className="text-center">₱{orderItem.total.toFixed(2)}</td>
+                            <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                        </tr>
+                    </tbody>
+                ))
+                ) : (
+                    <tbody className="table-group-divider">
+                    <tr data-bs-toggle="modal" className="text-center">
+                        <td></td>
+                        <td></td>
+                        <td>No pending orders available</td>
+                        <td></td>
+                        <td></td>
                     </tr>
-                </tbody>
+                    </tbody>
+                )}
             </table>
         </div>
 
@@ -37,8 +228,9 @@ function Pending_Orders (){
                 <div className="modal-content">
                 <div className="modalHeader">
                     <img className='modal-logo' src={ uniteeLogo }/>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleCloseButton}></button>
                 </div>
+                {selectedOrders && (
                 <div className="modal-body orderDetails-modal">
                     <div className="order-detail-1">
                         <div>
@@ -46,6 +238,7 @@ function Pending_Orders (){
                             <div className="order-details-container">
                                 <div className="ord-details-labels">
                                     <span className='details-label'>Status</span>
+                                    <span className='details-label'>Payment Type</span>
                                     <span className='details-label'>Order Number</span>
                                     <span className='details-label'>Date</span>
                                     <span className='details-label'>Number of Items</span>
@@ -54,13 +247,23 @@ function Pending_Orders (){
                                     <span className='details-label-totalAmount'>Total Amount</span>
                                 </div>
                                 <div className="ord-details-data">
-                                    <span className='details-data' style={{ color:'#f1b50d' }}>Pending</span>
-                                    <span className='details-data'>57786</span>
-                                    <span className='details-data'>01/09/2024</span>
-                                    <span className='details-data'>5</span>
-                                    <span className='details-data'><a href="/">sampleProof.png</a></span>
-                                    <span className='details-data'>5353522</span>
-                                    <span className='details-data-totalAmount'>5,332.00</span>
+                                    <span className='details-data' style={{ color:'#f1b50d' }}>{Status[Object.keys(Status)[selectedOrders.status - 1]]}</span>
+                                    <span className='details-data'>{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
+                                    <span className='details-data'>{selectedOrders.orderNumber}</span>
+                                    <span className='details-data'>{formatDate(selectedOrders.dateCreated)}</span>
+                                    <span className='details-data'>{selectedOrders.orderItems.length}</span>
+                                    <span className='details-data'>
+                                    <a 
+                                        className="modal-info" 
+                                        rel="noopener noreferrer" 
+                                        target="_blank" 
+                                        href={`https://localhost:7017/${selectedOrders.proofOfPayment}`} 
+                                    >
+                                        {selectedOrders.proofOfPayment.split('\\').pop()}
+                                    </a>
+                                    </span>
+                                    <span className='details-data'>{selectedOrders.referenceId}</span>
+                                    <span className='details-data-totalAmount'>₱{selectedOrders.total.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
@@ -75,11 +278,11 @@ function Pending_Orders (){
                                     <span className='cust-details-label'>Gender</span>
                                 </div>
                                 <div className="customer-details-data">
-                                    <span className='details-data'>552445</span>
-                                    <span className='details-data'>Racel Anne</span>
-                                    <span className='details-data'>Pitogo</span>
-                                    <span className='details-data'>College of Computer Studies</span>
-                                    <span className='details-data'>Female</span>
+                                    <span className='details-data'>{selectedOrders.user.id}</span>
+                                    <span className='details-data'>{selectedOrders.user.firstName}</span>
+                                    <span className='details-data'>{selectedOrders.user.lastName}</span>
+                                    <span className='details-data'>{getDepartmentName(selectedOrders.user.departmentId)}</span>
+                                    <span className='details-data'>{selectedOrders.user.gender}</span>
                                 </div>
                             </div>
                         </div>
@@ -91,30 +294,37 @@ function Pending_Orders (){
                                 <thead className='table-dark'>
                                     <tr>
                                         <th scope='col'>Product Name</th>
-                                        <th scope='col'>Type</th>
-                                        <th scope='col'>Gender</th>
-                                        <th scope='col'>Size</th>
-                                        <th scope='col'>Quantity</th>
-                                        <th scope='col'>Price</th>
+                                        <th className='text-center' scope='col'>Type</th>
+                                        <th className='text-center' scope='col'>Gender</th>
+                                        <th className='text-center' scope='col'>Size</th>
+                                        <th className='text-center' scope='col'>Quantity</th>
+                                        <th className='text-center' scope='col'>Price</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <th scope='row'>CCS Department T-shirt</th>
-                                        <td>Department Shirt</td>
-                                        <td>Unisex</td>
-                                        <td>S</td>
-                                        <td>7</td>
-                                        <td>1,235.00</td>
-                                    </tr>
+                                {selectedOrders && selectedOrders.orderItems && 
+                                    (Status[Object.keys(Status)[selectedOrders.status - 1]] === Status.Pending) && (
+                                        selectedOrders.orderItems.map((item, index) => (
+                                            <tr key={index}>
+                                                <th scope="row">{item.product.productName}</th>
+                                                <td className='text-center'>{getProductTypeName(item.product.productTypeId)}</td>
+                                                <td className="text-center">{item.product.category}</td>
+                                                <td className="text-center">{item.sizeQuantity.size}</td>
+                                                <td className="text-center">{item.quantity}</td>
+                                                <td className="text-center">₱{item.product.price.toLocaleString()}</td>
+                                            </tr>
+                                        ))
+                                    )
+                                }
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+                )}
                 <div className="orderModal-footer">
-                    <button className='approve-btn'>Approve</button>
-                    <button className='deny-btn'>Deny</button>
+                    <button className='approve-btn' onClick={() => HandleApprovedOrders(selectedOrders.id)}>Approve</button>
+                    <button className='deny-btn' onClick={() => HandleDeniedOrders(selectedOrders.id)}>Deny</button>
                 </div>
                 </div>
             </div>
