@@ -11,7 +11,7 @@
 }
 
 .loading-logo img {
-    width: 500px;
+    width: 30em;
     height: auto;
     margin-bottom: 20px; 
 }
@@ -30,6 +30,22 @@
     margin-top: 20px;
     opacity: 0;
     animation: fadeIn 1s ease 2s forwards;
+}
+
+.gif-size, .loading-bar {
+    width: 100%;
+    max-width: 5em;
+}
+
+.spinner {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  margin-left: -75px;
 }
 
 @keyframes fadeIn {

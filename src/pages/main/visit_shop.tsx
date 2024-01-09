@@ -564,6 +564,34 @@ function Visit_Shop () {
             </div>
     
             <div className="shop-content2-container">
+                <div className="top-ratedProducts-Shop">
+                    <h3 className="topRated-label">Recommended For You</h3>
+                    <div className="topProds-container-visitShop">
+                        <div className="topProdShop-card"
+                        // data-bs-toggle="modal" 
+                        // data-bs-target={!product.isActive ? undefined : "#viewProdDetailsModal"}
+                        // key={product.productId} 
+                        // onClick={() => {
+                        //     if (product.isActive) {
+                        //         setSelectedProduct(product);
+                        //         setImage(`https://localhost:7017/${product.image}`);
+                        //     }
+                        // }}
+                        >
+                            <img className="visitShopProdImg" src="/" alt="" />
+                            {/* PLEASE DELETE */}
+                            <h4 className="visitShop-topProdName">Sample name</h4>
+                            <h3 className="topProdPrice">123.00(temporary)</h3>
+                            {/* REMOVE COMMENT TAGS */}
+                            {/* <div className="col-md-12 shop-prodDetails-container">
+                                <h4 className="col-md-8 visitShop-topProdName">{product.productName}</h4>
+                                <h3 className="visitShop-topProdPrice">₱{product.price.toFixed(2)}</h3>
+                                {!product.isActive && <span className="badge badge-danger">Inactive</span>}
+                            </div> */}
+                        </div>
+                    </div>
+                </div>
+                <h3 className="prods-available-label">Products Available</h3>
                 {filteredProduct.map(product => (
                     <div 
                         className={`prodShop-card ${!product.isActive ? 'inactive-product' : ''}`} 
