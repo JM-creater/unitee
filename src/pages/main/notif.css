@@ -34,6 +34,14 @@ body {
     margin: 8px;
 }
 
+.cancel-orders-btn-container {
+    display: flex;
+    width: 40em;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
 .top {
     padding-top: 40px;
     padding-left: 13% !important;
@@ -264,6 +272,21 @@ body {
 
 .view-receipt-btn:hover {
     background-color: #0056b3; 
+}
+
+.view-receipt-received-btn {
+    margin-left: 30px;
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: red;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.view-receipt-received-btn:hover {
+    background-color: red; 
 }
 
 #cancellationModal .modal-content {

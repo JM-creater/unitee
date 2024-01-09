@@ -194,6 +194,11 @@
     background-color: #ffffff;
     overflow: hidden;
     transition: transform 0.3s ease;
+    height: 31em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
 
   .recommendation-card:hover {
@@ -202,6 +207,9 @@
 
   .product-image {
     width: 100%;
+    max-width: 15em;
+    max-height: 15em;
+    object-fit: contain;
     height: auto;
     display: block;
   }
@@ -235,20 +243,69 @@
     margin: 10px 0;
   }
 
-  .go-to-shop-button {
-    background-color: #4a90e2;
-    color: white;
+  /* .go-to-shop-button {
+    border: solid 2px black;
+    color: black;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
-    margin-top: 15px;
+    font-size: 12px;
+    margin-top: 10px;
     transition: background-color 0.3s ease;
   }
 
   .go-to-shop-button:hover {
-    background-color: #3a7ed0;
-  }
+    background-color: #06254b;
+  } */
+
+  .go-to-shop-button {
+    --color: #003cffc0;
+    font-family: inherit;
+    display: inline-block;
+    width: 8em;
+    height: 2.6em;
+    line-height: 2.5em;
+    margin: 20px;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid var(--color);
+    transition: color .5s;
+    z-index: 1;
+    font-size: 13px;
+    border-radius: 6px;
+    font-weight: 500;
+    color: var(--color);
+   }
+   
+   .go-to-shop-button:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    background: var(--color);
+    height: 150px;
+    width: 200px;
+    border-radius: 50%;
+   }
+   
+   .go-to-shop-button:hover {
+    color: #fff;
+   }
+   
+   .go-to-shop-button:before {
+    top: 100%;
+    left: 100%;
+    transition: all .7s;
+   }
+   
+   .go-to-shop-button:hover:before {
+    top: -30px;
+    left: -30px;
+   }
+   
+   .go-to-shop-button:active:before {
+    background: #3a0ca3;
+    transition: background 0s;
+   }
 
 

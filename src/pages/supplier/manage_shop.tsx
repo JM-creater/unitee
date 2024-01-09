@@ -1,12 +1,14 @@
 import prodImage from "../../assets/images/shop_products/picture-2.png";
 import addIcon from "../../assets/images/icons/plus-4.png";
 import noProdsIcon from "../../assets/images/icons/empty-box.png";
+import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 import "./manage_shop.css";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import addProductEventEmitter from "../../helpers/AddProductEventEmitter";
+import React from "react";
 
 function Manage_Shop() {
   interface Department {
@@ -84,6 +86,8 @@ function Manage_Shop() {
   const [newSelectedDepartments, setNewSelectedDepartments] = useState([]);
   const [lastErrorMessage, setLastErrorMessage] = useState("");
   //const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+
+  const [isLoading, setIsLoading] = useState(true);
 
   const { id } = useParams();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -197,7 +201,7 @@ function Manage_Shop() {
   };
 
   // * Category Change for Add
-  const handleCategoryChange = (e, gender) => {
+  const handleCategoryChange = (_e, gender) => {
     setProductCategory(productCategory === gender ? "" : gender);
   };
 
@@ -394,15 +398,18 @@ function Manage_Shop() {
 
   // * Get Product By Supplier Id
   useEffect(() => {
+    setIsLoading(true);
     const fetchProductSupplierId = async () => {
       try {
         const response = await axios.get(
           `https://localhost:7017/Product/bysupplier/${id}`
         );
         setProducts(response.data);
+        setIsLoading(false);
       } catch (error) {
         console.error(error);
         console.error("Error fetching products");
+        setIsLoading(false);
       }
     };
     fetchProductSupplierId();
@@ -704,484 +711,133 @@ function Manage_Shop() {
   };
 
   return (
-    <div className="manage-shop-main-container">
-      <div className="add-prod-btn-container">
-        <h3
-          style={{ marginBottom: "20px", color: "#020654", fontWeight: "600" }}
-        >
-          Manage Shop
-        </h3>
-        <button
-          className="supplier-add-prod-btn"
-          data-bs-toggle="modal"
-          data-bs-target="#addProductModal"
-        >
-          <img className="addbtnIcon" src={addIcon} alt="" />
-          Add New Product
-        </button>
-      </div>
-
-      {/* PRODUCTS */}
-      <div className="col-md-12 supplier-prods-container">
-        {products.length > 0 ? (
-          products.map((productItem, index) => (
-            <div
-              key={index}
-              className="prod-card"
-              data-bs-toggle="modal"
-              data-bs-target="#editProductModal"
-              onClick={() => {
-                setSelectedProduct(productItem);
-                setNewSizes(productItem.sizes);
-                setNewPrice(productItem.price);
-                setNewCategory(productItem.category);
-                setNewDescription(productItem.description);
-                setNewIsActive(productItem.isActive);
-                setNewName(productItem.productName);
-                setNewProductType(productItem.productTypeId);
-                setNewSelectedImage(productItem.image);
-                setNewSelectedFrontImage(productItem.frontViewImage);
-                setNewSelectedSideImage(productItem.sideViewImage);
-                setNewSelectedBackImage(productItem.backViewImage);
-                setNewSizeGuide(productItem.sizeGuide);
-                handleCategoryChange2(productItem.category);
-                selectProductForEditing(productItem);
-              }}
-            >
-              <div className="prod-shop-image-container">
-                <img
-                  className="supplier-shop-prod-image"
-                  src={
-                    productItem.image
-                      ? `https://localhost:7017/${productItem.image}`
-                      : prodImage
-                  }
-                />
-              </div>
-              <div className="col-md-11 prod-shop-details">
-                <span
-                  className="col-md-3 supplier-prod-details"
-                  style={{ color: productItem.isActive ? "" : "black" }}
-                >
-                  {productItem.productName}
-                </span>
-                <span
-                  className="col-md-2 supplier-prod-details"
-                  style={{ color: productItem.isActive ? "" : "black" }}
-                >
-                  {getProductTypeName(productItem.productTypeId)}
-                </span>
-                <span
-                  className="col-md-1 supplier-prod-details"
-                  style={{ color: productItem.isActive ? "" : "black" }}
-                >
-                  {productItem.category}
-                </span>
-                <span
-                  className="col-md-1 supplier-prod-details"
-                  style={{ color: productItem.isActive ? "" : "black" }}
-                >
-                  {totalStock(productItem.sizes)}
-                </span>
-                <span
-                  className="col-md-1 supplier-prod-details"
-                  style={{
-                    backgroundColor: productItem.isActive ? "green" : "red",
-                    color: "white",
-                  }}
-                >
-                  {productItem.isActive ? "Active" : "Inactive"}
-                </span>
-                <h4
-                  className="col-md-2 supplier-prod-price"
-                  style={{ color: productItem.isActive ? "" : "black" }}
-                >
-                  ₱{productItem.price.toLocaleString()}
-                </h4>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="no-productsShop-message">
-            <img src={noProdsIcon} />
-            <p>No products available</p>
-          </div>
-        )}
-      </div>
-
-      {/* ADD NEW PRODUCT - MODAL  */}
-      <div
-        className="modal fade"
-        id="addProductModal"
-        tabIndex={-1}
-        aria-labelledby="addProductModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-fullscreen">
-          <div
-            className="modal-content"
-            style={{ padding: "15px", height: "100vh" }}
-          >
-            <div className="prod-header">
-              <h1 className="modal-title" id="exampleModalLabel">
-                Add New Product
-              </h1>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                onClick={() => window.location.reload()}
-              ></button>
-            </div>
-            <div className="modal-basta-container">
-              <span>You can add new products to your shop here</span>
-              <div className="modal-btns-container">
-                <button
-                  type="button"
-                  className="cancel-btn-modal"
-                  data-bs-dismiss="modal"
-                  onClick={HandleResetButton}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  className="save-prod-btn"
-                  onClick={handleAddItem}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-            <div
-              className="modal-body"
-              style={{ display: "flex", flexFlow: "row" }}
-            >
-              <div>
-                <div className="thumbnail-container">
-                  <h3 className="prod-info-titles">Main Image</h3>
-                  <img
-                    id="productImage"
-                    alt="Upload Product"
-                    className="supplier-modal-addprod-img"
-                    src={
-                      selectedImage
-                        ? URL.createObjectURL(selectedImage)
-                        : prodImage
-                    }
-                    onClick={handleImageClick}
-                  />
-                  <i
-                    className="overlay-icon fa fa-cloud-upload"
-                    onClick={handleImageClick}
-                  ></i>
-                  <input
-                    ref={inputRef}
-                    type="file"
-                    name="prodImage"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    style={{ display: "none" }}
-                    onKeyDown={handleKeyDown}
-                  />
-                </div>
-
-                <div className="thumbnail-container">
-                  <h3 className="prod-info-titles">Front Image</h3>
-                  <img
-                    id="productFrontImage"
-                    alt="Upload Product"
-                    className="supplier-modal-addprod-img"
-                    src={
-                      selectedFrontImage
-                        ? URL.createObjectURL(selectedFrontImage)
-                        : prodImage
-                    }
-                    onClick={handleFrontClick}
-                  />
-                  <i
-                    className="overlay-icon fa fa-cloud-upload"
-                    onClick={handleFrontClick}
-                  ></i>
-                  <input
-                    ref={frontImageRef}
-                    type="file"
-                    name="prodImage"
-                    accept="image/*"
-                    onChange={handleFrontImageChange}
-                    style={{ display: "none" }}
-                    onKeyDown={handleKeyDown}
-                  />
-                </div>
-
-                <div className="thumbnail-container">
-                  <h3 className="prod-info-titles">Side Image</h3>
-                  <img
-                    id="productSideImage"
-                    alt="Upload Product"
-                    className="supplier-modal-addprod-img"
-                    src={
-                      selectedSideImage
-                        ? URL.createObjectURL(selectedSideImage)
-                        : prodImage
-                    }
-                    onClick={handleSideClick}
-                  />
-                  <i
-                    className="overlay-icon fa fa-cloud-upload"
-                    onClick={handleSideClick}
-                  ></i>
-                  <input
-                    ref={sideImageRef}
-                    type="file"
-                    name="prodImage"
-                    accept="image/*"
-                    onChange={handleSideImageChange}
-                    style={{ display: "none" }}
-                    onKeyDown={handleKeyDown}
-                  />
-                </div>
-
-                <div className="thumbnail-container">
-                  <h3 className="prod-info-titles">Back Image</h3>
-                  <img
-                    id="productBackImage"
-                    alt="Upload Product"
-                    className="supplier-modal-addprod-img"
-                    src={
-                      selectedBackImage
-                        ? URL.createObjectURL(selectedBackImage)
-                        : prodImage
-                    }
-                    onClick={handleBackClick}
-                  />
-                  <i
-                    className="overlay-icon fa fa-cloud-upload"
-                    onClick={handleBackClick}
-                  ></i>
-                  <input
-                    ref={backImageRef}
-                    type="file"
-                    name="prodImage"
-                    accept="image/*"
-                    onChange={handleBackImageChange}
-                    style={{ display: "none" }}
-                    onKeyDown={handleKeyDown}
-                  />
-                </div>
-              </div>
-
-              <div className="col-md supplier-prod-details-modal">
-                <h3 className="col-md-12 prod-details-titles">
-                  Product Details
-                </h3>
-
-                <label className="prod-details-labels" htmlFor="prodName">
-                  Product Name
-                </label>
-                <input
-                  className="modal-input-box"
-                  type="text"
-                  name="prodName"
-                  placeholder="Enter product name"
-                  id="prodName"
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
-
-                <label className="prodDescription-label">Description</label>
-                <textarea
-                  className="form-control"
-                  aria-label="Product description"
-                  placeholder="Enter product description"
-                  value={productDescription}
-                  onChange={(e) => setProductDescription(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
-
-                <label className="prod-details-labels">Department</label>
-                {/* DEPARTMENT CHECKBOX */}
-                <div className="suppliers-department-checkbox">
-                  {departments.map((department, index) => (
-                    <label key={index}>
-                      <input
-                        className="departmentCheckbox"
-                        type="checkbox"
-                        value={department.departmentId}
-                        checked={selectedDepartments.includes(
-                          department.departmentId
-                        )}
-                        onChange={(e) =>
-                          handleDepartmentChange(
-                            department.departmentId,
-                            e.target.checked
-                          )
-                        }
-                      />
-                      {department.department_Name}
-                    </label>
-                  ))}
-                </div>
-                {/* GENDER OPTIONS */}
-                <label className="prod-details-labels">Gender</label>
-                <div className="department-option">
-                  <input
-                    className="genderRadio"
-                    type="radio"
-                    value="Male"
-                    name="gender"
-                    id="departmentCheck1"
-                    checked={productCategory === "Male"}
-                    onChange={(e) => handleCategoryChange(e, "Male")}
-                    onKeyDown={handleKeyDown}
-                  />
-                  <label
-                    className="departmentCheckLabel"
-                    htmlFor="departmentCheck1"
-                  >
-                    Male
-                  </label>
-                </div>
-                <div className="department-option">
-                  <input
-                    className="genderRadio"
-                    type="radio"
-                    value="Female"
-                    name="gender"
-                    id="departmentCheck2"
-                    checked={productCategory === "Female"}
-                    onChange={(e) => handleCategoryChange(e, "Female")}
-                    onKeyDown={handleKeyDown}
-                  />
-                  <label
-                    className="departmentCheckLabel"
-                    htmlFor="departmentCheck2"
-                  >
-                    Female
-                  </label>
-                </div>
-                <div className="department-option">
-                  <input
-                    className="genderRadio"
-                    type="radio"
-                    value="Unisex"
-                    name="gender"
-                    id="departmentCheck3"
-                    checked={productCategory === "Unisex"}
-                    onChange={(e) => handleCategoryChange(e, "Unisex")}
-                    onKeyDown={handleKeyDown}
-                  />
-                  <label
-                    className="departmentCheckLabel"
-                    htmlFor="departmentCheck3"
-                  >
-                    Unisex
-                  </label>
-                </div>
-
-                <label className="prod-details-labels">Product Type</label>
-                <select
-                  name="prodType"
-                  id="prodType"
-                  style={{
-                    padding: "5px",
-                    fontSize: "12px",
-                    borderRadius: "10px",
-                    width: "18rem",
-                  }}
-                  value={productTypeId}
-                  onChange={(e) => setSelectedProductType(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                >
-                  <option value="" disabled selected hidden>
-                    Select Type of Product
-                  </option>
-                  {productTypes.map((productType, index) => (
-                    <option key={index} value={productType.productTypeId}>
-                      {productType.product_Type}
-                    </option>
-                  ))}
-                </select>
-
-                <label className="prod-details-labels">Price</label>
-                <input
-                  className="modal-input-box"
-                  type="text"
-                  name="prodPrice"
-                  placeholder="Enter product price"
-                  id="prodPrice"
-                  value={productPrice}
-                  onChange={(e) => handlePrice(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
-
-                <h2 className="prod-details-labels">Upload Size Guide:</h2>
-                <input
-                  type="file"
-                  ref={sizeGuideRef}
-                  className="size-guide-img"
-                  accept="image/png, image/gif, image/jpeg"
-                  onChange={handleSizeGuideChange}
-                />
-
-                {/* SIZES AVAILABLE */}
-                <label className="prod-details-labels">Sizes Available</label>
-                <div className="suppliers-sizes-avail-checkbox">
-                  {sizes.map((sizeQty, index) => (
-                    <div key={index} className="supplier-size-avail-item">
-                      <input
-                        className="supplier-size-avail-checkbox"
-                        type="text"
-                        placeholder="Size"
-                        onChange={(e) => (sizeQty.size = e.target.value)}
-                      />
-                      <input
-                        className="supplier-size-avail-checkbox"
-                        type="text"
-                        placeholder="Quantity"
-                        onChange={(e) => (sizeQty.quantity = e.target.value)}
-                      />
-                      <span
-                        className="close-btn-size"
-                        onClick={() =>
-                          setSizes(sizes.filter((_, i) => i !== index))
-                        }
-                        style={{ cursor: "pointer", color: "red" }}
-                      >
-                        X
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <button className="addSizeBtn" onClick={addNewSizeInput}>
-                  Add Size +
-                </button>
-              </div>
-            </div>
-          </div>
+    <React.Fragment>
+      {isLoading ? (
+        <div className="mainloading-screen">
+          <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
         </div>
-      </div>
-
-      {/* EDIT PRODUCT INFO MODAL */}
-      <div
-        className="modal fade"
-        id="editProductModal"
-        tabIndex={-1}
-        aria-labelledby="editProductModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-fullscreen">
-          {selectedProduct && (
+      ) : (
+        <div className="manage-shop-main-container">
+        <div className="add-prod-btn-container">
+          <h3
+            style={{ marginBottom: "20px", color: "#020654", fontWeight: "600" }}
+          >
+            Manage Shop
+          </h3>
+          <button
+            className="supplier-add-prod-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#addProductModal"
+          >
+            <img className="addbtnIcon" src={addIcon} alt="" />
+            Add New Product
+          </button>
+        </div>
+  
+        {/* PRODUCTS */}
+        <div className="col-md-12 supplier-prods-container">
+          {products.length > 0 ? (
+            products.map((productItem, index) => (
+              <div
+                key={index}
+                className="prod-card"
+                data-bs-toggle="modal"
+                data-bs-target="#editProductModal"
+                onClick={() => {
+                  setSelectedProduct(productItem);
+                  setNewSizes(productItem.sizes);
+                  setNewPrice(productItem.price);
+                  setNewCategory(productItem.category);
+                  setNewDescription(productItem.description);
+                  setNewIsActive(productItem.isActive);
+                  setNewName(productItem.productName);
+                  setNewProductType(productItem.productTypeId);
+                  setNewSelectedImage(productItem.image);
+                  setNewSelectedFrontImage(productItem.frontViewImage);
+                  setNewSelectedSideImage(productItem.sideViewImage);
+                  setNewSelectedBackImage(productItem.backViewImage);
+                  setNewSizeGuide(productItem.sizeGuide);
+                  handleCategoryChange2(productItem.category);
+                  selectProductForEditing(productItem);
+                }}
+              >
+                <div className="prod-shop-image-container">
+                  <img
+                    className="supplier-shop-prod-image"
+                    src={
+                      productItem.image
+                        ? `https://localhost:7017/${productItem.image}`
+                        : prodImage
+                    }
+                  />
+                </div>
+                <div className="col-md-11 prod-shop-details">
+                  <span
+                    className="col-md-3 supplier-prod-details"
+                    style={{ color: productItem.isActive ? "" : "black" }}
+                  >
+                    {productItem.productName}
+                  </span>
+                  <span
+                    className="col-md-2 supplier-prod-details"
+                    style={{ color: productItem.isActive ? "" : "black" }}
+                  >
+                    {getProductTypeName(productItem.productTypeId)}
+                  </span>
+                  <span
+                    className="col-md-1 supplier-prod-details"
+                    style={{ color: productItem.isActive ? "" : "black" }}
+                  >
+                    {productItem.category}
+                  </span>
+                  <span
+                    className="col-md-1 supplier-prod-details"
+                    style={{ color: productItem.isActive ? "" : "black" }}
+                  >
+                    {totalStock(productItem.sizes)}
+                  </span>
+                  <span
+                    className="col-md-1 supplier-prod-details"
+                    style={{
+                      backgroundColor: productItem.isActive ? "green" : "red",
+                      color: "white",
+                    }}
+                  >
+                    {productItem.isActive ? "Active" : "Inactive"}
+                  </span>
+                  <h4
+                    className="col-md-2 supplier-prod-price"
+                    style={{ color: productItem.isActive ? "" : "black" }}
+                  >
+                    ₱{productItem.price.toFixed(2)}
+                  </h4>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="no-productsShop-message">
+              <img src={noProdsIcon} />
+              <p>No products available</p>
+            </div>
+          )}
+        </div>
+  
+        {/* ADD NEW PRODUCT - MODAL  */}
+        <div
+          className="modal fade"
+          id="addProductModal"
+          tabIndex={-1}
+          aria-labelledby="addProductModalLabel"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-fullscreen">
             <div
               className="modal-content"
               style={{ padding: "15px", height: "100vh" }}
-              onLoad={() => handleChangeButton(NewisActive)}
             >
               <div className="prod-header">
                 <h1 className="modal-title" id="exampleModalLabel">
-                  Edit Product
+                  Add New Product
                 </h1>
                 <button
                   type="button"
@@ -1192,32 +848,25 @@ function Manage_Shop() {
                 ></button>
               </div>
               <div className="modal-basta-container">
-                <span>You can edit product details here</span>
+                <span>You can add new products to your shop here</span>
                 <div className="modal-btns-container">
                   <button
                     type="button"
                     className="cancel-btn-modal"
-                    onClick={() => handleChangeStatus(NewisActive)}
-                    id="btnStatus"
-                  ></button>
-                  <button
-                    type="button"
-                    className="cancel-btn-modal"
                     data-bs-dismiss="modal"
-                    onClick={() => window.location.reload()}
+                    onClick={HandleResetButton}
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     className="save-prod-btn"
-                    onClick={handleEdit}
+                    onClick={handleAddItem}
                   >
                     Save
                   </button>
                 </div>
               </div>
-
               <div
                 className="modal-body"
                 style={{ display: "flex", flexFlow: "row" }}
@@ -1226,12 +875,12 @@ function Manage_Shop() {
                   <div className="thumbnail-container">
                     <h3 className="prod-info-titles">Main Image</h3>
                     <img
-                      id="productImage2"
+                      id="productImage"
                       alt="Upload Product"
                       className="supplier-modal-addprod-img"
                       src={
-                        newSelectedImage
-                          ? `https://localhost:7017/${newSelectedImage}`
+                        selectedImage
+                          ? URL.createObjectURL(selectedImage)
                           : prodImage
                       }
                       onClick={handleImageClick}
@@ -1245,47 +894,49 @@ function Manage_Shop() {
                       type="file"
                       name="prodImage"
                       accept="image/*"
-                      onChange={handleMainImageChange2}
+                      onChange={handleImageChange}
                       style={{ display: "none" }}
+                      onKeyDown={handleKeyDown}
                     />
                   </div>
-
+  
                   <div className="thumbnail-container">
                     <h3 className="prod-info-titles">Front Image</h3>
                     <img
-                      id="productFrontImage2"
+                      id="productFrontImage"
                       alt="Upload Product"
                       className="supplier-modal-addprod-img"
                       src={
-                        newSelectedFrontImage
-                          ? `https://localhost:7017/${newSelectedFrontImage}`
+                        selectedFrontImage
+                          ? URL.createObjectURL(selectedFrontImage)
                           : prodImage
                       }
-                      onClick={handleFrontClick2}
+                      onClick={handleFrontClick}
                     />
                     <i
                       className="overlay-icon fa fa-cloud-upload"
-                      onClick={handleFrontClick2}
+                      onClick={handleFrontClick}
                     ></i>
                     <input
-                      ref={frontImageRef2}
+                      ref={frontImageRef}
                       type="file"
                       name="prodImage"
                       accept="image/*"
-                      onChange={handleFrontImageChange2}
+                      onChange={handleFrontImageChange}
                       style={{ display: "none" }}
+                      onKeyDown={handleKeyDown}
                     />
                   </div>
-
+  
                   <div className="thumbnail-container">
                     <h3 className="prod-info-titles">Side Image</h3>
                     <img
-                      id="productSideImage2"
+                      id="productSideImage"
                       alt="Upload Product"
                       className="supplier-modal-addprod-img"
                       src={
-                        newSelectedSideImage
-                          ? `https://localhost:7017/${newSelectedSideImage}`
+                        selectedSideImage
+                          ? URL.createObjectURL(selectedSideImage)
                           : prodImage
                       }
                       onClick={handleSideClick}
@@ -1299,20 +950,21 @@ function Manage_Shop() {
                       type="file"
                       name="prodImage"
                       accept="image/*"
-                      onChange={handleSideImageChange2}
+                      onChange={handleSideImageChange}
                       style={{ display: "none" }}
+                      onKeyDown={handleKeyDown}
                     />
                   </div>
-
+  
                   <div className="thumbnail-container">
                     <h3 className="prod-info-titles">Back Image</h3>
                     <img
-                      id="productBackImage2"
+                      id="productBackImage"
                       alt="Upload Product"
                       className="supplier-modal-addprod-img"
                       src={
-                        newSelectedBackImage
-                          ? `https://localhost:7017/${newSelectedBackImage}`
+                        selectedBackImage
+                          ? URL.createObjectURL(selectedBackImage)
                           : prodImage
                       }
                       onClick={handleBackClick}
@@ -1326,15 +978,18 @@ function Manage_Shop() {
                       type="file"
                       name="prodImage"
                       accept="image/*"
-                      onChange={handleBackImageChange2}
+                      onChange={handleBackImageChange}
                       style={{ display: "none" }}
+                      onKeyDown={handleKeyDown}
                     />
                   </div>
                 </div>
-
+  
                 <div className="col-md supplier-prod-details-modal">
-                  <h3 className="prod-details-titles">Product Details</h3>
-
+                  <h3 className="col-md-12 prod-details-titles">
+                    Product Details
+                  </h3>
+  
                   <label className="prod-details-labels" htmlFor="prodName">
                     Product Name
                   </label>
@@ -1342,34 +997,37 @@ function Manage_Shop() {
                     className="modal-input-box"
                     type="text"
                     name="prodName"
-                    id="prodName"
                     placeholder="Enter product name"
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
+                    id="prodName"
+                    value={productName}
+                    onChange={(e) => setProductName(e.target.value)}
+                    onKeyDown={handleKeyDown}
                   />
-
+  
                   <label className="prodDescription-label">Description</label>
                   <textarea
                     className="form-control"
                     aria-label="Product description"
                     placeholder="Enter product description"
-                    value={newDescription}
-                    onChange={(e) => setNewDescription(e.target.value)}
+                    value={productDescription}
+                    onChange={(e) => setProductDescription(e.target.value)}
+                    onKeyDown={handleKeyDown}
                   />
-
-                  {/* DEPARTMENT CHECKBOX */}
+  
                   <label className="prod-details-labels">Department</label>
+                  {/* DEPARTMENT CHECKBOX */}
                   <div className="suppliers-department-checkbox">
                     {departments.map((department, index) => (
                       <label key={index}>
                         <input
+                          className="departmentCheckbox"
                           type="checkbox"
                           value={department.departmentId}
-                          checked={newSelectedDepartments.includes(
+                          checked={selectedDepartments.includes(
                             department.departmentId
                           )}
                           onChange={(e) =>
-                            handleDepartmentChangeEdit(
+                            handleDepartmentChange(
                               department.departmentId,
                               e.target.checked
                             )
@@ -1379,17 +1037,18 @@ function Manage_Shop() {
                       </label>
                     ))}
                   </div>
-
                   {/* GENDER OPTIONS */}
                   <label className="prod-details-labels">Gender</label>
                   <div className="department-option">
                     <input
+                      className="genderRadio"
                       type="radio"
                       value="Male"
                       name="gender"
                       id="departmentCheck1"
-                      checked={newCategory === "Male"}
+                      checked={productCategory === "Male"}
                       onChange={(e) => handleCategoryChange(e, "Male")}
+                      onKeyDown={handleKeyDown}
                     />
                     <label
                       className="departmentCheckLabel"
@@ -1400,12 +1059,14 @@ function Manage_Shop() {
                   </div>
                   <div className="department-option">
                     <input
+                      className="genderRadio"
                       type="radio"
                       value="Female"
                       name="gender"
                       id="departmentCheck2"
-                      checked={newCategory === "Female"}
+                      checked={productCategory === "Female"}
                       onChange={(e) => handleCategoryChange(e, "Female")}
+                      onKeyDown={handleKeyDown}
                     />
                     <label
                       className="departmentCheckLabel"
@@ -1416,12 +1077,14 @@ function Manage_Shop() {
                   </div>
                   <div className="department-option">
                     <input
+                      className="genderRadio"
                       type="radio"
                       value="Unisex"
                       name="gender"
                       id="departmentCheck3"
-                      checked={newCategory === "Unisex"}
+                      checked={productCategory === "Unisex"}
                       onChange={(e) => handleCategoryChange(e, "Unisex")}
+                      onKeyDown={handleKeyDown}
                     />
                     <label
                       className="departmentCheckLabel"
@@ -1430,86 +1093,74 @@ function Manage_Shop() {
                       Unisex
                     </label>
                   </div>
-
+  
                   <label className="prod-details-labels">Product Type</label>
                   <select
-                    name="prodGender"
-                    id="prodGender"
+                    name="prodType"
+                    id="prodType"
                     style={{
                       padding: "5px",
                       fontSize: "12px",
                       borderRadius: "10px",
                       width: "18rem",
                     }}
-                    onChange={(e) => setNewProductType(e.target.value)}
+                    value={productTypeId}
+                    onChange={(e) => setSelectedProductType(e.target.value)}
+                    onKeyDown={handleKeyDown}
                   >
                     <option value="" disabled selected hidden>
                       Select Type of Product
                     </option>
                     {productTypes.map((productType, index) => (
-                      <option
-                        key={index}
-                        value={productType.productTypeId}
-                        selected={
-                          selectedProduct.productTypeId ===
-                          productType.productTypeId
-                        }
-                      >
+                      <option key={index} value={productType.productTypeId}>
                         {productType.product_Type}
                       </option>
                     ))}
                   </select>
-
+  
+                  <label className="prod-details-labels">Price</label>
+                  <input
+                    className="modal-input-box"
+                    type="text"
+                    name="prodPrice"
+                    placeholder="Enter product price"
+                    id="prodPrice"
+                    value={productPrice}
+                    onChange={(e) => handlePrice(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                  />
+  
                   <h2 className="prod-details-labels">Upload Size Guide:</h2>
                   <input
                     type="file"
                     ref={sizeGuideRef}
                     className="size-guide-img"
                     accept="image/png, image/gif, image/jpeg"
-                    onChange={handleSizeGuideChange2}
+                    onChange={handleSizeGuideChange}
                   />
-
-                  {/* SIZES AVAILABLE CHECKBOX */}
+  
+                  {/* SIZES AVAILABLE */}
                   <label className="prod-details-labels">Sizes Available</label>
                   <div className="suppliers-sizes-avail-checkbox">
-                    {Newsizes.map((sizeQty, index) => (
+                    {sizes.map((sizeQty, index) => (
                       <div key={index} className="supplier-size-avail-item">
                         <input
                           className="supplier-size-avail-checkbox"
                           type="text"
                           placeholder="Size"
-                          defaultValue={sizeQty.size}
-                          onChange={(e) => {
-                            const newSizeQty = {
-                              ...sizeQty,
-                              size: e.target.value,
-                            };
-                            setNewSizes(
-                              Newsizes.map((sq) =>
-                                sq.id === sizeQty.id ? newSizeQty : sq
-                              )
-                            );
-                          }}
+                          onChange={(e) => (sizeQty.size = e.target.value)}
                         />
                         <input
                           className="supplier-size-avail-checkbox"
                           type="text"
                           placeholder="Quantity"
-                          defaultValue={sizeQty.quantity}
-                          onChange={(e) => {
-                            const newSizeQty = {
-                              ...sizeQty,
-                              quantity: e.target.value,
-                            };
-                            setNewSizes(
-                              Newsizes.map((sq) =>
-                                sq.id === sizeQty.id ? newSizeQty : sq
-                              )
-                            );
-                          }}
+                          onChange={(e) => (sizeQty.quantity = e.target.value)}
                         />
                         <span
-                          onClick={() => handleDelete(sizeQty.id)}
+                          className="close-btn-size"
+                          onClick={() =>
+                            setSizes(sizes.filter((_, i) => i !== index))
+                          }
                           style={{ cursor: "pointer", color: "red" }}
                         >
                           X
@@ -1517,26 +1168,390 @@ function Manage_Shop() {
                       </div>
                     ))}
                   </div>
-                  <button className="addSizeBtn" onClick={addNewSizeInput2}>
+                  <button className="addSizeBtn" onClick={addNewSizeInput}>
                     Add Size +
                   </button>
-                  <label className="prod-details-labels">Price</label>
-                  <input
-                    className="modal-input-box"
-                    type="text"
-                    name="prodPrice"
-                    id="prodPrice"
-                    placeholder="Enter product price"
-                    value={newPrice}
-                    onChange={(e) => handleNewPrice(e.target.value)}
-                  />
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        </div>
+  
+        {/* EDIT PRODUCT INFO MODAL */}
+        <div
+          className="modal fade"
+          id="editProductModal"
+          tabIndex={-1}
+          aria-labelledby="editProductModalLabel"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-fullscreen">
+            {selectedProduct && (
+              <div
+                className="modal-content"
+                style={{ padding: "15px", height: "100vh" }}
+                onLoad={() => handleChangeButton(NewisActive)}
+              >
+                <div className="prod-header">
+                  <h1 className="modal-title" id="exampleModalLabel">
+                    Edit Product
+                  </h1>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    onClick={() => window.location.reload()}
+                  ></button>
+                </div>
+                <div className="modal-basta-container">
+                  <span>You can edit product details here</span>
+                  <div className="modal-btns-container">
+                    <button
+                      type="button"
+                      className="cancel-btn-modal"
+                      onClick={() => handleChangeStatus(NewisActive)}
+                      id="btnStatus"
+                    ></button>
+                    <button
+                      type="button"
+                      className="cancel-btn-modal"
+                      data-bs-dismiss="modal"
+                      onClick={() => window.location.reload()}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="save-prod-btn"
+                      onClick={handleEdit}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+  
+                <div
+                  className="modal-body"
+                  style={{ display: "flex", flexFlow: "row" }}
+                >
+                  <div>
+                    <div className="thumbnail-container">
+                      <h3 className="prod-info-titles">Main Image</h3>
+                      <img
+                        id="productImage2"
+                        alt="Upload Product"
+                        className="supplier-modal-addprod-img"
+                        src={
+                          newSelectedImage
+                            ? `https://localhost:7017/${newSelectedImage}`
+                            : prodImage
+                        }
+                        onClick={handleImageClick}
+                      />
+                      <i
+                        className="overlay-icon fa fa-cloud-upload"
+                        onClick={handleImageClick}
+                      ></i>
+                      <input
+                        ref={inputRef}
+                        type="file"
+                        name="prodImage"
+                        accept="image/*"
+                        onChange={handleMainImageChange2}
+                        style={{ display: "none" }}
+                      />
+                    </div>
+  
+                    <div className="thumbnail-container">
+                      <h3 className="prod-info-titles">Front Image</h3>
+                      <img
+                        id="productFrontImage2"
+                        alt="Upload Product"
+                        className="supplier-modal-addprod-img"
+                        src={
+                          newSelectedFrontImage
+                            ? `https://localhost:7017/${newSelectedFrontImage}`
+                            : prodImage
+                        }
+                        onClick={handleFrontClick2}
+                      />
+                      <i
+                        className="overlay-icon fa fa-cloud-upload"
+                        onClick={handleFrontClick2}
+                      ></i>
+                      <input
+                        ref={frontImageRef2}
+                        type="file"
+                        name="prodImage"
+                        accept="image/*"
+                        onChange={handleFrontImageChange2}
+                        style={{ display: "none" }}
+                      />
+                    </div>
+  
+                    <div className="thumbnail-container">
+                      <h3 className="prod-info-titles">Side Image</h3>
+                      <img
+                        id="productSideImage2"
+                        alt="Upload Product"
+                        className="supplier-modal-addprod-img"
+                        src={
+                          newSelectedSideImage
+                            ? `https://localhost:7017/${newSelectedSideImage}`
+                            : prodImage
+                        }
+                        onClick={handleSideClick}
+                      />
+                      <i
+                        className="overlay-icon fa fa-cloud-upload"
+                        onClick={handleSideClick}
+                      ></i>
+                      <input
+                        ref={sideImageRef}
+                        type="file"
+                        name="prodImage"
+                        accept="image/*"
+                        onChange={handleSideImageChange2}
+                        style={{ display: "none" }}
+                      />
+                    </div>
+  
+                    <div className="thumbnail-container">
+                      <h3 className="prod-info-titles">Back Image</h3>
+                      <img
+                        id="productBackImage2"
+                        alt="Upload Product"
+                        className="supplier-modal-addprod-img"
+                        src={
+                          newSelectedBackImage
+                            ? `https://localhost:7017/${newSelectedBackImage}`
+                            : prodImage
+                        }
+                        onClick={handleBackClick}
+                      />
+                      <i
+                        className="overlay-icon fa fa-cloud-upload"
+                        onClick={handleBackClick}
+                      ></i>
+                      <input
+                        ref={backImageRef}
+                        type="file"
+                        name="prodImage"
+                        accept="image/*"
+                        onChange={handleBackImageChange2}
+                        style={{ display: "none" }}
+                      />
+                    </div>
+                  </div>
+  
+                  <div className="col-md supplier-prod-details-modal">
+                    <h3 className="prod-details-titles">Product Details</h3>
+  
+                    <label className="prod-details-labels" htmlFor="prodName">
+                      Product Name
+                    </label>
+                    <input
+                      className="modal-input-box"
+                      type="text"
+                      name="prodName"
+                      id="prodName"
+                      placeholder="Enter product name"
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                    />
+  
+                    <label className="prodDescription-label">Description</label>
+                    <textarea
+                      className="form-control"
+                      aria-label="Product description"
+                      placeholder="Enter product description"
+                      value={newDescription}
+                      onChange={(e) => setNewDescription(e.target.value)}
+                    />
+  
+                    {/* DEPARTMENT CHECKBOX */}
+                    <label className="prod-details-labels">Department</label>
+                    <div className="suppliers-department-checkbox">
+                      {departments.map((department, index) => (
+                        <label key={index}>
+                          <input
+                            type="checkbox"
+                            value={department.departmentId}
+                            checked={newSelectedDepartments.includes(
+                              department.departmentId
+                            )}
+                            onChange={(e) =>
+                              handleDepartmentChangeEdit(
+                                department.departmentId,
+                                e.target.checked
+                              )
+                            }
+                          />
+                          {department.department_Name}
+                        </label>
+                      ))}
+                    </div>
+  
+                    {/* GENDER OPTIONS */}
+                    <label className="prod-details-labels">Gender</label>
+                    <div className="department-option">
+                      <input
+                        type="radio"
+                        value="Male"
+                        name="gender"
+                        id="departmentCheck1"
+                        checked={newCategory === "Male"}
+                        onChange={(e) => handleCategoryChange(e, "Male")}
+                      />
+                      <label
+                        className="departmentCheckLabel"
+                        htmlFor="departmentCheck1"
+                      >
+                        Male
+                      </label>
+                    </div>
+                    <div className="department-option">
+                      <input
+                        type="radio"
+                        value="Female"
+                        name="gender"
+                        id="departmentCheck2"
+                        checked={newCategory === "Female"}
+                        onChange={(e) => handleCategoryChange(e, "Female")}
+                      />
+                      <label
+                        className="departmentCheckLabel"
+                        htmlFor="departmentCheck2"
+                      >
+                        Female
+                      </label>
+                    </div>
+                    <div className="department-option">
+                      <input
+                        type="radio"
+                        value="Unisex"
+                        name="gender"
+                        id="departmentCheck3"
+                        checked={newCategory === "Unisex"}
+                        onChange={(e) => handleCategoryChange(e, "Unisex")}
+                      />
+                      <label
+                        className="departmentCheckLabel"
+                        htmlFor="departmentCheck3"
+                      >
+                        Unisex
+                      </label>
+                    </div>
+  
+                    <label className="prod-details-labels">Product Type</label>
+                    <select
+                      name="prodGender"
+                      id="prodGender"
+                      style={{
+                        padding: "5px",
+                        fontSize: "12px",
+                        borderRadius: "10px",
+                        width: "18rem",
+                      }}
+                      onChange={(e) => setNewProductType(e.target.value)}
+                    >
+                      <option value="" disabled selected hidden>
+                        Select Type of Product
+                      </option>
+                      {productTypes.map((productType, index) => (
+                        <option
+                          key={index}
+                          value={productType.productTypeId}
+                          selected={
+                            selectedProduct.productTypeId ===
+                            productType.productTypeId
+                          }
+                        >
+                          {productType.product_Type}
+                        </option>
+                      ))}
+                    </select>
+  
+                    <h2 className="prod-details-labels">Upload Size Guide:</h2>
+                    <input
+                      type="file"
+                      ref={sizeGuideRef}
+                      className="size-guide-img"
+                      accept="image/png, image/gif, image/jpeg"
+                      onChange={handleSizeGuideChange2}
+                    />
+  
+                    {/* SIZES AVAILABLE CHECKBOX */}
+                    <label className="prod-details-labels">Sizes Available</label>
+                    <div className="suppliers-sizes-avail-checkbox">
+                      {Newsizes.map((sizeQty, index) => (
+                        <div key={index} className="supplier-size-avail-item">
+                          <input
+                            className="supplier-size-avail-checkbox"
+                            type="text"
+                            placeholder="Size"
+                            defaultValue={sizeQty.size}
+                            onChange={(e) => {
+                              const newSizeQty = {
+                                ...sizeQty,
+                                size: e.target.value,
+                              };
+                              setNewSizes(
+                                Newsizes.map((sq) =>
+                                  sq.id === sizeQty.id ? newSizeQty : sq
+                                )
+                              );
+                            }}
+                          />
+                          <input
+                            className="supplier-size-avail-checkbox"
+                            type="text"
+                            placeholder="Quantity"
+                            defaultValue={sizeQty.quantity}
+                            onChange={(e) => {
+                              const newSizeQty = {
+                                ...sizeQty,
+                                quantity: e.target.value,
+                              };
+                              setNewSizes(
+                                Newsizes.map((sq) =>
+                                  sq.id === sizeQty.id ? newSizeQty : sq
+                                )
+                              );
+                            }}
+                          />
+                          <span
+                            onClick={() => handleDelete(sizeQty.id)}
+                            style={{ cursor: "pointer", color: "red" }}
+                          >
+                            X
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <button className="addSizeBtn" onClick={addNewSizeInput2}>
+                      Add Size +
+                    </button>
+                    <label className="prod-details-labels">Price</label>
+                    <input
+                      className="modal-input-box"
+                      type="text"
+                      name="prodPrice"
+                      id="prodPrice"
+                      placeholder="Enter product price"
+                      value={newPrice}
+                      onChange={(e) => handleNewPrice(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+      )}
+    </React.Fragment>
   );
 }
 

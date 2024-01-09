@@ -1,0 +1,163 @@
+.pending-orders-main-container {
+    width: 85vw;
+    padding: 10px;
+    background-color: #f0f0f0;
+    height: 92vh;
+    flex-wrap: wrap;
+}
+
+.pending-table-container {
+    max-height: 75vh;
+    scroll-behavior: smooth;
+    overflow: auto;
+}
+
+.order-header {
+    display: flex;
+    flex-direction: row;
+    gap: 60px;
+    padding: 20px;
+}
+
+.input-searchOrder {
+    width: 290px;
+    background-color: #f5f5f5;
+    color: #242424;
+    padding: .15rem .5rem;
+    min-height: 40px;
+    border-radius: 4px;
+    outline: none;
+    border: none;
+    line-height: 1.15;
+    box-shadow: 0px 10px 20px -18px;
+  }
+  
+  input-searchOrder:focus {
+    border-bottom: 2px solid #5b5fc7;
+    border-radius: 4px 4px 2px 2px;
+  }
+  
+  input-searchOrder:hover {
+    outline: 1px solid lightgrey;
+  }
+
+  
+
+  /* MODAL */
+  .orderDetails-modal {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .order-detail-1 {
+    width: 40em;
+    height: 40em;
+    gap: 40px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .orderModal-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    gap: 10px;
+    padding: 20px 30px 40px;
+  }
+
+  .modalHeader {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .modal-logo {
+    width: 100%;
+    max-width: 10em;
+  }
+
+  .ord-details-data, .ord-details-labels, .customer-details-labels, .customer-details-data {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .details-label, .cust-details-label {
+    font-size: 15px;
+  }
+
+  .details-data, .customer-details-data {
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .itemList-tableWrapper {
+    height: 38em;
+    overflow: auto;
+    scroll-behavior: smooth;
+  }
+
+  .details-label-totalAmount, .details-data-totalAmount {
+    font-size: 20px;
+    font-weight: 700;
+    color: #007bff;
+  }
+  
+
+  /* BUTTON */
+  .approve-btn, .deny-btn {
+    position: relative;
+    padding: 8px 32px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #000;
+    background-color: #fff;
+    border: none;
+    border-radius: 50px;
+    overflow: hidden;
+    z-index: 1;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+  }
+  
+  .approve-btn:hover, .deny-btn:hover {
+    transform: scale(1.05);
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .approve-btn:active, .deny-btn {
+    transform: scale(0.9);
+  }
+  
+  .approve-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, #007bff, #00bfff);
+    transition: all 0.4s ease-in-out;
+    z-index: -1;
+    border-radius: 50px;
+  }
+
+  .deny-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, #ff5100, #ffd000);
+    transition: all 0.4s ease-in-out;
+    z-index: -1;
+    border-radius: 50px;
+  }
+  
+  .approve-btn:hover::before, .deny-btn:hover::before {
+    right: 0;
+  }

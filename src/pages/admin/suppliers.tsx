@@ -123,7 +123,8 @@ function Suppliers() {
         toast.error(response.data.message);
       }
     } catch (error) {
-      toast.error("Network error or server not responding" || error);
+      console.log(error);
+      console.error("Network error or server not responding");
     }
   };
 
@@ -167,7 +168,8 @@ function Suppliers() {
           toast.error(`Error: ${response.status} - ${response.data.message}`);
         }
       } catch (error) {
-        toast.error(`Network error or server not responding: ${error}`);
+        console.log(error);
+        console.error("Network error or server not responding");
       }
     } else {
       toast.error("Passwords do not match");

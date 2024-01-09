@@ -39,7 +39,9 @@ function Register() {
   const [barangayClearance, setBarangayClearance] = useState(null);
   const [validIdFront, setValidIdFront] = useState(null);
   const [validIdBack, setValidIdBack] = useState(null);
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+    {}
+  );
   const navigate = useNavigate();
 
   // * Get the Generated ID number for Supplier
@@ -76,7 +78,10 @@ function Register() {
       setPhoneNumber(value);
       setValidationErrors((prevErrors) => ({ ...prevErrors, phoneNumber: "" }));
     } else {
-      setValidationErrors((prevErrors) => ({ ...prevErrors, phoneNumber: "Phone Number must contain only numbers." }));
+      setValidationErrors((prevErrors) => ({
+        ...prevErrors,
+        phoneNumber: "Phone Number must contain only numbers.",
+      }));
     }
   };
 
@@ -114,7 +119,7 @@ function Register() {
 
   const handleValidIdBack = (e) => {
     setValidIdBack(e.target.files[0]);
-  }
+  };
 
   // * Handle Register Supplier
   const handleSubmit = async (event: React.FormEvent) => {
@@ -145,8 +150,8 @@ function Register() {
           formData
         );
         if (response.data) {
-          localStorage.setItem('Id', response.data.newSupplier.id)
-          localStorage.setItem('token', response.data.token);
+          localStorage.setItem("Id", response.data.newSupplier.id);
+          localStorage.setItem("token", response.data.token);
           registerUsersEventEmitter.emit("registerSupplier");
           toast.success("Successfully registered.", {
             onClose: () => navigate("/confirmation_email"),
@@ -193,7 +198,8 @@ function Register() {
     if (!phoneNumber) {
       errors.phoneNumber = "Phone Number is required.";
     } else if (phoneNumber.length !== 11 || !/^\d+$/.test(phoneNumber)) {
-      errors.phoneNumber = "Phone Number must be exactly 11 numeric characters.";
+      errors.phoneNumber =
+        "Phone Number must be exactly 11 numeric characters.";
     }
 
     if (!password) {
@@ -231,11 +237,13 @@ function Register() {
     }
 
     if (!validIdFront) {
-      errors.validIdFrontImage = "Please upload a valid front side of the ID card.";
+      errors.validIdFrontImage =
+        "Please upload a valid front side of the ID card.";
     }
-    
+
     if (!validIdBack) {
-      errors.validIdBackImage = "Please upload a valid back side of the ID card.";
+      errors.validIdBackImage =
+        "Please upload a valid back side of the ID card.";
     }
 
     setValidationErrors(errors);
@@ -244,16 +252,28 @@ function Register() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="registerCustomer-main-container">
-        <div className="registerCustomer-1">
+      <div className="col-md-12 registerCustomer-main-container">
+        <div className="col-md-8 registerCustomer-1">
           <h1 className="loginText-1">Let's Get Started!</h1>
           <h5>Create an account using your credentials</h5>
           <div>
-            <div className="input-register-container">
+            <div
+              className="row"
+              style={{
+                marginTop: "55px",
+                display: "flex",
+                width: "fit-content",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               <div className="inputs-container">
-                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
-                  <span>This is your ID Number:</span>
+                <div
+                  className="col-md-5 input-container-withErrorMessage"
+                  style={{ marginLeft: "45px"}}>
+                  <span>Supplier ID Number:</span>
                   <input
+                    style={{ fontWeight:'700', fontSize:'18px'  }}
                     className="input-register"
                     type="text"
                     placeholder="Store ID"
@@ -262,8 +282,12 @@ function Register() {
                     disabled
                   />
                 </div>
-                <div className='col-md-5 input-container-withErrorMessage'>
-                  <div className={`error-message-container ${validationErrors.shopName ? 'error-message' : 'hidden'}`}>
+                <div className="col-md-5 input-container-withErrorMessage">
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.shopName ? "error-message" : "hidden"
+                    }`}
+                  >
                     {validationErrors.shopName}
                   </div>
                   <input
@@ -275,22 +299,33 @@ function Register() {
                   />
                 </div>
               </div>
-            
+
               <div className="inputs-container">
-                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
-                  <div className={`error-message-container ${validationErrors.address ? 'error-message' : 'hidden'}`}>
+                <div
+                  className="col-md-5 input-container-withErrorMessage"
+                  style={{ marginLeft: "45px" }}
+                >
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.address ? "error-message" : "hidden"
+                    }`}
+                  >
                     {validationErrors.address}
                   </div>
                   <input
-                      className="input-register"
-                      type="text"
-                      placeholder="Address"
-                      onChange={(e) => handleAddress(e.target.value)}
-                      value={address}
-                    />
+                    className="input-register"
+                    type="text"
+                    placeholder="Address"
+                    onChange={(e) => handleAddress(e.target.value)}
+                    value={address}
+                  />
                 </div>
-                <div className='col-md-5 input-container-withErrorMessage'>
-                  <div className={`error-message-container ${validationErrors.email ? 'error-message' : 'hidden'}`}>
+                <div className="col-md-5 input-container-withErrorMessage">
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.email ? "error-message" : "hidden"
+                    }`}
+                  >
                     {validationErrors.email}
                   </div>
                   <input
@@ -304,14 +339,21 @@ function Register() {
               </div>
 
               <div className="inputs-container">
-                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
-                    <div className={`error-message-container ${validationErrors.phoneNumber ? 'error-message' : 'hidden'}`}>
-                      {validationErrors.phoneNumber && (
-                        <div className="error-message-container">
-                          {validationErrors.phoneNumber}
-                        </div>
-                      )}
-                    </div>
+                <div
+                  className="col-md-5 input-container-withErrorMessage"
+                  style={{ marginLeft: "45px" }}
+                >
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.phoneNumber ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.phoneNumber && (
+                      <div className="error-message-container">
+                        {validationErrors.phoneNumber}
+                      </div>
+                    )}
+                  </div>
                   <input
                     className="input-register"
                     type="text"
@@ -321,8 +363,12 @@ function Register() {
                     maxLength={11}
                   />
                 </div>
-                <div className='col-md-5 input-container-withErrorMessage'>
-                  <div className={`error-message-container ${validationErrors.password ? 'error-message' : 'hidden'}`}>
+                <div className="col-md-5 input-container-withErrorMessage">
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.password ? "error-message" : "hidden"
+                    }`}
+                  >
                     {validationErrors.password}
                   </div>
                   <input
@@ -334,22 +380,35 @@ function Register() {
                   />
                 </div>
               </div>
-              
+
               <div className="inputs-container">
-                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
-                  <div className={`error-message-container ${validationErrors.confirmPassword ? 'error-message' : 'hidden'}`}>
+                <div
+                  className="col-md-5 input-container-withErrorMessage"
+                  style={{ marginLeft: "45px" }}
+                >
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.confirmPassword
+                        ? "error-message"
+                        : "hidden"
+                    }`}
+                  >
                     {validationErrors.confirmPassword}
                   </div>
                   <input
-                      className="input-register"
-                      type="password"
-                      placeholder="Confirm Password"
-                      onChange={(e) => handleConfirmPassword(e.target.value)}
-                      value={confirmPassword}
-                    />
+                    className="input-register"
+                    type="password"
+                    placeholder="Confirm Password"
+                    onChange={(e) => handleConfirmPassword(e.target.value)}
+                    value={confirmPassword}
+                  />
                 </div>
-                <div className='col-md-5 input-container-withErrorMessage'>
-                  <div className={`error-message-container ${validationErrors.image ? 'error-message' : 'hidden'}`}>
+                <div className="col-md-5 input-container-withErrorMessage">
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.image ? "error-message" : "hidden"
+                    }`}
+                  >
                     {validationErrors.image}
                   </div>
                   <div className="profile-pic-register-container">
@@ -360,10 +419,17 @@ function Register() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="inputs-container">
-                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
-                  <div className={`error-message-container ${validationErrors.bir ? 'error-message' : 'hidden'}`}>
+                <div
+                  className="col-md-5 input-container-withErrorMessage"
+                  style={{ marginLeft: "45px" }}
+                >
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.bir ? "error-message" : "hidden"
+                    }`}
+                  >
                     {validationErrors.bir}
                   </div>
                   <div className="birPermit-pic-register-container">
@@ -373,9 +439,13 @@ function Register() {
                     <input type="file" onChange={handleImageBirChange} />
                   </div>
                 </div>
-                
-                <div className='col-md-5 input-container-withErrorMessage'>
-                  <div className={`error-message-container ${validationErrors.cityPermit ? 'error-message' : 'hidden'}`}>
+
+                <div className="col-md-5 input-container-withErrorMessage">
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.cityPermit ? "error-message" : "hidden"
+                    }`}
+                  >
                     {validationErrors.cityPermit}
                   </div>
                   <div className="cityPermit-pic-register-container">
@@ -388,8 +458,15 @@ function Register() {
               </div>
 
               <div className="inputs-container">
-                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
-                  <div className={`error-message-container ${validationErrors.schoolPermit ? 'error-message' : 'hidden'}`}>
+                <div
+                  className="col-md-5 input-container-withErrorMessage"
+                  style={{ marginLeft: "45px" }}
+                >
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.schoolPermit ? "error-message" : "hidden"
+                    }`}
+                  >
                     {validationErrors.schoolPermit}
                   </div>
                   <div className="schoolPermit-pic-register-container">
@@ -400,8 +477,14 @@ function Register() {
                   </div>
                 </div>
 
-                <div className='col-md-5 input-container-withErrorMessage'>
-                  <div className={`error-message-container ${validationErrors.barangayClearance ? 'error-message' : 'hidden'}`}>
+                <div className="col-md-5 input-container-withErrorMessage">
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.barangayClearance
+                        ? "error-message"
+                        : "hidden"
+                    }`}
+                  >
                     {validationErrors.barangayClearance}
                   </div>
                   <div className="schoolPermit-pic-register-container">
@@ -414,8 +497,17 @@ function Register() {
               </div>
 
               <div className="inputs-container">
-                <div className='col-md-5 input-container-withErrorMessage' style={{ marginLeft:'45px' }}>
-                  <div className={`error-message-container ${validationErrors.validIdFrontImage ? 'error-message' : 'hidden'}`}>
+                <div
+                  className="col-md-5 input-container-withErrorMessage"
+                  style={{ marginLeft: "45px" }}
+                >
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.validIdFrontImage
+                        ? "error-message"
+                        : "hidden"
+                    }`}
+                  >
                     {validationErrors.validIdFrontImage}
                   </div>
                   <div className="schoolPermit-pic-register-container">
@@ -426,8 +518,14 @@ function Register() {
                   </div>
                 </div>
 
-                <div className='col-md-5 input-container-withErrorMessage'>
-                  <div className={`error-message-container ${validationErrors.validIdBackImage ? 'error-message' : 'hidden'}`}>
+                <div className="col-md-5 input-container-withErrorMessage">
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.validIdBackImage
+                        ? "error-message"
+                        : "hidden"
+                    }`}
+                  >
                     {validationErrors.validIdBackImage}
                   </div>
                   <div className="schoolPermit-pic-register-container">
@@ -438,9 +536,13 @@ function Register() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="register-supplier-btn-container">
-                <button className="btn register-btn btn-primary" style={{ borderRadius:'20px' }} type="submit">
+                <button
+                  className="registerCustomer-btn"
+                  style={{ borderRadius: "20px" }}
+                  type="submit"
+                >
                   Register
                 </button>
               </div>

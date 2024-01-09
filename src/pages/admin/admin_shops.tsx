@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import starIcon from "../../assets/images/icons/starRating.png"
 import prodRating from "../../assets/images/icons/star.png"
 import axios from 'axios'
-import { toast } from 'react-toastify';
 import validationEventEmitter from '../../helpers/ValidationEmitter';
 import registerUsersEventEmitter from '../../helpers/RegisterUsersEmitter';
 import addProductEventEmitter from '../../helpers/AddProductEventEmitter'
@@ -21,6 +20,7 @@ function Admin_Shops () {
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
     const [averageRatingSupplier, setAverageRatingSupplier] = useState(null);
     const [averageRatingProduct, setAverageRatingProduct] = useState(null);
+    
 
     // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -51,7 +51,8 @@ function Admin_Shops () {
                 const response = await axios.get("https://localhost:7017/ProductType");
                 setProductTypes(response.data);
             } catch(error) {
-                console.error(error);
+                console.log(error);
+                console.error("Network error or server not responding");
             }
         }
         fetchProductType();
@@ -141,7 +142,7 @@ function Admin_Shops () {
                 const response = await axios.get('https://localhost:7017/Users/getSuppliers');
                 setShop(response.data);
             } catch (error) {
-                toast.error('Network error or server not responding');
+                console.error('Network error or server not responding');
             }
         };
 
@@ -168,7 +169,7 @@ function Admin_Shops () {
                 const response = await axios.get('https://localhost:7017/Users/getSuppliers');
                 setShop(response.data);
             } catch (error) {
-                toast.error('Network error or server not responding');
+                console.error('Network error or server not responding');
             }
         };
 
@@ -508,7 +509,7 @@ function Admin_Shops () {
                                                 <span className='totalStocks-adminProd'>{totalStock(product.sizes)}</span>
                                             </h4>
                                             <h4 className='col-md-3 admin-prodPrice'>Price:
-                                                <span className='price-adminProd'>₱{product.price.toLocaleString()}</span>
+                                                <span className='price-adminProd'>₱{product.price.toFixed(2)}</span>
                                             </h4>
                                         </div>
                                         

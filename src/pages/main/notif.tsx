@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import './notif.css';
 import noNotification from '../../assets/images/icons/notification-bell.png'
 import orderProcess from "../../assets/images/icons/orderProcessed.png"
+import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 import axios from 'axios';
 import { useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import notifEventEmitter from '../../helpers/NotifEventEmitter';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import React from 'react';
 
 function Notif() {
 
@@ -23,10 +25,12 @@ function Notif() {
 
   const [orders, setOrders] = useState([]);
   const [notification, setNotification] = useState([]);
+  const [disabledButtons, setDisabledButtons] = useState(new Map());
   const [showAllNotifications, setShowAllNotifications] = useState(false);
   const [selectedOrderReceipt, setSelectedOrderReceipt] = useState(null);
   const [selectedReason, setSelectedReason] = useState("");
   const [otherReasons, setOtherReasons] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { userId } = useParams();
 
   // * Show More / Less Notification
@@ -84,12 +88,15 @@ function Notif() {
 
   // * Get Notifications 
   useEffect(() => {
+    setIsLoading(true);
     const fetchNotification = async () => {
       try {
         const response = await axios.get(`https://localhost:7017/Notification/${userId}`);
         setNotification(response.data);
+        setIsLoading(false);
       } catch (error) {
         console.error(error);
+        setIsLoading(false);
       }
     };
 
@@ -228,6 +235,30 @@ function Notif() {
     });
   };
 
+    // * Order Received
+    const handleOrderReceived = (orderId) => {
+      axios.put(`https://localhost:7017/Order/orderReceived/${orderId}`)
+        .then(() => {
+          // * Update the state to disable this specific button
+          setDisabledButtons(prevState => new Map(prevState).set(orderId, true));
+          localStorage.setItem(`clickReceived_${orderId}`, 'true');
+          toast.success("Order Received");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    };
+  
+    // * useEffect to set the initial state of buttons
+    useEffect(() => {
+      const initialState = new Map();
+      notification.forEach(item => {
+        const isButtonClicked = localStorage.getItem(`clickReceived_${item.orderId}`) === 'true';
+        initialState.set(item.orderId, isButtonClicked);
+      });
+      setDisabledButtons(initialState);
+    }, [notification]);
+
   // * Handle close button
   const HandleCloseButton = () => {
     setSelectedReason('');
@@ -247,990 +278,1012 @@ function Notif() {
   }, []);
 
   return (
-    <div className="container">
-      {notification.length > 0 ? (
-        notification.slice(0, showAllNotifications ? notification.length : 3).map((notificationItem, index) => {
-          if (Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied") {
-            const [placed, pending, approved, pickup, completed] = getActiveStatus(
-              Status[Object.keys(Status)[notificationItem.order.status - 1]]
-            );
-            return (
-              <div key={index} className="card">
-              <div className="row d-flex justify-content-between px-3 top">
-                <div className="d-flex">
-                  <h5>
-                    <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
-                  </h5>
+    <React.Fragment>
+      {isLoading ? (
+        <div className="mainloading-screen">
+          <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
+        </div>
+      ) : (
+        <div className="container">
+        {notification.length > 0 ? (
+          notification.slice(0, showAllNotifications ? notification.length : 3).map((notificationItem, index) => {
+            if (Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied") {
+              const [placed, pending, approved, pickup, completed] = getActiveStatus(
+                Status[Object.keys(Status)[notificationItem.order.status - 1]]
+              );
+              return (
+                <div key={index} className="card">
+                <div className="row d-flex justify-content-between px-3 top">
+                  <div className="d-flex">
+                    <h5>
+                      <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
+                    </h5>
+                  </div>
+                  <div className="d-flex flex-column text-sm-left">
+                    <p>
+                      <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
+                    </p>
+                  </div>
                 </div>
-                <div className="d-flex flex-column text-sm-left">
-                  <p>
-                    <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
-                  </p>
+                {/* Add class 'active' to progress */}
+                <div className="row d-flex justify-content-center">
+                  <div className="col-12 order-progress-container">
+                    <ul id="progressbarCancel" className="text-center">
+                      <li className={placed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Processed Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px'}}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
+                        </div>
+                      </li>
+                      <li className={pending ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
+                        </div>
+                      </li>
+                      <li className={approved ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
+                        </div>
+                      </li>
+                      <li className={pickup ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order En Route Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
+                        </div>
+                      </li>
+                      <li className={completed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Arrived Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
-              </div>
-              {/* Add class 'active' to progress */}
-              <div className="row d-flex justify-content-center">
-                <div className="col-12 order-progress-container">
-                  <ul id="progressbarCancel" className="text-center">
-                    <li className={placed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Processed Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px'}}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
-                      </div>
-                    </li>
-                    <li className={pending ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
-                      </div>
-                    </li>
-                    <li className={approved ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
-                      </div>
-                    </li>
-                    <li className={pickup ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order En Route Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
-                      </div>
-                    </li>
-                    <li className={completed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Arrived Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div>
-              <button 
-                className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
-                  style={{ marginLeft: '30px' }} 
-                  disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
-                  data-bs-toggle="modal" 
-                  data-bs-target="#cancellationModal"
-                >
-                Cancel Order
-              </button>
-              </div>
-            </div>
-            );
-          }
-          if (Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled") {
-            const [placed, pending, approved, pickup, completed] = getActiveStatus(
-              Status[Object.keys(Status)[notificationItem.order.status - 1]]
-            );
-            return (
-              <div key={index} className="card">
-              <div className="row d-flex justify-content-between px-3 top">
-                <div className="d-flex">
-                  <h5>
-                    <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
-                  </h5>
-                </div>
-                <div className="d-flex flex-column text-sm-left">
-                  <p>
-                    <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
-                  </p>
-                </div>
-              </div>
-              {/* Add class 'active' to progress */}
-              <div className="row d-flex justify-content-center">
-                <div className="col-12">
-                  <ul id="progressbarCancel" className="text-center">
-                    <li className={placed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Processed Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px'}}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
-                      </div>
-                    </li>
-                    <li className={pending ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
-                      </div>
-                    </li>
-                    <li className={approved ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
-                      </div>
-                    </li>
-                    <li className={pickup ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order En Route Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
-                      </div>
-                    </li>
-                    <li className={completed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Arrived Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div>
-              <button 
-                className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
-                style={{ marginLeft: '30px' }} 
-                disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
-                data-bs-toggle="modal" 
-                data-bs-target="#cancellationModal"
-              >
-                Cancel Order
-              </button>
-              </div>
-            </div>
-            );
-          }
-          if (Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Pending") {
-            const [placed, pending, approved, pickup, completed] = getActiveStatus(
-              notificationItem.order.status
-            );
-            return (
-              <div key={index} className="card">
-              <div className="row d-flex justify-content-between px-3 top">
-                <div className="d-flex">
-                  <h5>
-                    <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
-                  </h5>
-                </div>
-                <div className="d-flex flex-column text-sm-left">
-                  <p>
-                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
-                  </p>
-                  <p>
-                    <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
-                  </p>
-                </div>
-              </div>
-              {/* Add class 'active' to progress */}
-              <div className="row d-flex justify-content-center">
-                <div className="col-12">
-                  <ul id="progressbar" className="text-center">
-                    <li className={placed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Processed Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px'}}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
-                      </div>
-                    </li>
-                    <li className={pending ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>
-                          Order<br />Pending
-                        </p>
-                      </div>
-                      <p style={{ fontSize: '12px' }}>
-                        <span>{formatDate(notificationItem.order.dateUpdated)}</span>
-                      </p>
-                    </li>
-                    <li className={approved ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
-                      </div>
-                    </li>
-                    <li className={pickup ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order En Route Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
-                      </div>
-                    </li>
-                    <li className={completed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Arrived Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div>
-              <button 
-                className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
-                style={{ marginLeft: '30px' }} 
-                disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
-                data-bs-toggle="modal" 
-                data-bs-target="#cancellationModal"
-                onClick={() => handleAddLocalStorageId(notificationItem.orderId)}
-              >
-                Cancel Order
-              </button>
-              </div>
-            </div>
-            );
-          }
-          if (Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved") {
-            const [placed, pending, approved, pickup, completed] = getActiveStatus(
-              notificationItem.order.status
-            );
-            return (
-              <div key={index} className="card">
-              <div className="row d-flex justify-content-between px-3 top">
-                <div className="d-flex">
-                  <h5>
-                    <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
-                  </h5>
-                </div>
-                <div className="d-flex flex-column text-sm-left">
-                  <p>
-                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
-                  </p>
-                  <p>
-                    <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
-                  </p>
-                </div>
-              </div>
-              {/* Add class 'active' to progress */}
-              <div className="row d-flex justify-content-center">
-                <div className="col-12">
-                  <ul id="progressbar" className="text-center">
-                    <li className={placed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Processed Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px'}}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
-                      </div>
-                    </li>
-                    <li className={pending ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
-                      </div>
-                    </li>
-                    <li className={approved ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
-                      </div>
-                      <p style={{ fontSize: '12px' }}>
-                        <span>{formatDate(notificationItem.order.dateUpdated)}</span>
-                      </p>
-                    </li>
-                    <li className={pickup ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order En Route Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
-                      </div>
-                    </li>
-                    <li className={completed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Arrived Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div>
-              <button 
-                className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
-                style={{ marginLeft: '30px' }} 
-                disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
-              >
-                Cancel Order
-              </button>
-              <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal" onClick={() => setSelectedOrderReceipt(notificationItem)}>View Order Receipt</button>
-              </div>
-            </div>
-            );
-          }
-          if (Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp") {
-            const [placed, pending, approved, pickup, completed] = getActiveStatus(
-              notificationItem.order.status
-            );
-            return (
-              <div key={index} className="card">
-              <div className="row d-flex justify-content-between px-3 top">
-                <div className="d-flex">
-                  <h5>
-                    <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
-                  </h5>
-                </div>
-                <div className="d-flex flex-column text-sm-left">
-                  <p>
-                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
-                  </p>
-                  <p>
-                    <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
-                  </p>
-                </div>
-              </div>
-              {/* Add class 'active' to progress */}
-              <div className="row d-flex justify-content-center">
-                <div className="col-12">
-                  <ul id="progressbar" className="text-center">
-                    <li className={placed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Processed Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px'}}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
-                      </div>
-                    </li>
-                    <li className={pending ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
-                      </div>
-                    </li>
-                    <li className={approved ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
-                      </div>
-                    </li>
-                    <li className={pickup ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order En Route Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
-                      </div>
-                      <p style={{ fontSize: '12px' }}>
-                        <span>{formatDate(notificationItem.order.dateUpdated)}</span>
-                      </p>
-                    </li>
-                    <li className={completed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Arrived Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div>
-              <button 
-                className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
-                style={{ marginLeft: '30px' }} 
-                disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
-              >
-                Cancel Order
-              </button>
-              {/* <a 
-                className="show-more-btn-notif" 
-                data-bs-toggle="collapse" 
-                href="#collapseExample" 
-                role="button"
-                aria-expanded="false" 
-                aria-controls="collapseExample"
-              >
-                Show more
-              </a> */}
-              <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal" onClick={() => setSelectedOrderReceipt(notificationItem)}>View Order Receipt</button>
-              </div>
-            </div>
-            );
-          }
-          if (Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed") {
-            const [placed, pending, approved, pickup, completed] = getActiveStatus(
-              notificationItem.order.status
-            );
-            return (
-              <div key={index} className="card">
-              <div className="row d-flex justify-content-between px-3 top">
-                <div className="d-flex">
-                  <h5>
-                    <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
-                  </h5>
-                </div>
-                <div className="d-flex flex-column text-sm-left">
-                  <p>
-                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
-                  </p>
-                  <p>
-                    <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
-                  </p>
-                </div>
-              </div>
-              {/* Add class 'active' to progress */}
-              <div className="row d-flex justify-content-center">
-                <div className="col-12">
-                  <ul id="progressbar" className="text-center">
-                    <li className={placed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Processed Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px'}}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
-                      </div>
-                    </li>
-                    <li className={pending ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
-                      </div>
-                    </li>
-                    <li className={approved ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
-                      </div>
-                    </li>
-                    <li className={pickup ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order En Route Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
-                      </div>
-                    </li>
-                    <li className={completed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Arrived Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
-                      </div>
-                      <p style={{ fontSize: '12px' }}>
-                        <span>{formatDate(notificationItem.order.dateUpdated)}</span>
-                      </p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div>
-              <button 
-                className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
-                style={{ marginLeft: '30px' }} 
-                disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
-                            Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
-              >
-                Cancel Order
-              </button>
-              <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal" onClick={() => setSelectedOrderReceipt(notificationItem)}>View Order Receipt</button>
-              </div>
-            </div>
-            );
-          }
-          const [placed, pending, approved, pickup, completed] = getActiveStatus (
-            notificationItem.order.status
-          );
-          return (
-            <div key={index} className="card">
-              <div className="row d-flex justify-content-between px-3 top">
-                <div className="d-flex">
-                  <h5>
-                    <span className="text-primary font-weight-bold" style={{ fontSize:'18px' }}>#{notificationItem.order.orderNumber}</span>
-                  </h5>
-                </div>
-                <div className="d-flex flex-column text-sm-left">
-                  <p>
-                    Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
-                  </p>
-                  <p>
-                    <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
-                  </p>
-                  {/* <p>
-                    <span className="font-weight-bold">Estimated pickup date for your order. {formatDate(notificationItem.order.estimateDate)}</span>
-                  </p> */}
-                </div>
-              </div>
-              {/* Add class 'active' to progress */}
-              <div className="row d-flex justify-content-center">
-                <div className="col-12">
-                  <ul id="progressbar" className="text-center">
-                    <li className={placed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Processed Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px'}}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
-                      </div>
-                    </li>
-                    <li className={pending ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
-                      </div>
-                    </li>
-                    <li className={approved ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Shipped Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
-                      </div>
-                    </li>
-                    <li className={pickup ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order En Route Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
-                      </div>
-                    </li>
-                    <li className={completed ? "active step0" : "step0"}>
-                      <div className="icon-content">
-                        <img
-                          className="icon"
-                          src={orderProcess}
-                          alt="Order Arrived Icon"
-                          style={{ width: '60px', height: '60px', marginLeft: '70px' }}
-                        />
-                        <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div>
-              <button 
-                className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                <div>
+                <button 
+                  className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
                               Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
                               Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
+                    style={{ marginLeft: '30px' }} 
+                    disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
+                    data-bs-toggle="modal" 
+                    data-bs-target="#cancellationModal"
+                  >
+                  Cancel Order
+                </button>
+                </div>
+              </div>
+              );
+            }
+            if (Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled") {
+              const [placed, pending, approved, pickup, completed] = getActiveStatus(
+                Status[Object.keys(Status)[notificationItem.order.status - 1]]
+              );
+              return (
+                <div key={index} className="card">
+                <div className="row d-flex justify-content-between px-3 top">
+                  <div className="d-flex">
+                    <h5>
+                      <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
+                    </h5>
+                  </div>
+                  <div className="d-flex flex-column text-sm-left">
+                    <p>
+                      <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
+                    </p>
+                  </div>
+                </div>
+                {/* Add class 'active' to progress */}
+                <div className="row d-flex justify-content-center">
+                  <div className="col-12">
+                    <ul id="progressbarCancel" className="text-center">
+                      <li className={placed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Processed Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px'}}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
+                        </div>
+                      </li>
+                      <li className={pending ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
+                        </div>
+                      </li>
+                      <li className={approved ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
+                        </div>
+                      </li>
+                      <li className={pickup ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order En Route Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
+                        </div>
+                      </li>
+                      <li className={completed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Arrived Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div>
+                <button 
+                  className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
                               Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
                   style={{ marginLeft: '30px' }} 
                   disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
                               Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
                               Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
+                  data-bs-toggle="modal" 
+                  data-bs-target="#cancellationModal"
+                >
+                  Cancel Order
+                </button>
+                </div>
+              </div>
+              );
+            }
+            if (Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Pending") {
+              const [placed, pending, approved, pickup, completed] = getActiveStatus(
+                notificationItem.order.status
+              );
+              return (
+                <div key={index} className="card">
+                <div className="row d-flex justify-content-between px-3 top">
+                  <div className="d-flex">
+                    <h5>
+                      <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
+                    </h5>
+                  </div>
+                  <div className="d-flex flex-column text-sm-left">
+                    <p>
+                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toFixed(2)}</span>
+                    </p>
+                    <p>
+                      <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
+                    </p>
+                  </div>
+                </div>
+                {/* Add class 'active' to progress */}
+                <div className="row d-flex justify-content-center">
+                  <div className="col-12">
+                    <ul id="progressbar" className="text-center">
+                      <li className={placed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Processed Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px'}}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
+                        </div>
+                      </li>
+                      <li className={pending ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>
+                            Order<br />Pending
+                          </p>
+                        </div>
+                        <p style={{ fontSize: '12px' }}>
+                          <span>{formatDate(notificationItem.order.dateUpdated)}</span>
+                        </p>
+                      </li>
+                      <li className={approved ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
+                        </div>
+                      </li>
+                      <li className={pickup ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order En Route Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
+                        </div>
+                      </li>
+                      <li className={completed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Arrived Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div>
+                <button 
+                  className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
+                  style={{ marginLeft: '30px' }} 
+                  disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
                               Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
                   data-bs-toggle="modal" 
                   data-bs-target="#cancellationModal"
                   onClick={() => handleAddLocalStorageId(notificationItem.orderId)}
                 >
-                Cancel Order
-              </button>
-              </div>
-            </div>
-          );
-        })
-      ) : (
-        <div className='notifItem-container'>
-          <div className="d-flex flex-column align-items-center justify-content-center" style={{ width: '100%', textAlign: 'center' }}>
-            <img
-              className="icon"
-              src={noNotification}
-              alt="No Notifications Icon"
-              style={{ width: '100%', maxWidth:'80px', height: '80px' }}
-            />
-            <p className="mt-3" style={{ fontSize: '18px' }}>No notifications available</p>
-          </div>
-        </div>
-      )}
-
-      {notification.length > 3 && ( 
-        <div className="card card-body">
-          <button onClick={toggleShowAll} className="show-more-btn">
-            {showAllNotifications ? 'Show Less' : 'Show More'}
-          </button>
-        </div>
-      )}
-
-    {/* RECEIPT MODAL  */}
-    <div className="modal fade" id="viewReceiptModal" tabIndex={-1} aria-labelledby="viewReceiptModalLabel" aria-hidden="true">
-      <div className="modal-dialog modal-dialog-centered modal-xl">
-        {selectedOrderReceipt && (
-            <div className="modal-content" id={`receipt-content-${selectedOrderReceipt.order.orderNumber}`}>
-            <div className="modal-body" style={{ padding:'30px' }}>
-              <div className='modal-receipt-header'>
-                {/* HEADER */}
-                <div className='order-num-receipt-header-container'>
-                  <h2 className="modal-title" id="exampleModalLabel">Order Receipt</h2>
-                  <h2 className='receipt-num-header'>#{selectedOrderReceipt.order.orderNumber}</h2>
-                </div>
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div className='order-details-itemList-container'>
-                  {/* ORDER DETAILS */}
-                <div className='col-md-6 notif-order-details-label'>
-                  {/* CUSTOMER INFORMATION */}
-                  <div className='customer-info-container-notif'>
-                    <h4 className='notif-order-details-subTitle'>Customer Details</h4>
-                    <div className='notif-order-details-container'>
-                      <div className='notif-order-details-1'>
-                        <span>ID Number</span>
-                        <span>First Name</span>
-                        <span>Last Name</span>
-                        <span>Reference ID (GCash)</span>
-                      </div>
-  
-                      <div className='notif-order-details-2'>
-                        <span>{selectedOrderReceipt.order.user.id}</span>
-                        <span>{selectedOrderReceipt.order.user.firstName}</span>
-                        <span>{selectedOrderReceipt.order.user.lastName}</span>
-                        <span>{selectedOrderReceipt.order.referenceId}</span>
-                      </div>
-                    </div>
-                  </div>
-  
-                  {/* ORDER INFORMATION */}
-                  <div className='order-info-container-notif'>
-                    <h4 className='notif-order-details-subTitle'>Order Details</h4>
-                    <div className='notif-order-details-container'>
-                      <div className='notif-order-details-1'>
-                        <span>Order Number</span>
-                        <span>Number of items</span>
-                        <span>Shop Name</span>
-                      </div>
-  
-                      <div className='notif-order-details-2'>
-                        <span>{selectedOrderReceipt.order.orderNumber}</span>
-                        <span>{selectedOrderReceipt.order.orderItems.length}</span>
-                        <span>{selectedOrderReceipt.order.cart.supplier.shopName}</span>
-                      </div>
-                    </div>
-                  </div>
-  
-                  {/* TOTAL AMOUNT */}
-                  <div className='order-info-totalAmount-receiptContainer'>
-                    <div className='total-amount-text-receipt'>
-                      <h4 className='totalAmount-receipt'>Total Amount</h4>
-                    </div>
-                    <div className='total-amount-receipt'>
-                      <h4 className='receipt-amount'>₱{selectedOrderReceipt.order.total.toLocaleString()}</h4>
-                    </div>
-                  </div>
-                </div> 
-                {/* END OF ORDER DETAILS CONTAINER */}
-                <div className='col-md-6 item-list-container-receipt'>
-                  <h4 style={{ borderBottom:'solid 2px #F0F0F0' }}>Item List</h4>
-                  <table className="table align-middle receipt-itemList ">
-                    <thead className='table-secondary'>
-                      <tr>
-                        <th scope="col">Product Name</th>
-                        <th className='text-center' scope="col">Size</th>
-                        <th className='text-center' scope="col">Quantity</th>
-                        <th className='text-center' scope="col">Price</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedOrderReceipt && selectedOrderReceipt.order && selectedOrderReceipt.order.orderItems.map((item, index) => ( 
-                        <tr key={index}>
-                          <th scope="row">{item.product.productName}</th>
-                          <td className='text-center'>{item.sizeQuantity.size}</td>
-                          <td className='text-center'>{item.quantity}</td>
-                          <td className='text-center'>₱{item.product.price.toLocaleString()}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  Cancel Order
+                </button>
                 </div>
               </div>
-  
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="close-receipt-btn" data-bs-dismiss="modal">Close</button>
-              <button type="button" className="save-receipt-btn" onClick={() => downloadReceipt(selectedOrderReceipt.order.orderNumber)}>Download</button>
+              );
+            }
+            if (Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved") {
+              const [placed, pending, approved, pickup, completed] = getActiveStatus(
+                notificationItem.order.status
+              );
+              return (
+                <div key={index} className="card">
+                <div className="row d-flex justify-content-between px-3 top">
+                  <div className="d-flex">
+                    <h5>
+                      <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
+                    </h5>
+                  </div>
+                  <div className="d-flex flex-column text-sm-left">
+                    <p>
+                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
+                    </p>
+                    <p>
+                      <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
+                    </p>
+                  </div>
+                </div>
+                {/* Add class 'active' to progress */}
+                <div className="row d-flex justify-content-center">
+                  <div className="col-12">
+                    <ul id="progressbar" className="text-center">
+                      <li className={placed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Processed Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px'}}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
+                        </div>
+                      </li>
+                      <li className={pending ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
+                        </div>
+                      </li>
+                      <li className={approved ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
+                        </div>
+                        <p style={{ fontSize: '12px' }}>
+                          <span>{formatDate(notificationItem.order.dateUpdated)}</span>
+                        </p>
+                      </li>
+                      <li className={pickup ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order En Route Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
+                        </div>
+                      </li>
+                      <li className={completed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Arrived Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div>
+                <button 
+                  className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
+                  style={{ marginLeft: '30px' }} 
+                  disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
+                >
+                  Cancel Order
+                </button>
+                <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal" onClick={() => setSelectedOrderReceipt(notificationItem)}>View Order Receipt</button>
+                </div>
+              </div>
+              );
+            }
+            if (Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp") {
+              const [placed, pending, approved, pickup, completed] = getActiveStatus(
+                notificationItem.order.status
+              );
+              return (
+                <div key={index} className="card">
+                <div className="row d-flex justify-content-between px-3 top">
+                  <div className="d-flex">
+                    <h5>
+                      <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
+                    </h5>
+                  </div>
+                  <div className="d-flex flex-column text-sm-left">
+                    <p>
+                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
+                    </p>
+                    <p>
+                      <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
+                    </p>
+                  </div>
+                </div>
+                {/* Add class 'active' to progress */}
+                <div className="row d-flex justify-content-center">
+                  <div className="col-12">
+                    <ul id="progressbar" className="text-center">
+                      <li className={placed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Processed Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px'}}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
+                        </div>
+                      </li>
+                      <li className={pending ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
+                        </div>
+                      </li>
+                      <li className={approved ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
+                        </div>
+                      </li>
+                      <li className={pickup ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order En Route Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
+                        </div>
+                        <p style={{ fontSize: '12px' }}>
+                          <span>{formatDate(notificationItem.order.dateUpdated)}</span>
+                        </p>
+                      </li>
+                      <li className={completed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Arrived Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div>
+                <button 
+                  className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
+                  style={{ marginLeft: '30px' }} 
+                  disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
+                >
+                  Cancel Order
+                </button>
+                {/* <a 
+                  className="show-more-btn-notif" 
+                  data-bs-toggle="collapse" 
+                  href="#collapseExample" 
+                  role="button"
+                  aria-expanded="false" 
+                  aria-controls="collapseExample"
+                >
+                  Show more
+                </a> */}
+                <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal" onClick={() => setSelectedOrderReceipt(notificationItem)}>View Order Receipt</button>
+                </div>
+              </div>
+              );
+            }
+            if (Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed") {
+              const [placed, pending, approved, pickup, completed] = getActiveStatus(
+                notificationItem.order.status
+              );
+              return (
+                <div key={index} className="card">
+                <div className="row d-flex justify-content-between px-3 top">
+                  <div className="d-flex">
+                    <h5>
+                      <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
+                    </h5>
+                  </div>
+                  <div className="d-flex flex-column text-sm-left">
+                    <p>
+                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
+                    </p>
+                    <p>
+                      <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
+                    </p>
+                  </div>
+                </div>
+                {/* Add class 'active' to progress */}
+                <div className="row d-flex justify-content-center">
+                  <div className="col-12">
+                    <ul id="progressbar" className="text-center">
+                      <li className={placed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Processed Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px'}}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
+                        </div>
+                      </li>
+                      <li className={pending ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
+                        </div>
+                      </li>
+                      <li className={approved ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
+                        </div>
+                      </li>
+                      <li className={pickup ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order En Route Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
+                        </div>
+                      </li>
+                      <li className={completed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Arrived Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
+                        </div>
+                        <p style={{ fontSize: '12px' }}>
+                          <span>{formatDate(notificationItem.order.dateUpdated)}</span>
+                        </p>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div>
+                <button 
+                  className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
+                  style={{ marginLeft: '30px' }} 
+                  disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Canceled" ||
+                              Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
+                >
+                  Cancel Order
+                </button>
+                <button className='view-receipt-btn' data-bs-toggle="modal" data-bs-target="#viewReceiptModal" onClick={() => setSelectedOrderReceipt(notificationItem)}>View Order Receipt</button>
+                <button 
+                    className='view-receipt-received-btn' 
+                    onClick={() => handleOrderReceived(notificationItem.orderId)}
+                    disabled={disabledButtons.get(notificationItem.orderId)}
+                    style={{
+                      backgroundColor: disabledButtons.get(notificationItem.orderId) ? 'grey' : 'red',
+                      color: disabledButtons.get(notificationItem.orderId) ? 'darkgray' : 'white',
+                      cursor: 'not-allowed'
+                    }}
+                  >
+                    Order Received
+                </button>
+                </div>
+              </div>
+              );
+            }
+            const [placed, pending, approved, pickup, completed] = getActiveStatus (
+              notificationItem.order.status
+            );
+            return (
+              <div key={index} className="card">
+                <div className="row d-flex justify-content-between px-3 top">
+                  <div className="d-flex">
+                    <h5>
+                      <span className="text-primary font-weight-bold" style={{ fontSize:'18px' }}>#{notificationItem.order.orderNumber}</span>
+                    </h5>
+                  </div>
+                  <div className="d-flex flex-column text-sm-left">
+                    <p>
+                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
+                    </p>
+                    <p>
+                      <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
+                    </p>
+                    {/* <p>
+                      <span className="font-weight-bold">Estimated pickup date for your order. {formatDate(notificationItem.order.estimateDate)}</span>
+                    </p> */}
+                  </div>
+                </div>
+                {/* Add class 'active' to progress */}
+                <div className="row d-flex justify-content-center">
+                  <div className="col-12">
+                    <ul id="progressbar" className="text-center">
+                      <li className={placed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Processed Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px'}}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Placed</p>
+                        </div>
+                      </li>
+                      <li className={pending ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Pending</p>
+                        </div>
+                      </li>
+                      <li className={approved ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Shipped Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Approved</p>
+                        </div>
+                      </li>
+                      <li className={pickup ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order En Route Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>For<br />Pick Up</p>
+                        </div>
+                      </li>
+                      <li className={completed ? "active step0" : "step0"}>
+                        <div className="icon-content">
+                          <img
+                            className="icon"
+                            src={orderProcess}
+                            alt="Order Arrived Icon"
+                            style={{ width: '60px', height: '60px', marginLeft: '70px' }}
+                          />
+                          <p className="font-weight-bold" style={{ fontSize: '14px' }}>Order<br />Completed</p>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div>
+                <button 
+                  className={`btn ${Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                                Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                                Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                                Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed" ? 'btn-secondary' : 'btn-danger'}`}
+                    style={{ marginLeft: '30px' }} 
+                    disabled={Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Approved" || 
+                                Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Denied" || 
+                                Status[Object.keys(Status)[notificationItem.order.status - 1]] === "ForPickUp" || 
+                                Status[Object.keys(Status)[notificationItem.order.status - 1]] === "Completed"}
+                    data-bs-toggle="modal" 
+                    data-bs-target="#cancellationModal"
+                    onClick={() => handleAddLocalStorageId(notificationItem.orderId)}
+                  >
+                  Cancel Order
+                </button>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className='notifItem-container'>
+            <div className="d-flex flex-column align-items-center justify-content-center" style={{ width: '100%', textAlign: 'center' }}>
+              <img
+                className="icon"
+                src={noNotification}
+                alt="No Notifications Icon"
+                style={{ width: '100%', maxWidth:'80px', height: '80px' }}
+              />
+              <p className="mt-3" style={{ fontSize: '18px' }}>No notifications available</p>
             </div>
           </div>
         )}
-      </div>
-    </div>
-
-    <div className="modal fade" id="cancellationModal" tabIndex={-1} role="dialog" aria-labelledby="cancellationModalLabel" aria-hidden="true">
-      <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content w-80">
-          <div className="modal-header">
-            <h5 className="modal-title" id="exampleModalLabel2">Please select a reason for cancellation:</h5>
-            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose"></button>
+  
+        {notification.length > 3 && ( 
+          <div className="card card-body">
+            <button onClick={toggleShowAll} className="show-more-btn">
+              {showAllNotifications ? 'Show Less' : 'Show More'}
+            </button>
           </div>
-          <div className="modal-body p-4">
-            <div className="form-check mb-4">
-              <input 
-                type="radio" 
-                id="wrongRefNumber" 
-                name="cancelReason" 
-                value="Wrong reference number inputted"
-                className="form-check-input" 
-                checked={selectedReason === "Wrong reference number inputted"}
-                onChange={handleReasonClick} 
-              />
-              <label className="form-check-label" htmlFor="wrongRefNumber">Wrong reference number inputted</label>
-            </div>
-
-            <div className="form-check mb-4">
-              <input 
-                type="radio" 
-                id="changeOfMind" 
-                name="cancelReason" 
-                value="Change of mind"
-                className="form-check-input" 
-                checked={selectedReason === "Change of mind"}
-                onChange={handleReasonClick} 
-              />
-              <label className="form-check-label" htmlFor="changeOfMind">Change of mind</label>
-            </div>
-
-            <div className="form-check mb-4">
-              <input 
-                type="radio" 
-                id="modifyOrder" 
-                name="cancelReason" 
-                value="Need to modify order (size, quantity, etc)"
-                className="form-check-input" 
-                checked={selectedReason === "Need to modify order (size, quantity, etc)"}
-                onChange={handleReasonClick} 
-              />
-              <label className="form-check-label" htmlFor="modifyOrder">Need to modify order (size, quantity, etc)</label>
-            </div>
-
-            <div className="form-check mb-4">
-              <input 
-                type="radio" 
-                id="foundAlternative" 
-                name="cancelReason" 
-                value="Found an alternative"
-                className="form-check-input" 
-                checked={selectedReason === "Found an alternative"}
-                onChange={handleReasonClick} 
-              />
-              <label className="form-check-label" htmlFor="foundAlternative">Found an alternative</label>
-            </div>
-
-            <div className="form-check mb-4">
-              <input 
-                type="radio" 
-                id="notBuy" 
-                name="cancelReason" 
-                value="Don't want to buy anymore"
-                className="form-check-input" 
-                checked={selectedReason === "Don't want to buy anymore"}
-                onChange={handleReasonClick} 
-              />
-              <label className="form-check-label" htmlFor="notBuy">Don't want to buy anymore</label>
-            </div>
-
-            <div className="form-check mb-4">
-              <input 
-                type="radio" 
-                id="others" 
-                name="cancelReason" 
-                value="Others"
-                className="form-check-input" 
-                checked={selectedReason === "Others"}
-                onChange={handleReasonClick}
-              />
-              <label className="form-check-label" htmlFor="others">Others</label>
-            </div>
-
-            {selectedReason === "Others" && (
-              <div className="form-group">
-                <label htmlFor="otherReasons">Enter other reasons:</label>
-                <input
-                  type="text"
-                  id="otherReasons"
-                  name="otherReasons"
-                  className="form-control"
-                  placeholder="Enter other reasons here"
-                  value={otherReasons}
-                  onChange={(e) => setOtherReasons(e.target.value)}
-                />
+        )}
+  
+      {/* RECEIPT MODAL  */}
+      <div className="modal fade" id="viewReceiptModal" tabIndex={-1} aria-labelledby="viewReceiptModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered modal-xl">
+          {selectedOrderReceipt && (
+              <div className="modal-content" id={`receipt-content-${selectedOrderReceipt.order.orderNumber}`}>
+              <div className="modal-body" style={{ padding:'30px' }}>
+                <div className='modal-receipt-header'>
+                  {/* HEADER */}
+                  <div className='order-num-receipt-header-container'>
+                    <h2 className="modal-title" id="exampleModalLabel">Order Receipt</h2>
+                    <h2 className='receipt-num-header'>#{selectedOrderReceipt.order.orderNumber}</h2>
+                  </div>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div className='order-details-itemList-container'>
+                    {/* ORDER DETAILS */}
+                  <div className='col-md-6 notif-order-details-label'>
+                    {/* CUSTOMER INFORMATION */}
+                    <div className='customer-info-container-notif'>
+                      <h4 className='notif-order-details-subTitle'>Customer Details</h4>
+                      <div className='notif-order-details-container'>
+                        <div className='notif-order-details-1'>
+                          <span>ID Number</span>
+                          <span>First Name</span>
+                          <span>Last Name</span>
+                          <span>Reference ID (GCash)</span>
+                        </div>
+    
+                        <div className='notif-order-details-2'>
+                          <span>{selectedOrderReceipt.order.user.id}</span>
+                          <span>{selectedOrderReceipt.order.user.firstName}</span>
+                          <span>{selectedOrderReceipt.order.user.lastName}</span>
+                          <span>{selectedOrderReceipt.order.referenceId}</span>
+                        </div>
+                      </div>
+                    </div>
+    
+                    {/* ORDER INFORMATION */}
+                    <div className='order-info-container-notif'>
+                      <h4 className='notif-order-details-subTitle'>Order Details</h4>
+                      <div className='notif-order-details-container'>
+                        <div className='notif-order-details-1'>
+                          <span>Order Number</span>
+                          <span>Number of items</span>
+                          <span>Shop Name</span>
+                        </div>
+    
+                        <div className='notif-order-details-2'>
+                          <span>{selectedOrderReceipt.order.orderNumber}</span>
+                          <span>{selectedOrderReceipt.order.orderItems.length}</span>
+                          <span>{selectedOrderReceipt.order.cart.supplier.shopName}</span>
+                        </div>
+                      </div>
+                    </div>
+    
+                    {/* TOTAL AMOUNT */}
+                    <div className='order-info-totalAmount-receiptContainer'>
+                      <div className='total-amount-text-receipt'>
+                        <h4 className='totalAmount-receipt'>Total Amount</h4>
+                      </div>
+                      <div className='total-amount-receipt'>
+                        <h4 className='receipt-amount'>₱{selectedOrderReceipt.order.total.toFixed(2)}</h4>
+                      </div>
+                    </div>
+                  </div> 
+                  {/* END OF ORDER DETAILS CONTAINER */}
+                  <div className='col-md-6 item-list-container-receipt'>
+                    <h4 style={{ borderBottom:'solid 2px #F0F0F0' }}>Item List</h4>
+                    <table className="table align-middle receipt-itemList ">
+                      <thead className='table-secondary'>
+                        <tr>
+                          <th scope="col">Product Name</th>
+                          <th className='text-center' scope="col">Size</th>
+                          <th className='text-center' scope="col">Quantity</th>
+                          <th className='text-center' scope="col">Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedOrderReceipt && selectedOrderReceipt.order && selectedOrderReceipt.order.orderItems.map((item, index) => ( 
+                          <tr key={index}>
+                            <th scope="row">{item.product.productName}</th>
+                            <td className='text-center'>{item.sizeQuantity.size}</td>
+                            <td className='text-center'>{item.quantity}</td>
+                            <td className='text-center'>₱{item.product.price.toFixed(2)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+    
               </div>
-            )}
-
-            <button type="submit" className="btn btn-primary btn-block" onClick={submitCancellation}>Cancel Order</button>
-            <button type="submit" className="btn btn-danger btn-block" data-bs-dismiss="modal" onClick={HandleCloseButton}>NOT NOW</button>
+              <div className="modal-footer">
+                <button type="button" className="close-receipt-btn" data-bs-dismiss="modal">Close</button>
+                <button type="button" className="save-receipt-btn" onClick={() => downloadReceipt(selectedOrderReceipt.order.orderNumber)}>Download</button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+  
+      <div className="modal fade" id="cancellationModal" tabIndex={-1} role="dialog" aria-labelledby="cancellationModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content w-80">
+            <div className="modal-header">
+              <h5 className="modal-title" id="exampleModalLabel2">Please select a reason for cancellation:</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnClose"></button>
+            </div>
+            <div className="modal-body p-4">
+              <div className="form-check mb-4">
+                <input 
+                  type="radio" 
+                  id="wrongRefNumber" 
+                  name="cancelReason" 
+                  value="Wrong reference number inputted"
+                  className="form-check-input" 
+                  checked={selectedReason === "Wrong reference number inputted"}
+                  onChange={handleReasonClick} 
+                />
+                <label className="form-check-label" htmlFor="wrongRefNumber">Wrong reference number inputted</label>
+              </div>
+  
+              <div className="form-check mb-4">
+                <input 
+                  type="radio" 
+                  id="changeOfMind" 
+                  name="cancelReason" 
+                  value="Change of mind"
+                  className="form-check-input" 
+                  checked={selectedReason === "Change of mind"}
+                  onChange={handleReasonClick} 
+                />
+                <label className="form-check-label" htmlFor="changeOfMind">Change of mind</label>
+              </div>
+  
+              <div className="form-check mb-4">
+                <input 
+                  type="radio" 
+                  id="modifyOrder" 
+                  name="cancelReason" 
+                  value="Need to modify order (size, quantity, etc)"
+                  className="form-check-input" 
+                  checked={selectedReason === "Need to modify order (size, quantity, etc)"}
+                  onChange={handleReasonClick} 
+                />
+                <label className="form-check-label" htmlFor="modifyOrder">Need to modify order (size, quantity, etc)</label>
+              </div>
+  
+              <div className="form-check mb-4">
+                <input 
+                  type="radio" 
+                  id="foundAlternative" 
+                  name="cancelReason" 
+                  value="Found an alternative"
+                  className="form-check-input" 
+                  checked={selectedReason === "Found an alternative"}
+                  onChange={handleReasonClick} 
+                />
+                <label className="form-check-label" htmlFor="foundAlternative">Found an alternative</label>
+              </div>
+  
+              <div className="form-check mb-4">
+                <input 
+                  type="radio" 
+                  id="notBuy" 
+                  name="cancelReason" 
+                  value="Don't want to buy anymore"
+                  className="form-check-input" 
+                  checked={selectedReason === "Don't want to buy anymore"}
+                  onChange={handleReasonClick} 
+                />
+                <label className="form-check-label" htmlFor="notBuy">Don't want to buy anymore</label>
+              </div>
+  
+              <div className="form-check mb-4">
+                <input 
+                  type="radio" 
+                  id="others" 
+                  name="cancelReason" 
+                  value="Others"
+                  className="form-check-input" 
+                  checked={selectedReason === "Others"}
+                  onChange={handleReasonClick}
+                />
+                <label className="form-check-label" htmlFor="others">Others</label>
+              </div>
+  
+              {selectedReason === "Others" && (
+                <div className="form-group">
+                  <label htmlFor="otherReasons">Enter other reasons:</label>
+                  <input
+                    type="text"
+                    id="otherReasons"
+                    name="otherReasons"
+                    className="form-control"
+                    placeholder="Enter other reasons here"
+                    value={otherReasons}
+                    onChange={(e) => setOtherReasons(e.target.value)}
+                  />
+                </div>
+              )}
+  
+              <div className="cancel-orders-btn-container">
+                <button type="submit" className="approve-btn" onClick={submitCancellation}>Cancel Order</button>
+                <button type="submit" className="deny-btn" data-bs-dismiss="modal" onClick={HandleCloseButton}>NOT NOW</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    </div>
+      </div>
+      )}
+    </React.Fragment>
   )
 }
 export default Notif;

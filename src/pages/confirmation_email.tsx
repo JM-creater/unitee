@@ -1,11 +1,12 @@
 import "./login.css";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import illustration from "../../src/assets/images/loginPic.png";
 import logo from "../../src/assets/images/unitee.png";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingGif from "../assets/images/icons/loadingscreen.svg";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Confirmation_Code() {
   const [confirmEmail, setConfirmEmail] = useState("");
@@ -28,22 +29,17 @@ function Confirmation_Code() {
   // * Handle verify later
   const handleVerifyLater = async () => {
     const id = localStorage.getItem('Id');
-    await fetch(`https://localhost:7017/Users/verify-later/${id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await axios.post(`https://localhost:7017/Users/verify-later/${id}`);
     navigate("/");
   };
 
   // * Check if the email is confirmed
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/');
-    }
-  }, [navigate]);
+  // useEffect(() => {
+  //   const token = localStorage.getItem('token');
+  //   if (!token) {
+  //     navigate('/');
+  //   }
+  // }, [navigate]);
 
   // * Confirm Email
   const handleConfirmEmail = async () => {

@@ -1,5 +1,3 @@
-// import MWSizing from "../../assets/images/MW SIZING.png"
-// import UNISEX from "../../assets/images/UNISEX SIZING.png"
 import starIcon from "../../assets/images/icons/starRating.png"
 import cartIcon from "../../assets/images/icons/addToCart.png"
 import prodRatingModal from "../../assets/images/icons/starRating.png"
@@ -371,387 +369,417 @@ function Visit_Shop () {
         }
     };
 
-    return <div className="shop-main-container">
-        <div className="shop-content1-container">
-            <div className="col-md-10 shopDetails-container-shop">
-                <div>
-                    {supplier ? (
-                        <React.Fragment>
-                            <img className="shop-img" src={`https://localhost:7017/${supplier.image}`} />
-                            <h3 className="visitShop-Name">{supplier.shopName}</h3>
-                        </React.Fragment>
-                    ) : (
-                        <p>Loading supplier details...</p>
-                    )}
-                </div>
-
-                <h5 className="visitShop-rating">
-                <img className="ratingIcon" src={ starIcon }/>{averageRatingSupplier}</h5>
-                
-                {/* Filter */}
-                <div className="prodFilter-container">
-                    <h4>Filter</h4>
-
-                    {/* product type filter */}
-                    <div className="prod-type-filter-container row">
-                        <div className="col-md-3 filter-type-text">
-                            <h4 className="prodType-filter-title">Type</h4>
-                        </div>
-                        {/* check button product types */}
-                        <div className="col-md-8 prod-type-checkbox">
-                            <h4 className="type-filter-label">
-                                <input 
-                                    className="form-check-input prod-cart-checkBox" 
-                                    type="radio" 
-                                    value="1" 
-                                    name="productType"
-                                    id="shopProdTypeSchoolUniform"
-                                    checked={selectedProductType === '1'}
-                                    onClick={handleProductTypeClick}
-                                />
-                                <hr/> School Uniform
-                            </h4>
-                            <h4 className="type-filter-label">
-                                <input 
-                                    className="form-check-input prod-cart-checkBox" 
-                                    type="radio" 
-                                    value="2" 
-                                    name="productType"
-                                    id="shopProdCheckbox"
-                                    checked={selectedProductType === '2'}
-                                    onClick={handleProductTypeClick}
-                                />
-                                <hr/> Event T-shirt
-                            </h4>
-                            <h4 className="type-filter-label">
-                                <input 
-                                    className="form-check-input prod-cart-checkBox" 
-                                    type="radio" 
-                                    value="3" 
-                                    name="productType"
-                                    id="shopProdCheckbox"
-                                    checked={selectedProductType === '3'}
-                                    onClick={handleProductTypeClick}
-                                />
-                                <hr/> Department Shirt
-                            </h4>
-                            <h4 className="type-filter-label">
-                                <input 
-                                    className="form-check-input prod-cart-checkBox" 
-                                    type="radio" 
-                                    value="4" 
-                                    name="productType"
-                                    id="shopProdCheckbox"
-                                    checked={selectedProductType === '4'}
-                                    onClick={handleProductTypeClick}
-                                />
-                                <hr/> PE Uniform
-                            </h4>
-                            <h4 className="type-filter-label">
-                                <input 
-                                    className="form-check-input prod-cart-checkBox" 
-                                    type="radio" 
-                                    value="5" 
-                                    name="productType"
-                                    id="shopProdCheckbox"
-                                    checked={selectedProductType === '5'}
-                                    onClick={handleProductTypeClick}
-                                />
-                                <hr/> ID Sling
-                            </h4>
-                            <h4 className="type-filter-label">
-                                <input 
-                                    className="form-check-input prod-cart-checkBox" 
-                                    type="radio" 
-                                    value="6" 
-                                    name="productType"
-                                    id="shopProdCheckbox"
-                                    checked={selectedProductType === '6'}
-                                    onClick={handleProductTypeClick}
-                                />
-                                <hr/> Accessories
-                            </h4>
-                        </div>
-
-                        {/* Price filter */}
-                        <div className="prod-price-filter-container row">
-                            <div className="col-md-3 filter-price-text">
-                                <h4 className="prodType-filter-title">Price</h4>
+    return (
+        <div className="shop-main-container">
+            <div className="shop-content1-container">
+                <div className="col-md-10 shopDetails-container-shop">
+                    <div>
+                        {supplier ? (
+                            <React.Fragment>
+                                <img className="shop-img" src={`https://localhost:7017/${supplier.image}`} />
+                                <h3 className="visitShop-Name">{supplier.shopName}</h3>
+                            </React.Fragment>
+                        ) : (
+                            <p>Loading supplier details...</p>
+                        )}
+                    </div>
+    
+                    <h5 className="visitShop-rating">
+                    <img className="ratingIcon" src={ starIcon }/>{averageRatingSupplier}</h5>
+                    
+                    {/* Filter */}
+                    <div className="prodFilter-container">
+                        <h4 className="filter-text">Filter</h4>
+    
+                        {/* product type filter */}
+                        <div className="prod-type-filter-container row">
+                            <div className="col-md-3 filter-type-text">
+                                <h4 className="prodType-filter-title">Type</h4>
                             </div>
-                            <div className="col-md-8 prod-price-checkbox">
-                                <h4 className="price-filter-label">
+                            {/* check button product types */}
+                            <div className="col-md-8 prod-type-checkbox">
+                                <h4 className="type-filter-label">
                                     <input 
                                         className="form-check-input prod-cart-checkBox" 
                                         type="radio" 
-                                        value="<100"
-                                        checked={selectedPriceRange === '<100'}
-                                        onClick={(e) => handlePriceRangeClick(e, '<100')}
+                                        value="1" 
+                                        name="productType"
+                                        id="shopProdTypeSchoolUniform"
+                                        checked={selectedProductType === '1'}
+                                        onClick={handleProductTypeClick}
                                     />
-                                    <hr/> Below ₱100
+                                    <hr/> School Uniform
                                 </h4>
-                                <h4 className="price-filter-label">
+                                <h4 className="type-filter-label">
                                     <input 
                                         className="form-check-input prod-cart-checkBox" 
                                         type="radio" 
-                                        value="100-500"
-                                        checked={selectedPriceRange === '100-500'}
-                                        onClick={(e) => handlePriceRangeClick(e, '100-500')}
+                                        value="2" 
+                                        name="productType"
+                                        id="shopProdCheckbox"
+                                        checked={selectedProductType === '2'}
+                                        onClick={handleProductTypeClick}
                                     />
-                                    <hr/> ₱100 - ₱500
+                                    <hr/> Event T-shirt
                                 </h4>
-                                <h4 className="price-filter-label">
+                                <h4 className="type-filter-label">
                                     <input 
                                         className="form-check-input prod-cart-checkBox" 
                                         type="radio" 
-                                        value=">500"
-                                        checked={selectedPriceRange === '>500'}
-                                        onClick={(e) => handlePriceRangeClick(e, '>500')}
+                                        value="3" 
+                                        name="productType"
+                                        id="shopProdCheckbox"
+                                        checked={selectedProductType === '3'}
+                                        onClick={handleProductTypeClick}
                                     />
-                                    <hr/> Above ₱500
+                                    <hr/> Department Shirt
+                                </h4>
+                                <h4 className="type-filter-label">
+                                    <input 
+                                        className="form-check-input prod-cart-checkBox" 
+                                        type="radio" 
+                                        value="4" 
+                                        name="productType"
+                                        id="shopProdCheckbox"
+                                        checked={selectedProductType === '4'}
+                                        onClick={handleProductTypeClick}
+                                    />
+                                    <hr/> PE Uniform
+                                </h4>
+                                <h4 className="type-filter-label">
+                                    <input 
+                                        className="form-check-input prod-cart-checkBox" 
+                                        type="radio" 
+                                        value="5" 
+                                        name="productType"
+                                        id="shopProdCheckbox"
+                                        checked={selectedProductType === '5'}
+                                        onClick={handleProductTypeClick}
+                                    />
+                                    <hr/> ID Sling
+                                </h4>
+                                <h4 className="type-filter-label">
+                                    <input 
+                                        className="form-check-input prod-cart-checkBox" 
+                                        type="radio" 
+                                        value="6" 
+                                        name="productType"
+                                        id="shopProdCheckbox"
+                                        checked={selectedProductType === '6'}
+                                        onClick={handleProductTypeClick}
+                                    />
+                                    <hr/> Accessories
                                 </h4>
                             </div>
-                        </div>
-
-
-                            {/* GENDER filter */}
-                        <div className="prod-gender-filter-container row">
-                            <div className="col-md-3 filter-gender-text">
-                                <h4 className="prodType-filter-title">Gender</h4>
+    
+                            {/* Price filter */}
+                            <div className="prod-price-filter-container row">
+                                <div className="col-md-3 filter-price-text">
+                                    <h4 className="prodType-filter-title">Price</h4>
+                                </div>
+                                <div className="col-md-8 prod-price-checkbox">
+                                    <h4 className="price-filter-label">
+                                        <input 
+                                            className="form-check-input prod-cart-checkBox" 
+                                            type="radio" 
+                                            value="<100"
+                                            checked={selectedPriceRange === '<100'}
+                                            onClick={(e) => handlePriceRangeClick(e, '<100')}
+                                        />
+                                        <hr/> Below ₱100
+                                    </h4>
+                                    <h4 className="price-filter-label">
+                                        <input 
+                                            className="form-check-input prod-cart-checkBox" 
+                                            type="radio" 
+                                            value="100-500"
+                                            checked={selectedPriceRange === '100-500'}
+                                            onClick={(e) => handlePriceRangeClick(e, '100-500')}
+                                        />
+                                        <hr/> ₱100 - ₱500
+                                    </h4>
+                                    <h4 className="price-filter-label">
+                                        <input 
+                                            className="form-check-input prod-cart-checkBox" 
+                                            type="radio" 
+                                            value=">500"
+                                            checked={selectedPriceRange === '>500'}
+                                            onClick={(e) => handlePriceRangeClick(e, '>500')}
+                                        />
+                                        <hr/> Above ₱500
+                                    </h4>
+                                </div>
                             </div>
-                            {/* check button GENDER */}
-                            <div className="col-md-8 prod-gender-checkbox">
-                                <h4 className="gender-filter-label">
-                                    <input 
-                                        className="form-check-input prod-cart-checkBox" 
-                                        type="radio" 
-                                        value="male" 
-                                        name="gender"
-                                        id="shopProdGenderMale"
-                                        defaultChecked={selectedGender === 'male'}
-                                        onClick={(e) => handleGenderClick(e, 'male')}
-                                    />
-                                    <hr/> Male
-                                </h4>
-                                <h4 className="gender-filter-label">
-                                    <input 
-                                        className="form-check-input prod-cart-checkBox" 
-                                        type="radio" 
-                                        value="female" 
-                                        name="gender"
-                                        id="shopProdGenderFemale"
-                                        defaultChecked={selectedGender === 'female'}
-                                        onClick={(e) => handleGenderClick(e, 'female')}
-                                    />
-                                    <hr/> Female
-                                </h4>
-                                <h4 className="gender-filter-label">
-                                    <input 
-                                        className="form-check-input prod-cart-checkBox" 
-                                        type="radio" 
-                                        value="unisex" 
-                                        name="gender"
-                                        id="shopProdGenderUnisex"
-                                        defaultChecked={selectedGender === 'unisex'}
-                                        onClick={(e) => handleGenderClick(e, 'unisex')}
-                                    />
-                                    <hr/> Unisex
-                                </h4>
+    
+    
+                                {/* GENDER filter */}
+                            <div className="prod-gender-filter-container row">
+                                <div className="col-md-3 filter-gender-text">
+                                    <h4 className="prodType-filter-title">Gender</h4>
+                                </div>
+                                {/* check button GENDER */}
+                                <div className="col-md-8 prod-gender-checkbox">
+                                    <h4 className="gender-filter-label">
+                                        <input 
+                                            className="form-check-input prod-cart-checkBox" 
+                                            type="radio" 
+                                            value="male" 
+                                            name="gender"
+                                            id="shopProdGenderMale"
+                                            defaultChecked={selectedGender === 'male'}
+                                            onClick={(e) => handleGenderClick(e, 'male')}
+                                        />
+                                        <hr/> Male
+                                    </h4>
+                                    <h4 className="gender-filter-label">
+                                        <input 
+                                            className="form-check-input prod-cart-checkBox" 
+                                            type="radio" 
+                                            value="female" 
+                                            name="gender"
+                                            id="shopProdGenderFemale"
+                                            defaultChecked={selectedGender === 'female'}
+                                            onClick={(e) => handleGenderClick(e, 'female')}
+                                        />
+                                        <hr/> Female
+                                    </h4>
+                                    <h4 className="gender-filter-label">
+                                        <input 
+                                            className="form-check-input prod-cart-checkBox" 
+                                            type="radio" 
+                                            value="unisex" 
+                                            name="gender"
+                                            id="shopProdGenderUnisex"
+                                            defaultChecked={selectedGender === 'unisex'}
+                                            onClick={(e) => handleGenderClick(e, 'unisex')}
+                                        />
+                                        <hr/> Unisex
+                                    </h4>
+                                </div>
                             </div>
+    
                         </div>
-
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div className="shop-content2-container">
-            {filteredProduct.map(product => (
-                <div 
-                    className={`prodShop-card ${!product.isActive ? 'inactive-product' : ''}`} 
-                    data-bs-toggle="modal" 
-                    data-bs-target={!product.isActive ? undefined : "#viewProdDetailsModal"}
-                    key={product.productId} 
-                    onClick={() => {
-                        if (product.isActive) {
-                            setSelectedProduct(product);
-                            setImage(`https://localhost:7017/${product.image}`);
-                        }
-                    }}
-                > 
-                    <img className="visitShopProdImg" src={`https://localhost:7017/${product.image}`} alt={product.productName}/>
-                    <div className="col-md-12 shop-prodDetails-container">
-                        <h4 className="col-md-8 visitShop-prodName">{product.productName}</h4>
-                        <h3 className="visitShop-prodPrice">₱{product.price.toLocaleString()}</h3>
-                        {!product.isActive && <span className="badge badge-danger">Inactive</span>}
+    
+            <div className="shop-content2-container">
+                <div className="top-ratedProducts-Shop">
+                    <h3 className="topRated-label">Recommended For You</h3>
+                    <div className="topProds-container-visitShop">
+                        <div className="topProdShop-card"
+                        // data-bs-toggle="modal" 
+                        // data-bs-target={!product.isActive ? undefined : "#viewProdDetailsModal"}
+                        // key={product.productId} 
+                        // onClick={() => {
+                        //     if (product.isActive) {
+                        //         setSelectedProduct(product);
+                        //         setImage(`https://localhost:7017/${product.image}`);
+                        //     }
+                        // }}
+                        >
+                            <img className="visitShopProdImg" src="/" alt="" />
+                            {/* PLEASE DELETE */}
+                            <h4 className="visitShop-topProdName">Sample name</h4>
+                            <h3 className="topProdPrice">123.00(temporary)</h3>
+                            {/* REMOVE COMMENT TAGS */}
+                            {/* <div className="col-md-12 shop-prodDetails-container">
+                                <h4 className="col-md-8 visitShop-topProdName">{product.productName}</h4>
+                                <h3 className="visitShop-topProdPrice">₱{product.price.toFixed(2)}</h3>
+                                {!product.isActive && <span className="badge badge-danger">Inactive</span>}
+                            </div> */}
+                        </div>
                     </div>
                 </div>
-            ))}
-        </div>
-
-
-        <div className="modal fade" id="viewProdDetailsModal" tabIndex={-1} aria-labelledby="viewProdDetailsModalLabel" aria-hidden="true">
-            <div className="modal-dialog modal-dialog-centered modal-lg">
-                <div className="modal-content">
-                    <div className="col-md-12 close-btn-container">
-                        <button 
-                            type="button" 
-                            className="btn-close"
-                            data-bs-dismiss="modal" 
-                            aria-label="Close"
-                            onClick={HandleCloseButton}
-                            id="btnClose"
-                        >
-                        </button>
+                <h3 className="prods-available-label">Products Available</h3>
+                {filteredProduct.map(product => (
+                    <div 
+                        className={`prodShop-card ${!product.isActive ? 'inactive-product' : ''}`} 
+                        data-bs-toggle="modal" 
+                        data-bs-target={!product.isActive ? undefined : "#viewProdDetailsModal"}
+                        key={product.productId} 
+                        onClick={() => {
+                            if (product.isActive) {
+                                setSelectedProduct(product);
+                                setImage(`https://localhost:7017/${product.image}`);
+                            }
+                        }}
+                    > 
+                        <img className="visitShopProdImg" src={`https://localhost:7017/${product.image}`} alt={product.productName}/>
+                        <div className="col-md-12 shop-prodDetails-container">
+                            <h4 className="col-md-8 visitShop-prodName">{product.productName}</h4>
+                            <h3 className="visitShop-prodPrice">₱{product.price.toFixed(2)}</h3>
+                            {!product.isActive && <span className="badge badge-danger">Inactive</span>}
+                        </div>
                     </div>
-                        <div className="modal-body viewProd-modalBody">
-                        {selectedProduct && (
-                        <React.Fragment>
-                            <div className="product-div-left">
-                                <div className="img-container">
-                                    <img 
-                                        className="prodModal-Image" 
-                                        src={notHover || image} 
-                                    />
-                                </div>
-                                <div className="hover-container">
-                                    <div 
-                                        onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.frontViewImage}`)}
-                                        onMouseLeave={() => setNotHover('')}
-                                    >
+                ))}
+            </div>
+    
+    
+            <div className="modal fade" id="viewProdDetailsModal" tabIndex={-1} aria-labelledby="viewProdDetailsModalLabel" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered modal-lg">
+                    <div className="modal-content">
+                        <div className="col-md-12 close-btn-container">
+                            <button 
+                                type="button" 
+                                className="btn-close"
+                                data-bs-dismiss="modal" 
+                                aria-label="Close"
+                                onClick={HandleCloseButton}
+                                id="btnClose"
+                            >
+                            </button>
+                        </div>
+                            <div className="modal-body viewProd-modalBody">
+                            {selectedProduct && (
+                            <React.Fragment>
+                                <div className="product-div-left">
+                                    <div className="img-container">
                                         <img 
-                                            className="small-image" 
-                                            src={`https://localhost:7017/${selectedProduct.frontViewImage}`} 
+                                            className="prodModal-Image" 
+                                            src={notHover || image} 
                                         />
                                     </div>
-                                    <div 
-                                        onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.sideViewImage}`)}
-                                        onMouseLeave={() => setNotHover('')}
-                                    >
-                                        <img 
-                                            className="small-image" 
-                                            src={`https://localhost:7017/${selectedProduct.sideViewImage}`} 
-                                        />
-                                    </div>
-                                    <div 
-                                        onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.backViewImage}`)}
-                                        onMouseLeave={() => setNotHover('')}
-                                    >
-                                        <img 
-                                            className="small-image" 
-                                            src={`https://localhost:7017/${selectedProduct.backViewImage}`}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-5 prodModal-details-container">
-                                <h2 className="col-md-12 prodModal-Name">{selectedProduct.productName}</h2>
-
-                                <h5 className="prodModal-text">
-                                    <img className="prodModalRating-icon" src={ prodRatingModal }/>
-                                    {productAverageRating[selectedProduct.productId] || 0}
-                                </h5>
-
-                                <h5 className="prodModal-text">
-                                    {getDepartmentName(selectedProduct.productDepartments.departmentId)}
-                                </h5>
-                                <h5 className="prodModal-text">
-                                    {selectedProduct.category}
-                                </h5>
-                                <h1 className="prodModal-Price">₱{selectedProduct.price.toLocaleString()}</h1>
-                                <div className="prodModal-SizeGuide">
-                                    <h5 className="prodModal-text">
-                                        <button 
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#viewSizeGuideModal"
-                                            style={{ 
-                                                padding:'5px', 
-                                                border: '2px solid white', 
-                                                backgroundColor:'#004AAD', 
-                                                borderRadius:'10px',
-                                                color: 'white'
-                                            }}
+                                    <div className="hover-container">
+                                        <div 
+                                            onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.frontViewImage}`)}
+                                            onMouseLeave={() => setNotHover('')}
                                         >
-                                            Size Guide
-                                        </button>
+                                            <img 
+                                                className="small-image" 
+                                                src={`https://localhost:7017/${selectedProduct.frontViewImage}`} 
+                                            />
+                                        </div>
+                                        <div 
+                                            onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.sideViewImage}`)}
+                                            onMouseLeave={() => setNotHover('')}
+                                        >
+                                            <img 
+                                                className="small-image" 
+                                                src={`https://localhost:7017/${selectedProduct.sideViewImage}`} 
+                                            />
+                                        </div>
+                                        <div 
+                                            onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.backViewImage}`)}
+                                            onMouseLeave={() => setNotHover('')}
+                                        >
+                                            <img 
+                                                className="small-image" 
+                                                src={`https://localhost:7017/${selectedProduct.backViewImage}`}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-5 prodModal-details-container">
+                                    <h2 className="col-md-12 prodModal-Name">{selectedProduct.productName}</h2>
+    
+                                    <h5 className="prodModal-text">
+                                        <img className="prodModalRating-icon" src={ prodRatingModal }/>
+                                        {productAverageRating[selectedProduct.productId] || 0}
                                     </h5>
-                                    
-                                </div>
-                                <div className="col-md-12 prodModal-Size-Stock-container">
-                                    <select 
-                                        className="col-md-5" 
-                                        style={{ padding:'10px', border: '2px solid white', backgroundColor:'#F0F0F0', borderRadius:'10px' }}
-                                        onChange={HandleSelectedSize}
-                                    >
-                                        <option disabled selected hidden>
-                                            Select Size
-                                        </option>
-                                        {selectedProduct.sizes && selectedProduct.sizes.map((size, index) => (
-                                            <option key={`${size}-${index}`} value={size.id} disabled={size.quantity === 0}>
-                                                {size.size} {size.quantity === 0 ? '(Sold Out)' : ''}
+    
+                                    <h5 className="prodModal-text">
+                                        {getDepartmentName(selectedProduct.productDepartments.departmentId)}
+                                    </h5>
+                                    <h5 className="prodModal-text">
+                                        {selectedProduct.category}
+                                    </h5>
+                                    <h1 className="prodModal-Price">₱{selectedProduct.price.toLocaleString()}</h1>
+                                    <div className="prodModal-SizeGuide">
+                                        <h5 className="prodModal-text">
+                                            <button 
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#viewSizeGuideModal"
+                                                style={{ 
+                                                    padding:'5px', 
+                                                    border: '2px solid white', 
+                                                    backgroundColor:'#004AAD', 
+                                                    borderRadius:'10px',
+                                                    color: 'white'
+                                                }}
+                                            >
+                                                Size Guide
+                                            </button>
+                                        </h5>
+                                        
+                                    </div>
+                                    <div className="col-md-12 prodModal-Size-Stock-container">
+                                        <select 
+                                            className="col-md-5" 
+                                            style={{ padding:'10px', border: '2px solid white', backgroundColor:'#F0F0F0', borderRadius:'10px' }}
+                                            onChange={HandleSelectedSize}
+                                        >
+                                            <option disabled selected hidden>
+                                                Select Size
                                             </option>
-                                        ))}
-                                    </select>
-                                    {selectedProduct.sizes && (
-                                        <h5 className="prodModal-stocks">Stocks: {newQuantity}</h5>
-                                    )}
-                                </div>
-                                <div className="prodModal-quantity-container">
-                                        <h5 style={{ marginRight:'10px', fontSize:'12px' }}>Quantity</h5>
-                                    <button className="prodModal-minus-quanti-btn" onClick={HandleMinusQuantity}>
-                                        -
+                                            {selectedProduct.sizes && selectedProduct.sizes.map((size, index) => (
+                                                <option key={`${size}-${index}`} value={size.id} disabled={size.quantity === 0}>
+                                                    {size.size} {size.quantity === 0 ? '(Sold Out)' : ''}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {selectedProduct.sizes && (
+                                            <h5 className="prodModal-stocks">Stocks: {newQuantity}</h5>
+                                        )}
+                                    </div>
+                                    <div className="prodModal-quantity-container">
+                                            <h5 style={{ marginRight:'10px', fontSize:'12px' }}>Quantity</h5>
+                                        <button className="prodModal-minus-quanti-btn" onClick={HandleMinusQuantity}>
+                                            -
+                                        </button>
+    
+                                        <input 
+                                            id="quantities"
+                                            className="prodModal-quanti-input" 
+                                            type="text" 
+                                            value={quantity}
+                                            onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
+                                        >
+                                        </input>
+    
+                                        <button className="prodModal-plus-quanti-btn" onClick={HandlePlusQuantity}>
+                                            +
+                                        </button>
+                                    </div>
+                                    <button className="prodModal-add-to-cart-btn" onClick={addToCart} >
+                                        <img className="prodModal-cart-icon" src={ cartIcon }/>
+                                        Add to Cart
                                     </button>
-
-                                    <input 
-                                        id="quantities"
-                                        className="prodModal-quanti-input" 
-                                        type="text" 
-                                        value={quantity}
-                                        onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
-                                    >
-                                    </input>
-
-                                    <button className="prodModal-plus-quanti-btn" onClick={HandlePlusQuantity}>
-                                        +
-                                    </button>
                                 </div>
-                                <button className="prodModal-add-to-cart-btn" onClick={addToCart} >
-                                    <img className="prodModal-cart-icon" src={ cartIcon }/>
-                                    Add to Cart
-                                </button>
-                            </div>
-                        </React.Fragment>
-                        )}
+                            </React.Fragment>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div className="modal fade" id="viewSizeGuideModal" tabIndex={-1} aria-labelledby="viewSizeGuideModalLabel" aria-hidden="true">
-            <div className="modal-dialog modal-dialog-centered modal-lg">
-                <div className="modal-content">
-                    <div className="col-md-12 close-btn-container">
-                        <button 
-                            type="button" 
-                            className="btn-close"
-                            data-bs-dismiss="modal" 
-                            aria-label="Close"
-                            onClick={() => window.location.reload()}
-                        >
-                        </button>
-                    </div> 
-                    <div className="image-container">
-                        {selectedProduct &&  (
-                            <img 
-                                className="prodSizeGuideModal-Image" 
-                                src={`https://localhost:7017/${selectedProduct.sizeGuide}`} 
-                                alt="Size Guide" 
-                            />
-                        )}
-                    </div>     
+    
+            <div className="modal fade" id="viewSizeGuideModal" tabIndex={-1} aria-labelledby="viewSizeGuideModalLabel" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered modal-lg">
+                    <div className="modal-content">
+                        <div className="col-md-12 close-btn-container">
+                            <button 
+                                type="button" 
+                                className="btn-close"
+                                data-bs-dismiss="modal" 
+                                aria-label="Close"
+                                onClick={() => window.location.reload()}
+                            >
+                            </button>
+                        </div> 
+                        <div className="image-container">
+                            {selectedProduct &&  (
+                                <img 
+                                    className="prodSizeGuideModal-Image" 
+                                    src={`https://localhost:7017/${selectedProduct.sizeGuide}`} 
+                                    alt="Size Guide" 
+                                />
+                            )}
+                        </div>     
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </div>   
+    )
 }
 
 export default Visit_Shop

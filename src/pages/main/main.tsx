@@ -45,8 +45,13 @@ function Main() {
 
   // * Navigate Search
   const performSearch = (searchCriteria = searchTerm) => {
-    setSearchTerm(searchCriteria);
-    navigate(`/shop/${userId}/search_product?search=${searchCriteria}`);
+    if (searchCriteria !== "") {
+      setSearchTerm(searchCriteria);
+      navigate(`/shop/${userId}/search_product?search=${searchCriteria}`);
+    } else {
+      // navigate(`/shop/${userId}`);
+      return;
+    }
   };
 
   // * Search Product Data
@@ -298,18 +303,50 @@ function Main() {
                     let displayText = "";
                     let searchCriteria = "";
 
+                    // Helper function to bold the matching letters
+                    const highlightMatch = (text, searchTerm) => {
+                      const matchIndex = text.indexOf(searchTerm);
+                      if (matchIndex !== -1) {
+                        return (
+                          <>
+                            {text.substring(0, matchIndex)}
+                            <strong>
+                              {text.substring(
+                                matchIndex,
+                                matchIndex + searchTerm.length
+                              )}
+                            </strong>
+                            {text.substring(matchIndex + searchTerm.length)}
+                          </>
+                        );
+                      }
+                      return text;
+                    };
+
                     if (productName?.includes(searchTermLowerCase)) {
-                      displayText = productData.productName;
-                      searchCriteria = productData.productName;
+                      displayText = highlightMatch(
+                        productData.productName.toLowerCase(),
+                        searchTermLowerCase
+                      );
+                      searchCriteria = productData.productName.toLowerCase();
                     } else if (productTypeName?.includes(searchTermLowerCase)) {
-                      displayText = productTypeName;
-                      searchCriteria = productTypeName;
+                      displayText = highlightMatch(
+                        productTypeName.toLowerCase(),
+                        searchTermLowerCase
+                      );
+                      searchCriteria = productTypeName.toLowerCase();
                     } else if (category?.includes(searchTermLowerCase)) {
-                      displayText = productData.category;
-                      searchCriteria = productData.category;
+                      displayText = highlightMatch(
+                        productData.category.toLowerCase(),
+                        searchTermLowerCase
+                      );
+                      searchCriteria = productData.category.toLowerCase();
                     } else if (description?.includes(searchTermLowerCase)) {
-                      displayText = productData.description;
-                      searchCriteria = productData.description;
+                      displayText = highlightMatch(
+                        productData.description.toLowerCase(),
+                        searchTermLowerCase
+                      );
+                      searchCriteria = productData.description.toLowerCase();
                     }
 
                     return (
@@ -319,19 +356,27 @@ function Main() {
                         onClick={() => {
                           performSearch(searchCriteria);
                           setSearchTerm("");
+                          // Add additional functionality like navigating to the selected item or triggering a search
                         }}
                       >
-                        <span className=" form-control-feedback"></span>
-                        {displayText}
+                        <img
+                          src={`https://localhost:7017/${productData.image}`}
+                          width={30}
+                          height={30}
+                          style={{ marginRight: "10px" }}
+                        ></img>
+                        <span className="form-control-feedback">
+                          {displayText}
+                        </span>
                       </div>
                     );
                   })}
               </div>
             </div>
-                  <input type="checkbox" id="menu" hidden/>
-                  <label className="navLabel" htmlFor="menu">
-                    <i className="fa-solid fa-bars"></i>
-                  </label>
+            <input type="checkbox" id="menu" hidden />
+            <label className="navLabel" htmlFor="menu">
+              <i className="fa-solid fa-bars"></i>
+            </label>
 
             <div className="col-md-3 header-button-container">
               <label className="navLabel" htmlFor="menu">
@@ -375,7 +420,7 @@ function Main() {
                                       {item.product.productName}
                                     </span>
                                     <span className="dropdown-price">
-                                      ₱{item.product.price}
+                                      ₱{item.product.price.toFixed(2)}
                                     </span>
                                   </div>
                                 </Link>

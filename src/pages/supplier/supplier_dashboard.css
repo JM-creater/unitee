@@ -130,6 +130,7 @@
     align-items: start;
     flex-wrap: wrap;
     margin-top: 45px;
+    max-height: fit-content;
 }
 
 .dash-pending-ords-container {
@@ -226,11 +227,11 @@
 
 .top-rated-products-container {
     background-color: white;
-    height: 30vh;
     padding: 10px;
     border-radius: 10px;
     display: flex;
     flex-wrap: wrap;
+    height: fit-content;
 }
 
 .top-rated-prod-container {

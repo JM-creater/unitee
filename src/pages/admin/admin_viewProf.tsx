@@ -7,6 +7,7 @@ import { useParams } from "react-router";
 import axios from "axios";
 import { toast } from "react-toastify";
 import uploadimage from "../../assets/images/icons/uploadimage.png"
+import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 import React from "react";
 
 type ValidationErrors = {
@@ -37,6 +38,7 @@ function Admin_viewProf() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
 
   // * For Delay
@@ -79,6 +81,7 @@ function Admin_viewProf() {
 
   // * Fetch User Data
   useEffect(() => {
+    setIsLoading(true);
     const fetchUserData = async () => {
       try {
         const response = await axios.get(`https://localhost:7017/Users/${id}`);
@@ -87,8 +90,10 @@ function Admin_viewProf() {
         setLastName(response.data.lastName);
         setEmail(response.data.email);
         setPhoneNumber(response.data.phoneNumber);
+        setIsLoading(false);
       } catch (error) {
         console.error(error);
+        setIsLoading(false);
       }
     };
     fetchUserData();
@@ -160,8 +165,8 @@ function Admin_viewProf() {
           toast.error(response.data);
         }
       } catch (error) {
-        console.error(error);
-        toast.error("Failed to Update. Please try again later.");
+        console.log(error);
+        console.error("Network error or server not responding");
       }
     }
   };
@@ -207,206 +212,215 @@ function Admin_viewProf() {
         toast.error('Failed to update password. Please try again later.');
       }
     } catch (error) {
-      console.error(error);
-      toast.error('An error occurred while updating the password.');
+      console.log(error);
+        console.error("Network error or server not responding");
     }
   };
 
 
   return (
-    <div className="viewProfile-admin-main-container">
-      <div className="profile-details-container">
-        {UserProfile && (
-          <div className="user-details-viewProfile">
-            {isEditing && (
-              <input
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                id="imageUploadInput"
-                onChange={handleImageUpload}
-              />
-            )}
-            <label htmlFor="imageUploadInput" style={{ position: 'relative', display: 'inline-block' }}>
-              <img
-                className='profileImg'
-                src={imagePreviewUrl || `https://localhost:7017/${UserProfile.image}`}
-                alt="Profile"
-                style={{ width: '200px', height: '200px'}}
-              />
+    <React.Fragment>
+      {isLoading ? (
+        <div className="mainloading-screen">
+          <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
+        </div>
+      ) : (
+        <div className="viewProfile-admin-main-container">
+        <div className="profile-details-container">
+          {UserProfile && (
+            <div className="user-details-viewProfile">
               {isEditing && (
-                <img 
-                  src={uploadimage}
-                  alt="Upload Icon" 
-                  style={{ 
-                    position: 'absolute', 
-                    bottom: '-5px', 
-                    right: '20px',
-                    cursor: 'pointer',
-                    width: '40px',
-                    height: '40px'
-                  }} 
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  id="imageUploadInput"
+                  onChange={handleImageUpload}
                 />
               )}
-            </label>
-            <div className="username-id-container">
-              <h1 className="acc-name">
-                {UserProfile.firstName + " " + UserProfile.lastName}
-              </h1>
-              <p className="id-number-profile">{id}</p>
-            </div>
-          </div>
-        )}
-
-        <button
-          className="editProf-btn"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#editProfCollapse"
-          aria-expanded="false"
-          aria-controls="editProfCollapse"
-          onClick={handleEditProfileClick}
-        >
-          <img className="editIconProf" src={editProfIcon} alt="" />
-          Edit Profile
-        </button>
-      </div>
-
-      {/* EDIT COLLAPSE */}
-      <div
-        className="collapse"
-        id="editProfCollapse"
-        style={{ padding: "40px" }}
-      >
-        <h1>Edit Profile Information</h1>
-        <div
-          className="card card-body"
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-evenly",
-          }}
-        >
-          <div className="editProf-details-1">
-            <label className="profLabelEdit" htmlFor="profFirstName">
-              First Name
-            </label>
-            <input
-              className="input-prof"
-              type="text"
-              id="profFirstName"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              disabled={isDisabled}
-            ></input>
-
-            <label className="profLabelEdit" htmlFor="profLastName">
-              Last Name
-            </label>
-            <input
-              className="input-prof"
-              type="text"
-              id="profLastName"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              disabled={isDisabled}
-            ></input>
-          </div>
-
-          <div className="editProf-details-2">
-            <label className="profLabelEdit" htmlFor="profEmail">
-              Email
-            </label>
-            <input
-              className="input-prof"
-              type="email"
-              id="profEmail"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isDisabled}
-            ></input>
-
-            <label className="profLabelEdit" htmlFor="profPhone">
-              Phone Number
-            </label>
-            <input
-              className="input-prof"
-              type="text"
-              id="profPhone"
-              value={phoneNumber}
-              onChange={(e) => handlePhoneNumber(e.target.value)}
-              maxLength={11}
-              disabled={isDisabled}
-            ></input>
-              <label className='profLabelEdit' htmlFor="editPass">Password</label>
-              <button onClick={toggleInput}>
-                {isDisabled ? 'Hide Input Password' : 'Edit Password'}
-              </button>
-              {isDisabled && (
-                <React.Fragment>
-                  <label className='profLabelEdit' htmlFor="editPass">Current Password</label>
-                  <input 
-                    className='input-prof' 
-                    type="password" 
-                    name="" 
-                    id="editPass" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  >
-                  </input>
-                  <label className='profLabelEdit' htmlFor="editPass">Confirm Password</label>
-                  <input 
-                    className='input-prof' 
-                    type="password" 
-                    name="" 
-                    id="editPass" 
-                    value={confirmPassword} 
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                  >
-                  </input>
-                  
-                  <div className="updatePassword-btn-container" style={{ display: 'flex', justifyContent: 'center' }}>
-                    <button className='editProf-save-btn' onClick={handleUpdatePassword}>Update</button>
-                  </div>
-                </React.Fragment>
-              )}    
-          </div>
-        </div>
-        <div className="saveChanges-btn-container">
-          <button className="editProf-save-btn" onClick={HandleUpdate}>
-            Save Changes
-          </button>
-        </div>
-      </div>
-
-      <div className="about-user-container">
-        <h3
-          style={{
-            borderBottom: "2px solid #f0f0f0",
-          }}
-        >
-          About
-        </h3>
-        <div className="about-userInfo-container">
-          <div>
-            <h5 className="about-details-prof">
-              <img className="aboutIcons" src={emailIcon} alt="" />
-              Email
-            </h5>
-            <h5 className="about-details-prof">
-              <img className="aboutIcons" src={phoneIcon} alt="" />
-              Phone Number
-            </h5>
-          </div>
-          {UserProfile && (
-            <div>
-              <h5 className="about-details-prof">{UserProfile.email}</h5>
-              <h5 className="about-details-prof">{UserProfile.phoneNumber}</h5>
+              <label htmlFor="imageUploadInput" style={{ position: 'relative', display: 'inline-block' }}>
+                <img
+                  className='profileImg'
+                  src={imagePreviewUrl || `https://localhost:7017/${UserProfile.image}`}
+                  alt="Profile"
+                  style={{ width: '200px', height: '200px'}}
+                />
+                {isEditing && (
+                  <img 
+                    src={uploadimage}
+                    alt="Upload Icon" 
+                    style={{ 
+                      position: 'absolute', 
+                      bottom: '-5px', 
+                      right: '20px',
+                      cursor: 'pointer',
+                      width: '40px',
+                      height: '40px'
+                    }} 
+                  />
+                )}
+              </label>
+              <div className="username-id-container">
+                <h1 className="acc-name">
+                  {UserProfile.firstName + " " + UserProfile.lastName}
+                </h1>
+                <p className="id-number-profile">{id}</p>
+              </div>
             </div>
           )}
+  
+          <button
+            className="editProf-btn"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#editProfCollapse"
+            aria-expanded="false"
+            aria-controls="editProfCollapse"
+            onClick={handleEditProfileClick}
+          >
+            <img className="editIconProf" src={editProfIcon} alt="" />
+            Edit Profile
+          </button>
+        </div>
+  
+        {/* EDIT COLLAPSE */}
+        <div
+          className="collapse"
+          id="editProfCollapse"
+          style={{ padding: "40px" }}
+        >
+          <h1>Edit Profile Information</h1>
+          <div
+            className="card card-body"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+            }}
+          >
+            <div className="editProf-details-1">
+              <label className="profLabelEdit" htmlFor="profFirstName">
+                First Name
+              </label>
+              <input
+                className="input-prof"
+                type="text"
+                id="profFirstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                disabled={isDisabled}
+              ></input>
+  
+              <label className="profLabelEdit" htmlFor="profLastName">
+                Last Name
+              </label>
+              <input
+                className="input-prof"
+                type="text"
+                id="profLastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                disabled={isDisabled}
+              ></input>
+            </div>
+  
+            <div className="editProf-details-2">
+              <label className="profLabelEdit" htmlFor="profEmail">
+                Email
+              </label>
+              <input
+                className="input-prof"
+                type="email"
+                id="profEmail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isDisabled}
+              ></input>
+  
+              <label className="profLabelEdit" htmlFor="profPhone">
+                Phone Number
+              </label>
+              <input
+                className="input-prof"
+                type="text"
+                id="profPhone"
+                value={phoneNumber}
+                onChange={(e) => handlePhoneNumber(e.target.value)}
+                maxLength={11}
+                disabled={isDisabled}
+              ></input>
+                <label className='profLabelEdit' htmlFor="editPass">Password</label>
+                <button onClick={toggleInput}>
+                  {isDisabled ? 'Hide Input Password' : 'Edit Password'}
+                </button>
+                {isDisabled && (
+                  <React.Fragment>
+                    <label className='profLabelEdit' htmlFor="editPass">Current Password</label>
+                    <input 
+                      className='input-prof' 
+                      type="password" 
+                      name="" 
+                      id="editPass" 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    >
+                    </input>
+                    <label className='profLabelEdit' htmlFor="editPass">Confirm Password</label>
+                    <input 
+                      className='input-prof' 
+                      type="password" 
+                      name="" 
+                      id="editPass" 
+                      value={confirmPassword} 
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    >
+                    </input>
+                    
+                    <div className="updatePassword-btn-container" style={{ display: 'flex', justifyContent: 'center' }}>
+                      <button className='editProf-save-btn' onClick={handleUpdatePassword}>Update</button>
+                    </div>
+                  </React.Fragment>
+                )}    
+            </div>
+          </div>
+          <div className="saveChanges-btn-container">
+            <button className="editProf-save-btn" onClick={HandleUpdate}>
+              Save Changes
+            </button>
+          </div>
+        </div>
+  
+        <div className="about-user-container">
+          <h3
+            style={{
+              borderBottom: "2px solid #f0f0f0",
+            }}
+          >
+            About
+          </h3>
+          <div className="about-userInfo-container">
+            <div>
+              <h5 className="about-details-prof">
+                <img className="aboutIcons" src={emailIcon} alt="" />
+                Email
+              </h5>
+              <h5 className="about-details-prof">
+                <img className="aboutIcons" src={phoneIcon} alt="" />
+                Phone Number
+              </h5>
+            </div>
+            {UserProfile && (
+              <div>
+                <h5 className="about-details-prof">{UserProfile.email}</h5>
+                <h5 className="about-details-prof">{UserProfile.phoneNumber}</h5>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+      )}
+    </React.Fragment>
+    
   );
 }
 

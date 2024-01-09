@@ -68,7 +68,8 @@ function View_Customers() {
         );
         setCustomer(response.data);
       } catch (error) {
-        toast.error("Network error or server not responding");
+        console.log(error);
+        console.error("Network error or server not responding");
       }
     };
 
@@ -131,7 +132,8 @@ function View_Customers() {
         toast.error(response.data.message);
       }
     } catch (error) {
-      toast.error("Network error or server not responding");
+      console.log(error);
+      console.error("Network error or server not responding");
     }
   };
 

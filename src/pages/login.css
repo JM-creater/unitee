@@ -58,18 +58,32 @@
 }
 
 .login-btn {
-    color: white;
-    font-size: 15px;
-    padding: 10px;
-    background-color: #004AAD;
-    border-radius: 20px;
-    margin-top: 30px;
+    display: block;
     width: 20em;
+    font-weight: bold;
+    background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+    color: white;
+    padding-block: 15px;
+    margin: 20px auto;
+    border-radius: 20px;
+    box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 20px 10px -15px;
+    border: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.login-btn:hover {
+    transform: scale(1.03);
+    box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 23px 10px -20px;
 }
 
 .login-btn:hover {
     background-color: #00439b;
     font-weight: 600;
+}
+
+.login-btn:active {
+    transform: scale(0.95);
+    box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 15px 10px -10px;
 }
 
 .login-link-btn {
