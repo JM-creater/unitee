@@ -18,6 +18,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import orderEventEmitter from '../../helpers/OrderEmitter';
 import React from 'react';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 ChartJS.register(
     BarElement,
@@ -39,6 +41,7 @@ function Admin_Reports () {
     const [selectedStatus, setSelectedStatus] = useState('');
     const [supplierOrderCounts, setSupplierOrderCounts] = useState({});
     const [isLoading, setIsLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
 
     // * Get the Sales by Weekly, Monthly, Yearly
     useEffect(() => {
@@ -158,6 +161,35 @@ function Admin_Reports () {
         fetchShops();
     }, []);
 
+    // * Download Report to PDF
+    const HandleExportToPDF = async () => {
+        const input = document.getElementById('report-container');
+
+        const canvas = await html2canvas(input);
+        const imgData = canvas.toDataURL('image/png');
+    
+        const imgWidth = 210; 
+        const pageHeight = 295; 
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        let heightLeft = imgHeight;
+    
+        const doc = new jsPDF('p', 'mm');
+        let position = 0;
+    
+        doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+    
+        while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            doc.addPage();
+            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+    
+        doc.save('Report.pdf');
+        setShowModal(!showModal);
+    };
+
     // * Download Report to Excel
     const HandleExportToExcel = async () => {
         const ordersData = filteredOrders.map(ord => ({
@@ -271,6 +303,7 @@ function Admin_Reports () {
 
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
+        setShowModal(!showModal);
     };
 
 
@@ -431,7 +464,21 @@ function Admin_Reports () {
                         </div>
                     </div>
                     {/* GENERATE REPORT BUTTON */}
-                    <button className='admin-generate-report-btn' onClick={HandleExportToExcel}>Generate Report</button>
+                    <button className='admin-generate-report-btn' data-bs-toggle="modal" data-bs-target="#exportModal">Generate Report</button>
+                </div>
+
+                <div className='modal fade' id="exportModal" tabIndex={1} aria-labelledby="exportModalLabel" aria-hidden={!showModal}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="logout-confirmation-modalBody">
+                                <h3>Select Format to Export Report</h3>
+                                <div className="col-md-12 logout-btn-container">
+                                    <button className="logout-btn" data-bs-dismiss="modal" onClick={HandleExportToExcel}>Excel</button>
+                                    <button className="cancel-logout-btn" data-bs-dismiss="modal" onClick={HandleExportToPDF}>PDF</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
         
                 <div 

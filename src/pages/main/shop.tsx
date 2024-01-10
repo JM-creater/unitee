@@ -151,7 +151,8 @@ function Shop() {
                 <div className="carousel-inner">
                   <div className="carousel-item active">
                     {recommendedOverAll.slice(0, 1).map((firstRecommended) => (
-                      <div className="featuredProd-card">
+                      <Link to={`/shop/${userId}/visit_shop/${firstRecommended.supplierId}`} style={{ textDecoration: 'none' }}>
+                        <div key={firstRecommended.productId} className="featuredProd-card">
                         <div className="prod-card-featured">
                           <img
                             className="featuredProd-img d-block w-100"
@@ -170,10 +171,12 @@ function Shop() {
                           </div>
                         </div>
                       </div>
+                      </Link>
                     ))}
                   </div>
-                  {recommendedOverAll.slice(1, 3).map((recommendedOverAll) => (
-                    <div className="carousel-item">
+                  {recommendedOverAll.slice(1, 5).map((recommendedOverAll) => (
+                    <Link to={`/shop/${userId}/visit_shop/${recommendedOverAll.supplierId}`}>
+                      <div key={recommendedOverAll.productId}  className="carousel-item">
                       <div className="featuredProd-card">
                         <div className="prod-card-featured">
                           <img
@@ -194,6 +197,7 @@ function Shop() {
                         </div>
                       </div>
                     </div>
+                    </Link>
                   ))}
                 </div>
                 <button
@@ -250,7 +254,7 @@ function Shop() {
                             alt="Star icon"
                           />
                           {averageRatingSupplier[shops.id]
-                            ? averageRatingSupplier[shops.id]
+                            ? averageRatingSupplier[shops.id].toFixed(1)
                             : "0"}
                         </h5>
                       </React.Fragment>
