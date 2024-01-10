@@ -73,10 +73,10 @@
 .shop-profile-top-seller {
     width: 100%;
     max-width: 60px;
-    max-height: 60px;
-    object-fit: fill;
+    height: 60px;
+    object-fit: cover;
     border-radius: 50%;
-    border: solid white 4px;
+    border: solid #F0F0F0 3px;
 }
 
 .top-sellers-dash {
@@ -85,16 +85,26 @@
     border-radius: 10px;
     height: fit-content;
     margin-top: 45px;
+    max-height: 70vh;
+    overflow: auto;
 }
 
 .top-shop-details-container {
     display: flex;
     flex-direction: column;
+    justify-content: start;
+    width: 30em;
     gap: 5px;
 }
 
+.shop-name-dash {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: .9;
+    max-width: 15em;
+}
+
 .dash-top-sellers-container {
-    background-color: #F0F0F0;
     padding: 10px;
     border-radius: 10px;
     display: flex;

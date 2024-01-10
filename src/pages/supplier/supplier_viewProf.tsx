@@ -1,11 +1,13 @@
 import editProfIcon from "../../assets/images/icons/editing.png";
 import emailIcon from "../../assets/images/icons/mail-2.png";
 import phoneIcon from "../../assets/images/icons/smartphone-call.png";
+import addressIcon from '../../assets/images/icons/address.png';
 import "./supplier_viewProf.css";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import uploadimage from "../../assets/images/icons/uploadimage.png"
 import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
+import verifiedIcon from '../../assets/images/icons/verified.png'
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -427,11 +429,16 @@ function Supplier_ViewProf() {
                 <img className="aboutIcons" src={phoneIcon} alt="" />
                 Phone Number
               </h5>
+              <h5 className="about-details-prof">
+                <img className="aboutIcons" src={addressIcon} alt="" />
+                Shop Address
+              </h5>
             </div>
             {UserProfile && (
               <div>
                 <h5 className="about-details-prof">{UserProfile.email}</h5>
                 <h5 className="about-details-prof">{UserProfile.phoneNumber}</h5>
+                <h5 className="about-details-prof">{UserProfile.address}</h5>
               </div>
             )}
             <div>
@@ -439,8 +446,9 @@ function Supplier_ViewProf() {
                 (() => {
                   if (UserProfile && UserProfile.emailVerificationStatus === 2) {
                     return (
-                      <div style={{ color: 'green' }}>
-                        Verified
+                      <div style={{ color: '#267df4', fontWeight:'700' }}>
+                        <img className='customer-gmail-verifiedIcon' src={ verifiedIcon } alt="icon for verified users" />
+                          Verified
                       </div>
                     );
                   } else if (UserProfile && UserProfile.emailVerificationStatus === 1 || UserProfile.emailVerificationStatus === 3 || UserProfile && UserProfile.emailVerificationStatus === 4) {

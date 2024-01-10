@@ -387,11 +387,16 @@ function Visit_Shop () {
         <div className="shop-main-container">
             <div className="shop-content1-container">
                 <div className="col-md-10 shopDetails-container-shop">
-                    <div>
+                    <div className="visitShop-seller-details-container">
                         {supplier ? (
                             <React.Fragment>
-                                <img className="shop-img" src={`https://localhost:7017/${supplier.image}`} />
-                                <h3 className="visitShop-Name">{supplier.shopName}</h3>
+                                <div className="seller-information-visitShop">
+                                    <img className="shop-img" src={`https://localhost:7017/${supplier.image}`} />
+                                    <div className="seller-name-address-container">
+                                        <h3 className="visitShop-Name">{supplier.shopName}</h3>
+                                        <h3 className="visitShop-address">{supplier.address}</h3>
+                                    </div>
+                                </div>
                             </React.Fragment>
                         ) : (
                             <p>Loading supplier details...</p>
@@ -403,7 +408,7 @@ function Visit_Shop () {
                     
                     {/* Filter */}
                     <div className="prodFilter-container">
-                        <h4 className="filter-text">Filter</h4>
+                        {/* <h4 className="filter-text">Filter</h4> */}
     
                         {/* product type filter */}
                         <div className="prod-type-filter-container row">

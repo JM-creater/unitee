@@ -267,7 +267,7 @@ function Admin_Shops () {
                 <h5 style={{ marginRight:'20px', color:'#020654' }}>Sort by</h5>
             <label className='customerStatus-label' htmlFor="status">Status</label>
                 <select
-                    style={{ padding: '10px', border: '2px solid white' }}
+                    style={{ padding: '10px', border: '2px solid white', borderRadius:'10px' }}
                     name="customerStatus" 
                     id="status"
                     onChange={(e) => setSelectedStatus(e.target.value)}
@@ -293,12 +293,12 @@ function Admin_Shops () {
                     <img className='shopProfileImgCard' src={ `https://localhost:7017/${shopItem.image}` } />
                     <div className='col-md-8 adminShop-card-details'>
                         <h5 className="supplier-card-title">{shopItem.shopName}</h5>
+                        <h5 className='shop-rating-card'>{shopItem.address}</h5>
                         <h5 className='shop-rating-card'>
                             <img className="ratingIcon" src={starIcon} />
                             {averageRatingSupplier && averageRatingSupplier[shopItem.id] ?
                                 averageRatingSupplier[shopItem.id].toFixed(1) : "No rating yet"}
                         </h5>
-                        <h5 className='shop-rating-card'>{shopItem.address}</h5>
                     </div>
                 </div>
             ))}

@@ -725,7 +725,7 @@ function Manage_Shop() {
             Manage Shop
           </h3>
           <button
-            className="supplier-add-prod-btn"
+            className="approve-btn"
             data-bs-toggle="modal"
             data-bs-target="#addProductModal"
           >

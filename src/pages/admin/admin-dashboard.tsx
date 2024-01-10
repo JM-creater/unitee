@@ -296,6 +296,7 @@ function Admin_Dashboard () {
               <img className="shop-profile-top-seller" src={`https://localhost:7017/${topSellingSupplier.image}`}/>
               <div className="top-shop-details-container">
                 <span className="shop-name-dash">{topSellingSupplier.shopName}</span>
+                <span className="shop-address-dash">{topSellingSupplier.address}</span>
                 <span className="shop-total-sale-dash"></span>
               </div>
               <span className="shop-totalProds-sold"></span>

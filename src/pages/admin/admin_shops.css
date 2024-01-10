@@ -10,9 +10,13 @@
 .shopProfileImgCard {
     width: 100%;
     max-width: 10rem;
-    max-height: 10rem;
+    height: 10rem;
     object-fit: cover;
-    border-radius: 5px;
+    border-radius: 50%;
+}
+
+.supplier-card-title {
+    max-width: 11em;
 }
 
 .admin-shops-header {

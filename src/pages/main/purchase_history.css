@@ -72,6 +72,10 @@
     animation: idle 4s linear infinite;
     transition: stroke 0.2s, fill 0.5s;
   }
+
+  .buyAgain-btn-link {
+    text-decoration: none;
+  }
   
   @keyframes idle {
     from {
