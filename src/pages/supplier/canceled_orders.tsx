@@ -161,8 +161,13 @@ function Canceled_Orders () {
                             <td className="text-center">
                                 {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                             </td>
-                            <td className="text-center">₱{orderItem.total.toFixed(2)}</td>
-                            <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                            <td className="text-center">{orderItem.user.firstName}</td>
+                            <td className="text-center">{orderItem.total.toLocaleString('en-US', {
+                            style: 'currency',
+                            currency: 'PHP',
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,})}
+                            </td>
                         </tr>
                     </tbody>
                 ))
@@ -171,7 +176,7 @@ function Canceled_Orders () {
                     <tr data-bs-toggle="modal" className="text-center">
                         <td></td>
                         <td></td>
-                        <td>No pending orders available</td>
+                        <td>No canceled orders available</td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -196,6 +201,7 @@ function Canceled_Orders () {
                             <div className="order-details-container">
                                 <div className="ord-details-labels">
                                     <span className='details-label'>Status</span>
+                                    <span className='details-label'>Reason For Cancellation</span>
                                     <span className='details-label'>Payment Type</span>
                                     <span className='details-label'>Order Number</span>
                                     <span className='details-label'>Date</span>
@@ -203,10 +209,10 @@ function Canceled_Orders () {
                                     <span className='details-label'>Proof of Payment</span>
                                     <span className='details-label'>Reference no.</span>
                                     <span className='details-label-totalAmount'>Total Amount</span>
-                                    <span className='details-label'>Cancellation Reason</span>
                                 </div>
                                 <div className="ord-details-data">
                                     <span className='details-data' style={{ color:'#f1b50d' }}>{Status[Object.keys(Status)[selectedOrders.status - 1]]}</span>
+                                    <span className='details-data'>{selectedOrders.cancellationReason}</span>
                                     <span className='details-data'>{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
                                     <span className='details-data'>{selectedOrders.orderNumber}</span>
                                     <span className='details-data'>{formatDate(selectedOrders.dateCreated)}</span>
@@ -222,8 +228,11 @@ function Canceled_Orders () {
                                     </a>
                                     </span>
                                     <span className='details-data'>{selectedOrders.referenceId}</span>
-                                    <span className='details-data-totalAmount'>₱{selectedOrders.total.toFixed(2)}</span>
-                                    <span className='details-data'>{selectedOrders.cancellationReason}</span>
+                                    <span className='details-data-totalAmount'>{selectedOrders.total.toLocaleString('en-US', {
+                                    style: 'currency',
+                                    currency: 'PHP',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,})}</span>
                                 </div>
                             </div>
                         </div>
@@ -271,7 +280,11 @@ function Canceled_Orders () {
                                                 <td className="text-center">{item.product.category}</td>
                                                 <td className="text-center">{item.sizeQuantity.size}</td>
                                                 <td className="text-center">{item.quantity}</td>
-                                                <td className="text-center">₱{item.product.price.toLocaleString()}</td>
+                                                <td className="text-center">{item.product.price.toLocaleString('en-US', {
+                                                style: 'currency',
+                                                currency: 'PHP',
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2,})}</td>
                                             </tr>
                                         ))
                                     )

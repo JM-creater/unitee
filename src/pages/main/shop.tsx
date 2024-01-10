@@ -5,6 +5,8 @@ import "react-toastify/dist/ReactToastify.css";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
+//sample please do not include in merging
+import sampleProd from '../../assets/images/shop_products/college-uniform.jpg'
 
 function Shop() {
     const [shop, setShop] = useState([]);
@@ -123,10 +125,57 @@ function Shop() {
             <div className="container shop-contianer">
                 <div className="content-container">
                     <div className="col-md-12 shopCustomer-title-container">
-                        
                         <div className="motto-container">
                             <p className="shop-title1">New Clothes,</p>
                             <p className="shop-title2">New Passion.</p>
+                        </div>
+                        <div id="carouselExample" className="carousel carousel-dark slide">
+                            <div className="carousel-inner">
+                                <div className="carousel-item active">
+                                    <div className="featuredProd-card">
+                                        <div className="prod-card-featured">
+                                            <img className="featuredProd-img d-block w-100" src={ sampleProd }/>
+                                            <div className="featured-prod-details">
+                                                <h3 className="featuredProd-name">Sample prod name</h3>
+                                                <span className="featuredProd-rating">prod rating</span>
+                                                <h3 className="featuredProd-price">123535</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="carousel-item">
+                                    <div className="featuredProd-card">
+                                        <div className="prod-card-featured">
+                                            <img className="featuredProd-img d-block w-100" src={ sampleProd }/>
+                                            <div className="featured-prod-details">
+                                                <h3 className="featuredProd-name">Sample prod name</h3>
+                                                <span className="featuredProd-rating">prod rating</span>
+                                                <h3 className="featuredProd-price">123535</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="carousel-item">
+                                    <div className="featuredProd-card">
+                                        <div className="prod-card-featured">
+                                            <img className="featuredProd-img d-block w-100" src={ sampleProd }/>
+                                            <div className="featured-prod-details">
+                                                <h3 className="featuredProd-name">Sample prod name</h3>
+                                                <span className="featuredProd-rating">prod rating</span>
+                                                <h3 className="featuredProd-price">123535</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button className="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span className="visually-hidden">Previous</span>
+                            </button>
+                            <button className="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                                <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span className="visually-hidden">Next</span>
+                            </button>
                         </div>
                     </div>
 
