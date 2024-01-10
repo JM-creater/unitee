@@ -6,6 +6,7 @@ import emailIcon from "../../assets/images/icons/mail-2.png"
 import phoneIcon from "../../assets/images/icons/smartphone-call.png"
 import uploadimage from "../../assets/images/icons/uploadimage.png"
 import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
+import verifiedIcon from '../../assets/images/icons/verified.png'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import axios from 'axios'
@@ -449,7 +450,8 @@ function ViewCustomer_Profile () {
     
                           if (UserProfile && UserProfile.emailVerificationStatus === 2) {
                             return (
-                              <div style={{ color: 'green', marginTop: '76px' }}>
+                              <div style={{ color: '#267df4', marginTop: '76px', fontWeight:'700' }}>
+                                <img className='customer-gmail-verifiedIcon' src={ verifiedIcon } alt="icon for verified users" />
                                 Verified
                               </div>
                             );

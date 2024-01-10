@@ -420,7 +420,11 @@ function Main() {
                                       {item.product.productName}
                                     </span>
                                     <span className="dropdown-price">
-                                      ₱{item.product.price.toFixed(2)}
+                                      {item.product.price.toLocaleString('en-US', {
+                                                        style: 'currency',
+                                                        currency: 'PHP',
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2,})}
                                     </span>
                                   </div>
                                 </Link>

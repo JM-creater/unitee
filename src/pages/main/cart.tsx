@@ -644,7 +644,7 @@ function Cart() {
                         </button>
                       </div>
                       {/* Price */}
-                      <div className="col-md-2 prodPrice-container">
+                      <div className="prodPrice-container">
                         <h3 className="cartProd-price">
                           {(item.product.price * item.quantity).toLocaleString('en-US', {
                                                         style: 'currency',

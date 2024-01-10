@@ -11,6 +11,12 @@
     object-fit: cover;
 }
 
+.customer-gmail-verifiedIcon {
+    width: 100%;
+    max-width: 20px;
+    height: 20px;
+}
+
 .profile-details-container {
     display: flex;
     flex-direction: row;
@@ -25,6 +31,8 @@
     font-weight: 600;
     font-size: 3em;
     color: #212227;
+    width: 18em;
+    max-width: 18em;
 }
 
 .username-id-container {

@@ -313,6 +313,8 @@ button {
   .prod-img-cart {
     width: 100%;
     max-width: 80px;
+    height: 80px;
+    object-fit: cover;
     border-radius: 5px;
   }
 
@@ -331,7 +333,7 @@ button {
   }
 
   .quanti-input {
-    width: 20px;
+    max-width: 50px;
     border: none;
     border-radius: 3px;
   }
@@ -386,6 +388,8 @@ button {
   .prodPrice-container {
     display: flex;
     justify-content: end;
+    width: 30em;
+    max-width: 30em;
   }
 
   .empty-cart-message {

@@ -183,6 +183,7 @@
   border-radius: 5px;
   padding: 5px;
   width: 45em;
+  cursor: pointer;
   display: flex;
   flex-direction: row;
   gap: 10px;

@@ -148,7 +148,7 @@ function Shop() {
                                         <div className="prod-card-featured">
                                             <img className="featuredProd-img d-block w-100" src={ sampleProd }/>
                                             <div className="featured-prod-details">
-                                                <h3 className="featuredProd-name">Sample prod name</h3>
+                                                <h3 className="featuredProd-name">Sample pqweqwerod name</h3>
                                                 <span className="featuredProd-rating">prod rating</span>
                                                 <h3 className="featuredProd-price">123535</h3>
                                             </div>
@@ -160,7 +160,7 @@ function Shop() {
                                         <div className="prod-card-featured">
                                             <img className="featuredProd-img d-block w-100" src={ sampleProd }/>
                                             <div className="featured-prod-details">
-                                                <h3 className="featuredProd-name">Sample prod name</h3>
+                                                <h3 className="featuredProd-name">Sample prodrewrwe name</h3>
                                                 <span className="featuredProd-rating">prod rating</span>
                                                 <h3 className="featuredProd-price">123535</h3>
                                             </div>
