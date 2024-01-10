@@ -268,7 +268,15 @@ function Admin_Dashboard () {
               <div key={product.productId} className='top-prods-container'>
                   <img className='top-prod-img' src={`https://localhost:7017/${product.image}`} alt={product.productName} />
                   <span className='top-prod-name'>{product.productName}</span>
-                  <span className='top-prod-price'>₱{product.price.toFixed(2)}</span>
+                  <span className='top-prod-price'>
+                    {product.price ? product.price.toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'PHP',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })
+                    : "₱0.00"}
+                  </span>
               </div>
             )) : (
               <div className="no-topselling-products">

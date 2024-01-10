@@ -165,8 +165,11 @@ function Admin_viewProf() {
           toast.error(response.data);
         }
       } catch (error) {
-        console.log(error);
-        console.error("Network error or server not responding");
+        if (error.response && error.response.status === 400) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error("An error occurred. Please try again later.");
+        }
       }
     }
   };
@@ -212,8 +215,8 @@ function Admin_viewProf() {
         toast.error('Failed to update password. Please try again later.');
       }
     } catch (error) {
-      console.log(error);
-        console.error("Network error or server not responding");
+      console.error(error);
+      console.error("Network error or server not responding");
     }
   };
 

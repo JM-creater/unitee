@@ -363,10 +363,14 @@ function Supplier() {
                 <div className="col-md-9 dash-card">
                   <span>Weekly Sales</span>
                   <h1 className="col-md-11 number-dash">
-                    ₱ 
                     {weeklySales.length > 0
-                      ? weeklySales.reduce((a, b) => a + b).toFixed(2)
-                      : 0}
+                        ? weeklySales.reduce((a, b) => a + b).toLocaleString('en-US', {
+                            style: 'currency',
+                            currency: 'PHP',
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                          })
+                        : "₱0.00"}
                   </h1>
                 </div>
                 <img
@@ -379,10 +383,14 @@ function Supplier() {
                 <div className="col-md-9 dash-card">
                   <span>Monthly Sales</span>
                   <h1 className="col-md-11 number-dash">
-                    ₱ 
                     {monthlySales.length > 0
-                      ? monthlySales.reduce((a, b) => a + b).toFixed(2)
-                      : 0}
+                      ? monthlySales.reduce((a, b) => a + b).toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'PHP',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })
+                    : "₱0.00"}
                   </h1>
                 </div>
                 <img
@@ -395,10 +403,14 @@ function Supplier() {
                 <div className="col-md-9 dash-card">
                   <span>Yearly Sales</span>
                   <h1 className="col-md-11 number-dash">
-                    ₱ 
                     {yearlySales.length > 0
-                      ? yearlySales.reduce((a, b) => a + b).toFixed(2)
-                      : 0}
+                      ? yearlySales.reduce((a, b) => a + b).toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'PHP',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })
+                    : "₱0.00"}
                   </h1>
                 </div>
                 <img

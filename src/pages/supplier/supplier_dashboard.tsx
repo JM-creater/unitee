@@ -128,7 +128,14 @@ function Supplier (){
                                     <div  key={index}  className='top-prods-container'>
                                         <img className='top-prod-img' src={ `https://localhost:7017/${productItem.image}` } />
                                         <span className='top-prod-name'>{productItem.productName}</span>
-                                        <span className='top-prod-price'>₱{productItem.price.toFixed(2)}</span>
+                                        <span className='top-prod-price'>{productItem.price ? productItem.price.toLocaleString('en-US', {
+                                                style: 'currency',
+                                                currency: 'PHP',
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            })
+                                            : "₱0.00"}
+                                        </span>
                                     </div>
                                 ))}
                                 <Link to={`/supplier_dashboard/${id}/manage_shop`} className="no-underline-link">
@@ -160,7 +167,14 @@ function Supplier (){
                                             )}
                                             <div className='cust-details-container'>
                                                 <span className='cust-name-dash'>{orderItem.user.firstName}</span>
-                                                <span className='cust-name-dash total'>₱{orderItem.total.toFixed(2)}</span>
+                                                <span className='cust-name-dash total'>{orderItem.total ? orderItem.total.toLocaleString('en-US', {
+                                                        style: 'currency',
+                                                        currency: 'PHP',
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2
+                                                    })
+                                                    : "₱0.00"}
+                                                </span>
                                             </div>
                                             <span className='cust-order-num-dash'>{orderItem.orderNumber}</span>
                                         </div>

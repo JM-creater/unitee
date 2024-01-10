@@ -169,8 +169,11 @@ function Supplier_ViewProf() {
           toast.error(response.data);
         }
       } catch (error) {
-        console.error(error);
-        toast.error("Failed to Update. Please try again later.");
+        if (error.response && error.response.status === 400) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error("An error occurred. Please try again later.");
+        }
       }
     }
   };
@@ -230,7 +233,6 @@ function Supplier_ViewProf() {
           "Content-Type": "application/json",
         }
       })
-      toast.success("Please confirm your email");
       navigate("/secondconfirmation_email");
     } catch (error) {
       console.error(error);
@@ -441,7 +443,7 @@ function Supplier_ViewProf() {
                         Verified
                       </div>
                     );
-                  } else if (UserProfile && UserProfile.emailVerificationStatus === 3 || UserProfile && UserProfile.emailVerificationStatus === 4) {
+                  } else if (UserProfile && UserProfile.emailVerificationStatus === 1 || UserProfile.emailVerificationStatus === 3 || UserProfile && UserProfile.emailVerificationStatus === 4) {
                     return (
                       <button
                         onClick={handleVerifyEmail}
