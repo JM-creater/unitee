@@ -166,7 +166,13 @@ function Shop() {
                               prod rating
                             </span>
                             <h3 className="featuredProd-price">
-                              ₱{firstRecommended.price.toFixed(2)}
+                              {firstRecommended.price ? firstRecommended.price.toLocaleString('en-US', {
+                                    style: 'currency',
+                                    currency: 'PHP',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })
+                                : "₱0.00"}
                             </h3>
                           </div>
                         </div>
@@ -191,7 +197,13 @@ function Shop() {
                               prod rating
                             </span>
                             <h3 className="featuredProd-price">
-                              ₱{recommendedOverAll.price.toFixed(2)}
+                              {recommendedOverAll.price ? recommendedOverAll.price.toLocaleString('en-US', {
+                                  style: 'currency',
+                                  currency: 'PHP',
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2
+                              })
+                              : "₱0.00"}
                             </h3>
                           </div>
                         </div>

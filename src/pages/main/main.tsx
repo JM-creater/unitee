@@ -356,7 +356,6 @@ function Main() {
                         onClick={() => {
                           performSearch(searchCriteria);
                           setSearchTerm("");
-                          // Add additional functionality like navigating to the selected item or triggering a search
                         }}
                       >
                         <img

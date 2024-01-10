@@ -21,7 +21,7 @@ function Supplier_Main (){
 
     interface Supplier {
         image: string;
-    }
+    };
 
     const [notificationMessage, setNotificationMessage] = useState([]);
     const [notifItem, setNotifItem] = useState([]);
@@ -232,9 +232,9 @@ function Supplier_Main (){
                             <img className="supplier-nav-icon" src={ ordersSupplierIcon }/>
                             <span className="supplier-nav-text">Orders {notifItem.length > 0 && <span className='notifOrder-count'>{notifItem.length}</span>}</span>
                         </Link> */}
-                        <div className="supplier-nav-link" data-bs-toggle="collapse" href="#orderStatusCollapse" role="button" aria-expanded="false" aria-controls="orderStatusCollapse">
+                        <div onClick={handleNotificationClick} className="supplier-nav-link" data-bs-toggle="collapse" href="#orderStatusCollapse" role="button" aria-expanded="false" aria-controls="orderStatusCollapse">
                             <img className="supplier-nav-icon" src={ ordersSupplierIcon }/>
-                            <span className="order-status-collapse">Orders</span>
+                            <span className="order-status-collapse">Orders {notifItem.length > 0 && <span className='notifOrder-count'>{notifItem.length}</span>}</span>
                         </div>
                         <div className="collapse" id="orderStatusCollapse">
                             <div className="orders-collapse-container"

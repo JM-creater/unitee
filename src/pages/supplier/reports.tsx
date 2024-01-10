@@ -496,7 +496,15 @@ function Supplier() {
                     alt={product.productName}
                   />
                   <span className="top-prod-name">{product.productName}</span>
-                  <span className="top-prod-price">₱{product.price.toFixed(2)}</span>
+                  <span className="top-prod-price">
+                    {product.price ? product.price.toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'PHP',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })
+                    : "₱0.00"}
+                  </span>
                 </div>
               ))
             ) : (
@@ -612,7 +620,15 @@ function Supplier() {
                   <td className="text-center">
                     {ord.orderItems.length}
                   </td>
-                  <td className="text-center">₱{ord.total.toFixed(2)}</td>
+                  <td className="text-center">
+                    {ord.total ? ord.total.toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'PHP',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })
+                    : "₱0.00"}
+                  </td>
                   <td className="text-center">
                     {
                       ord.status === 1

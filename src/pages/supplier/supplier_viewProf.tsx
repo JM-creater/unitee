@@ -28,6 +28,7 @@ type SupplierProfileType = {
   gender: string;
   image: string;
   emailVerificationStatus: number;
+  address: string
 };
 
 function Supplier_ViewProf() {

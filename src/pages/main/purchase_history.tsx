@@ -360,7 +360,7 @@ function Purchase_History () {
                                                 selectedPurchases.orderItems.map((item, index) => (
                                                 <tr key={index}>
                                                     <th scope="row">{item.product.productName}</th>
-                                                    <td>{getProductTypeName(item.product.productTypeId)}</td>
+                                                    <td className="text-center">{getProductTypeName(item.product.productTypeId)}</td>
                                                     <td className="text-center">{item.product.category}</td>
                                                     <td className="text-center">{item.sizeQuantity.size}</td>
                                                     <td className="text-center">{item.quantity}</td>
@@ -417,11 +417,15 @@ function Purchase_History () {
                                                     <div className="product-details">
                                                         <h4 className="product-name">{product.productName}</h4>
                                                         <p className="product-description">{product.description}</p>
-                                                        <p className="product-price">{product.price.toLocaleString('en-US', {
-                                                        style: 'currency',
-                                                        currency: 'PHP',
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2,})}</p>
+                                                        <p className="product-price">
+                                                            {product.price ? product.price.toLocaleString('en-US', {
+                                                                style: 'currency',
+                                                                currency: 'PHP',
+                                                                minimumFractionDigits: 2,
+                                                                maximumFractionDigits: 2
+                                                            })
+                                                            : "₱0.00"}
+                                                        </p>
                                                     </div>
                                                     <Link to={`/shop/${userId}/visit_shop/${product.supplierId}`}>
                                                         <button className="go-to-shop-button" onClick={handleCLose}>Go to Shop</button>
