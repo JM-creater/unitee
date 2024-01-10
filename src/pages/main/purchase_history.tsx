@@ -256,7 +256,15 @@ function Purchase_History () {
                                             <td className="text-center">{purchaseItem.orderNumber}</td>
                                             <td className="text-center">{purchaseItem.cart.supplier.shopName}</td>
                                             <td className="text-center">{purchaseItem.orderItems.length}</td>
-                                            <td className="text-center">₱{purchaseItem.total.toFixed(2)}</td>
+                                            <td className="text-center">
+                                                {purchaseItem.total ? purchaseItem.total.toLocaleString('en-US', {
+                                                    style: 'currency',
+                                                    currency: 'PHP',
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2
+                                                })
+                                                : "₱0.00"}
+                                            </td>
                                         </tr>
                                     </tbody>
                                 ))
@@ -306,7 +314,13 @@ function Purchase_History () {
                                     
                                     <div className='payment-details-content'>
                                         <h3 className='order-details-titles'>Payment Details</h3>
-                                        <p style={{ fontSize: "15px" }}>Total Amount: ₱{selectedPurchases.total.toFixed(2)}</p>
+                                        <p style={{ fontSize: "15px" }}>Total Amount: {selectedPurchases.total ? selectedPurchases.total.toLocaleString('en-US', {
+                                                style: 'currency',
+                                                currency: 'PHP',
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            })
+                                            : "₱0.00"}</p>
                                         <span className="order-details-text">Proof of payment:</span>
                                         <a 
                                             className="modal-info" 
@@ -350,7 +364,15 @@ function Purchase_History () {
                                                     <td className="text-center">{item.product.category}</td>
                                                     <td className="text-center">{item.sizeQuantity.size}</td>
                                                     <td className="text-center">{item.quantity}</td>
-                                                    <td className="text-center">₱{item.product.price.toFixed(2)}</td>
+                                                    <td className="text-center">
+                                                        {item.product.price ? item.product.price.toLocaleString('en-US', {
+                                                            style: 'currency',
+                                                            currency: 'PHP',
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2
+                                                        })
+                                                        : "₱0.00"}
+                                                    </td>
                                                 </tr>
                                             ))
                                         )}

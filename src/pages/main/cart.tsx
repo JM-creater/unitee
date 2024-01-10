@@ -611,15 +611,20 @@ function Cart() {
                             handleSizeChange(index, itemIndex, e.target.value)
                           }
                         >
-                          {item.product.sizes.map((sizeItem) => (
-                            <option
-                              key={sizeItem.id}
-                              value={sizeItem.id}
-                              selected={item.sizeQuantityId === sizeItem.id}
-                            >
-                              {sizeItem.size}
-                            </option>
-                          ))}
+                          {item.product.sizes.map((sizeItem) => {
+                            const isSizeUnavailable = sizeItem.quantity === 0;
+                            
+                            return (
+                              <option
+                                key={sizeItem.id}
+                                value={sizeItem.id}
+                                selected={item.sizeQuantityId === sizeItem.id}
+                                disabled={isSizeUnavailable} 
+                              >
+                                {sizeItem.size} {isSizeUnavailable && "(Sold Out)"}
+                              </option>
+                            );
+                          })}
                         </select>
                       </div>
                       {/* Quantity */}
@@ -645,14 +650,17 @@ function Cart() {
                       </div>
                       {/* Price */}
                       <div className="col-md-2 prodPrice-container">
-                        <h3 className="cartProd-price">
-                          ₱
-                          {/* {(item.product.price * item.quantity).toLocaleString(
-                            "en-US",
-                            { maximumFractionDigits: 2 }
-                          )} */}
-                          {(item.product.price * item.quantity).toFixed(2)}
-                        </h3>
+                      <h3 className="cartProd-price">
+                        {item.product.price * item.quantity > 0 
+                          ? (item.product.price * item.quantity).toLocaleString('en-US', {
+                              style: 'currency',
+                              currency: 'PHP',
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })
+                          : "₱0.00"
+                        }
+                      </h3>
                       </div>
                     </div>
                   </div>
@@ -702,10 +710,13 @@ function Cart() {
                 </h2>
                 <h2 className="total-amount-text">Total amount:</h2>
                 <span className="total-amount-num">
-                  ₱
-                  {totalAmount.toLocaleString("en-US", {
-                    maximumFractionDigits: 2,
-                  })}
+                  {totalAmount ? totalAmount.toLocaleString('en-US', {
+                      style: 'currency',
+                      currency: 'PHP',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })
+                  : "₱0.00"}
                 </span>
                 <h2 className="total-amount-text">Upload Proof of Payment:</h2>
                 <input

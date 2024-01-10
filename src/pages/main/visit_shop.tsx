@@ -608,7 +608,14 @@ function Visit_Shop () {
                         <img className="visitShopProdImg" src={`https://localhost:7017/${product.image}`} alt={product.productName}/>
                         <div className="col-md-12 shop-prodDetails-container">
                             <h4 className="col-md-8 visitShop-prodName">{product.productName}</h4>
-                            <h3 className="visitShop-prodPrice">₱{product.price.toFixed(2)}</h3>
+                            <h3 className="visitShop-prodPrice">{product.price ? product.price.toLocaleString('en-US', {
+                                    style: 'currency',
+                                    currency: 'PHP',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })
+                                : "₱0.00"}
+                            </h3>
                             {!product.isActive && <span className="badge badge-danger">Inactive</span>}
                         </div>
                     </div>
@@ -684,7 +691,15 @@ function Visit_Shop () {
                                     <h5 className="prodModal-text">
                                         {selectedProduct.category}
                                     </h5>
-                                    <h1 className="prodModal-Price">₱{selectedProduct.price.toLocaleString()}</h1>
+                                    <h1 className="prodModal-Price">
+                                        {selectedProduct.price ? selectedProduct.price.toLocaleString('en-US', {
+                                            style: 'currency',
+                                            currency: 'PHP',
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        })
+                                        : "₱0.00"}
+                                    </h1>
                                     <div className="prodModal-SizeGuide">
                                         <h5 className="prodModal-text">
                                             <button 

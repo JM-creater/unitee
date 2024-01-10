@@ -185,8 +185,11 @@ function ViewCustomer_Profile () {
           }
       }
       catch (error) {
-          console.error(error);
-          toast.error("Failed to Update. Please try again later.");
+        if (error.response && error.response.status === 400) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error("An error occurred. Please try again later.");
+        }
       }
     }
   };
@@ -246,7 +249,6 @@ function ViewCustomer_Profile () {
         }
       })
       //localStorage.setItem("verifyEmail", userId);
-      toast.success("Please confirm your email");
       navigate("/secondconfirmation_email");
     } catch (error) {
       console.error(error);
@@ -298,7 +300,7 @@ function ViewCustomer_Profile () {
                 </label>
                 <div className="username-id-container">
                   <h1 className='acc-name'>{UserProfile.firstName} {UserProfile.lastName}</h1>
-                  <p className='id-number-profile'>{userId}</p>
+                  <p className='id-number-profile'>Customer ID: {userId}</p>
                 </div>
               </div>
             )}
@@ -453,7 +455,7 @@ function ViewCustomer_Profile () {
                                 Verified
                               </div>
                             );
-                          } else if (UserProfile && UserProfile.emailVerificationStatus === 3 || UserProfile && UserProfile.emailVerificationStatus === 4) {
+                          } else if (UserProfile && UserProfile.emailVerificationStatus === 1 || UserProfile.emailVerificationStatus === 3 || UserProfile && UserProfile.emailVerificationStatus === 4) {
                             return (
                               <button
                                 onClick={handleVerifyEmail}
