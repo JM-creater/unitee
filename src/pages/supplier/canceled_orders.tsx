@@ -188,7 +188,8 @@ function Canceled_Orders () {
                     <img className='modal-logo' src={ uniteeLogo }/>
                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleCloseButton}></button>
                 </div>
-                <div className="modal-body orderDetails-modal">
+                {selectedOrders && (
+                    <div className="modal-body orderDetails-modal">
                     <div className="order-detail-1">
                         <div>
                             <h1>Order Details</h1>
@@ -280,6 +281,7 @@ function Canceled_Orders () {
                         </div>
                     </div>
                 </div>
+                )}
                 <div className="orderModal-footer">
                     <button className='deny-btn' aria-label="Close" data-bs-dismiss="modal" onClick={handleCloseButton}>Close</button>
                 </div>

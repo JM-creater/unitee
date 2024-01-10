@@ -298,7 +298,7 @@ function ViewCustomer_Profile () {
                 </label>
                 <div className="username-id-container">
                   <h1 className='acc-name'>{UserProfile.firstName} {UserProfile.lastName}</h1>
-                  <p className='id-number-profile'>{userId}</p>
+                  <p className='id-number-profile'>Customer ID: {userId}</p>
                 </div>
               </div>
             )}

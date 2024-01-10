@@ -264,7 +264,7 @@ function Admin_viewProf() {
                 <h1 className="acc-name">
                   {UserProfile.firstName + " " + UserProfile.lastName}
                 </h1>
-                <p className="id-number-profile">{id}</p>
+                <p className="id-number-profile">Admin ID: {id}</p>
               </div>
             </div>
           )}
@@ -350,8 +350,8 @@ function Admin_viewProf() {
                 disabled={isDisabled}
               ></input>
                 <label className='profLabelEdit' htmlFor="editPass">Password</label>
-                <button onClick={toggleInput}>
-                  {isDisabled ? 'Hide Input Password' : 'Edit Password'}
+                <button className='changePass-btn-prof' onClick={toggleInput}>
+                  {isDisabled ? 'Hide Input Password' : 'Change Password'}
                 </button>
                 {isDisabled && (
                   <React.Fragment>

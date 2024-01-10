@@ -684,7 +684,7 @@ function Visit_Shop () {
                                     <h5 className="prodModal-text">
                                         {selectedProduct.category}
                                     </h5>
-                                    <h1 className="prodModal-Price">₱{selectedProduct.price.toLocaleString()}</h1>
+                                    <h1 className="prodModal-Price">₱{selectedProduct.price.toFixed(2)}</h1>
                                     <div className="prodModal-SizeGuide">
                                         <h5 className="prodModal-text">
                                             <button 

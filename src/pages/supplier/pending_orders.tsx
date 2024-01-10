@@ -311,7 +311,7 @@ function Pending_Orders (){
                                                 <td className="text-center">{item.product.category}</td>
                                                 <td className="text-center">{item.sizeQuantity.size}</td>
                                                 <td className="text-center">{item.quantity}</td>
-                                                <td className="text-center">₱{item.product.price.toLocaleString()}</td>
+                                                <td className="text-center">₱{item.product.price.toFixed(2)}</td>
                                             </tr>
                                         ))
                                     )
