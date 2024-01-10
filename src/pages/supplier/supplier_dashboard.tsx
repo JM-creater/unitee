@@ -96,7 +96,7 @@ function Supplier (){
                         <div className='card-content-container'>
                             <div className='col-md-9 dash-card'>
                                 <span>Total Sales</span>
-                                <h1 className='col-md-11 number-dash'>₱{totalSales.toLocaleString()}</h1>
+                                <h1 className='col-md-11 number-dash'>₱{totalSales.toFixed(2)}</h1>
                             </div>
                             <img className='dash-card-icon' src={ totalSalesIcon } alt="Total Sales Icon"/>
                         </div>

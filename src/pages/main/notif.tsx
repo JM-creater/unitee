@@ -614,7 +614,7 @@ function Notif() {
                   </div>
                   <div className="d-flex flex-column text-sm-left">
                     <p>
-                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
+                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toFixed(2)}</span>
                     </p>
                     <p>
                       <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
@@ -721,7 +721,7 @@ function Notif() {
                   </div>
                   <div className="d-flex flex-column text-sm-left">
                     <p>
-                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
+                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toFixed(2)}</span>
                     </p>
                     <p>
                       <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
@@ -838,7 +838,7 @@ function Notif() {
                   </div>
                   <div className="d-flex flex-column text-sm-left">
                     <p>
-                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
+                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toFixed(2)}</span>
                     </p>
                     <p>
                       <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
@@ -955,7 +955,7 @@ function Notif() {
                   </div>
                   <div className="d-flex flex-column text-sm-left">
                     <p>
-                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toLocaleString()}</span>
+                      Total Amount: <span className="font-weight-bold">₱{notificationItem.order.total.toFixed(2)}</span>
                     </p>
                     <p>
                       <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>

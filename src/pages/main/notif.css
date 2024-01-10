@@ -286,7 +286,7 @@ body {
 }
 
 .view-receipt-received-btn:disabled {
-    cursor: 'not-allowed'
+    cursor: not-allowed;
 }
 
 .view-receipt-received-btn:hover {

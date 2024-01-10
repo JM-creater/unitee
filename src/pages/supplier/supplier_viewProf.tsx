@@ -281,7 +281,7 @@ function Supplier_ViewProf() {
               </label>
               <div className="username-id-container">
                 <h1 className='acc-name'>{UserProfile.shopName}</h1>
-                <p className='id-number-profile'>{id}</p>
+                <p className='id-number-profile'>Supplier ID: {id}</p>
               </div>
             </div>
           )}
@@ -367,8 +367,8 @@ function Supplier_ViewProf() {
               ></input>
   
               <label className='profLabelEdit' htmlFor="editPass">Password</label>
-                <button onClick={toggleInput}>
-                  {isDisabled ? 'Hide Input Password' : 'Edit Password'}
+                <button className='changePass-btn-prof' onClick={toggleInput}>
+                  {isDisabled ? 'Hide Input Password' : 'Change Password'}
                 </button>
                 {isDisabled && (
                   <React.Fragment>
