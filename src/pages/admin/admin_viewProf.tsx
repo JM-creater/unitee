@@ -243,7 +243,7 @@ function Admin_viewProf() {
               )}
               <label htmlFor="imageUploadInput" style={{ position: 'relative', display: 'inline-block' }}>
                 <img
-                  className='profileImg'
+                  className='profileImg-ADMIN'
                   src={imagePreviewUrl || `https://localhost:7017/${UserProfile.image}`}
                   alt="Profile"
                   style={{ width: '200px', height: '200px'}}

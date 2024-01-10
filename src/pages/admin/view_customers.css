@@ -91,6 +91,9 @@
 .customer-profile-img {
     width: 100%;
     max-width: 18rem;
+    height: 18rem;
+    object-fit: cover;
+    border: solid 3px #F0F0F0;
     border-radius: 50%;
     margin-left: 2rem;
 }

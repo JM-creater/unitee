@@ -5,3 +5,12 @@
     flex-wrap: wrap;
     overflow: auto;
 }
+
+.profileImg-ADMIN {
+    width: 100%;
+    max-width: 18rem;
+    height: 18rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: solid 3px #F0F0F0;
+}

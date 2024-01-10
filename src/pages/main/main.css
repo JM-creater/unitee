@@ -22,7 +22,7 @@
 .imageProfile {
     width: 100%;
     max-width: 33px;
-    max-height: 33px;
+    height: 33px;
     object-fit: cover;
     border: solid 2px #D3D3D3;
     border-radius: 50%;

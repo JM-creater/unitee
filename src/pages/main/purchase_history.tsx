@@ -453,7 +453,7 @@ function Purchase_History () {
                         </div>
                         {selectedPurchases && (
                             <div className="modal-footer">
-                                <Link to={`/shop/${userId}/visit_shop/${selectedPurchases.cart.supplier.id}`}>
+                                <Link className='buyAgain-btn-link' to={`/shop/${userId}/visit_shop/${selectedPurchases.cart.supplier.id}`}>
                                     <button className="proceed-Btn" onClick={handleCLose}>
                                         Buy Again
                                     </button>

@@ -14,11 +14,11 @@
 
 .shop-img {
     width: 100%;
-    max-width: 100px;
-    height: 100px;
+    max-width: 70px;
+    height: 70px;
     object-fit: cover;
     border-radius: 50%;
-    border: solid 5px white;
+    border: solid 3px white;
     margin-left: 12px;
 }
 
@@ -29,14 +29,36 @@
     flex-flow: column;
     justify-content: start;
     align-items: center;
-    padding: 15px;
-    height: fit-content;
+    padding: 10px;
     min-width: fit-content;
 }
 
+.visitShop-seller-details-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.seller-information-visitShop {
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: start;
+    gap: 10px;
+}
+
 .visitShop-Name {
-    font-weight: 400;
+    font-weight: 600;
     margin-top: 10px;
+    width: 10em;
+    display: flex;
+    justify-content: start;
+}
+
+.visitShop-address {
+    font-size: 13px;
 }
 
 .ratingIcon {
@@ -85,15 +107,15 @@
 }
 
 .filter-text {
-    font-size: 30px;
+    font-size: 20px;
     width: 8em;
     padding-top: 10px;
     margin-bottom: 10px;
 }
 
 .prod-cart-checkBox {
-    min-width: 20px;
-    min-height: 20px;
+    width: fit-content;
+    height: fit-content;
 }
 
 .topRated-label {
@@ -125,11 +147,12 @@
 /* PRODUCT LIST DESIGN */
 .shop-content2-container {
     width: 75%;
-    height: 50vh;
+    height: 87vh;
     padding: 20px;
     display: flex;
     flex-wrap: wrap; 
-    justify-content: flex-start; 
+    justify-content: flex-start;
+    overflow: auto;
 }
 
 .topProds-container-visitShop {
@@ -367,6 +390,7 @@
 
     .visitShop-Name {
         font-size: 15px;
+        font-weight: 600;
     }
 
     .prodModal-Image {
@@ -386,6 +410,7 @@
         max-width: 70px;
         max-height: 70px;
         object-fit: cover;
+        background-color: rebeccapurple;
       }
 
       .prodShop-card {

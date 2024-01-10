@@ -857,11 +857,24 @@ function Notif() {
               );
               return (
                 <div key={index} className="card">
-                <div className="row d-flex justify-content-between px-3 top">
-                  <div className="d-flex">
-                    <h5>
-                      <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
-                    </h5>
+                  <div className="row d-flex justify-content-between px-3 top">
+                    <div className="d-flex">
+                      <h5>
+                        <span className="text-primary font-weight-bold">#{notificationItem.order.orderNumber}</span>
+                      </h5>
+                    </div>
+                    <div className="d-flex flex-column text-sm-left">
+                      <p>
+                        Total Amount: <span className="font-weight-bold">{notificationItem.order.total.toLocaleString('en-US', {
+                                                          style: 'currency',
+                                                          currency: 'PHP',
+                                                          minimumFractionDigits: 2,
+                                                          maximumFractionDigits: 2,})}</span>
+                      </p>
+                      <p>
+                        <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
+                      </p>
+                    </div>
                   </div>
                   <div className="d-flex flex-column text-sm-left">
                     <p>
