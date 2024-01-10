@@ -33,10 +33,24 @@ function Visit_Shop () {
     const [averageRatingSupplier, setAverageRatingSupplier] = useState(null);
     const [, setProductData] = useState([]);
     const [productAverageRating ,setProductAverageRating] = useState({}); 
+    const [recommendedForYou, setRecommendedForYou] = useState([]);
     const [image, setImage] = useState('');
     const [notHover, setNotHover] = useState('');
     const { userId, id: shopId } = useParams();
     const supplier = suppliers[shopId];
+
+
+   // * Get Recommended Products For You
+    useEffect(() => {
+        if (!userId) return;
+        axios.get(`https://localhost:7017/Product/recommendedForYou?userId=${userId}&supplierId=${shopId}`)
+            .then(async (res) => {
+                setRecommendedForYou(res.data);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    }, [userId, shopId]);
 
     // * Get the Average Rating for Supplier
     useEffect(() => {
@@ -385,7 +399,7 @@ function Visit_Shop () {
                     </div>
     
                     <h5 className="visitShop-rating">
-                    <img className="ratingIcon" src={ starIcon }/>{averageRatingSupplier}</h5>
+                    <img className="ratingIcon" src={ starIcon }/>{averageRatingSupplier !== null ? averageRatingSupplier.toFixed(1) : 'No Rating Yet'}</h5>
                     
                     {/* Filter */}
                     <div className="prodFilter-container">
@@ -567,30 +581,34 @@ function Visit_Shop () {
                 <div className="top-ratedProducts-Shop">
                     <h3 className="topRated-label">Recommended For You</h3>
                     <div className="topProds-container-visitShop">
-                        <div className="topProdShop-card"
-                        // data-bs-toggle="modal" 
-                        // data-bs-target={!product.isActive ? undefined : "#viewProdDetailsModal"}
-                        // key={product.productId} 
-                        // onClick={() => {
-                        //     if (product.isActive) {
-                        //         setSelectedProduct(product);
-                        //         setImage(`https://localhost:7017/${product.image}`);
-                        //     }
-                        // }}
-                        >
-                            <img className="visitShopProdImg" src="/" alt="" />
-                            {/* PLEASE DELETE */}
-                            <h4 className="visitShop-topProdName">Sample name</h4>
-                            <h3 className="topProdPrice">123.00(temporary)</h3>
-                            {/* REMOVE COMMENT TAGS */}
-                            {/* <div className="col-md-12 shop-prodDetails-container">
-                                <h4 className="col-md-8 visitShop-topProdName">{product.productName}</h4>
-                                <h3 className="visitShop-topProdPrice">₱{product.price.toFixed(2)}</h3>
-                                {!product.isActive && <span className="badge badge-danger">Inactive</span>}
-                            </div> */}
-                        </div>
+                        {recommendedForYou.map(recommended => (
+                            <div 
+                                className="topProdShop-card"
+                                data-bs-toggle="modal" 
+                                data-bs-target={!recommended.isActive ? undefined : "#viewProdDetailsModal"}
+                                key={recommended.productId} 
+                                onClick={() => {
+                                    if (recommended.isActive) {
+                                        setSelectedProduct(recommended);
+                                        setImage(`https://localhost:7017/${recommended.image}`);
+                                    }
+                                }}
+                            >
+                                <img className="visitShopProdImg" src={`https://localhost:7017/${recommended.image}`} alt="" />
+                                <h4 className="visitShop-topProdName">{recommended.productName}</h4>
+                                <h3 className="topProdPrice">{recommended.price ? recommended.price.toLocaleString('en-US', {
+                                            style: 'currency',
+                                            currency: 'PHP',
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        })
+                                        : "₱0.00"}</h3>
+                                {!recommended.isActive && <span className="badge badge-danger">Inactive</span>}
+                            </div>
+                        ))}
                     </div>
                 </div>
+
                 <h3 className="prods-available-label">Products Available</h3>
                 {filteredProduct.map(product => (
                     <div 
@@ -681,8 +699,8 @@ function Visit_Shop () {
                                     <h2 className="col-md-12 prodModal-Name">{selectedProduct.productName}</h2>
     
                                     <h5 className="prodModal-text">
-                                        <img className="prodModalRating-icon" src={ prodRatingModal }/>
-                                        {productAverageRating[selectedProduct.productId] || 0}
+                                        <img className="prodModalRating-icon" src={prodRatingModal} alt="Product Rating Icon" />
+                                        {productAverageRating[selectedProduct.productId] ? productAverageRating[selectedProduct.productId].toFixed(1) : 0}
                                     </h5>
     
                                     <h5 className="prodModal-text">

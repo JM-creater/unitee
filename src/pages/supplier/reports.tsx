@@ -168,7 +168,7 @@ function Supplier() {
     setIsLoading(true);
     const fetchOrders = async () => {
       try {
-        const response = await axios.get("https://localhost:7017/Order");
+        const response = await axios.get(`https://localhost:7017/Order/BySupplier/${id}`);
         setOrders(response.data);
         setIsLoading(false);
       } catch (error) {
@@ -187,13 +187,13 @@ function Supplier() {
     return () => {
       orderEventEmitter.off("statusUpdate", validationListener);
     };
-  }, []);
+  }, [id]);
 
   // * Windows Event Listener Focus
   useEffect(() => {
     const fetchData = async () => {
     try {
-          const response = await axios.get('https://localhost:7017/Order');
+          const response = await axios.get(`https://localhost:7017/Order/BySupplier/${id}`);
           setOrders(response.data);
         } catch (error) {
           console.error('Network error or server not responding');
@@ -209,7 +209,7 @@ function Supplier() {
     return () => {
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [id]);
 
   // * Filtered By Status, Departments
   const filteredOrders = orders.filter((ord) => {

@@ -623,8 +623,8 @@ function Notif() {
                   </div>
                   <div className="d-flex flex-column text-sm-left">
                     <p>
-                      Total Amount: 
-                      <span className="font-weight-bold">
+                      Total Amount: <span className="font-weight-bold">
+
                         {notificationItem.order.total ? notificationItem.order.total.toLocaleString('en-US', {
                             style: 'currency',
                             currency: 'PHP',
@@ -739,8 +739,8 @@ function Notif() {
                   </div>
                   <div className="d-flex flex-column text-sm-left">
                     <p>
-                      Total Amount: 
-                      <span className="font-weight-bold">
+                      Total Amount: <span className="font-weight-bold">
+
                         {notificationItem.order.total ? notificationItem.order.total.toLocaleString('en-US', {
                           style: 'currency',
                           currency: 'PHP',
@@ -865,8 +865,8 @@ function Notif() {
                   </div>
                   <div className="d-flex flex-column text-sm-left">
                     <p>
-                      Total Amount: 
-                      <span className="font-weight-bold">
+                      Total Amount: <span className="font-weight-bold">
+
                         {notificationItem.order.total ? notificationItem.order.total.toLocaleString('en-US', {
                             style: 'currency',
                             currency: 'PHP',
@@ -968,7 +968,7 @@ function Notif() {
                     onClick={() => handleOrderReceived(notificationItem.orderId)}
                     disabled={disabledButtons.get(notificationItem.orderId)}
                     style={{
-                      backgroundColor: disabledButtons.get(notificationItem.orderId) ? '#9FA5AA' : 'red',
+                      backgroundColor: disabledButtons.get(notificationItem.orderId) ? '#9FA5AA' : 'green',
                       color: disabledButtons.get(notificationItem.orderId) ? 'white' : 'white'
                     }}
                   >
