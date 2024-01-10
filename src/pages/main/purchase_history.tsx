@@ -417,7 +417,11 @@ function Purchase_History () {
                                                     <div className="product-details">
                                                         <h4 className="product-name">{product.productName}</h4>
                                                         <p className="product-description">{product.description}</p>
-                                                        <p className="product-price">₱{product.price.toFixed(2)}</p>
+                                                        <p className="product-price">{product.price.toLocaleString('en-US', {
+                                                        style: 'currency',
+                                                        currency: 'PHP',
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2,})}</p>
                                                     </div>
                                                     <Link to={`/shop/${userId}/visit_shop/${product.supplierId}`}>
                                                         <button className="go-to-shop-button" onClick={handleCLose}>Go to Shop</button>

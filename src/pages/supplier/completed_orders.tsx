@@ -178,7 +178,7 @@ function Completed_Orders () {
                     <tr data-bs-toggle="modal" className="text-center">
                         <td></td>
                         <td></td>
-                        <td>No pending orders available</td>
+                        <td>No completed orders available</td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -210,7 +210,7 @@ function Completed_Orders () {
                                     <span className='details-label'>Proof of Payment</span>
                                     <span className='details-label'>Reference no.</span>
                                     <span className='details-label-totalAmount'>Total Amount</span>
-                                    <span className='details-label'>Received</span>
+                                    <span className='details-label'>Awaiting Receipt</span>
                                 </div>
                                 <div className="ord-details-data">
                                     <span className='details-data' style={{ color:'#f1b50d' }}>{Status[Object.keys(Status)[selectedOrders.status - 1]]}</span>

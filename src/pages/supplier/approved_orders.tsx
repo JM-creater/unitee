@@ -198,7 +198,7 @@ function Approved_Orders() {
                     <tr data-bs-toggle="modal" className="text-center">
                         <td></td>
                         <td></td>
-                        <td>No pending orders available</td>
+                        <td>No approved orders available</td>
                         <td></td>
                         <td></td>
                     </tr>

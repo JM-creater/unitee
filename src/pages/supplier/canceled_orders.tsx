@@ -178,7 +178,7 @@ function Canceled_Orders () {
                     <tr data-bs-toggle="modal" className="text-center">
                         <td></td>
                         <td></td>
-                        <td>No pending orders available</td>
+                        <td>No canceled orders available</td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -203,6 +203,7 @@ function Canceled_Orders () {
                             <div className="order-details-container">
                                 <div className="ord-details-labels">
                                     <span className='details-label'>Status</span>
+                                    <span className='details-label'>Reason For Cancellation</span>
                                     <span className='details-label'>Payment Type</span>
                                     <span className='details-label'>Order Number</span>
                                     <span className='details-label'>Date</span>
@@ -210,10 +211,10 @@ function Canceled_Orders () {
                                     <span className='details-label'>Proof of Payment</span>
                                     <span className='details-label'>Reference no.</span>
                                     <span className='details-label-totalAmount'>Total Amount</span>
-                                    <span className='details-label'>Cancellation Reason</span>
                                 </div>
                                 <div className="ord-details-data">
                                     <span className='details-data' style={{ color:'#f1b50d' }}>{Status[Object.keys(Status)[selectedOrders.status - 1]]}</span>
+                                    <span className='details-data'>{selectedOrders.cancellationReason}</span>
                                     <span className='details-data'>{PaymentType[Object.keys(PaymentType)[selectedOrders.paymentType - 1]]}</span>
                                     <span className='details-data'>{selectedOrders.orderNumber}</span>
                                     <span className='details-data'>{formatDate(selectedOrders.dateCreated)}</span>
