@@ -738,6 +738,12 @@ function Notif() {
                     <p>
                       <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
                     </p>
+                    <p>
+                      <span className="font-weight-bold" style={{ fontSize: '20px' }}>
+                        {`Your order will be ready for pick-up on ${notificationItem.order.estimatedDate}. 
+                        Please pick up your order at the front of the UC Chapel.`}
+                      </span>
+                    </p>
                   </div>
                 </div>
                 {/* Add class 'active' to progress */}
@@ -948,7 +954,7 @@ function Notif() {
                     onClick={() => handleOrderReceived(notificationItem.orderId)}
                     disabled={disabledButtons.get(notificationItem.orderId)}
                     style={{
-                      backgroundColor: disabledButtons.get(notificationItem.orderId) ? '#9FA5AA' : 'red',
+                      backgroundColor: disabledButtons.get(notificationItem.orderId) ? '#9FA5AA' : 'green',
                       color: disabledButtons.get(notificationItem.orderId) ? 'white' : 'white'
                     }}
                   >

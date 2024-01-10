@@ -187,8 +187,22 @@
   .recommendation-section {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: start;
     gap: 15px;
+    width: 54em;
+    max-width: 54em;
+    height: 33em;
+    flex-direction: row;
+    overflow: auto;
+    scroll-behavior: smooth;
+  }
+
+  .purchHistory-product-image {
+    width: 100%;
+    max-width: 10em;
+    height: 10em;
+    object-fit: cover;
+    border-radius: 8px;
   }
 
   .recommendation-card {

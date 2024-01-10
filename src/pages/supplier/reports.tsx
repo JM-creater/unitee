@@ -16,6 +16,8 @@ import { useParams } from "react-router";
 import axios from "axios";
 import orderEventEmitter from "../../helpers/OrderEmitter";
 import React from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -27,7 +29,38 @@ function Supplier() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [topSellingProducts, setTopSellingProducts] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   const { id } = useParams();
+
+  // * Download Report to PDF
+  const HandleExportToPDF = async () => {
+    const input = document.getElementById('report-container');
+
+    const canvas = await html2canvas(input);
+    const imgData = canvas.toDataURL('image/png');
+  
+    const imgWidth = 210; 
+    const pageHeight = 295; 
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+    let heightLeft = imgHeight;
+  
+    const doc = new jsPDF('p', 'mm');
+    let position = 0;
+  
+    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+  
+    while (heightLeft >= 0) {
+      position = heightLeft - imgHeight;
+      doc.addPage();
+      doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+  
+    doc.save('Report.pdf');
+    setShowModal(!showModal);
+  };
+  
 
   // * Download Report to Excel
   const HandleExportToExcel = async () => {
@@ -140,6 +173,7 @@ function Supplier() {
 
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    setShowModal(!showModal);
   };
 
   const getStatusText = (status) => {
@@ -345,7 +379,7 @@ function Supplier() {
           <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
         </div>
       ) : (
-        <div className="report-main-container">
+        <div className="report-main-container" id="report-container">
         <div className="row">
           <div className="col-md-7">
             <h3
@@ -448,7 +482,7 @@ function Supplier() {
                 display: "flex",
               }}
             >
-              <button className="generate-report-btn" onClick={HandleExportToExcel}>Generate Report</button>
+              <button className="generate-report-btn" data-bs-toggle="modal" data-bs-target="#exportModal">Generate Report</button>
             </div>
           </div>
           <div className="col-md-4 top-selling-prods-ReportsContainer">
@@ -469,6 +503,19 @@ function Supplier() {
               <span>No Top Selling Products Found</span>
             )}
           </div>
+        </div>
+        <div className='modal fade' id="exportModal" tabIndex={1} aria-labelledby="exportModalLabel" aria-hidden={!showModal}>
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                    <div className="logout-confirmation-modalBody">
+                        <h3>Select Format to Export Report</h3>
+                        <div className="col-md-12 logout-btn-container">
+                            <button className="logout-btn" data-bs-dismiss="modal" onClick={HandleExportToExcel}>Excel</button>
+                            <button className="cancel-logout-btn" data-bs-dismiss="modal" onClick={HandleExportToPDF}>PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div
           data-bs-spy="scroll"

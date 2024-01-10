@@ -163,7 +163,7 @@ function Supplier (){
                     <div className='col pending-orders-dash'>
                         <h3>Pending Orders</h3>
                         {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).slice(0, 3).length > 0 ? (
-                                <Link to={`/supplier_dashboard/${id}/supplier_orders`} className='no-underline-link'>
+                                <Link to={`/supplier_dashboard/${id}/pending_orders`} className='no-underline-link'>
                                     {orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Pending).slice(0, 3).map((orderItem, orderIndex) => (
                                         <div key={orderIndex} className='dash-pending-ords-container'>
                                             {orderItem.cart.items.length > 0 && (
