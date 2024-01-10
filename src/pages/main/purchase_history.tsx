@@ -256,7 +256,11 @@ function Purchase_History () {
                                             <td className="text-center">{purchaseItem.orderNumber}</td>
                                             <td className="text-center">{purchaseItem.cart.supplier.shopName}</td>
                                             <td className="text-center">{purchaseItem.orderItems.length}</td>
-                                            <td className="text-center">₱{purchaseItem.total.toFixed(2)}</td>
+                                            <td className="text-center">{purchaseItem.total.toLocaleString('en-US', {
+                                            style: 'currency',
+                                            currency: 'PHP',
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,})}</td>
                                         </tr>
                                     </tbody>
                                 ))
@@ -306,7 +310,11 @@ function Purchase_History () {
                                     
                                     <div className='payment-details-content'>
                                         <h3 className='order-details-titles'>Payment Details</h3>
-                                        <p style={{ fontSize: "15px" }}>Total Amount: ₱{selectedPurchases.total.toFixed(2)}</p>
+                                        <p style={{ fontSize: "15px" }}>Total Amount: {selectedPurchases.total.toLocaleString('en-US', {
+                                            style: 'currency',
+                                            currency: 'PHP',
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,})}</p>
                                         <span className="order-details-text">Proof of payment:</span>
                                         <a 
                                             className="modal-info" 
@@ -350,7 +358,11 @@ function Purchase_History () {
                                                     <td className="text-center">{item.product.category}</td>
                                                     <td className="text-center">{item.sizeQuantity.size}</td>
                                                     <td className="text-center">{item.quantity}</td>
-                                                    <td className="text-center">₱{item.product.price.toFixed(2)}</td>
+                                                    <td className="text-center">{item.product.price.toLocaleString('en-US', {
+                                                    style: 'currency',
+                                                    currency: 'PHP',
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2,})}</td>
                                                 </tr>
                                             ))
                                         )}
@@ -395,7 +407,11 @@ function Purchase_History () {
                                                     <div className="product-details">
                                                         <h4 className="product-name">{product.productName}</h4>
                                                         <p className="product-description">{product.description}</p>
-                                                        <p className="product-price">₱{product.price.toFixed(2)}</p>
+                                                        <p className="product-price">{product.price.toLocaleString('en-US', {
+                                                        style: 'currency',
+                                                        currency: 'PHP',
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2,})}</p>
                                                     </div>
                                                     <Link to={`/shop/${userId}/visit_shop/${product.supplierId}`}>
                                                         <button className="go-to-shop-button" onClick={handleCLose}>Go to Shop</button>

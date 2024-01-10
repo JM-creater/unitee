@@ -125,7 +125,8 @@
 .seller-profile {
     width: 100%;
     max-width: 40px;
-    max-height: 40px;
+    height: 40px;
+    object-fit: cover;
     border: solid #f0f0f0;
     border-radius: 50%;
     cursor: pointer;

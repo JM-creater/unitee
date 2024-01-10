@@ -203,8 +203,13 @@ function Pending_Orders (){
                             <td className="text-center">
                                 {orderItem.orderItems && orderItem.orderItems ? orderItem.orderItems.length : 0}
                             </td>
-                            <td className="text-center">₱{orderItem.total.toFixed(2)}</td>
-                            <td className="text-center">{Status[Object.keys(Status)[orderItem.status - 1]]}</td>
+                            <td className="text-center">{orderItem.user.firstName}</td>
+                            <td className="text-center">{orderItem.total.toLocaleString('en-US', {
+                            style: 'currency',
+                            currency: 'PHP',
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,})}
+                            </td>
                         </tr>
                     </tbody>
                 ))
@@ -263,7 +268,11 @@ function Pending_Orders (){
                                     </a>
                                     </span>
                                     <span className='details-data'>{selectedOrders.referenceId}</span>
-                                    <span className='details-data-totalAmount'>₱{selectedOrders.total.toFixed(2)}</span>
+                                    <span className='details-data-totalAmount'>{selectedOrders.total.toLocaleString('en-US', {
+                                    style: 'currency',
+                                    currency: 'PHP',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,})}</span>
                                 </div>
                             </div>
                         </div>
@@ -311,7 +320,11 @@ function Pending_Orders (){
                                                 <td className="text-center">{item.product.category}</td>
                                                 <td className="text-center">{item.sizeQuantity.size}</td>
                                                 <td className="text-center">{item.quantity}</td>
-                                                <td className="text-center">₱{item.product.price.toFixed(2)}</td>
+                                                <td className="text-center">₱{item.product.price.toLocaleString('en-US', {
+                                                style: 'currency',
+                                                currency: 'PHP',
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2,})}</td>
                                             </tr>
                                         ))
                                     )
