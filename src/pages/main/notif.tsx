@@ -503,11 +503,13 @@ function Notif() {
                   </div>
                   <div className="d-flex flex-column text-sm-left">
                     <p>
-                      Total Amount: <span className="font-weight-bold">{notificationItem.order.total.toLocaleString('en-US', {
-                                                        style: 'currency',
-                                                        currency: 'PHP',
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2,})}</span>
+                      Total Amount: <span className="font-weight-bold">{notificationItem.order.total ? notificationItem.order.total.toLocaleString('en-US', {
+                                                                          style: 'currency',
+                                                                          currency: 'PHP',
+                                                                          minimumFractionDigits: 2,
+                                                                          maximumFractionDigits: 2
+                                                                        })
+                                                                      : "₱0.00"}</span>
                     </p>
                     <p>
                       <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
@@ -618,11 +620,13 @@ function Notif() {
                   </div>
                   <div className="d-flex flex-column text-sm-left">
                     <p>
-                      Total Amount: <span className="font-weight-bold">{notificationItem.order.total.toLocaleString('en-US', {
-                                                        style: 'currency',
-                                                        currency: 'PHP',
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2,})}</span>
+                      Total Amount: <span className="font-weight-bold">{notificationItem.order.total ? notificationItem.order.total.toLocaleString('en-US', {
+                                                                          style: 'currency',
+                                                                          currency: 'PHP',
+                                                                          minimumFractionDigits: 2,
+                                                                          maximumFractionDigits: 2
+                                                                        })
+                                                                      : "₱0.00"}</span>
                     </p>
                     <p>
                       <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
@@ -729,11 +733,13 @@ function Notif() {
                   </div>
                   <div className="d-flex flex-column text-sm-left">
                     <p>
-                      Total Amount: <span className="font-weight-bold">{notificationItem.order.total.toLocaleString('en-US', {
-                                                        style: 'currency',
-                                                        currency: 'PHP',
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2,})}</span>
+                      Total Amount: <span className="font-weight-bold">{notificationItem.order.total ? notificationItem.order.total.toLocaleString('en-US', {
+                                                                          style: 'currency',
+                                                                          currency: 'PHP',
+                                                                          minimumFractionDigits: 2,
+                                                                          maximumFractionDigits: 2
+                                                                        })
+                                                                      : "₱0.00"}</span>
                     </p>
                     <p>
                       <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
@@ -856,11 +862,13 @@ function Notif() {
                     </div>
                     <div className="d-flex flex-column text-sm-left">
                       <p>
-                        Total Amount: <span className="font-weight-bold">{notificationItem.order.total.toLocaleString('en-US', {
-                                                          style: 'currency',
-                                                          currency: 'PHP',
-                                                          minimumFractionDigits: 2,
-                                                          maximumFractionDigits: 2,})}</span>
+                        Total Amount: <span className="font-weight-bold">{notificationItem.order.total ? notificationItem.order.total.toLocaleString('en-US', {
+                                                                          style: 'currency',
+                                                                          currency: 'PHP',
+                                                                          minimumFractionDigits: 2,
+                                                                          maximumFractionDigits: 2
+                                                                        })
+                                                                      : "₱0.00"}</span>
                       </p>
                       <p>
                         <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
@@ -977,18 +985,17 @@ function Notif() {
                   </div>
                   <div className="d-flex flex-column text-sm-left">
                     <p>
-                      Total Amount: <span className="font-weight-bold">{notificationItem.order.total.toLocaleString('en-US', {
-                                                        style: 'currency',
-                                                        currency: 'PHP',
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2,})}</span>
+                      Total Amount: <span className="font-weight-bold">{notificationItem.order.total ? notificationItem.order.total.toLocaleString('en-US', {
+                                                                          style: 'currency',
+                                                                          currency: 'PHP',
+                                                                          minimumFractionDigits: 2,
+                                                                          maximumFractionDigits: 2
+                                                                        })
+                                                                      : "₱0.00"}</span>
                     </p>
                     <p>
                       <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
                     </p>
-                    {/* <p>
-                      <span className="font-weight-bold">Estimated pickup date for your order. {formatDate(notificationItem.order.estimateDate)}</span>
-                    </p> */}
                   </div>
                 </div>
                 {/* Add class 'active' to progress */}
@@ -1157,11 +1164,15 @@ function Notif() {
                         <h4 className='totalAmount-receipt'>Total Amount</h4>
                       </div>
                       <div className='total-amount-receipt'>
-                        <h4 className='receipt-amount'>{selectedOrderReceipt.order.total.toLocaleString('en-US', {
-                                                        style: 'currency',
-                                                        currency: 'PHP',
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2,})}</h4>
+                        <h4 className='receipt-amount'>
+                          {selectedOrderReceipt.order.total ? selectedOrderReceipt.order.total.toLocaleString('en-US', {
+                              style: 'currency',
+                              currency: 'PHP',
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })
+                          : "₱0.00"}
+                        </h4>
                       </div>
                     </div>
                   </div> 
@@ -1183,11 +1194,15 @@ function Notif() {
                             <td className='row' style={{ padding: '16px' }}>{item.product.productName}</td>
                             <td className='text-center'>{item.sizeQuantity.size}</td>
                             <td className='text-center'>{item.quantity}</td>
-                            <td className='text-center'>{item.product.price.toLocaleString('en-US', {
-                                                        style: 'currency',
-                                                        currency: 'PHP',
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2,})}</td>
+                            <td className='text-center'>
+                              {item.product.price ? item.product.price.toLocaleString('en-US', {
+                                  style: 'currency',
+                                  currency: 'PHP',
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2
+                                })
+                              : "₱0.00"}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
