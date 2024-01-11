@@ -58,19 +58,19 @@ function Supplier_Main (){
     useEffect(() => {
         const fetchCountData = async () => {
             try {
-                const responseCountPending = await axios.get('https://localhost:7017/Order/countPending');
+                const responseCountPending = await axios.get(`https://localhost:7017/Order/countPending/${id}`);
                 setCountPending(responseCountPending.data);
 
-                const responseCountApproved = await axios.get('https://localhost:7017/Order/countApproved');
+                const responseCountApproved = await axios.get(`https://localhost:7017/Order/countApproved/${id}`);
                 setCountApproved(responseCountApproved.data);
 
-                const responseCountForPickUp = await axios.get('https://localhost:7017/Order/countForPickUp');
+                const responseCountForPickUp = await axios.get(`https://localhost:7017/Order/countForPickUp/${id}`);
                 setCountForPickUp(responseCountForPickUp.data);
 
-                const responseCountCompleted = await axios.get('https://localhost:7017/Order/countCompleted');
+                const responseCountCompleted = await axios.get(`https://localhost:7017/Order/countCompleted/${id}`);
                 setCountCompleted(responseCountCompleted.data);
 
-                const responseCountCanceled = await axios.get('https://localhost:7017/Order/countCanceled');
+                const responseCountCanceled = await axios.get(`https://localhost:7017/Order/countCanceled/${id}`);
                 setCountCanceled(responseCountCanceled.data);
             } catch (error) {
                 console.error(error);

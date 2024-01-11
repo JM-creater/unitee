@@ -120,7 +120,46 @@ useEffect(() => {
   fetchAverageRatingProduct();
 }, [departmentId]);
 
+  // * Windows Event Listener Focus
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const productResponse = await axios.get(
+          `https://localhost:7017/Users/getSuppliersProduct/${departmentId}`
+        );
+        setProductData(productResponse.data);
   
+        const ratingsPromises = productResponse.data.flatMap((supplier) =>
+          supplier.products.map((product) =>
+            axios.get(`https://localhost:7017/Rating/average-product-rating/${product.productId}`)
+          )
+        );
+  
+        const ratingsResponses = await Promise.all(ratingsPromises);
+        const ratingsMap = ratingsResponses.reduce((acc, response, index) => {
+          const productId = productResponse.data.flatMap((supplier) =>
+            supplier.products.map((product) => product.productId)
+          )[index];
+          acc[productId] = response.data.averageRating;
+          return acc;
+        }, {});
+  
+        setAverageRatingProduct(ratingsMap);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const handleFocus = () => {
+      fetchData();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [departmentId]);
 
   // * Get User Department
   useEffect(() => {
@@ -181,6 +220,7 @@ useEffect(() => {
               <div
                 id="carouselExample"
                 className="carousel carousel-dark slide"
+                data-bs-ride="carousel"
               >
                 <div className="carousel-inner">
                   <div className="carousel-item active">

@@ -134,6 +134,7 @@ function Notif() {
     };
   }, [userId]); 
 
+  // * Format Date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
@@ -143,7 +144,7 @@ function Notif() {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${month}/${day}/${year} ${hours}:${minutes}`;
   };
-
+  
   const getActiveStatus = (status) => {
     switch (status) {
       case 1:
@@ -743,12 +744,6 @@ function Notif() {
                     </p>
                     <p>
                       <span className="font-weight-bold" style={{ fontSize: '20px' }}>{notificationItem.message}</span>
-                    </p>
-                    <p>
-                      <span className="font-weight-bold" style={{ fontSize: '20px' }}>
-                        {`Your order will be ready for pick-up on ${notificationItem.order.estimatedDate}. 
-                        Please pick up your order at the front of the UC Chapel.`}
-                      </span>
                     </p>
                   </div>
                 </div>

@@ -494,7 +494,7 @@ function Admin_Shops () {
 
                                 {/* PRODUCT CARD */}
                                 {filteredProducts.map(product => (
-                                <div key={product.productId} className='col-md-12' style={{ backgroundColor:'#004AAD', padding:'10px', borderRadius:'5px' }}>
+                                <div key={product.productId} className='prodList-card-admin' style={{ backgroundColor:'#004AAD', padding:'10px', borderRadius:'5px' }}>
                                     <div style={{ display:'flex', flexFlow:'column' }}>
                                         <div className='admin-viewProds-card'>
                                             <img className='admin-viewProd-img' src={ `https://localhost:7017/${product.image}` }/>
@@ -539,7 +539,7 @@ function Admin_Shops () {
 
                                     <div className="collapse" id={`prodDetailsCollapse${product.productId}`} style={{ marginRight:'18px' }}>
                                         {/* START OF CARD BODY */}
-                                        <div className="card card-body" style={{ display:'flex', justifyContent:'space-between', gap:'10px' }}>
+                                        <div className="card card-body" style={{ display:'flex', justifyContent:'space-between', gap:'10px', backgroundColor: 'transparent' }}>
 
                                             {/* DESCRIPTION */}
                                             <h5 className='admin-prodDetails-labels' style={{ display:'flex', flexWrap:'wrap' }}>Description:
@@ -560,7 +560,7 @@ function Admin_Shops () {
                                             <h5 className='admin-prodDetails-labels'>Sizes Available:
                                                 <h5 className='admin-prodDetails-text'>
                                                     {product.sizes.map((sizeObj, index) => (
-                                                        <span style={{ fontSize: '18px' }} key={index}>{sizeObj.size}{index !== product.sizes.length - 1 ? ', ' : ''}</span>
+                                                        <span style={{ fontSize: '18px', color: 'white' }} key={index}>{sizeObj.size}{index !== product.sizes.length - 1 ? ', ' : ''}</span>
                                                     ))}
                                                 </h5>
                                             </h5>

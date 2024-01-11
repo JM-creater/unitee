@@ -1,6 +1,5 @@
 import './admin_reports.css'
 import totalOrdersIcon from "../../assets/images/icons/order-2.png"
-import salesIcon from "../../assets/images/icons/sales.png"
 import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 import ExcelJS from "exceljs"
 import {
@@ -392,7 +391,7 @@ function Admin_Reports () {
                 <div className='admin-reports-header'>
                     {/* HEADER CARDS */}
                     <div className='admin-reports-allOrders-card'>
-                        <div className='col-md-9'>
+                        <div className='reports-card'>
                             <h5 className='header-adminSales-label'>Total Orders</h5>
                             <h3>{orders ? orders.length : 0}</h3>
                             <ul className="nav nav-pills"
@@ -420,7 +419,7 @@ function Admin_Reports () {
                     <div className='admin-salesCards-container'>
                         <div className='admin-sales-card'>
                             {/* WEEKLY */}
-                            <div className='col-md-9'>
+                            <div className='reports-card'>
                                 <h5 className='header-adminSales-label'>Weekly Sales</h5>
                                 <h3>{weeklySales.length > 0 ? weeklySales.reduce((a, b) => a + b).toLocaleString('en-US', {
                                     style: 'currency',
@@ -430,12 +429,12 @@ function Admin_Reports () {
                                 })
                                 : "₱0.00"}</h3>
                             </div>
-                            <img className='admin-reports-headerIcons' src={ salesIcon }/>
+                            {/* <img className='admin-reports-headerIcons' src={ salesIcon }/> */}
                         </div>
         
                         {/* MONTHLY */}
                         <div className='admin-sales-card'>
-                            <div className='col-md-9'>
+                            <div className='reports-card'>
                                 <h5 className='header-adminSales-label'>Monthly Sales</h5>
                                 <h3>{monthlySales.length > 0 ? monthlySales.reduce((a, b) => a + b).toLocaleString('en-US', {
                                     style: 'currency',
@@ -445,12 +444,12 @@ function Admin_Reports () {
                                 })
                                 : "₱0.00"}</h3>
                             </div>
-                            <img className='admin-reports-headerIcons' src={ salesIcon }/>
+                            {/* <img className='admin-reports-headerIcons' src={ salesIcon }/> */}
                         </div>
         
                         {/* YEARLY */}
                         <div className='admin-sales-card'>
-                            <div className='col-md-9'>
+                            <div className='reports-card'>
                                 <h5 className='header-adminSales-label'>Yearly Sales</h5>
                                 <h3>{yearlySales.length > 0 ? yearlySales.reduce((a, b) => a + b).toLocaleString('en-US', {
                                     style: 'currency',
@@ -460,7 +459,7 @@ function Admin_Reports () {
                                 })
                                 : "₱0.00"}</h3>
                             </div>
-                            <img className='admin-reports-headerIcons' src={ salesIcon }/>
+                            {/* <img className='admin-reports-headerIcons' src={ salesIcon }/> */}
                         </div>
                     </div>
                     {/* GENERATE REPORT BUTTON */}
