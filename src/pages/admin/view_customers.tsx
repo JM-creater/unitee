@@ -219,7 +219,7 @@ function View_Customers() {
               Status:
             </label>
             <select
-              style={{ padding: "5px", border: "2px solid white", borderRadius: '10px' }}
+              style={{ padding: "5px", border: "2px solid white", borderRadius: '10px', cursor:'pointer' }}
               name="customerStatus"
               id="status"
               onChange={(e) => setSelectedStatus(e.target.value)}
@@ -238,7 +238,7 @@ function View_Customers() {
               Gender:
             </label>
             <select
-              style={{ padding: "5px", border: "2px solid white", borderRadius: '10px' }}
+              style={{ padding: "5px", border: "2px solid white", borderRadius: '10px', cursor:'pointer' }}
               name="customerStatus"
               id="status"
               onChange={(e) => setSelectedGender(e.target.value)}
@@ -257,7 +257,7 @@ function View_Customers() {
               Department:
             </label>
             <select
-              style={{ padding: "5px", border: "2px solid white", borderRadius: '10px' }}
+              style={{ padding: "5px", border: "2px solid white", borderRadius: '10px', cursor:'pointer' }}
               name="customerStatus"
               id="status"
               onChange={(e) => setSelectedDepartments(e.target.value)}

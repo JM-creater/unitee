@@ -212,10 +212,10 @@ useEffect(() => {
       ) : (
         <div className="container shop-contianer">
           <div className="content-container">
-            <div className="col-md-12 shopCustomer-title-container">
+            <div className="shopCustomer-title-container">
               <div className="motto-container">
-                <p className="shop-title1">New Clothes,</p>
-                <p className="shop-title2">New Passion.</p>
+                <p className="shop-title1">TOP-RATED PICKS,</p>
+                <p className="shop-title2">for academic tricks!</p>
               </div>
               <div
                 id="carouselExample"

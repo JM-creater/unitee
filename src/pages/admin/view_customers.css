@@ -132,20 +132,6 @@
     margin-top: 5px;
 }
 
-.permits-link {
-    font-size: 15px;
-    font-weight: 500;
-    padding: 10px;
-    text-decoration: none;
-    border-radius: 5px;
-}
-
-.permits-link:hover {
-    background-color: #f0f0f0;
-    text-decoration: none;
-    font-weight: 600;
-}
-
 .supp-collapse-btn-container {
     display: flex;
     justify-content: center;
@@ -162,23 +148,4 @@
 .input-changePass {
     padding: 10px;
     border-radius: 5px;
-}
-
-.saveChanges-btn-container {
-    display: flex;
-    justify-content: end;
-    align-items: end;
-}
-
-.saveChanges-btn {
-    padding: 10px;
-    border: solid 2px black;
-    border-radius: 10px;
-    margin-top: 3rem;
-    width: 10rem;
-}
-
-.saveChanges-btn:hover {
-    background-color: #020654;
-    color: white;
 }
