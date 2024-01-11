@@ -130,12 +130,12 @@ function Register() {
   // * Handle register customer
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     const errors = validateForm();
-
+  
     if (Object.keys(errors).length === 0) {
       const formData = new FormData();
-
+  
       formData.append("Id", IDNumber);
       formData.append("DepartmentId", departmentId);
       formData.append("FirstName", firstName);
@@ -146,33 +146,46 @@ function Register() {
       formData.append("Gender", gender);
       formData.append("Image", image);
       formData.append("StudyLoad", studyLoad);
-
+  
+      const loadingToast = toast.loading("Registering...");
+  
       try {
         const response = await axios.post(
           "https://localhost:7017/Users/register",
           formData
         );
+  
+        toast.dismiss(loadingToast);
+  
         if (response.data) {
           localStorage.setItem("Id", response.data.newUser.id);
           localStorage.setItem("token", response.data.token);
           registerUsersEventEmitter.emit("registerCustomer");
+  
           toast.success("Successfully registered.", {
             onClose: () => navigate("/confirmation_email"),
           });
+  
           await sleep(1000);
         } else {
           toast.error(response.data);
           return;
         }
       } catch (error) {
+        toast.dismiss(loadingToast);
         if (error.response && error.response.status === 400) {
           toast.error(error.response.data.message);
         } else {
           toast.error("An error occurred. Please try again later.");
         }
       }
+    } else {
+      setValidationErrors(errors);
+      const firstErrorField = Object.keys(errors)[0];
+      document.getElementsByName(firstErrorField)[0].focus();
     }
   };
+  
 
   // * Validate Form
   const validateForm = () => {
