@@ -160,8 +160,10 @@ function Admin_Reports () {
         fetchShops();
     }, []);
 
-    pdfMake.vfs = pdfFonts.pdfMake.vfs;
     const HandleExportToPDF = async () => {
+
+        pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
         const ordersData = filteredOrders.map((ord) => ({
             OrderNumber: ord.orderNumber,
             Customer: `${ord.user.firstName} ${ord.user.lastName}`,
