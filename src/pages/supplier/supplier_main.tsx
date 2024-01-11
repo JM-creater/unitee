@@ -28,6 +28,11 @@ function Supplier_Main (){
     const [supplier, setSupplier] = useState<Supplier | null>(null); 
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [countPending, setCountPending] = useState(0);
+    const [countApproved, setCountApproved] = useState(0);
+    const [countForPickUp, setCountForPickUp] = useState(0);
+    const [countCompleted, setCountCompleted] = useState(0);
+    const [countCanceled, setCountCanceled] = useState(0);
     const { id } = useParams();
     const { setLogout } = useAuth();
     const navigate = useNavigate();
@@ -48,6 +53,65 @@ function Supplier_Main (){
         setLogout();
         navigate('/');
     };
+
+    // * Get the counts orders
+    useEffect(() => {
+        const fetchCountData = async () => {
+            try {
+                const responseCountPending = await axios.get('https://localhost:7017/Order/countPending');
+                setCountPending(responseCountPending.data);
+
+                const responseCountApproved = await axios.get('https://localhost:7017/Order/countApproved');
+                setCountApproved(responseCountApproved.data);
+
+                const responseCountForPickUp = await axios.get('https://localhost:7017/Order/countForPickUp');
+                setCountForPickUp(responseCountForPickUp.data);
+
+                const responseCountCompleted = await axios.get('https://localhost:7017/Order/countCompleted');
+                setCountCompleted(responseCountCompleted.data);
+
+                const responseCountCanceled = await axios.get('https://localhost:7017/Order/countCanceled');
+                setCountCanceled(responseCountCanceled.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchCountData();
+    }, []);
+
+    // * Windows Event Listener Focus
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const responseCountPending = await axios.get('https://localhost:7017/Order/countPending');
+                    setCountPending(responseCountPending.data);
+
+                    const responseCountApproved = await axios.get('https://localhost:7017/Order/countApproved');
+                    setCountApproved(responseCountApproved.data);
+
+                    const responseCountForPickUp = await axios.get('https://localhost:7017/Order/countForPickUp');
+                    setCountForPickUp(responseCountForPickUp.data);
+
+                    const responseCountCompleted = await axios.get('https://localhost:7017/Order/countCompleted');
+                    setCountCompleted(responseCountCompleted.data);
+
+                    const responseCountCanceled = await axios.get('https://localhost:7017/Order/countCanceled');
+                    setCountCanceled(responseCountCanceled.data);
+            } catch (error) {
+                console.error('Network error or server not responding');
+            }
+        };
+
+        const handleFocus = () => {
+            fetchData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, []); 
 
     // * Mark as Read Supplier in Notification
     const handleNotificationClick = () => {
@@ -240,19 +304,19 @@ function Supplier_Main (){
                             <div className="orders-collapse-container"
                             style={{ backgroundColor: "#020654" }}>
                                 <Link className="supplier-collapse-orders-link" to="pending_orders">
-                                    <span className="supplier-nav-text-collapse">Pending</span>
+                                    <span className="supplier-nav-text-collapse">Pending {countPending > 0 && <span className='notifPending-count'>{countPending}</span>}</span>
                                 </Link>
                                 <Link className="supplier-collapse-orders-link" to="approved_orders">
-                                    <span className="supplier-nav-text-collapse">Approved</span>
+                                    <span className="supplier-nav-text-collapse">Approved {countApproved > 0 && <span className='notifApproved-count'>{countApproved}</span>}</span>
                                 </Link>
                                 <Link className="supplier-collapse-orders-link" to="pickUp_orders">
-                                    <span className="supplier-nav-text-collapse">For Pick Up</span>
+                                    <span className="supplier-nav-text-collapse">For Pick Up {countForPickUp > 0 && <span className='notifForPickUp-count'>{countForPickUp}</span>}</span>
                                 </Link>
                                 <Link className="supplier-collapse-orders-link" to="completed_orders">
-                                    <span className="supplier-nav-text-collapse">Completed</span>
+                                    <span className="supplier-nav-text-collapse">Completed {countCompleted > 0 && <span className='notifCompleted-count'>{countCompleted}</span>}</span>
                                 </Link>
                                 <Link className="supplier-collapse-orders-link" to="canceled_orders">
-                                    <span className="supplier-nav-text-collapse">Canceled</span>
+                                    <span className="supplier-nav-text-collapse">Canceled {countCanceled > 0 && <span className='notifCanceled-count'>{countCanceled}</span>}</span>
                                 </Link>
                             </div>
                         </div>

@@ -190,14 +190,18 @@ function Login() {
       return;
     }
 
+    const loadingToast = toast.loading("Verifying...");
+    
     try {
       const response = await axios.post(`https://localhost:7017/Users/forgot-password?email=${resetEmail}`);
+      toast.dismiss(loadingToast);
       if (response.data) {
         toast.success("Please check your email");
         setResetEmail("");
         CloseBtn.click();
       }
     } catch (error) {
+      toast.dismiss(loadingToast);
       if (error.response && error.response.status === 400) {
         toast.error(error.response.data.message);
       } else {

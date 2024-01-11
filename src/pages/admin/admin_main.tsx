@@ -9,14 +9,19 @@ import adminReportsIcon from "../../assets/images/icons/reports.png";
 import shopsIcon from "../../assets/images/icons/store-2.png";
 import viewProfIcon from "../../assets/images/icons/view.png";
 import logoutAdminIcon from "../../assets/images/icons/logout-4.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import LogoutLoadingScreen from "../common/LogoutLoadingScreen";
 import { useAuth } from "../../utils/AuthContext";
+import axios from "axios";
 
 function Admin_Main() {
+
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [overallUserCount, setOverallUserCount] = useState(0);
+  const [customerCount, setCustomerCount] = useState(0);
+  const [supplierCount, setSupplierCount] = useState(0);
   const { setLogout } = useAuth();
   const navigate = useNavigate();
 
@@ -33,6 +38,53 @@ function Admin_Main() {
     setLogout();
     navigate("/");
   };
+
+  // * Get the counts
+  useEffect(() => {
+    const fetchCountData = async () => {
+      try {
+        const responseOverall = await axios.get('https://localhost:7017/Users/overAllCountUsers');
+        setOverallUserCount(responseOverall.data);
+
+        const responseCountCustomer = await axios.get('https://localhost:7017/Users/countCustomers');
+        setCustomerCount(responseCountCustomer.data);
+
+        const responseCountSupplier = await axios.get('https://localhost:7017/Users/countSuppliers');
+        setSupplierCount(responseCountSupplier.data);
+      } catch (error) {
+        console.error('Failed to fetch overall user count', error);
+      }
+    }
+    fetchCountData();
+  }, []);
+  
+  // * Windows Event Listener Focus
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const responseOverall = await axios.get('https://localhost:7017/Users/overAllCountUsers');
+        setOverallUserCount(responseOverall.data);
+
+        const responseCountCustomer = await axios.get('https://localhost:7017/Users/countCustomers');
+        setCustomerCount(responseCountCustomer.data);
+
+        const responseCountSupplier = await axios.get('https://localhost:7017/Users/countSuppliers');
+        setSupplierCount(responseCountSupplier.data);
+      } catch (error) {
+          console.error('Network error or server not responding', error);
+      }
+    };
+
+    const handleFocus = () => {
+        fetchData();
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+        window.removeEventListener('focus', handleFocus);
+    };
+}, []); 
 
   return (
     <React.Fragment>
@@ -63,17 +115,17 @@ function Admin_Main() {
 
               <div className="admin-nav-link" data-bs-toggle="collapse" href="#usersTypeCollapse" role="button" aria-expanded="false" aria-controls="usersTypeCollapse">
                 <img className="admin-nav-icon" src={usersIcon} alt="" />
-                <span className="users-type-collapse">Users</span>
+                <span className="users-type-collapse">Users {overallUserCount > 0 && <span className='notifPending-count'>{overallUserCount}</span>}</span>
               </div>
 
               <div className="collapse" id="usersTypeCollapse">
                 <div className="users-collapse-container"
                   style={{ backgroundColor: "#020654" }}>
                   <Link className="admin-collapse-users-link" to="view_customers">
-                    <span className="admin-nav-text-collapse">Customers</span>
+                    <span className="admin-nav-text-collapse">Customers {customerCount > 0 && <span className='notifPending-count'>{customerCount}</span>}</span>
                   </Link>
                   <Link className="admin-collapse-users-link" to="suppliers">
-                    <span className="admin-nav-text-collapse">Suppliers</span>
+                    <span className="admin-nav-text-collapse">Suppliers {supplierCount > 0 && <span className='notifPending-count'>{supplierCount}</span>}</span>
                   </Link>
                 </div>
               </div>
