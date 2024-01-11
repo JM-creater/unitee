@@ -11,7 +11,6 @@
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  gap: 50px;
 }
 
 .shopCarousel-container {
@@ -29,6 +28,7 @@
 
 .motto-container {
   white-space: nowrap;
+  line-height: .8;
 }
 
 .gender-filter-container{

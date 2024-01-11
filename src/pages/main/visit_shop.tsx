@@ -613,36 +613,37 @@ function Visit_Shop () {
                         ))}
                     </div>
                 </div>
-
                 <h3 className="prods-available-label">Products Available</h3>
-                {filteredProduct.map(product => (
-                    <div 
-                        className={`prodShop-card ${!product.isActive ? 'inactive-product' : ''}`} 
-                        data-bs-toggle="modal" 
-                        data-bs-target={!product.isActive ? undefined : "#viewProdDetailsModal"}
-                        key={product.productId} 
-                        onClick={() => {
-                            if (product.isActive) {
-                                setSelectedProduct(product);
-                                setImage(`https://localhost:7017/${product.image}`);
-                            }
-                        }}
-                    > 
-                        <img className="visitShopProdImg" src={`https://localhost:7017/${product.image}`} alt={product.productName}/>
-                        <div className="col-md-12 shop-prodDetails-container">
-                            <h4 className="col-md-8 visitShop-prodName">{product.productName}</h4>
-                            <h3 className="visitShop-prodPrice">{product.price ? product.price.toLocaleString('en-US', {
-                                    style: 'currency',
-                                    currency: 'PHP',
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                })
-                                : "₱0.00"}
-                            </h3>
-                            {!product.isActive && <span className="badge badge-danger">Inactive</span>}
+                <div className="otherProds-visitShop-container">
+                    {filteredProduct.map(product => (
+                        <div 
+                            className={`prodShop-card ${!product.isActive ? 'inactive-product' : ''}`} 
+                            data-bs-toggle="modal" 
+                            data-bs-target={!product.isActive ? undefined : "#viewProdDetailsModal"}
+                            key={product.productId} 
+                            onClick={() => {
+                                if (product.isActive) {
+                                    setSelectedProduct(product);
+                                    setImage(`https://localhost:7017/${product.image}`);
+                                }
+                            }}
+                        > 
+                            <img className="visitShopProdImg" src={`https://localhost:7017/${product.image}`} alt={product.productName}/>
+                            <div className="col-md-12 shop-prodDetails-container">
+                                <h4 className="col-md-8 visitShop-prodName">{product.productName}</h4>
+                                <h3 className="visitShop-prodPrice">{product.price ? product.price.toLocaleString('en-US', {
+                                        style: 'currency',
+                                        currency: 'PHP',
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    })
+                                    : "₱0.00"}
+                                </h3>
+                                {!product.isActive && <span className="badge badge-danger">Inactive</span>}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
     
     
