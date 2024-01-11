@@ -17,8 +17,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import orderEventEmitter from '../../helpers/OrderEmitter';
 import React from 'react';
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
 
 ChartJS.register(
     BarElement,
@@ -160,34 +160,145 @@ function Admin_Reports () {
         fetchShops();
     }, []);
 
-    // * Download Report to PDF
+    pdfMake.vfs = pdfFonts.pdfMake.vfs;
     const HandleExportToPDF = async () => {
-        const input = document.getElementById('report-container');
+        const ordersData = filteredOrders.map((ord) => ({
+            OrderNumber: ord.orderNumber,
+            Customer: `${ord.user.firstName} ${ord.user.lastName}`,
+            Items: ord.cart.items.reduce((total, item) => total + item.quantity, 0),
+            Total: ord.total,
+            Status: getStatusText(ord.status),
+        }));
 
-        const canvas = await html2canvas(input);
-        const imgData = canvas.toDataURL('image/png');
-    
-        const imgWidth = 210; 
-        const pageHeight = 295; 
-        const imgHeight = canvas.height * imgWidth / canvas.width;
-        let heightLeft = imgHeight;
-    
-        const doc = new jsPDF('p', 'mm');
-        let position = 0;
-    
-        doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-    
-        while (heightLeft >= 0) {
-            position = heightLeft - imgHeight;
-            doc.addPage();
-            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-        }
-    
-        doc.save('Report.pdf');
-        setShowModal(!showModal);
+        const totalSales = ordersData.reduce((total, order) => total + order.Total, 0);
+
+        const salesData = [
+            {
+                Type: "Weekly Sales",
+                Amount:
+                    weeklySales.length > 0 ? weeklySales.reduce((a, b) => a + b) : 0,
+            },
+            {
+                Type: "Monthly Sales",
+                Amount:
+                    monthlySales.length > 0 ? monthlySales.reduce((a, b) => a + b) : 0,
+            },
+            {
+                Type: "Yearly Sales",
+                Amount:
+                    yearlySales.length > 0 ? yearlySales.reduce((a, b) => a + b) : 0,
+            },
+        ];
+
+    const pdfDefinition = {
+        header: function (currentPage, pageCount, pageSize) {
+            return {
+                text: (filteredOrders.length > 0 && filteredOrders[0].cart.supplier.shopName) || 'Default Header',
+                alignment: 'center',
+                fontSize: 18,
+                bold: true,
+                margin: [0, 10, 0, 0], 
+            };
+        },
+        content: [
+        {
+            text: "Sales Report",
+            alignment: "center",
+            fontSize: 24,
+            bold: true,
+            margin: [0, 0, 0, 20], 
+        },
+        {
+            table: {
+            headerRows: 1,
+            widths: ["auto", "*", "auto", "auto", "auto"],
+            body: [
+                [{ text: "OrderNumber", style: "tableHeader" }, { text: "Customer", style: "tableHeader" }, { text: "Items", style: "tableHeader" }, { text: "Status", style: "tableHeader" }, { text: "Total", style: "tableHeader" }],
+                ...ordersData.map((order) => [
+                order.OrderNumber,
+                order.Customer,
+                order.Items,
+                order.Status,
+                { text: `₱${order.Total.toFixed(2)}`, style: "tableCell" },
+                ]),
+                [
+                { text: "", colSpan: 3, border: [0, 0, 0, 0] }, 
+                {},
+                {},
+                { text: "Total Sales", style: "tableHeaderWithBorders" }, 
+                { text: `₱${totalSales.toFixed(2)}`, style: "tableCellWithBorders" }, 
+                ], // Total Sales row
+            ],
+            },
+        },
+        "\n",
+        {
+            text: "Sales Summary",
+            alignment: "center",
+            fontSize: 18,
+            bold: true,
+            margin: [0, 20, 0, 10],
+        },
+        {
+            table: {
+            headerRows: 1,
+            widths: ["*", "auto"],
+            body: [
+                [{ text: "Type", style: "tableHeader" }, { text: "Amount", style: "tableHeader" }],
+                ...salesData.map((sale) => [sale.Type, `₱${sale.Amount.toFixed(2)}`]),
+            ],
+            },
+            layout: {
+            fillColor: function (rowIndex, node, columnIndex) {
+                return rowIndex === 0 ? "#2C3E50" : null;
+            },
+            },
+        },
+        "\n",
+        {
+            table: {
+            headerRows: 1,
+            widths: ["*"],
+            body: [
+                [{ text: "Total Orders", style: "tableHeader" }],
+                [orders && orders.length > 0 ? orders.length : 0],
+            ],
+            },
+            layout: {
+            fillColor: function (rowIndex, node, columnIndex) {
+                return rowIndex === 0 ? "#2C3E50" : null;
+            },
+            },
+        },
+        ],
+        styles: {
+        tableHeader: {
+            bold: true,
+            fontSize: 12,
+            color: "white",
+            fillColor: "#34495E", 
+        },
+        tableCell: {
+            fontSize: 12,
+        },
+        tableHeaderWithBorders: {
+            bold: true,
+            fontSize: 12,
+            color: "white",
+            fillColor: "#34495E", 
+            border: [0, 0, 0, 1], 
+        },
+        tableCellWithBorders: {
+            fontSize: 12,
+            border: [0, 0, 0, 1], 
+        },
+        },
     };
+
+        const pdfDocGenerator = pdfMake.createPdf(pdfDefinition);
+        pdfDocGenerator.download("SalesReport.pdf");
+    };
+    
 
     // * Download Report to Excel
     const HandleExportToExcel = async () => {
