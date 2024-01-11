@@ -29,9 +29,14 @@ function Completed_Orders () {
     const [departments, setDepartments] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [selectedOrders, setSelectedOrders] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
 
     // * Handle Close Button s
     const handleCloseButton = async () => {
@@ -139,7 +144,7 @@ function Completed_Orders () {
     return <div className="completed-orders-main-container">
             <header className='order-header'>
                 <h1>Completed Orders</h1>
-                <input className="input-searchOrder" name="text" placeholder="Search..." type="search"></input>
+                <input className="input-searchOrder" name="text" placeholder="Search..." type="search" onChange={handleSearchChange}></input>
             </header>
         <div className="completed-table-container">
             <table className='table table-hover'>
@@ -153,7 +158,11 @@ function Completed_Orders () {
                     </tr>
                 </thead>
                 {orders.length > 0 ? (
-                    orders.filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Completed).map((orderItem, index) => (
+                    orders
+                    .filter(order => order.user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    order.user.lastName.toLowerCase().includes(searchTerm.toLowerCase()))
+                    .filter(order => Status[Object.keys(Status)[order.status - 1]] === Status.Completed)
+                    .map((orderItem, index) => (
                     <tbody key={index} className="table-group-divider">
                         <tr data-bs-toggle="modal" data-bs-target="#orderDetailsModal" onClick={() => handleOrderClick(orderItem)}>
                             <th scope="row">{formatDate(orderItem.dateUpdated)}</th>

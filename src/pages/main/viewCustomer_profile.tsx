@@ -242,16 +242,14 @@ function ViewCustomer_Profile () {
 
   // * Handle Verify Email
   const handleVerifyEmail = async () => {
+    const loadingToast = toast.loading("Verifying...");
     try {
-      await fetch(`https://localhost:7017/Users/verify-email/${userId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        }
-      })
+      await axios.post(`https://localhost:7017/Users/verify-email/${userId}`);
       //localStorage.setItem("verifyEmail", userId);
+      toast.dismiss(loadingToast);
       navigate("/secondconfirmation_email");
     } catch (error) {
+      toast.dismiss(loadingToast);
       console.error(error);
     }
   };

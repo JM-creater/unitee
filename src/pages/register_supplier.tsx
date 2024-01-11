@@ -44,6 +44,9 @@ function Register() {
   );
   const navigate = useNavigate();
 
+   // * For Delay
+   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
   // * Get the Generated ID number for Supplier
   useEffect(() => {
     const fetchedID = localStorage.getItem("generatedSupplierID");
@@ -144,11 +147,16 @@ function Register() {
       formData.append("ValidIdFrontImage", validIdFront);
       formData.append("ValidIdBackImage", validIdBack);
 
+      const loadingToast = toast.loading("Registering...");
+
       try {
         const response = await axios.post(
           "https://localhost:7017/Users/registerSupplier",
           formData
         );
+
+        toast.dismiss(loadingToast);
+
         if (response.data) {
           localStorage.setItem("Id", response.data.newSupplier.id);
           localStorage.setItem("token", response.data.token);
@@ -158,19 +166,28 @@ function Register() {
           });
           localStorage.setItem("showSupplierIDModal", "true");
           localStorage.setItem("generatedSupplierID", IDNumber);
+
+          await sleep(1000);
         } else {
           toast.error(response.data);
+          return;
         }
       } catch (error) {
+        toast.dismiss(loadingToast);
         if (error.response && error.response.status === 400) {
           toast.error(error.response.data.message);
         } else {
           toast.error("An error occurred. Please try again later.");
         }
       }
+    } else {
+      setValidationErrors(errors);
+      const firstErrorField = Object.keys(errors)[0];
+      document.getElementsByName(firstErrorField)[0].focus();
     }
   };
 
+  // * Validate Form
   const validateForm = (): ValidationErrors => {
     const errors: ValidationErrors = {};
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
