@@ -248,7 +248,6 @@ function Canceled_Orders () {
                                         })
                                         : "₱0.00"}
                                     </span>
-                                    <span className='details-data'>{selectedOrders.cancellationReason}</span>
                                 </div>
                             </div>
                         </div>
