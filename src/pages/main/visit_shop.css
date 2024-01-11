@@ -207,8 +207,9 @@
 
 .visitShopProdImg {
     width: 100%;
-    max-width: 180px;
-    height: 180px;
+    max-width: 150px;
+    height: 150px;
+    margin-bottom: 5px;
     border-radius: 8px;
 }
 
