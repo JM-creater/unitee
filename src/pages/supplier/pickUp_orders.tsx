@@ -134,7 +134,7 @@ function PickUp_Orders () {
         return productType ? productType.product_Type : 'Unknown Type';
     };
 
-   // * Handle Completed Orders
+    // * Handle Completed Orders
     const HandleOrderCompleted = (orderId) => {
         axios.put(`https://localhost:7017/Order/orderCompleted/${orderId}`)
         .then(async response => {

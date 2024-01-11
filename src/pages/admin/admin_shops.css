@@ -58,6 +58,12 @@
     border-radius: 10px;
     margin: 5px;
     cursor: pointer;
+    box-shadow: 4px 6px 14px #00000036;
+    transition: all .3s ease;
+}
+
+.admin-shop-card:hover {
+    scale: .97;
 }
 
 .adminShop-card-details {
@@ -141,25 +147,50 @@
     color: white;
 }
 
-.admin-prodShowDetails-btn {
-    border: solid 1px white;
-    color: white;
-    padding: 3px;
-    border-radius: 5px;
-    width: fit-content;
-    margin-left: 82rem;
-}
-
-.admin-prodShowDetails-btn:hover {
-    font-weight: 600;
-    padding: 2px;
-    border: solid 2px white;
-}
-
 .admin-prodDetails-labels {
     font-weight: 600;
+    color: white;
 }
 
 .admin-prodDetails-text {
     font-weight: 400;
+    color: white;
+}
+
+.prodList-card-admin {
+    box-shadow: 4px 6px 14px #00000036;
+    border-radius: 10px;
+    width: 80em;
+    padding: 10px;
+    background: linear-gradient(-45deg, rgb(1, 29, 185) 0%, rgb(12, 201, 235) 100%);
+}
+
+.admin-prodShowDetails-btn {
+    color: white;
+    text-decoration: none;
+    font-size: 13px;
+    border: none;
+    background: none;
+}
+
+.admin-prodShowDetails-btn::before {
+    margin-left: auto;
+}
+
+.admin-prodShowDetails-btn::after, .admin-prodShowDetails-btn::before {
+    content: '';
+    width: 0%;
+    height: 2px;
+    background: #36b8f4;
+    display: block;
+    transition: 0.5s;
+}
+  
+.admin-prodShowDetails-btn:hover::after, .admin-prodShowDetails-btn:hover::before {
+    width: 100%;
+}
+
+.showMore-btn-container {
+    display: flex;
+    justify-content: end;
 }

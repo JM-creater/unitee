@@ -79,3 +79,12 @@
     justify-content: end;
     margin-bottom: 15px;
 }
+
+.reports-card {
+    width: 15em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    
+}

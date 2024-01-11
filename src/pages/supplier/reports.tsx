@@ -1,5 +1,4 @@
 import "./supplier_dashboard.css";
-import totalSalesIcon from "../../assets/images/icons/dollar.png";
 import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 import {
   Chart as ChartJS,
@@ -407,11 +406,6 @@ function Supplier() {
                         : "₱0.00"}
                   </h1>
                 </div>
-                <img
-                  className="dash-card-icon"
-                  src={totalSalesIcon}
-                  alt="Total Sales Icon"
-                />
               </div>
               <div className="card-content-container">
                 <div className="col-md-9 dash-card">
@@ -427,11 +421,6 @@ function Supplier() {
                     : "₱0.00"}
                   </h1>
                 </div>
-                <img
-                  className="dash-card-icon"
-                  src={totalSalesIcon}
-                  alt="Total Orders Icon"
-                />
               </div>
               <div className="card-content-container">
                 <div className="col-md-9 dash-card">
@@ -447,11 +436,6 @@ function Supplier() {
                     : "₱0.00"}
                   </h1>
                 </div>
-                <img
-                  className="dash-card-icon"
-                  src={totalSalesIcon}
-                  alt="Total Products Icon"
-                />
               </div>
             </div>
   

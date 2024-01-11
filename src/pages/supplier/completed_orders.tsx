@@ -31,18 +31,9 @@ function Completed_Orders () {
     const [selectedOrders, setSelectedOrders] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
-    // * For Delay
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
-
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
     };
-
-    // * Handle Close Button s
-    const handleCloseButton = async () => {
-        await sleep(50);
-        window.location.reload();
-    };  
 
     // * Handle Order Click
     const handleOrderClick = (orderItem) => {
@@ -202,7 +193,7 @@ function Completed_Orders () {
                 <div className="modal-content">
                 <div className="modalHeader">
                     <img className='modal-logo' src={ uniteeLogo }/>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleCloseButton}></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 {selectedOrders && (
                     <div className="modal-body orderDetails-modal">
@@ -316,7 +307,7 @@ function Completed_Orders () {
                 </div>
                 )}
                 <div className="orderModal-footer">
-                    <button className='deny-btn' aria-label="Close" data-bs-dismiss="modal" onClick={handleCloseButton}>Close</button>
+                    <button className='deny-btn' aria-label="Close" data-bs-dismiss="modal">Close</button>
                 </div>
                 </div>
             </div>
