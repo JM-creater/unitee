@@ -21,7 +21,7 @@ function Supplier_Main (){
 
     interface Supplier {
         image: string;
-    };
+    }
 
     const [notificationMessage, setNotificationMessage] = useState([]);
     const [notifItem, setNotifItem] = useState([]);
@@ -84,19 +84,19 @@ function Supplier_Main (){
         const fetchData = async () => {
             try {
                 const responseCountPending = await axios.get('https://localhost:7017/Order/countPending');
-                    setCountPending(responseCountPending.data);
+                setCountPending(responseCountPending.data);
 
-                    const responseCountApproved = await axios.get('https://localhost:7017/Order/countApproved');
-                    setCountApproved(responseCountApproved.data);
+                const responseCountApproved = await axios.get('https://localhost:7017/Order/countApproved');
+                setCountApproved(responseCountApproved.data);
 
-                    const responseCountForPickUp = await axios.get('https://localhost:7017/Order/countForPickUp');
-                    setCountForPickUp(responseCountForPickUp.data);
+                const responseCountForPickUp = await axios.get('https://localhost:7017/Order/countForPickUp');
+                setCountForPickUp(responseCountForPickUp.data);
 
-                    const responseCountCompleted = await axios.get('https://localhost:7017/Order/countCompleted');
-                    setCountCompleted(responseCountCompleted.data);
+                const responseCountCompleted = await axios.get('https://localhost:7017/Order/countCompleted');
+                setCountCompleted(responseCountCompleted.data);
 
-                    const responseCountCanceled = await axios.get('https://localhost:7017/Order/countCanceled');
-                    setCountCanceled(responseCountCanceled.data);
+                const responseCountCanceled = await axios.get('https://localhost:7017/Order/countCanceled');
+                setCountCanceled(responseCountCanceled.data);
             } catch (error) {
                 console.error('Network error or server not responding');
             }

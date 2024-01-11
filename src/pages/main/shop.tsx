@@ -12,13 +12,14 @@ function Shop() {
   const [departmentId, setDepartmentId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [averageRatingSupplier, setAverageRatingSupplier] = useState({});
+  const [averageRatingProduct, setAverageRatingProduct] = useState({});
   const [, setProductData] = useState([]);
   const [recommendedOverAll, setRecommendedOverAll] = useState([]);
   const { userId } = useParams();
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  // * Get the Average Rating for Product
+  // * Get the Average Rating for Supplier
   useEffect(() => {
     if (!departmentId) return;
 
@@ -30,9 +31,7 @@ function Shop() {
         setProductData(supplierResponse.data);
 
         const ratingsPromises = supplierResponse.data.map((supplier) =>
-          axios.get(
-            `https://localhost:7017/Rating/average-supplier-rating/${supplier.id}`
-          )
+          axios.get(`https://localhost:7017/Rating/average-supplier-rating/${supplier.id}`)
         );
 
         const ratingsResponses = await Promise.all(ratingsPromises);
@@ -60,9 +59,7 @@ function Shop() {
         setProductData(supplierResponse.data);
 
         const ratingsPromises = supplierResponse.data.map((supplier) =>
-          axios.get(
-            `https://localhost:7017/Rating/average-supplier-rating/${supplier.id}`
-          )
+          axios.get(`https://localhost:7017/Rating/average-supplier-rating/${supplier.id}`)
         );
 
         const ratingsResponses = await Promise.all(ratingsPromises);
@@ -87,6 +84,43 @@ function Shop() {
       window.removeEventListener("focus", handleFocus);
     };
   }, [departmentId]);
+
+  // * Get the Average Rating for Product
+useEffect(() => {
+  if (!departmentId) return;
+
+  const fetchAverageRatingProduct = async () => {
+    try {
+      const productResponse = await axios.get(
+        `https://localhost:7017/Users/getSuppliersProduct/${departmentId}`
+      );
+      setProductData(productResponse.data);
+
+      const ratingsPromises = productResponse.data.flatMap((supplier) =>
+        supplier.products.map((product) =>
+          axios.get(`https://localhost:7017/Rating/average-product-rating/${product.productId}`)
+        )
+      );
+
+      const ratingsResponses = await Promise.all(ratingsPromises);
+      const ratingsMap = ratingsResponses.reduce((acc, response, index) => {
+        const productId = productResponse.data.flatMap((supplier) =>
+          supplier.products.map((product) => product.productId)
+        )[index];
+        acc[productId] = response.data.averageRating;
+        return acc;
+      }, {});
+
+      setAverageRatingProduct(ratingsMap);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  fetchAverageRatingProduct();
+}, [departmentId]);
+
+  
 
   // * Get User Department
   useEffect(() => {
@@ -151,8 +185,8 @@ function Shop() {
                 <div className="carousel-inner">
                   <div className="carousel-item active">
                     {recommendedOverAll.slice(0, 1).map((firstRecommended) => (
-                      <Link to={`/shop/${userId}/visit_shop/${firstRecommended.supplierId}`} style={{ textDecoration: 'none' }}>
-                        <div key={firstRecommended.productId} className="featuredProd-card">
+                      <Link to={`/shop/${userId}/visit_shop/${firstRecommended.supplierId}`} style={{ textDecoration: 'none' }} key={`first-${firstRecommended.productId}`}>
+                        <div className="featuredProd-card">
                         <div className="prod-card-featured">
                           <img
                             className="featuredProd-img d-block w-100"
@@ -163,7 +197,14 @@ function Shop() {
                               {firstRecommended.productName}
                             </h3>
                             <span className="featuredProd-rating">
-                              prod rating
+                              <img
+                                className="ratingIcon"
+                                src={starIcon}
+                                alt="Star icon"
+                              />
+                              {averageRatingProduct[firstRecommended.productId]
+                              ? averageRatingProduct[firstRecommended.productId].toFixed(1)
+                              : "0"}
                             </span>
                             <h3 className="featuredProd-price">
                               {firstRecommended.price ? firstRecommended.price.toLocaleString('en-US', {
@@ -181,8 +222,8 @@ function Shop() {
                     ))}
                   </div>
                   {recommendedOverAll.slice(1, 5).map((recommendedOverAll) => (
-                    <Link to={`/shop/${userId}/visit_shop/${recommendedOverAll.supplierId}`}>
-                      <div key={recommendedOverAll.productId}  className="carousel-item">
+                    <Link to={`/shop/${userId}/visit_shop/${recommendedOverAll.supplierId}`} style={{ textDecoration: 'none' }} key={`recommended-${recommendedOverAll.productId}`}>
+                      <div className="carousel-item">
                       <div className="featuredProd-card">
                         <div className="prod-card-featured">
                           <img
@@ -194,7 +235,14 @@ function Shop() {
                               {recommendedOverAll.productName}
                             </h3>
                             <span className="featuredProd-rating">
-                              prod rating
+                              <img
+                                className="ratingIcon"
+                                src={starIcon}
+                                alt="Star icon"
+                              />
+                              {averageRatingProduct[recommendedOverAll.productId]
+                              ? averageRatingProduct[recommendedOverAll.productId].toFixed(1)
+                              : "0"}
                             </span>
                             <h3 className="featuredProd-price">
                               {recommendedOverAll.price ? recommendedOverAll.price.toLocaleString('en-US', {
