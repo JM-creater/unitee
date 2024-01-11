@@ -31,9 +31,9 @@ function Supplier() {
   const [showModal, setShowModal] = useState(false);
   const { id } = useParams();
 
-  pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
   const HandleExportToPDF = async () => {
+    pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
     const ordersData = filteredOrders.map((ord) => ({
       OrderNumber: ord.orderNumber,
       Customer: `${ord.user.firstName} ${ord.user.lastName}`,
@@ -175,12 +175,18 @@ function Supplier() {
   // * Download Report to Excel
   const HandleExportToExcel = async () => {
     const ordersData = filteredOrders.map(ord => ({
-        OrderNumber: ord.orderNumber,
-        Customer: `${ord.user.firstName} ${ord.user.lastName}`,
-        Items: ord.cart.items.reduce((total, item) => total + item.quantity, 0),
-        Total: ord.total,
-        Status: getStatusText(ord.status)
+      OrderNumber: ord.orderNumber,
+      Customer: ord.user && `${ord.user.firstName} ${ord.user.lastName}`,
+      Items: ord.cart && ord.cart.items ? ord.cart.items.reduce((total, item) => total + item.quantity, 0) : 0,
+      Total: ord.total ? ord.total.toLocaleString('en-US', {
+          style: 'currency',
+          currency: 'PHP',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+      }) : "₱0.00",
+      Status: ord.status ? getStatusText(ord.status) : 'Unknown'
     }));
+  
 
     const salesData = [
         { Type: 'Weekly Sales', Amount: weeklySales.length > 0 ? weeklySales.reduce((a, b) => a + b) : 0 },
