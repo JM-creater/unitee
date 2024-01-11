@@ -586,99 +586,118 @@ function Manage_Shop() {
     }
   };
 
-  // * Add Item
-  const handleAddItem = () => {
-    const selectedSizes = sizes.filter(({ size }) => size);
+ // * Add Item
+ const handleAddItem = () => {
+  const selectedSizes = sizes.filter(({ size }) => size);
 
-    const errorMessages = [];
+  const errorMessages = [];
 
-    if (!productName) errorMessages.push("Product Name is required");
-    if (!productDescription) errorMessages.push("Product Description is required");
-    if (!productPrice || isNaN(Number(productPrice))) errorMessages.push("Valid Product Price is required");
-    if (!productCategory) errorMessages.push("Product Category is required");
-    if (!productTypeId) errorMessages.push("Product Type is required");
-    if (!selectedImage) errorMessages.push("Image is required");
-    if (!selectedFrontImage) errorMessages.push("Front Image is required");
-    if (!selectedSideImage) errorMessages.push("Side Image is required");
-    if (!selectedBackImage) errorMessages.push("Back Image is required");
-    if (!sizeGuide) errorMessages.push("Size Guide is required");
-    if (selectedSizes.length === 0) errorMessages.push("Sizes and Quantity is required");
+  if (!productName) errorMessages.push("Product Name is required");
+  if (!productDescription)
+    errorMessages.push("Product Description is required");
+  if (
+    !productPrice ||
+    isNaN(Number(productPrice)) ||
+    Number(productPrice) < 80
+  ) {
+    errorMessages.push(
+      "Valid Product Price must be a number and should not be less than 80"
+    );
+  }
 
-    if (errorMessages.length > 0) {
-      errorMessages.forEach((message) => toast.error(message));
-      return;
-    }
+  if (selectedSizes.some(({ quantity }) => parseInt(quantity) <= 0)) {
+    errorMessages.push("Quantity should be greater than 0 for all sizes");
+  }
 
-    const formData = new FormData();
-    formData.append("ProductTypeId", productTypeId);
-    formData.append("ProductName", productName);
-    formData.append("Description", productDescription);
-    formData.append("Category", productCategory);
-    formData.append("Price", productPrice);
-    formData.append("Image", selectedImage as File);
-    formData.append("FrontViewImage", selectedFrontImage as File);
-    formData.append("SideViewImage", selectedSideImage as File);
-    formData.append("BackViewImage", selectedBackImage as File);
-    formData.append("SizeGuide", sizeGuide as File);
-    formData.append("SupplierId", id);
-    selectedDepartments.forEach((departmentId) => {
-      formData.append("DepartmentIds", departmentId);
-    });
+  if (errorMessages.length > 0) {
+    errorMessages.forEach((message) => toast.error(message));
+    return;
+  }
+  if (!productCategory) errorMessages.push("Product Category is required");
+  if (!productTypeId) errorMessages.push("Product Type is required");
+  if (!selectedImage) errorMessages.push("Image is required");
+  if (!selectedFrontImage) errorMessages.push("Front Image is required");
+  if (!selectedSideImage) errorMessages.push("Side Image is required");
+  if (!selectedBackImage) errorMessages.push("Back Image is required");
+  if (!sizeGuide) errorMessages.push("Size Guide is required");
+  if (selectedSizes.length === 0)
+    errorMessages.push("Sizes and Quantity is required");
 
-    axios
-      .post("https://localhost:7017/Product/addproduct", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then(async (productResponse) => {
-        if (productResponse.status === 200) {
+  if (errorMessages.length > 0) {
+    errorMessages.forEach((message) => toast.error(message));
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("ProductTypeId", productTypeId);
+  formData.append("ProductName", productName);
+  formData.append("Description", productDescription);
+  formData.append("Category", productCategory);
+  formData.append("Price", productPrice);
+  formData.append("Image", selectedImage as File);
+  formData.append("FrontViewImage", selectedFrontImage as File);
+  formData.append("SideViewImage", selectedSideImage as File);
+  formData.append("BackViewImage", selectedBackImage as File);
+  formData.append("SizeGuide", sizeGuide as File);
+  formData.append("SupplierId", id);
+  selectedDepartments.forEach((departmentId) => {
+    formData.append("DepartmentIds", departmentId);
+  });
+
+  axios
+    .post("https://localhost:7017/Product/addproduct", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then(async (productResponse) => {
+      if (productResponse.status === 200) {
+        addProductEventEmitter.emit("addProduct");
+
+        const sizeApiCalls = selectedSizes.map(({ size, quantity }) => {
+          const sizeFormData = new FormData();
+          sizeFormData.append("size", size);
+          sizeFormData.append("productId", productResponse.data);
+          sizeFormData.append("quantity", quantity);
+
+          return axios.post(
+            "https://localhost:7017/SizeQuantity/createsizequantity",
+            sizeFormData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        });
+
+        try {
           addProductEventEmitter.emit("addProduct");
+          await Promise.all(sizeApiCalls);
+          toast.success("Successfully Added An Item");
 
-          const sizeApiCalls = selectedSizes.map(({ size, quantity }) => {
-            const sizeFormData = new FormData();
-            sizeFormData.append("size", size);
-            sizeFormData.append("productId", productResponse.data);
-            sizeFormData.append("quantity", quantity);
-
-            return axios.post(
-              "https://localhost:7017/SizeQuantity/createsizequantity",
-              sizeFormData,
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-          });
-
-          try {
-            addProductEventEmitter.emit("addProduct");
-            await Promise.all(sizeApiCalls);
-            toast.success("Successfully Added An Item");
-
-            await sleep(2000);
-            window.location.reload();
-          } catch (error) {
-            console.log(productResponse.data);
-            toast.warning(
-              "Network error or server not responding while adding sizes"
-            );
-          }
-        } else {
-          toast.error(productResponse.data.message);
+          await sleep(2000);
+          window.location.reload();
+        } catch (error) {
+          console.log(productResponse.data);
+          toast.warning(
+            "Network error or server not responding while adding sizes"
+          );
         }
-      })
-      .catch((error) => {
-        if (error.response) {
-          toast.error(error.response.data.message);
-        } else if (error.request) {
-          toast.error("Network error or server not responding");
-        } else {
-          toast.error("Error", error.message);
-        }
-      });
-  };
+      } else {
+        toast.error(productResponse.data.message);
+      }
+    })
+    .catch((error) => {
+      if (error.response) {
+        toast.error(error.response.data.message);
+      } else if (error.request) {
+        toast.error("Network error or server not responding");
+      } else {
+        toast.error("Error", error.message);
+      }
+    });
+};
 
   // * Total Stock Product
   const totalStock = (sizes) => {
