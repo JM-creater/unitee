@@ -382,36 +382,40 @@ function Purchase_History () {
                                 {!ratedPurchases.has(selectedPurchases.id) ? (
                                     <div className='rating-container'>
                                        {/* Product Rating */}
-                                        <div className="prod-rating">
-                                            <h3 className='order-details-titles'>Product Rating:</h3>
-                                            <Rating 
-                                                activeColor="#ffd700" 
-                                                count={5} 
-                                                size={45} 
-                                                value={ratingProduct}  
-                                                onChange={(rating) => setRatingProduct(rating)} 
-                                            />
-                                        </div>
-        
-                                        {/* Supplier Rating */}
-                                        <div className="prod-rating">
-                                            <h3 className='order-details-titles'>Supplier Rating:</h3>
+                                        <div className="stars-container">
+                                            <div className="prod-rating">
+                                                <h3 className='order-details-titles'>Product Rating:</h3>
                                                 <Rating 
                                                     activeColor="#ffd700" 
                                                     count={5} 
-                                                    size={45} 
-                                                    value={ratingSupplier}
-                                                    onChange={(rating) => setRatingSupplier(rating)} 
+                                                    size={35} 
+                                                    value={ratingProduct}  
+                                                    onChange={(rating) => setRatingProduct(rating)} 
                                                 />
+                                            </div>
+            
+                                            {/* Supplier Rating */}
+                                            <div className="prod-rating">
+                                                <h3 className='order-details-titles'>Supplier Rating:</h3>
+                                                    <Rating 
+                                                        activeColor="#ffd700" 
+                                                        count={5} 
+                                                        size={35} 
+                                                        value={ratingSupplier}
+                                                        onChange={(rating) => setRatingSupplier(rating)} 
+                                                    />
+                                            </div>
                                         </div>
-        
+                                        <div className="feedback-input-container">
+                                            <textarea placeholder='Please enter your feedback here.' className='cust-feedback-histo' name="customer-feedback" id="feedback" />
+                                        </div>
                                     </div>
                                 ) : (
                                     <div className="rating-complete-message">
                                         <p className="thank-you-message">Thank you for rating!</p>
-                                        <p className="follow-up-message">Based on your previous purchases, we recommend the following products for you. If you wish to buy again, just click the 'buy again' button below of the modal.</p>
+                                        {/* <p className="follow-up-message">Based on your previous purchases, we recommend the following products for you. If you wish to buy again, just click the 'buy again' button below of the modal.</p> */}
                                         <div className="recommendation-section">
-                                            {recommendationProducts.map((product, index) => (
+                                            {/* {recommendationProducts.map((product, index) => (
                                                 <div key={index} className="recommendation-card">
                                                     <img src={`https://localhost:7017/${product.image}`}className="purchHistory-product-image" />
                                                     <div className="product-details">
@@ -431,22 +435,43 @@ function Purchase_History () {
                                                         <button className="go-to-shop-button" onClick={handleCLose}>Go to Shop</button>
                                                     </Link>
                                                 </div>
-                                            ))}
+                                            ))} */}
+                                            <div className="rating-and-feedback-container">
+                                                <div className="prod-starRating-container">
+                                                    <h3 className='order-details-titles'>Product Rating:</h3>
+                                                    <span className='fa fa-star' style={{ fontSize:'15px', marginBottom:'10px', color:'#0b66dd' }}><span className='starRating-num'>9</span>out of 5</span>
+                                                </div>
+                                                <div className="shop-starRating-container">
+                                                    <h3 className='order-details-titles'>Supplier Rating:</h3>
+                                                    <span className='fa fa-star' style={{ fontSize:'15px', marginBottom:'10px', color:'#0b66dd' }}><span className='starRating-num'>5</span>out of 5</span>
+                                                </div>
+                                                <br />
+                                                <h3 className='order-details-titles'>Customer Feedback</h3>
+                                                    <p className='custFeedback-text'>
+                                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                                                        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                                                        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                                        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                                                            Excepteur sint occaecat cupidatat non proident,
+                                                        sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                                    </p>
+                                            </div>
                                         </div>
                                     </div>
                                 )}    
         
                                 {!ratedPurchases.has(selectedPurchases.id) && (
                                     <React.Fragment>
-                                        <button 
-                                            className="proceed-Btn" 
-                                            style={{ background: '#FFAA00', marginTop: '50px' }}
-                                            onClick={() => HandleSubmitRatings(selectedPurchases.id, selectedPurchases.cart.items[0].product.productId, 
-                                                                        selectedPurchases.cart.items[0].product.supplierId, 
-                                                                        ratingProduct, 
-                                                                        ratingSupplier)}>
-                                            Submit
-                                        </button>
+                                        <div className="feedback-btn-container">
+                                            <button 
+                                                className="submit-feedback-btn" 
+                                                onClick={() => HandleSubmitRatings(selectedPurchases.id, selectedPurchases.cart.items[0].product.productId, 
+                                                                            selectedPurchases.cart.items[0].product.supplierId, 
+                                                                            ratingProduct, 
+                                                                            ratingSupplier)}>
+                                                Submit
+                                            </button>
+                                        </div>
                                     </React.Fragment>
                                 )}
         
