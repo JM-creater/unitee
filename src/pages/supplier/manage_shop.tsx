@@ -1,7 +1,6 @@
 import prodImage from "../../assets/images/shop_products/picture-2.png";
 import addIcon from "../../assets/images/icons/plus-4.png";
 import noProdsIcon from "../../assets/images/icons/empty-box.png";
-import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 import "./manage_shop.css";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -86,8 +85,6 @@ function Manage_Shop() {
   const [newSelectedDepartments, setNewSelectedDepartments] = useState([]);
   const [lastErrorMessage, setLastErrorMessage] = useState("");
   //const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
-
-  const [isLoading, setIsLoading] = useState(true);
 
   const { id } = useParams();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -398,18 +395,15 @@ function Manage_Shop() {
 
   // * Get Product By Supplier Id
   useEffect(() => {
-    setIsLoading(true);
     const fetchProductSupplierId = async () => {
       try {
         const response = await axios.get(
           `https://localhost:7017/Product/bysupplier/${id}`
         );
         setProducts(response.data);
-        setIsLoading(false);
       } catch (error) {
         console.error(error);
         console.error("Error fetching products");
-        setIsLoading(false);
       }
     };
     fetchProductSupplierId();
@@ -730,13 +724,7 @@ function Manage_Shop() {
   };
 
   return (
-    <React.Fragment>
-      {isLoading ? (
-        <div className="mainloading-screen">
-          <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
-        </div>
-      ) : (
-        <div className="manage-shop-main-container">
+    <div className="manage-shop-main-container">
         <div className="add-prod-btn-container">
           <h3
             style={{ marginBottom: "20px", color: "#020654", fontWeight: "600" }}
@@ -1575,8 +1563,6 @@ function Manage_Shop() {
           </div>
         </div>
       </div>
-      )}
-    </React.Fragment>
   );
 }
 

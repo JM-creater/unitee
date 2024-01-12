@@ -82,8 +82,8 @@ function Confirmation_Code() {
             try {
                 const errorData = await response.json();
                 toast.error(errorData.message);
-            } catch (e) {
-                toast.error("An error occurred while confirming email.");
+            } catch (error) {
+                toast.error("An error occurred while confirming email.", error);
             }
         }
         } catch (error) {

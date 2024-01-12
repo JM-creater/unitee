@@ -28,9 +28,26 @@ function Confirmation_Code() {
 
   // * Handle verify later
   const handleVerifyLater = async () => {
-    const id = localStorage.getItem('Id');
-    await axios.post(`https://localhost:7017/Users/verify-later/${id}`);
-    navigate("/");
+    try {
+      const id = localStorage.getItem('IDNumber');
+      const response = await axios.post(`https://localhost:7017/Users/verify-later/${id}`);
+      
+      if (response.status === 200) {
+        console.error('Verification deferred successfully.');
+      } else {
+        console.error('Something went wrong!');
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error(error.response.data.message);
+      } else if (error.request) {
+        console.error('No response received from the server.');
+      } else {
+        console.error('Error:');
+      }
+    } finally {
+      navigate("/");
+    }
   };
 
   // * Check if the email is confirmed

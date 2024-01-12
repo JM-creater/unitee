@@ -136,8 +136,11 @@ function PickUp_Orders () {
 
     // * Handle Completed Orders
     const HandleOrderCompleted = (orderId) => {
+        const loadingToast = toast.loading("Completing...");
+
         axios.put(`https://localhost:7017/Order/orderCompleted/${orderId}`)
         .then(async response => {
+            toast.dismiss(loadingToast);
             const updatedOrder = orders.find(order => order.Id === response.data.Id);
             if (updatedOrder) {
                 Object.assign(updatedOrder, response.data);
@@ -150,6 +153,7 @@ function PickUp_Orders () {
             window.location.reload();
         })
         .catch(error => {
+            toast.dismiss(loadingToast);
             console.error(error.response.data.message);
         });
     };

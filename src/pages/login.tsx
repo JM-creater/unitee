@@ -25,6 +25,7 @@ function Login() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [supplierID, setSupplierID] = useState("");
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [copyMessage, setCopyMessage] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -72,7 +73,7 @@ function Login() {
     copyClip.select();
     document.execCommand("copy");
     document.body.removeChild(copyClip);
-    toast.success("Copied to clipboard: " + text);
+    setCopyMessage("Copied");
   };
 
   const handleResetPassword = (value: string) => {
@@ -279,45 +280,32 @@ function Login() {
               Log In
             </button>
 
-            <div
-              className={`modal ${isModalOpen ? "show" : ""}`}
-              id="IDNumberModal"
-              tabIndex={-1}
-              style={{ display: isModalOpen ? "block" : "none" }}
-            >
-              <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title" id="IDNumberModalLabel">
-                      Please copy your ID #:
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      aria-label="Close"
-                      onClick={closeModal}
-                    ></button>
-                  </div>
-                  <div className="modal-body">
-                    <h5>Your Supplier ID: {supplierID}</h5>
-                    <span
-                      className="copy-icon"
-                      onClick={() => copyToClipboard(supplierID)}
-                    >
-                      <FontAwesomeIcon icon={faCopy} />
-                    </span>
-                  </div>
-                  <div className="modal-footer">
-                    <button
-                      type="button"
-                      className="btn btn-success"
-                      onClick={closeModal}
-                    >
-                      Proceed
-                    </button>
-                  </div>
+            <div className={`modal ${isModalOpen ? "show" : ""}`} id="IDNumberModal" tabIndex={-1} style={{ display: isModalOpen ? "block" : "none" }}>
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="IDNumberModalLabel">
+                                Please copy your ID #:
+                            </h5>
+                            <button type="button" className="btn-close" aria-label="Close" onClick={closeModal}></button>
+                        </div>
+                        <div className="modal-body">
+                            <h5>Your Supplier ID: {supplierID}</h5>
+                            <span className="copy-icon" onClick={() => copyToClipboard(supplierID)}>
+                                <FontAwesomeIcon icon={faCopy} style={{ cursor: 'pointer' }} />
+                            </span>
+                            {/* Reserved space for copy message */}
+                            <div className="copy-message">
+                                {copyMessage}
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-success" onClick={closeModal}>
+                                Proceed
+                            </button>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
 
             <h3 className="register-text">Don't have an account?</h3>

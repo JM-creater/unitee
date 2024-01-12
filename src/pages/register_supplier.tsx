@@ -161,9 +161,7 @@ function Register() {
           localStorage.setItem("Id", response.data.newSupplier.id);
           localStorage.setItem("token", response.data.token);
           registerUsersEventEmitter.emit("registerSupplier");
-          toast.success("Successfully registered.", {
-            onClose: () => navigate("/confirmation_email"),
-          });
+          navigate("/confirmation_email")
           localStorage.setItem("showSupplierIDModal", "true");
           localStorage.setItem("generatedSupplierID", IDNumber);
 
