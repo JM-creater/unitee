@@ -1,5 +1,4 @@
 import "./supplier_dashboard.css";
-import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 import {
   Chart as ChartJS,
   BarElement,
@@ -14,7 +13,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import axios from "axios";
 import orderEventEmitter from "../../helpers/OrderEmitter";
-import React from "react";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
@@ -25,12 +23,12 @@ function Supplier() {
   const [weeklySales, setWeeklySales] = useState([]);
   const [monthlySales, setMonthlySales] = useState([]);
   const [yearlySales, setYearlySales] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [topSellingProducts, setTopSellingProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const { id } = useParams();
 
+   // * Download Report to PDF
   const HandleExportToPDF = async () => {
     pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -63,7 +61,7 @@ function Supplier() {
     ];
 
     const pdfDefinition = {
-        header: function (currentPage, pageCount, pageSize) {
+        header: function (/*currentPage, pageCount, pageSize*/) {
             return {
                 text: (filteredOrders.length > 0 && filteredOrders[0].cart.supplier.shopName) || 'Default Header',
                 alignment: 'center',
@@ -86,19 +84,19 @@ function Supplier() {
             widths: ["auto", "*", "auto", "auto", "auto"],
             body: [
                 [{ text: "OrderNumber", style: "tableHeader" }, { text: "Customer", style: "tableHeader" }, { text: "Items", style: "tableHeader" }, { text: "Status", style: "tableHeader" }, { text: "Total", style: "tableHeader" }],
-                ...ordersData.map((order) => [
-                order.OrderNumber,
-                order.Customer,
-                order.Items,
-                order.Status,
-                { text: `₱${order.Total.toFixed(2)}`, style: "tableCell" },
+                  ...ordersData.map((order) => [
+                  order.OrderNumber,
+                  order.Customer,
+                  order.Items,
+                  order.Status,
+                  { text: `₱${order.Total.toFixed(2)}`, style: "tableCell" },
                 ]),
                 [
-                { text: "", colSpan: 3, border: [0, 0, 0, 0] }, 
-                {},
-                {},
-                { text: "Total Sales", style: "tableHeaderWithBorders" }, 
-                { text: `₱${totalSales.toFixed(2)}`, style: "tableCellWithBorders" }, 
+                  { text: "", colSpan: 3, border: [0, 0, 0, 0] }, 
+                  {},
+                  {},
+                  { text: "Total Sales", style: "tableHeaderWithBorders" }, 
+                  { text: `₱${totalSales.toFixed(2)}`, style: "tableCellWithBorders" }, 
                 ],
             ],
             },
@@ -115,14 +113,14 @@ function Supplier() {
             table: {
               headerRows: 1,
               widths: ["*", "auto"],
-              body: [
-                  [{ text: "Type", style: "tableHeader" }, { text: "Amount", style: "tableHeader" }],
-                  ...salesData.map((sale) => [sale.Type, `₱${sale.Amount.toFixed(2)}`]),
-              ],
+                body: [
+                    [{ text: "Type", style: "tableHeader" }, { text: "Amount", style: "tableHeader" }],
+                    ...salesData.map((sale) => [sale.Type, `₱${sale.Amount.toFixed(2)}`]),
+                ],
               },
               layout: {
-              fillColor: function (rowIndex, node, columnIndex) {
-                  return rowIndex === 0 ? "#2C3E50" : null;
+                fillColor: function (rowIndex, /*node, columnIndex*/) {
+                    return rowIndex === 0 ? "#2C3E50" : null;
               },
             },
         },
@@ -131,15 +129,15 @@ function Supplier() {
             table: {
             headerRows: 1,
             widths: ["*"],
-            body: [
-                [{ text: "Total Orders", style: "tableHeader" }],
-                [orders && orders.length > 0 ? orders.length : 0],
-            ],
+              body: [
+                  [{ text: "Total Orders", style: "tableHeader" }],
+                  [orders && orders.length > 0 ? orders.length : 0],
+              ],
             },
             layout: {
-            fillColor: function (rowIndex, node, columnIndex) {
-                return rowIndex === 0 ? "#2C3E50" : null;
-            },
+              fillColor: function (rowIndex, /*node, columnIndex*/) {
+                  return rowIndex === 0 ? "#2C3E50" : null;
+              },
             },
         },
         ],
@@ -315,15 +313,12 @@ function Supplier() {
 
   // * Fetch Data of All Orders
   useEffect(() => {
-    setIsLoading(true);
     const fetchOrders = async () => {
       try {
         const response = await axios.get(`https://localhost:7017/Order/BySupplier/${id}`);
         setOrders(response.data);
-        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching orders: ", error);
-        setIsLoading(false);
       }
     };
 
@@ -489,13 +484,7 @@ function Supplier() {
   const options = {};
 
   return (
-    <React.Fragment>
-      {isLoading ? (
-        <div className="mainloading-screen">
-          <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
-        </div>
-      ) : (
-        <div className="report-main-container" id="report-container">
+      <div className="report-main-container" id="report-container">
         <div className="row">
           <div className="col-md-7">
             <h3
@@ -755,8 +744,6 @@ function Supplier() {
           </table>
         </div>
       </div>
-      )}
-    </React.Fragment>
   );
 }
 

@@ -158,14 +158,10 @@ function Register() {
         toast.dismiss(loadingToast);
   
         if (response.data) {
-          localStorage.setItem("Id", response.data.newUser.id);
+          localStorage.setItem("IDNumber", response.data.newUser.id);
           localStorage.setItem("token", response.data.token);
           registerUsersEventEmitter.emit("registerCustomer");
-  
-          toast.success("Successfully registered.", {
-            onClose: () => navigate("/confirmation_email"),
-          });
-  
+          navigate("/confirmation_email")
           await sleep(1000);
         } else {
           toast.error(response.data);

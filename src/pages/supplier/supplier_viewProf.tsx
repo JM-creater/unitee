@@ -6,7 +6,6 @@ import "./supplier_viewProf.css";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import uploadimage from "../../assets/images/icons/uploadimage.png"
-import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 import verifiedIcon from '../../assets/images/icons/verified.png'
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -44,7 +43,6 @@ function Supplier_ViewProf() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -89,7 +87,6 @@ function Supplier_ViewProf() {
 
   // * Fetch User Data
   useEffect(() => {
-    setIsLoading(true);
     axios
       .get(`https://localhost:7017/Users/${id}`)
       .then((res) => {
@@ -98,11 +95,9 @@ function Supplier_ViewProf() {
         setAddress(res.data.address);
         setEmail(res.data.email);
         setPhoneNumber(res.data.phoneNumber);
-        setIsLoading(false);
       })
       .catch((err) => {
         console.error(err);
-        setIsLoading(false);
       });
   }, [id]);
 
@@ -242,13 +237,7 @@ function Supplier_ViewProf() {
 
 
   return (
-    <React.Fragment>
-      {isLoading ? (
-        <div className="mainloading-screen">
-          <img className="mainloading-bar" src={LoadingGif} alt="loading..." />
-        </div>
-      ) : (
-        <div className="viewProfile-supplier-main-container">
+      <div className="viewProfile-supplier-main-container">
         <div className="profile-details-container">
         {UserProfile && (
             <div className="user-details-viewProfile">
@@ -476,9 +465,6 @@ function Supplier_ViewProf() {
           </div>
         </div>
       </div>
-      )}
-    </React.Fragment>
-    
   );
 }
 
