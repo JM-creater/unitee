@@ -32,7 +32,7 @@ function Visit_Shop () {
     const [departmentId, setDepartmentId] = useState<number | null>(null);
     const [averageRatingSupplier, setAverageRatingSupplier] = useState(null);
     const [, setProductData] = useState([]);
-    const [productAverageRating ,setProductAverageRating] = useState({}); 
+    const [ ,setProductAverageRating] = useState({}); 
     const [recommendedForYou, setRecommendedForYou] = useState([]);
     const [image, setImage] = useState('');
     const [notHover, setNotHover] = useState('');
@@ -706,7 +706,7 @@ function Visit_Shop () {
     
                                     <h5 className="prodModal-text">
                                         <img className="prodModalRating-icon" src={prodRatingModal} alt="Product Rating Icon" />
-                                        {productAverageRating[selectedProduct.productId] ? productAverageRating[selectedProduct.productId].toFixed(1) : 0}
+                                        {selectedProduct.averageRating.toFixed(1)}
                                     </h5>
     
                                     <h5 className="prodModal-text">

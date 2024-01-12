@@ -5,14 +5,13 @@ import "react-toastify/dist/ReactToastify.css";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
-//sample please do not include in merging
 
 function Shop() {
   const [shop, setShop] = useState([]);
   const [departmentId, setDepartmentId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [averageRatingSupplier, setAverageRatingSupplier] = useState({});
-  const [averageRatingProduct, setAverageRatingProduct] = useState({});
+  const [, setAverageRatingProduct] = useState({});
   const [, setProductData] = useState([]);
   const [recommendedOverAll, setRecommendedOverAll] = useState([]);
   const { userId } = useParams();
@@ -242,9 +241,7 @@ useEffect(() => {
                                 src={starIcon}
                                 alt="Star icon"
                               />
-                              {averageRatingProduct[firstRecommended.productId]
-                              ? averageRatingProduct[firstRecommended.productId].toFixed(1)
-                              : "0"}
+                              {firstRecommended.averageRating.toFixed(1)}
                             </span>
                             <h3 className="featuredProd-price">
                               {firstRecommended.price ? firstRecommended.price.toLocaleString('en-US', {
@@ -280,9 +277,7 @@ useEffect(() => {
                                 src={starIcon}
                                 alt="Star icon"
                               />
-                              {averageRatingProduct[recommendedOverAll.productId]
-                              ? averageRatingProduct[recommendedOverAll.productId].toFixed(1)
-                              : "0"}
+                              {recommendedOverAll.averageRating.toFixed(1)}
                             </span>
                             <h3 className="featuredProd-price">
                               {recommendedOverAll.price ? recommendedOverAll.price.toLocaleString('en-US', {
