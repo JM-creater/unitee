@@ -25,19 +25,20 @@ function Manage_Shop() {
     quantity: string;
   }
 
-  // type ValidationErrors = {
-  //   department?: string;
-  //   productName?: string;
-  //   description?: string;
-  //   category?: string;
-  //   image?: string | null;
-  //   frontViewImage?: string | null;
-  //   sideViewImage?: string | null;
-  //   backViewImage?: string | null;
-  //   sizeGuide?: string | null;
-  //   price?: string;
-  //   sizes?: string
-  // }
+  type ValidationErrors = {
+    department?: string;
+    productName?: string;
+    description?: string;
+    category?: string;
+    image?: string | null;
+    frontViewImage?: string | null;
+    sideViewImage?: string | null;
+    backViewImage?: string | null;
+    sizeGuide?: string | null;
+    price?: string;
+    sizes?: string;
+    productTypeId?: string;
+  }
 
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [products, setProducts] = useState([]);
@@ -84,7 +85,7 @@ function Manage_Shop() {
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [newSelectedDepartments, setNewSelectedDepartments] = useState([]);
   const [lastErrorMessage, setLastErrorMessage] = useState("");
-  //const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
   const { id } = useParams();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -475,28 +476,59 @@ function Manage_Shop() {
 
   // * Edit Item
   const handleEdit = async () => {
-    const selectedSizes = Newsizes.filter(({ size }) => size);
-    const errorMessages = [];
+    const errors: ValidationErrors = {};
 
-    if (!newName) errorMessages.push("Product Name is required");
-    if (!newDescription) errorMessages.push("Product Description is required");
-    if (!newPrice || isNaN(Number(productPrice)))
-      errorMessages.push("Valid Product Price is required");
-    if (!newCategory) errorMessages.push("Product Category is required");
-    if (!newTypeId) errorMessages.push("Product Type is required");
-    if (!newSelectedDepartments) errorMessages.push("Department is required");
-    if (!newSelectedImage) errorMessages.push("Image is required");
-    if (!newSelectedFrontImage) errorMessages.push("Front Image is required");
-    if (!newSelectedSideImage) errorMessages.push("Side Image is required");
-    if (!newSelectedBackImage) errorMessages.push("Back Image is required");
-    if (!newSizeGuide) errorMessages.push("Size Guide is required");
-    if (selectedSizes.length === 0)
-      errorMessages.push("Sizes and Quantity is required");
-
-    if (errorMessages.length > 0) {
-      errorMessages.forEach((message) => toast.error(message));
-      return;
+    if (!newName) {
+      errors.productName = "Product Name is required";
     }
+
+    if (!newDescription) {
+      errors.description = "Product Description is required";
+    }
+
+    if (!newSelectedDepartments) {
+      errors.department = "Department is required";
+    }
+
+    if (!newPrice) {
+      errors.price = "Price is required";
+    } else if (isNaN(Number(newPrice)) || Number(newPrice) < 80) {
+      errors.price = "Valid Product Price must be a number and should not be less than 80";
+    }
+
+    if (!newCategory) {
+      errors.category = "Product Category is required";
+    }
+
+    if (!newTypeId) {
+      errors.productTypeId = "Product Type is required";
+    }
+
+    if (!newSelectedImage) {
+      errors.image = "Main Image is required";
+    }
+    if (!newSelectedFrontImage) {
+      errors.frontViewImage = "Front Image is required";
+    }
+    if (!newSelectedSideImage) {
+      errors.sideViewImage = "Side Image is required";
+    }
+    if (!newSelectedBackImage) {
+      errors.backViewImage = "Back Image is required";
+    }
+
+    if (!newSizeGuide) {
+      errors.sizeGuide = "Size Guide is required";
+    }
+
+    const selectedSizes = Newsizes.filter(({ size }) => size);
+    if (selectedSizes.length === 0) {
+      errors.sizes = "At least one size is required";
+    } else if (selectedSizes.some(({ quantity }) => parseInt(quantity) <= 0)) {
+      errors.sizes = "Quantity should be greater than 0 for all sizes";
+    }
+
+  setValidationErrors(errors);
 
     const formData = new FormData();
     formData.append("ProductTypeId", newTypeId);
@@ -576,51 +608,67 @@ function Manage_Shop() {
       }
     } catch (error) {
       console.error(error);
-      toast.error("Network error or server not responding");
+      console.error("Network error or server not responding");
     }
   };
 
+
  // * Add Item
  const handleAddItem = () => {
+
+  const errors: ValidationErrors = {};
+
+  if (!productName) {
+    errors.productName = "Product Name is required";
+  }
+
+  if (!productDescription) {
+    errors.description = "Product Description is required";
+  }
+
+  if (!departments) {
+    errors.department = "Department is required";
+  }
+
+  if (!productPrice) {
+    errors.price = "Price is required";
+  } else if (isNaN(Number(productPrice)) || Number(productPrice) < 80) {
+    errors.price = "Valid Product Price must be a number and should not be less than 80";
+  }
+
+  if (!productCategory) {
+    errors.category = "Product Category is required";
+  }
+
+  if (!productTypeId) {
+    errors.productTypeId = "Product Type is required";
+  }
+
+  if (!selectedImage) {
+    errors.image = "Main Image is required";
+  }
+  if (!selectedFrontImage) {
+    errors.frontViewImage = "Front Image is required";
+  }
+  if (!selectedSideImage) {
+    errors.sideViewImage = "Side Image is required";
+  }
+  if (!selectedBackImage) {
+    errors.backViewImage = "Back Image is required";
+  }
+
+  if (!sizeGuide) {
+    errors.sizeGuide = "Size Guide is required";
+  }
+
   const selectedSizes = sizes.filter(({ size }) => size);
-
-  const errorMessages = [];
-
-  if (!productName) errorMessages.push("Product Name is required");
-  if (!productDescription)
-    errorMessages.push("Product Description is required");
-  if (
-    !productPrice ||
-    isNaN(Number(productPrice)) ||
-    Number(productPrice) < 80
-  ) {
-    errorMessages.push(
-      "Valid Product Price must be a number and should not be less than 80"
-    );
+  if (selectedSizes.length === 0) {
+    errors.sizes = "At least one size is required";
+  } else if (selectedSizes.some(({ quantity }) => parseInt(quantity) <= 0)) {
+    errors.sizes = "Quantity should be greater than 0 for all sizes";
   }
 
-  if (selectedSizes.some(({ quantity }) => parseInt(quantity) <= 0)) {
-    errorMessages.push("Quantity should be greater than 0 for all sizes");
-  }
-
-  if (errorMessages.length > 0) {
-    errorMessages.forEach((message) => toast.error(message));
-    return;
-  }
-  if (!productCategory) errorMessages.push("Product Category is required");
-  if (!productTypeId) errorMessages.push("Product Type is required");
-  if (!selectedImage) errorMessages.push("Image is required");
-  if (!selectedFrontImage) errorMessages.push("Front Image is required");
-  if (!selectedSideImage) errorMessages.push("Side Image is required");
-  if (!selectedBackImage) errorMessages.push("Back Image is required");
-  if (!sizeGuide) errorMessages.push("Size Guide is required");
-  if (selectedSizes.length === 0)
-    errorMessages.push("Sizes and Quantity is required");
-
-  if (errorMessages.length > 0) {
-    errorMessages.forEach((message) => toast.error(message));
-    return;
-  }
+  setValidationErrors(errors);
 
   const formData = new FormData();
   formData.append("ProductTypeId", productTypeId);
@@ -885,6 +933,17 @@ function Manage_Shop() {
                 style={{ display: "flex", flexFlow: "row" }}
               >
                 <div>
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.image ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.image && (
+                      <div className="error-message-container">
+                        {validationErrors.image}
+                      </div>
+                    )}
+                  </div>
                   <div className="thumbnail-container">
                     <h3 className="prod-info-titles">Main Image</h3>
                     <img
@@ -912,7 +971,17 @@ function Manage_Shop() {
                       onKeyDown={handleKeyDown}
                     />
                   </div>
-  
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.frontViewImage ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.frontViewImage && (
+                      <div className="error-message-container">
+                        {validationErrors.frontViewImage}
+                      </div>
+                    )}
+                  </div>
                   <div className="thumbnail-container">
                     <h3 className="prod-info-titles">Front Image</h3>
                     <img
@@ -940,7 +1009,17 @@ function Manage_Shop() {
                       onKeyDown={handleKeyDown}
                     />
                   </div>
-  
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.sideViewImage ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.sideViewImage && (
+                      <div className="error-message-container">
+                        {validationErrors.sideViewImage}
+                      </div>
+                    )}
+                  </div>
                   <div className="thumbnail-container">
                     <h3 className="prod-info-titles">Side Image</h3>
                     <img
@@ -968,7 +1047,17 @@ function Manage_Shop() {
                       onKeyDown={handleKeyDown}
                     />
                   </div>
-  
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.backViewImage ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.backViewImage && (
+                      <div className="error-message-container">
+                        {validationErrors.backViewImage}
+                      </div>
+                    )}
+                  </div>
                   <div className="thumbnail-container">
                     <h3 className="prod-info-titles">Back Image</h3>
                     <img
@@ -1002,7 +1091,17 @@ function Manage_Shop() {
                   <h3 className="col-md-12 prod-details-titles">
                     Product Details
                   </h3>
-  
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.productName ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.productName && (
+                      <div className="error-message-container">
+                        {validationErrors.productName}
+                      </div>
+                    )}
+                  </div>
                   <label className="prod-details-labels" htmlFor="prodName">
                     Product Name
                   </label>
@@ -1016,7 +1115,17 @@ function Manage_Shop() {
                     onChange={(e) => setProductName(e.target.value)}
                     onKeyDown={handleKeyDown}
                   />
-  
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.description ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.description && (
+                      <div className="error-message-container">
+                        {validationErrors.description}
+                      </div>
+                    )}
+                  </div>
                   <label className="prodDescription-label">Description</label>
                   <textarea
                     className="form-control"
@@ -1026,7 +1135,17 @@ function Manage_Shop() {
                     onChange={(e) => setProductDescription(e.target.value)}
                     onKeyDown={handleKeyDown}
                   />
-  
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.department ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.department && (
+                      <div className="error-message-container">
+                        {validationErrors.department}
+                      </div>
+                    )}
+                  </div>
                   <label className="prod-details-labels">Department</label>
                   {/* DEPARTMENT CHECKBOX */}
                   <div className="suppliers-department-checkbox">
@@ -1050,7 +1169,17 @@ function Manage_Shop() {
                       </label>
                     ))}
                   </div>
-                  {/* GENDER OPTIONS */}
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.category ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.category && (
+                      <div className="error-message-container">
+                        {validationErrors.category}
+                      </div>
+                    )}
+                  </div>
                   <label className="prod-details-labels">Gender</label>
                   <div className="department-option">
                     <input
@@ -1106,7 +1235,17 @@ function Manage_Shop() {
                       Unisex
                     </label>
                   </div>
-  
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.productTypeId ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.productTypeId && (
+                      <div className="error-message-container">
+                        {validationErrors.productTypeId}
+                      </div>
+                    )}
+                  </div>
                   <label className="prod-details-labels">Product Type</label>
                   <select
                     name="prodType"
@@ -1130,7 +1269,17 @@ function Manage_Shop() {
                       </option>
                     ))}
                   </select>
-  
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.price ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.price && (
+                      <div className="error-message-container">
+                        {validationErrors.price}
+                      </div>
+                    )}
+                  </div>
                   <label className="prod-details-labels">Price</label>
                   <input
                     className="modal-input-box"
@@ -1142,7 +1291,17 @@ function Manage_Shop() {
                     onChange={(e) => handlePrice(e.target.value)}
                     onKeyDown={handleKeyDown}
                   />
-  
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.sizeGuide ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.sizeGuide && (
+                      <div className="error-message-container">
+                        {validationErrors.sizeGuide}
+                      </div>
+                    )}
+                  </div>
                   <h2 className="prod-details-labels">Upload Size Guide:</h2>
                   <input
                     type="file"
@@ -1151,8 +1310,17 @@ function Manage_Shop() {
                     accept="image/png, image/gif, image/jpeg"
                     onChange={handleSizeGuideChange}
                   />
-  
-                  {/* SIZES AVAILABLE */}
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.sizes ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.sizes && (
+                      <div className="error-message-container">
+                        {validationErrors.sizes}
+                      </div>
+                    )}
+                  </div>
                   <label className="prod-details-labels">Sizes Available</label>
                   <div className="suppliers-sizes-avail-checkbox">
                     {sizes.map((sizeQty, index) => (
@@ -1249,6 +1417,17 @@ function Manage_Shop() {
                   style={{ display: "flex", flexFlow: "row" }}
                 >
                   <div>
+                  <div
+                    className={`error-message-container ${
+                      validationErrors.image ? "error-message" : "hidden"
+                    }`}
+                  >
+                    {validationErrors.image && (
+                      <div className="error-message-container">
+                        {validationErrors.image}
+                      </div>
+                    )}
+                  </div>
                     <div className="thumbnail-container">
                       <h3 className="prod-info-titles">Main Image</h3>
                       <img
@@ -1275,7 +1454,17 @@ function Manage_Shop() {
                         style={{ display: "none" }}
                       />
                     </div>
-  
+                    <div
+                      className={`error-message-container ${
+                        validationErrors.frontViewImage ? "error-message" : "hidden"
+                      }`}
+                    >
+                      {validationErrors.frontViewImage && (
+                        <div className="error-message-container">
+                          {validationErrors.frontViewImage}
+                        </div>
+                      )}
+                    </div>
                     <div className="thumbnail-container">
                       <h3 className="prod-info-titles">Front Image</h3>
                       <img
@@ -1302,7 +1491,17 @@ function Manage_Shop() {
                         style={{ display: "none" }}
                       />
                     </div>
-  
+                    <div
+                      className={`error-message-container ${
+                        validationErrors.sideViewImage ? "error-message" : "hidden"
+                      }`}
+                    >
+                      {validationErrors.sideViewImage && (
+                        <div className="error-message-container">
+                          {validationErrors.sideViewImage}
+                        </div>
+                      )}
+                    </div>
                     <div className="thumbnail-container">
                       <h3 className="prod-info-titles">Side Image</h3>
                       <img
@@ -1329,7 +1528,17 @@ function Manage_Shop() {
                         style={{ display: "none" }}
                       />
                     </div>
-  
+                    <div
+                      className={`error-message-container ${
+                        validationErrors.backViewImage ? "error-message" : "hidden"
+                      }`}
+                    >
+                      {validationErrors.backViewImage && (
+                        <div className="error-message-container">
+                          {validationErrors.backViewImage}
+                        </div>
+                      )}
+                    </div>
                     <div className="thumbnail-container">
                       <h3 className="prod-info-titles">Back Image</h3>
                       <img
@@ -1360,7 +1569,17 @@ function Manage_Shop() {
   
                   <div className="col-md supplier-prod-details-modal">
                     <h3 className="prod-details-titles">Product Details</h3>
-  
+                    <div
+                      className={`error-message-container ${
+                        validationErrors.productName ? "error-message" : "hidden"
+                      }`}
+                    >
+                      {validationErrors.productName && (
+                        <div className="error-message-container">
+                          {validationErrors.productName}
+                        </div>
+                      )}
+                    </div>
                     <label className="prod-details-labels" htmlFor="prodName">
                       Product Name
                     </label>
@@ -1373,7 +1592,17 @@ function Manage_Shop() {
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
                     />
-  
+                    <div
+                      className={`error-message-container ${
+                        validationErrors.description ? "error-message" : "hidden"
+                      }`}
+                    >
+                      {validationErrors.description && (
+                        <div className="error-message-container">
+                          {validationErrors.description}
+                        </div>
+                      )}
+                    </div>
                     <label className="prodDescription-label">Description</label>
                     <textarea
                       className="form-control"
@@ -1382,7 +1611,17 @@ function Manage_Shop() {
                       value={newDescription}
                       onChange={(e) => setNewDescription(e.target.value)}
                     />
-  
+                    <div
+                      className={`error-message-container ${
+                        validationErrors.department ? "error-message" : "hidden"
+                      }`}
+                    >
+                      {validationErrors.department && (
+                        <div className="error-message-container">
+                          {validationErrors.department}
+                        </div>
+                      )}
+                    </div>
                     {/* DEPARTMENT CHECKBOX */}
                     <label className="prod-details-labels">Department</label>
                     <div className="suppliers-department-checkbox">
@@ -1405,7 +1644,17 @@ function Manage_Shop() {
                         </label>
                       ))}
                     </div>
-  
+                    <div
+                      className={`error-message-container ${
+                        validationErrors.category ? "error-message" : "hidden"
+                      }`}
+                    >
+                      {validationErrors.category && (
+                        <div className="error-message-container">
+                          {validationErrors.category}
+                        </div>
+                      )}
+                    </div>
                     {/* GENDER OPTIONS */}
                     <label className="prod-details-labels">Gender</label>
                     <div className="department-option">
@@ -1456,7 +1705,17 @@ function Manage_Shop() {
                         Unisex
                       </label>
                     </div>
-  
+                    <div
+                      className={`error-message-container ${
+                        validationErrors.productTypeId ? "error-message" : "hidden"
+                      }`}
+                    >
+                      {validationErrors.productTypeId && (
+                        <div className="error-message-container">
+                          {validationErrors.productTypeId}
+                        </div>
+                      )}
+                    </div>
                     <label className="prod-details-labels">Product Type</label>
                     <select
                       name="prodGender"
@@ -1485,7 +1744,17 @@ function Manage_Shop() {
                         </option>
                       ))}
                     </select>
-  
+                    <div
+                      className={`error-message-container ${
+                        validationErrors.sizeGuide ? "error-message" : "hidden"
+                      }`}
+                    >
+                      {validationErrors.sizeGuide && (
+                        <div className="error-message-container">
+                          {validationErrors.sizeGuide}
+                        </div>
+                      )}
+                    </div>
                     <h2 className="prod-details-labels">Upload Size Guide:</h2>
                     <input
                       type="file"
@@ -1494,7 +1763,17 @@ function Manage_Shop() {
                       accept="image/png, image/gif, image/jpeg"
                       onChange={handleSizeGuideChange2}
                     />
-  
+                    <div
+                      className={`error-message-container ${
+                        validationErrors.sizes ? "error-message" : "hidden"
+                      }`}
+                    >
+                      {validationErrors.sizes && (
+                        <div className="error-message-container">
+                          {validationErrors.sizes}
+                        </div>
+                      )}
+                    </div>
                     {/* SIZES AVAILABLE CHECKBOX */}
                     <label className="prod-details-labels">Sizes Available</label>
                     <div className="suppliers-sizes-avail-checkbox">
