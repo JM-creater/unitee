@@ -10,6 +10,8 @@ import "./visit_shop.css"
 import cartEventEmitter from "../../helpers/EventEmitter"
 import React from "react"
 import addProductEventEmitter from "../../helpers/AddProductEventEmitter";
+//temporary please remove
+import userProfileReview from '../../assets/images/imageprofile.jpeg'
 
 function Visit_Shop () {
 
@@ -706,12 +708,12 @@ function Visit_Shop () {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-md-5 prodModal-details-container">
-                                    <h2 className="col-md-12 prodModal-Name">{selectedProduct.productName}</h2>
+                                <div className="prodModal-details-container">
+                                    <h2 className="prodModal-Name">{selectedProduct.productName}</h2>
     
                                     <h5 className="prodModal-text">
                                         <img className="prodModalRating-icon" src={prodRatingModal} alt="Product Rating Icon" />
-                                        {selectedProduct.averageRating.toFixed(1)}
+                                        {selectedProduct.averageRating.toFixed(1) }
                                     </h5>
     
                                     <h5 className="prodModal-text">
@@ -729,28 +731,19 @@ function Visit_Shop () {
                                         })
                                         : "₱0.00"}
                                     </h1>
-                                    <div className="prodModal-SizeGuide">
-                                        <h5 className="prodModal-text">
-                                            <button 
+                                    <div className="prodModal-Size-Stock-container">
+                                    <button 
+                                                className="sizeGuide-btn"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#viewSizeGuideModal"
-                                                style={{ 
-                                                    padding:'5px', 
-                                                    border: '2px solid white', 
-                                                    backgroundColor:'#004AAD', 
-                                                    borderRadius:'10px',
-                                                    color: 'white'
-                                                }}
+                                                title="view size guide"
                                             >
                                                 Size Guide
                                             </button>
-                                        </h5>
-                                        
-                                    </div>
-                                    <div className="col-md-12 prodModal-Size-Stock-container">
                                         <select 
-                                            className="col-md-5" 
-                                            style={{ padding:'10px', border: '2px solid white', backgroundColor:'#F0F0F0', borderRadius:'10px' }}
+                                            className="col-md-2" 
+                                            title="select product size"
+                                            style={{ padding:'10px', border: '2px solid white', borderRadius:'10px' }}
                                             onChange={HandleSelectedSize}
                                         >
                                             <option disabled selected hidden>
@@ -785,13 +778,29 @@ function Visit_Shop () {
                                             +
                                         </button>
                                     </div>
-                                    <button className="prodModal-add-to-cart-btn" onClick={addToCart} >
-                                        <img className="prodModal-cart-icon" src={ cartIcon }/>
-                                        Add to Cart
-                                    </button>
+                                    <div className="addToCart-container">
+                                        <button className="prodModal-add-to-cart-btn" onClick={addToCart} >
+                                            <img className="prodModal-cart-icon" src={ cartIcon }/>
+                                            Add to Cart
+                                        </button>
+                                    </div>
                                 </div>
                             </React.Fragment>
                             )}
+
+                            <div className="product-reviews-container">
+                                <h2>Reviews</h2>
+                                <div className="user-review-card">
+                                    <div className="custDetails-reviews">
+                                        <img className="review-cust-profile" src={ userProfileReview } alt="" />
+                                        <div className="cust-name-rating-container">
+                                            <span className="reviews-CustName">Racel Anne Pitogo</span>
+                                            <span className="reviews-rating"><span className="fa fa-star reviewRating"> 5</span> out of 5</span>
+                                        </div>
+                                    </div>
+                                    <p className="prodReview-visitShop" id="productReview">sadbasd ashjdb ashjdbashjdb ahjsdbashj bdhjsadbhjas bdhjasb dhjasbd hjasbdhj sa asdsad asdgvas dghasvdashgdv ghasvd gahsvdhgasvdghasvghdvasghdvasghd </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

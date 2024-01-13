@@ -16,6 +16,20 @@
     max-width: 350px;
 }
 
+.copy-icon {
+    padding: 5px 25px;
+    /* background-color: #00439b; */
+    border: solid 1px #060e18;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.copy-icon:hover {
+    border: solid 1px #ffffff;
+    background-color: #0967e2;
+}
+
 .login-text {
     margin-bottom: 30px;
 }
