@@ -521,7 +521,7 @@ function Cart() {
         <div className="cart-remove-btn-container">
           <button
             type="button"
-            className="btn btn-outline-primary"
+            className="deny-btn"
             onClick={handleRemoveCartPrompt}
           >
             <img style={{ width: "20%", marginRight: "5px" }} src={remove} />
@@ -726,15 +726,22 @@ function Cart() {
                   accept="image/png, image/gif, image/jpeg"
                   onChange={handleProofOfPaymentChange}
                 />
-                <h2 className="total-amount-text">Reference Id (GCash):</h2>
-                <input
+                {/* <h2 className="total-amount-text">Reference Id (GCash):</h2> */}
+                {/* <input
                   type="text"
                   style={{ borderRadius: "5px" }}
                   className="proof-payment-img"
                   value={referenceId}
                   onChange={(e) => handleReferenceId(e.target.value)}
                   maxLength={13}
-                />
+                /> */}
+                <div className="form__group field">
+                    <input type="input" className="form__field" placeholder="Name"
+                    value={referenceId}
+                    onChange={(e) => handleReferenceId(e.target.value)}
+                    maxLength={13}/>
+                    <label htmlFor="name" className="form__label">Reference ID (GCash)</label>
+                </div>
               </div>
               <div className="btn-container">
                 <button className="place-order" onClick={HandleOrderPlace}>
@@ -779,14 +786,14 @@ function Cart() {
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="approve-btn"
                 data-bs-dismiss="modal"
               >
                 Cancel
               </button>
               <button
                 type="button"
-                className="btn btn-danger"
+                className="deny-btn"
                 data-bs-dismiss="modal"
                 onClick={handleRemoveCart}
               >
