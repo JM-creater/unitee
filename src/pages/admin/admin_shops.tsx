@@ -18,7 +18,7 @@ function Admin_Shops () {
     const [selectedGender, setSelectedGender] = useState('');
     const [selectedProductType, setSelectedProductType] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
-    const [averageRatingSupplier, setAverageRatingSupplier] = useState(null);
+    const [, setAverageRatingSupplier] = useState(null);
     const [averageRatingProduct, setAverageRatingProduct] = useState(null);
     
 
@@ -296,8 +296,7 @@ function Admin_Shops () {
                         <h5 className='shop-rating-card'>{shopItem.address}</h5>
                         <h5 className='shop-rating-card'>
                             <img className="ratingIcon" src={starIcon} />
-                            {averageRatingSupplier && averageRatingSupplier[shopItem.id] ?
-                                averageRatingSupplier[shopItem.id].toFixed(1) : "No rating yet"}
+                            {shopItem.averageRating.toFixed(1)}
                         </h5>
                     </div>
                 </div>
@@ -502,7 +501,8 @@ function Admin_Shops () {
                                                 <span className='admin-prodRating' style={{ color:'white', marginTop:'8px', display:'flex', alignItems:'center' }}>
 
                                                     <img style={{ marginRight:'5px', width:'100%', maxWidth:'12px' }} src={ prodRating } alt="product rating icon" />
-                                                    {averageRatingProduct && averageRatingProduct[product.productId] ? averageRatingProduct[product.productId].toFixed(1) : "No rating yet"}
+                                                    {averageRatingProduct && averageRatingProduct[product.productId] ? averageRatingProduct[product.productId].toFixed(1) : "0.0"}
+                                                    
                                                 </span>
                                             </h4>
                                             <h4 className='col-md-3 admin-prodStocks'>Total Stocks:

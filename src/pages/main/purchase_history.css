@@ -304,8 +304,8 @@
     width: 54em;
     max-width: 54em;
     height: 33em;
-    /* overflow: auto; */
-    /* scroll-behavior: smooth; */
+    overflow: auto;
+    scroll-behavior: smooth;
   }
 
   .purchHistory-product-image {

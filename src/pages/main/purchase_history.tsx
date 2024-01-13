@@ -31,11 +31,17 @@ function Purchase_History () {
     const [purchases, setPurchases] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [selectedPurchases, setSelectedPurchases] = useState(null);
+    const [comment, setComment] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [ratingProduct, setRatingProduct] = useState(0);
     const [ratingSupplier, setRatingSupplier] = useState(0);
     const [ratedPurchases, setRatedPurchases] = useState(new Set());
+    const [searchTerm, setSearchTerm] = useState('');
     const { userId } = useParams();
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
 
     // * Handle Close Modal
     const handleCLose = () => {
@@ -76,7 +82,8 @@ function Purchase_History () {
                 UserId: userId,
                 ProductId: productId,
                 SupplierId: supplierId,
-                Value: supplierRating
+                Value: supplierRating,
+                Comment: comment
             });
 
             // * Add the purchaseId to the ratedPurchases set
@@ -228,8 +235,7 @@ function Purchase_History () {
                 <h1 className='history-title'>Purchase History</h1>
                     <div className="col-md-10 search-date-container row" style={{ gap:'10px', marginTop:'20px'}}>
                         <div className='col-md-4 history-search-container' style={{  display:'flex', flexFlow:'row', paddingLeft:'20px'}}>
-                            {/* <input className="form-control me-2" type="search" placeholder="Search by Order No." aria-label="Search"/>
-                            <button className="col-md-3 btn btn-outline-primary" type="submit">Search</button> */}
+                            <input className="form-control me-2" type="search" placeholder="Search by Shop Name" aria-label="Search" onChange={handleSearchChange}/>
                         </div>
                     </div>
                 </div>
@@ -248,7 +254,9 @@ function Purchase_History () {
                                 </tr>
                             </thead>
                             {purchases.length > 0 ? (
-                                purchases.filter(purchase => Status[Object.keys(Status)[purchase.status - 1]] === Status.Completed ||
+                                purchases
+                                    .filter(purchase => purchase.cart.supplier.shopName.toLowerCase().includes(searchTerm.toLowerCase()))
+                                    .filter(purchase => Status[Object.keys(Status)[purchase.status - 1]] === Status.Completed ||
                                     Status[Object.keys(Status)[purchase.status - 1]] === Status.Completed).map((purchaseItem, index) => (
                                     <tbody key={index} className="table-group-divider">
                                         <tr className='align-middle' data-bs-toggle="modal" data-bs-target="#purchaseHistoryModal" onClick={() => setSelectedPurchases(purchaseItem)}>
@@ -407,15 +415,15 @@ function Purchase_History () {
                                             </div>
                                         </div>
                                         <div className="feedback-input-container">
-                                            <textarea placeholder='Please enter your feedback here.' className='cust-feedback-histo' name="customer-feedback" id="feedback" />
+                                            <textarea onChange={(e) => setComment(e.target.value)} value={comment} placeholder='Please enter your feedback here.' className='cust-feedback-histo' name="customer-feedback" id="feedback" />
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="rating-complete-message">
                                         <p className="thank-you-message">Thank you for rating!</p>
-                                        {/* <p className="follow-up-message">Based on your previous purchases, we recommend the following products for you. If you wish to buy again, just click the 'buy again' button below of the modal.</p> */}
+                                        <p className="follow-up-message">Based on your previous purchases, we recommend the following products for you. If you wish to buy again, just click the 'buy again' button below of the modal.</p>
                                         <div className="recommendation-section">
-                                            {/* {recommendationProducts.map((product, index) => (
+                                            {recommendationProducts.map((product, index) => (
                                                 <div key={index} className="recommendation-card">
                                                     <img src={`https://localhost:7017/${product.image}`}className="purchHistory-product-image" />
                                                     <div className="product-details">
@@ -435,7 +443,7 @@ function Purchase_History () {
                                                         <button className="go-to-shop-button" onClick={handleCLose}>Go to Shop</button>
                                                     </Link>
                                                 </div>
-                                            ))} */}
+                                            ))}
                                             <div className="rating-and-feedback-container">
                                                 <div className="prod-starRating-container">
                                                     <h3 className='order-details-titles'>Product Rating:</h3>
