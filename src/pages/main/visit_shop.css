@@ -243,6 +243,16 @@
     align-items: center;
 }
 
+/* .modal-content {
+    background: linear-gradient(135deg, #a3b8ff 0%, #b0c7ff 25%, #bed5ff 50%, #cbe3ff 75%, #d8f1ff 100%);
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    padding: 25px;
+    color: #333;
+    position: relative;
+    overflow: hidden;
+} */
+
 .product-reviews-container {
     background-color: #f0f0f0;
     border-radius: 5px;

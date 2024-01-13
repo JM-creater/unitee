@@ -10,8 +10,7 @@ import "./visit_shop.css"
 import cartEventEmitter from "../../helpers/EventEmitter"
 import React from "react"
 import addProductEventEmitter from "../../helpers/AddProductEventEmitter";
-//temporary please remove
-import userProfileReview from '../../assets/images/imageprofile.jpeg'
+import { FaCommentSlash } from 'react-icons/fa'; 
 
 function Visit_Shop () {
 
@@ -790,17 +789,60 @@ function Visit_Shop () {
 
                             <div className="product-reviews-container">
                                 <h2>Reviews</h2>
-                                <div className="user-review-card">
-                                    <div className="custDetails-reviews">
-                                        <img className="review-cust-profile" src={ userProfileReview } alt="" />
-                                        <div className="cust-name-rating-container">
-                                            <span className="reviews-CustName">Racel Anne Pitogo</span>
-                                            <span className="reviews-rating"><span className="fa fa-star reviewRating"> 5</span> out of 5</span>
-                                        </div>
+                                {selectedProduct && selectedProduct.ratings.length > 0 ? (
+                                    <div className="user-review-card">
+                                        {selectedProduct.ratings
+                                            .filter(rating => rating.role === 1)
+                                            .slice(0, 5)
+                                            .map((rating, ratingIndex) => (
+                                                <React.Fragment key={ratingIndex}>
+                                                    <div className="custDetails-reviews">
+                                                        <img
+                                                            className="review-cust-profile"
+                                                            src={`https://localhost:7017/${rating.user.image}`}
+                                                            alt={`${rating.user.firstName} ${rating.user.lastName}`} />
+                                                        <div className="cust-name-rating-container">
+                                                            <span className="reviews-CustName">
+                                                                {rating.user.firstName} {rating.user.lastName}
+                                                            </span>
+                                                            <span className="reviews-rating">
+                                                                <span className="fa fa-star reviewRating">{rating.value}</span> out of 5
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <p className="prodReview-visitShop" id="productReview">{rating.comment}</p>
+                                                </React.Fragment>
+                                            ))
+                                        }
                                     </div>
-                                    <p className="prodReview-visitShop" id="productReview">sadbasd ashjdb ashjdbashjdb ahjsdbashj bdhjsadbhjas bdhjasb dhjasbd hjasbdhj sa asdsad asdgvas dghasvdashgdv ghasvd gahsvdhgasvdghasvghdvasghdvasghd </p>
-                                </div>
+                                ) : (
+                                    <div className="no-reviews-message text-center p-3 border border-white" style={{ backgroundColor: "white" }}>
+                                        <FaCommentSlash className="no-reviews-icon" style={{ height: '50px', width: '50px' }} />
+                                        <p className="no-reviews-text">
+                                            We're sorry, but there are no reviews available for this product at the moment.
+                                        </p>
+                                    </div>
+                                )}
                             </div>
+                            <nav aria-label="Page navigation example">
+                                <ul className="pagination pagination-lg">
+                                    <li className="page-item">
+                                        <a className="page-link" href="#" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                            <span className="sr-only">Previous</span>
+                                        </a>
+                                    </li>
+                                    <li className="page-item"><a className="page-link" href="#">1</a></li>
+                                    <li className="page-item"><a className="page-link" href="#">2</a></li>
+                                    <li className="page-item"><a className="page-link" href="#">3</a></li>
+                                    <li className="page-item">
+                                    <a className="page-link" href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        <span className="sr-only">Next</span>
+                                    </a>
+                                    </li>
+                                </ul>
+                            </nav>
                         </div>
                     </div>
                 </div>
