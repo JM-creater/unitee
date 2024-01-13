@@ -79,6 +79,7 @@ function Manage_Shop() {
 
   const [sizeGuide, setSizeGuide] = useState<File | null>(null);
   const [newSizeGuide, setNewSizeGuide] = useState<File | null>(null);
+  const [sizeGuideUrl, setSizeGuideUrl] = useState<string | null>(null);
 
   const [NewisActive, setNewIsActive] = useState();
 
@@ -124,6 +125,11 @@ function Manage_Shop() {
     setNewSelectedDepartments(
       productItem.departments.map((dept) => dept.departmentId)
     );
+    if (productItem.sizeGuide) {
+      setSizeGuideUrl(`https://localhost:7017/${productItem.sizeGuide}`);
+    } else {
+      setSizeGuideUrl(null);
+    }
   };
 
   // * Reset Button
@@ -205,7 +211,7 @@ function Manage_Shop() {
 
   // * Category Change for Edit
   const handleCategoryChange2 = (gender) => {
-    if (productCategory === gender) {
+    if (newCategory === gender) {
       setNewCategory("");
     } else {
       setNewCategory(gender);
@@ -219,7 +225,18 @@ function Manage_Shop() {
 
   // * Handle Size Guide Image for Edit
   const handleSizeGuideChange2 = (event) => {
-    setNewSizeGuide(event.target.files[0]);
+    const file = event.target.files ? event.target.files[0] : null;
+    if (file) {
+      setNewSizeGuide(file);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const newSizeGuideImageUrl = event.target?.result as string;
+        setSizeGuideUrl(newSizeGuideImageUrl); 
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setSizeGuideUrl(null);
+    }
   };
 
   // ! Add
@@ -507,15 +524,15 @@ function Manage_Shop() {
     if (!newSelectedImage) {
       errors.image = "Main Image is required";
     }
-    if (!newSelectedFrontImage) {
-      errors.frontViewImage = "Front Image is required";
-    }
-    if (!newSelectedSideImage) {
-      errors.sideViewImage = "Side Image is required";
-    }
-    if (!newSelectedBackImage) {
-      errors.backViewImage = "Back Image is required";
-    }
+    // if (!newSelectedFrontImage) {
+    //   errors.frontViewImage = "Front Image is required";
+    // }
+    // if (!newSelectedSideImage) {
+    //   errors.sideViewImage = "Side Image is required";
+    // }
+    // if (!newSelectedBackImage) {
+    //   errors.backViewImage = "Back Image is required";
+    // }
 
     if (!newSizeGuide) {
       errors.sizeGuide = "Size Guide is required";
@@ -1664,7 +1681,7 @@ function Manage_Shop() {
                         name="gender"
                         id="departmentCheck1"
                         checked={newCategory === "Male"}
-                        onChange={(e) => handleCategoryChange(e, "Male")}
+                        onChange={() => handleCategoryChange2("Male")}
                       />
                       <label
                         className="departmentCheckLabel"
@@ -1680,7 +1697,7 @@ function Manage_Shop() {
                         name="gender"
                         id="departmentCheck2"
                         checked={newCategory === "Female"}
-                        onChange={(e) => handleCategoryChange(e, "Female")}
+                        onChange={() => handleCategoryChange2("Female")}
                       />
                       <label
                         className="departmentCheckLabel"
@@ -1696,7 +1713,7 @@ function Manage_Shop() {
                         name="gender"
                         id="departmentCheck3"
                         checked={newCategory === "Unisex"}
-                        onChange={(e) => handleCategoryChange(e, "Unisex")}
+                        onChange={() => handleCategoryChange2("Unisex")}
                       />
                       <label
                         className="departmentCheckLabel"
@@ -1756,12 +1773,23 @@ function Manage_Shop() {
                       )}
                     </div>
                     <h2 className="prod-details-labels">Upload Size Guide:</h2>
+                    {sizeGuideUrl && (
+                      <div className="thumbnail-container">
+                        <img
+                          width={150}
+                          height={150}
+                          src={sizeGuideUrl}
+                          alt="Size Guide"
+                          className="supplier-modal-addprod-img"
+                        />
+                      </div>
+                    )}
                     <input
-                      type="file"
-                      ref={sizeGuideRef}
-                      className="size-guide-img"
-                      accept="image/png, image/gif, image/jpeg"
-                      onChange={handleSizeGuideChange2}
+                        type="file"
+                        ref={sizeGuideRef}
+                        className="size-guide-img"
+                        accept="image/png, image/gif, image/jpeg"
+                        onChange={handleSizeGuideChange2}
                     />
                     <div
                       className={`error-message-container ${

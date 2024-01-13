@@ -1,6 +1,7 @@
 import starIcon from "../../assets/images/icons/starRating.png"
 import cartIcon from "../../assets/images/icons/addToCart.png"
 import prodRatingModal from "../../assets/images/icons/starRating.png"
+import noimage from "../../assets/images/noimage.jpg"
 import axios from 'axios'
 import { toast } from 'react-toastify';
 import { useState, useEffect } from 'react'
@@ -30,7 +31,7 @@ function Visit_Shop () {
     const [quantity, setQuantity] = useState(0);
     const [newQuantity, setNewQuantity] = useState(0);
     const [departmentId, setDepartmentId] = useState<number | null>(null);
-    const [averageRatingSupplier, setAverageRatingSupplier] = useState(null);
+    const [, setAverageRatingSupplier] = useState(null);
     const [, setProductData] = useState([]);
     const [ ,setProductAverageRating] = useState({}); 
     const [recommendedForYou, setRecommendedForYou] = useState([]);
@@ -404,7 +405,11 @@ function Visit_Shop () {
                     </div>
     
                     <h5 className="visitShop-rating">
-                    <img className="ratingIcon" src={ starIcon }/>{averageRatingSupplier !== null ? averageRatingSupplier.toFixed(1) : 'No Rating Yet'}</h5>
+                        <img className="ratingIcon" src={starIcon} />
+                        {displayProduct.slice(0, 1).map((sup, index) => (
+                            <span key={index}>{sup.supplier.averageRating.toFixed(1)}</span>
+                        ))}
+                    </h5>
                     
                     {/* Filter */}
                     <div className="prodFilter-container">
@@ -668,7 +673,7 @@ function Visit_Shop () {
                                     <div className="img-container">
                                         <img 
                                             className="prodModal-Image" 
-                                            src={notHover || image} 
+                                            src={notHover || image || noimage} 
                                         />
                                     </div>
                                     <div className="hover-container">
@@ -678,7 +683,7 @@ function Visit_Shop () {
                                         >
                                             <img 
                                                 className="small-image" 
-                                                src={`https://localhost:7017/${selectedProduct.frontViewImage}`} 
+                                                src={selectedProduct.frontViewImage ? `https://localhost:7017/${selectedProduct.frontViewImage}` : noimage} 
                                             />
                                         </div>
                                         <div 
@@ -687,7 +692,7 @@ function Visit_Shop () {
                                         >
                                             <img 
                                                 className="small-image" 
-                                                src={`https://localhost:7017/${selectedProduct.sideViewImage}`} 
+                                                src={selectedProduct.sideViewImage ? `https://localhost:7017/${selectedProduct.sideViewImage}` : noimage} 
                                             />
                                         </div>
                                         <div 
@@ -696,7 +701,7 @@ function Visit_Shop () {
                                         >
                                             <img 
                                                 className="small-image" 
-                                                src={`https://localhost:7017/${selectedProduct.backViewImage}`}
+                                                src={selectedProduct.backViewImage ? `https://localhost:7017/${selectedProduct.backViewImage}` : noimage}
                                             />
                                         </div>
                                     </div>

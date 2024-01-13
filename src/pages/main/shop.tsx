@@ -10,7 +10,7 @@ function Shop() {
   const [shop, setShop] = useState([]);
   const [departmentId, setDepartmentId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [averageRatingSupplier, setAverageRatingSupplier] = useState({});
+  const [, setAverageRatingSupplier] = useState({});
   const [, setAverageRatingProduct] = useState({});
   const [, setProductData] = useState([]);
   const [recommendedOverAll, setRecommendedOverAll] = useState([]);
@@ -348,9 +348,7 @@ useEffect(() => {
                             src={starIcon}
                             alt="Star icon"
                           />
-                          {averageRatingSupplier[shops.id]
-                            ? averageRatingSupplier[shops.id].toFixed(1)
-                            : "0"}
+                          {shops.averageRating.toFixed(1)}
                         </h5>
                       </React.Fragment>
                     </div>
