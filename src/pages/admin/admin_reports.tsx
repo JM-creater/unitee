@@ -41,6 +41,8 @@ function Admin_Reports () {
     const [supplierOrderCounts, setSupplierOrderCounts] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
 
     // * Get the Sales by Weekly, Monthly, Yearly
     useEffect(() => {
@@ -456,10 +458,14 @@ function Admin_Reports () {
 
     // * Filtered By Status, Departments
     const filteredOrders = orders.filter((ord) => {
+        const orderDate = new Date(ord.dateCreated);
+        const matchesDateRange =
+        (!startDate || orderDate >= new Date(startDate)) &&
+        (!endDate || orderDate <= new Date(endDate));
         const matchesStatus = selectedStatus === 'All' || selectedStatus === '' || (ord.status === parseInt(selectedStatus, 10));
         const matchesShop = selectedShop === 'All' || selectedShop === '' || (ord.cart.supplier.id === parseInt(selectedShop, 10));
     
-        return matchesStatus && matchesShop;
+        return matchesStatus && matchesShop && matchesDateRange;
     });
 
     const months = [
@@ -675,6 +681,30 @@ function Admin_Reports () {
                                 )}
                             </select>
                         </div>
+
+                        <div>
+                            <label style={{ marginRight:'10px' }} htmlFor="supplierFilter">Start Date:</label>
+                            <input
+                                style={{ padding: '10px', border: '2px solid white' }} 
+                                type="date"
+                                id="startDate"
+                                name="order-status-filter-admin" 
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label style={{ marginRight:'10px' }} htmlFor="supplierFilter">End Date:</label>
+                            <input
+                                style={{ padding: '10px', border: '2px solid white' }} 
+                                type="date"
+                                id="endDate"
+                                name="order-status-filter-admin" 
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                            />
+                        </div>
+
                     </div>
         
                     {/* TABLE */}

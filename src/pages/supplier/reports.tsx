@@ -26,6 +26,8 @@ function Supplier() {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [topSellingProducts, setTopSellingProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const { id } = useParams();
 
    // * Download Report to PDF
@@ -358,14 +360,18 @@ function Supplier() {
 
   // * Filtered By Status, Departments
   const filteredOrders = orders.filter((ord) => {
+    const orderDate = new Date(ord.dateCreated);
+    const matchesDateRange =
+      (!startDate || orderDate >= new Date(startDate)) &&
+      (!endDate || orderDate <= new Date(endDate));
     const matchesStatus =
       selectedStatus === "All" ||
       selectedStatus === "" ||
       ord.status === parseInt(selectedStatus, 10);
-    const matchesShop = id;
-
-    return matchesStatus && matchesShop;
+    return matchesDateRange && matchesStatus;
   });
+  
+  
 
   // * Get the Sales by Weekly, Monthly, Yearly
   useEffect(() => {
@@ -676,6 +682,28 @@ function Supplier() {
                 )}
               </select>
             </div> */}
+            <div>
+              <label style={{ marginRight: "10px" }} htmlFor="statusOrderFilter">Start Date:</label>
+              <input
+                style={{ padding: "10px", border: "2px solid white" }}
+                name="order-status-filter-admin"
+                type="date"
+                id="startDate"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div>
+              <label style={{ marginRight: "10px" }} htmlFor="statusOrderFilter">End Date:</label>
+              <input
+                style={{ padding: "10px", border: "2px solid white" }}
+                name="order-status-filter-admin"
+                type="date"
+                id="endDate"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
           </div>
   
           {/* TABLE */}
