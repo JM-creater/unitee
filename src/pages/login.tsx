@@ -101,7 +101,180 @@ function Login() {
   };
 
   // * Login Account
-  const handleLogin = () => {
+  // const handleLogin = async () => {
+  //   const errors: ValidationErrors = {};
+  //   if (!IDOrEmail) {
+  //       errors.IDOrEmail = "ID Number or Email is required.";
+  //   }
+  //   if (!Password) {
+  //       errors.Password = "Password is required.";
+  //   }
+  //   setValidationErrors(errors);
+
+  //   if (Object.keys(errors).length > 0) {
+  //       return;
+  //   }
+
+  //   let data;
+  //   if (/^\d+$/.test(IDOrEmail)) {
+  //       data = {
+  //           Id: parseInt(IDOrEmail),
+  //           Password: Password
+  //       };
+  //   } else if (/@/.test(IDOrEmail)) {
+  //       data = {
+  //           Email: IDOrEmail,
+  //           Password: Password
+  //       };
+  //   } else {
+  //       toast.error("Please provide a valid ID Number or Email.");
+  //       return;
+  //   }
+
+  //   const url = "https://localhost:7017/Users/login";
+  //   try {
+  //       const result = await axios.post(url, data);
+  //       if (result.status === 200) {
+  //           login(result.data.token);
+
+  //           const checkTokenResponse = await axios.get(`https://localhost:7017/Users/checkTokenExpiration?token=${result.data.token}&userId=${result.data.user.id}`);
+
+  //           if (checkTokenResponse.data.user.isTokenExpired) {
+  //               navigate("/confirmation_login");
+  //               return;
+  //           } else if (checkTokenResponse.data.user.isTokenExpired === false) {
+  //               setIsLoading(true);
+  //               await sleep(10000);
+
+  //               switch (result.data.role) {
+  //                   case "Customer":
+  //                       navigate(`/shop/${result.data.user.id}`, {
+  //                           state: { userData: result.data.user }
+  //                       });
+  //                       break;
+  //                   case "Supplier":
+  //                       localStorage.removeItem('generatedSupplierID');
+  //                       navigate(`/supplier_dashboard/${result.data.user.id}`, {
+  //                           state: { supplierData: result.data.user }
+  //                       });
+  //                       break;
+  //                   case "Admin":
+  //                       navigate(`/admin_dashboard/${result.data.user.id}`, {
+  //                           state: { adminData: result.data.user }
+  //                       });
+  //                       break;
+  //                   default:
+  //                       console.log("Unknown role");
+  //                       break;
+  //               }
+  //           } else {
+  //             console.log("error");
+  //           }
+  //       } else {
+  //           toast.error(result.data.message);
+  //       }
+  //   } catch (error) {
+  //       if (error.response && error.response.status === 400) {
+  //           toast.error(error.response.data.message);
+  //       } else {
+  //           toast.error("An error occurred. Please try again later.");
+  //       }
+  //   }
+  // };
+
+//   const handleLogin = async () => {
+//     const errors: ValidationErrors = {};
+//     if (!IDOrEmail) {
+//         errors.IDOrEmail = "ID Number or Email is required.";
+//     }
+//     if (!Password) {
+//         errors.Password = "Password is required.";
+//     }
+//     setValidationErrors(errors);
+
+//     if (Object.keys(errors).length > 0) {
+//         return;
+//     }
+
+//     let data;
+//     if (/^\d+$/.test(IDOrEmail)) {
+//         data = {
+//             Id: parseInt(IDOrEmail),
+//             Password: Password
+//         };
+//     } else if (/@/.test(IDOrEmail)) {
+//         data = {
+//             Email: IDOrEmail,
+//             Password: Password
+//         };
+//     } else {
+//         toast.error("Please provide a valid ID Number or Email.");
+//         return;
+//     }
+
+//     const url = "https://localhost:7017/Users/login";
+//     try {
+//         const result = await axios.post(url, data);
+//         if (result.status === 200) {
+//             login(result.data.token);
+
+//             const checkTokenResponse = await axios.get(`https://localhost:7017/Users/checkTokenExpiration?token=${result.data.token}&userId=${result.data.user.id}`);
+
+//             if (checkTokenResponse.data.user.isTokenExpired) {
+//                 // Token is expired, send an email and navigate to confirmation_login
+//                 const emailResponse = await axios.post(`https://localhost:7017/SendEmail`, {
+//                     email: result.data.user.email,
+//                     confirmationCode: checkTokenResponse.data.user.confirmationCode
+//                 });
+
+//                 if (emailResponse.status === 200) {
+//                     toast.info("Token expired. An email has been sent with a new code.");
+//                     navigate("/confirmation_login");
+//                 } else {
+//                     toast.error("Failed to send email. Please try again later.");
+//                 }
+//             } else {
+//                 // Token is not expired, proceed with login
+//                 setIsLoading(true);
+//                 await sleep(10000);
+
+//                 switch (result.data.role) {
+//                     case "Customer":
+//                         navigate(`/shop/${result.data.user.id}`, {
+//                             state: { userData: result.data.user }
+//                         });
+//                         break;
+//                     case "Supplier":
+//                         localStorage.removeItem('generatedSupplierID');
+//                         navigate(`/supplier_dashboard/${result.data.user.id}`, {
+//                             state: { supplierData: result.data.user }
+//                         });
+//                         break;
+//                     case "Admin":
+//                         navigate(`/admin_dashboard/${result.data.user.id}`, {
+//                             state: { adminData: result.data.user }
+//                         });
+//                         break;
+//                     default:
+//                         console.log("Unknown role");
+//                         break;
+//                 }
+//             }
+//         } else {
+//             toast.error(result.data.message);
+//         }
+//     } catch (error) {
+//         if (error.response && error.response.status === 400) {
+//             toast.error(error.response.data.message);
+//         } else {
+//             toast.error("An error occurred. Please try again later.");
+//         }
+//     }
+// };
+
+
+// * Login Account
+const handleLogin = () => {
     const errors: ValidationErrors = {};
 
     if (!IDOrEmail) {
@@ -181,6 +354,7 @@ function Login() {
         }
       });
   };
+
 
   // * Handle Reset Password with Email
   const HandleResetPassword = async () => {
