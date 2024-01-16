@@ -1,6 +1,5 @@
 import "./shop.css";
 import { Link, useParams } from "react-router-dom";
-import starIcon from "../../assets/images/icons/starRating.png";
 import "react-toastify/dist/ReactToastify.css";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -236,13 +235,17 @@ useEffect(() => {
                               {firstRecommended.productName}
                             </h3>
                             <span className="featuredProd-rating">
-                              {/* <img
-                                className="ratingIcon"
-                                src={starIcon}
-                                alt="Star icon"
-                              /> */}
-                              <span className="fa fa-star" style={{ color:'yellow', marginRight:'3px' }}></span>
-                              {firstRecommended.averageRating.toFixed(1)}
+                              {firstRecommended.averageRating > 0 ? (
+                                <React.Fragment>
+                                  <span className="fa fa-star" style={{ color:'yellow', marginRight:'3px' }}></span>
+                                  {firstRecommended.averageRating.toFixed(1)}
+                                </React.Fragment>
+                              ) : (
+                                <React.Fragment>
+                                  <span className="fa fa-star" style={{ color:'#ccc', marginRight:'3px' }}></span>
+                                  0.0
+                                </React.Fragment>
+                              )}
                             </span>
                             <span className="num-sold-shop"><span className="numberSold">{firstRecommended.numberOfSolds}</span>sold</span>
                             <h3 className="featuredProd-price">
@@ -274,13 +277,17 @@ useEffect(() => {
                               {recommendedOverAll.productName}
                             </h3>
                             <span className="featuredProd-rating">
-                              {/* <img
-                                className="ratingIcon"
-                                src={starIcon}
-                                alt="Star icon"
-                              /> */}
-                              <span className="fa fa-star" style={{ color: 'yellow', marginRight:'3px' }}></span>
-                              {recommendedOverAll.averageRating.toFixed(1)}
+                              {recommendedOverAll.averageRating > 0 ? (
+                                <React.Fragment>
+                                  <span className="fa fa-star" style={{ color: 'yellow', marginRight:'3px' }}></span>
+                                  {recommendedOverAll.averageRating.toFixed(1)}
+                                </React.Fragment>
+                              ) : (
+                                <React.Fragment>
+                                  <span className="fa fa-star" style={{ color: '#ccc', marginRight:'3px' }}></span>
+                                  0.0
+                                </React.Fragment>
+                              )}
                             </span>
                             <span className="num-sold-shop"><span className="numberSold">{recommendedOverAll.numberOfSolds}</span>sold</span>
                             <h3 className="featuredProd-price">
@@ -347,12 +354,17 @@ useEffect(() => {
                       <h5 className="shop-rating-card">{shops.address}</h5>
                       <React.Fragment>
                         <h5 className="shop-rating-card">
-                          <img
-                            className="ratingIcon"
-                            src={starIcon}
-                            alt="Star icon"
-                          />
-                          {shops.averageRating.toFixed(1)}
+                          {shops.averageRating > 0 ? (
+                            <React.Fragment>
+                              <span className="fa fa-star" style={{ color: 'yellow', marginRight: '3px' }}></span>
+                              {shops.averageRating.toFixed(1)}
+                            </React.Fragment>
+                          ) : (
+                            <React.Fragment>
+                              <span className="fa fa-star" style={{ color: '#ccc', marginRight: '3px' }}></span>
+                              0.0
+                            </React.Fragment>
+                          )}
                         </h5>
                       </React.Fragment>
                     </div>

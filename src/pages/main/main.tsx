@@ -35,8 +35,6 @@ function Main() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [products, setProducts] = useState([]);
   const [productTypes, setProductTypes] = useState([]);
-  //const [displayText, setdDsplayText] = useState("");
-  //const [searchCriteria, setdSearchCriteria] = useState("");
 
   // * Handle Search Input
   const handleSearchInputChange = (event) => {
@@ -49,7 +47,6 @@ function Main() {
       setSearchTerm(searchCriteria);
       navigate(`/shop/${userId}/search_product?search=${searchCriteria}`);
     } else {
-      // navigate(`/shop/${userId}`);
       return;
     }
   };
@@ -303,12 +300,12 @@ function Main() {
                     let displayText = "";
                     let searchCriteria = "";
 
-                    // Helper function to bold the matching letters
+                    // * Helper function to bold the matching letters
                     const highlightMatch = (text, searchTerm) => {
                       const matchIndex = text.indexOf(searchTerm);
                       if (matchIndex !== -1) {
                         return (
-                          <>
+                          <React.Fragment>
                             {text.substring(0, matchIndex)}
                             <strong>
                               {text.substring(
@@ -317,7 +314,7 @@ function Main() {
                               )}
                             </strong>
                             {text.substring(matchIndex + searchTerm.length)}
-                          </>
+                          </React.Fragment>
                         );
                       }
                       return text;
@@ -363,7 +360,8 @@ function Main() {
                           width={30}
                           height={30}
                           style={{ marginRight: "10px" }}
-                        ></img>
+                        >
+                        </img>
                         <span className="form-control-feedback">
                           {displayText}
                         </span>
