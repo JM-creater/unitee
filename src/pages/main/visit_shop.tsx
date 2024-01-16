@@ -11,6 +11,7 @@ import cartEventEmitter from "../../helpers/EventEmitter"
 import React from "react"
 import addProductEventEmitter from "../../helpers/AddProductEventEmitter";
 import { FaCommentSlash } from 'react-icons/fa'; 
+// import { Rating } from "../../components/common/rate"
 
 function Visit_Shop () {
 
@@ -41,6 +42,19 @@ function Visit_Shop () {
     const [notHover, setNotHover] = useState('');
     const { userId, id: shopId } = useParams();
     const supplier = suppliers[shopId];
+
+    const renderStars = (rating) => {
+        const stars = [];
+        for (let i = 1; i <= 5; i++) {
+            if (i <= Math.round(rating)) {
+                stars.push(<span className="fa fa-star checked" key={i}></span>); 
+            } else {
+                stars.push(<span className="fa fa-star" key={i}></span>); 
+            }
+        }
+        return stars;
+    }
+    
 
     // * Function to fetch feedback for a specific product
     const handleFeedback = async (productId) => {
@@ -627,9 +641,9 @@ function Visit_Shop () {
                             >
                                 <img className="visitShopProdImg" src={`https://localhost:7017/${recommended.image}`} alt={recommended.productName} />
                                 <h4 className="visitShop-topProdName">{recommended.productName}</h4>
-                                <span className="topProd-rating">
-                                    <span className="fa fa-star topProd-rating"> {recommended.averageRating}</span>out of 5
-                                </span>
+                                <div className="topProd-rating">
+                                    {renderStars(recommended.averageRating)}
+                                </div>
                                 <h3 className="topProdPrice">{recommended.price ? recommended.price.toLocaleString('en-US', {
                                             style: 'currency',
                                             currency: 'PHP',
