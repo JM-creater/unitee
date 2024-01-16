@@ -236,13 +236,15 @@ useEffect(() => {
                               {firstRecommended.productName}
                             </h3>
                             <span className="featuredProd-rating">
-                              <img
+                              {/* <img
                                 className="ratingIcon"
                                 src={starIcon}
                                 alt="Star icon"
-                              />
+                              /> */}
+                              <span className="fa fa-star" style={{ color:'yellow', marginRight:'3px' }}></span>
                               {firstRecommended.averageRating.toFixed(1)}
                             </span>
+                            <span className="num-sold-shop"><span className="numberSold">{firstRecommended.numberOfSolds}</span>sold</span>
                             <h3 className="featuredProd-price">
                               {firstRecommended.price ? firstRecommended.price.toLocaleString('en-US', {
                                     style: 'currency',
@@ -272,13 +274,15 @@ useEffect(() => {
                               {recommendedOverAll.productName}
                             </h3>
                             <span className="featuredProd-rating">
-                              <img
+                              {/* <img
                                 className="ratingIcon"
                                 src={starIcon}
                                 alt="Star icon"
-                              />
+                              /> */}
+                              <span className="fa fa-star" style={{ color: 'yellow', marginRight:'3px' }}></span>
                               {recommendedOverAll.averageRating.toFixed(1)}
                             </span>
+                            <span className="num-sold-shop"><span className="numberSold">{recommendedOverAll.numberOfSolds}</span>sold</span>
                             <h3 className="featuredProd-price">
                               {recommendedOverAll.price ? recommendedOverAll.price.toLocaleString('en-US', {
                                   style: 'currency',

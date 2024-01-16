@@ -22,6 +22,15 @@
     margin-left: 12px;
 }
 
+.numberSold-prod, .num-sold-prod {
+    color: #187cd9;
+    font-size: 15px;
+}
+
+.numberSold-prod {
+    margin-right: 3px;
+}
+
 .shopDetails-container-shop {
     background-color: #F0F0F0;
     border-radius: 20px;
@@ -31,6 +40,12 @@
     align-items: center;
     padding: 10px;
     min-width: fit-content;
+}
+
+.topProd-rating {
+    color: white;
+    font-size: 11px;
+    padding: 5px;
 }
 
 .visitShop-seller-details-container {

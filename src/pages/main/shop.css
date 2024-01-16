@@ -192,6 +192,19 @@
 .featured-prod-details {
   width: fit-content;
   padding: 10px;
+  display: flex;
+  flex-direction: column;
+  height: 12em;
+}
+
+.num-sold-shop {
+  color: white;
+  font-weight: 600;
+}
+
+.numberSold {
+  color: white;
+  margin-right: 3px;
 }
 
 .featuredProd-name, .featuredProd-rating, .featuredProd-price {

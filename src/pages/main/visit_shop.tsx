@@ -23,6 +23,7 @@ function Visit_Shop () {
     const [, setCart] = useState([]);
     const [displayProduct, setDisplayProduct] = useState([]);
     const [departments, setDepartments] = useState([]);
+    const [feedBack, setFeedBack] = useState([]);
     const [selectedProductType, setSelectedProductType] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -41,6 +42,21 @@ function Visit_Shop () {
     const { userId, id: shopId } = useParams();
     const supplier = suppliers[shopId];
 
+    // * Function to fetch feedback for a specific product
+    const handleFeedback = async (productId) => {
+        try {
+            const response = await axios.get(`https://localhost:7017/Rating/getFeedBack/${productId}`);
+            setFeedBack(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    // * Function to get the number of sold items for a product
+    const getNumberOfSolds = (productId) => {
+        const product = recommendedForYou.find(p => p.productId === productId);
+        return product ? product.numberOfSolds : 0;
+    };
 
    // * Get Recommended Products For You
     useEffect(() => {
@@ -385,6 +401,7 @@ function Visit_Shop () {
         }
     };
 
+
     return (
         <div className="shop-main-container">
             <div className="shop-content1-container">
@@ -592,7 +609,9 @@ function Visit_Shop () {
                 <div className="top-ratedProducts-Shop">
                     <h3 className="topRated-label">Recommended For You</h3>
                     <div className="topProds-container-visitShop">
-                        {recommendedForYou.map(recommended => (
+                        {recommendedForYou
+                        .slice(0, 5)
+                        .map(recommended => (
                             <div 
                                 className="topProdShop-card"
                                 data-bs-toggle="modal" 
@@ -602,11 +621,15 @@ function Visit_Shop () {
                                     if (recommended.isActive) {
                                         setSelectedProduct(recommended);
                                         setImage(`https://localhost:7017/${recommended.image}`);
+                                        handleFeedback(recommended.productId);
                                     }
                                 }}
                             >
-                                <img className="visitShopProdImg" src={`https://localhost:7017/${recommended.image}`} alt="" />
+                                <img className="visitShopProdImg" src={`https://localhost:7017/${recommended.image}`} alt={recommended.productName} />
                                 <h4 className="visitShop-topProdName">{recommended.productName}</h4>
+                                <span className="topProd-rating">
+                                    <span className="fa fa-star topProd-rating"> {recommended.averageRating}</span>out of 5
+                                </span>
                                 <h3 className="topProdPrice">{recommended.price ? recommended.price.toLocaleString('en-US', {
                                             style: 'currency',
                                             currency: 'PHP',
@@ -631,6 +654,7 @@ function Visit_Shop () {
                                 if (product.isActive) {
                                     setSelectedProduct(product);
                                     setImage(`https://localhost:7017/${product.image}`);
+                                    handleFeedback(product.productId);
                                 }
                             }}
                         > 
@@ -679,7 +703,7 @@ function Visit_Shop () {
                                     </div>
                                     <div className="hover-container">
                                         <div 
-                                            onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.frontViewImage}`)}
+                                            onMouseOver={() => setNotHover(selectedProduct.frontViewImage ? `https://localhost:7017/${selectedProduct.frontViewImage}` : noimage)}
                                             onMouseLeave={() => setNotHover('')}
                                         >
                                             <img 
@@ -688,7 +712,7 @@ function Visit_Shop () {
                                             />
                                         </div>
                                         <div 
-                                            onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.sideViewImage}`)}
+                                            onMouseOver={() => setNotHover(selectedProduct.sideViewImage ? `https://localhost:7017/${selectedProduct.sideViewImage}` : noimage)}
                                             onMouseLeave={() => setNotHover('')}
                                         >
                                             <img 
@@ -697,7 +721,7 @@ function Visit_Shop () {
                                             />
                                         </div>
                                         <div 
-                                            onMouseOver={() => setNotHover(`https://localhost:7017/${selectedProduct.backViewImage}`)}
+                                            onMouseOver={() => setNotHover(selectedProduct.backViewImage ? `https://localhost:7017/${selectedProduct.backViewImage}` : noimage)}
                                             onMouseLeave={() => setNotHover('')}
                                         >
                                             <img 
@@ -714,7 +738,7 @@ function Visit_Shop () {
                                         <img className="prodModalRating-icon" src={prodRatingModal} alt="Product Rating Icon" />
                                         {selectedProduct.averageRating.toFixed(1) }
                                     </h5>
-    
+                                    <span className="num-sold-prod"><span className="numberSold-prod"> {getNumberOfSolds(selectedProduct.productId)}</span>sold</span>
                                     <h5 className="prodModal-text">
                                         {getDepartmentName(selectedProduct.productDepartments.departmentId)}
                                     </h5>
@@ -789,9 +813,9 @@ function Visit_Shop () {
 
                             <div className="product-reviews-container">
                                 <h2>Reviews</h2>
-                                {selectedProduct && selectedProduct.ratings.length > 0 ? (
+                                {feedBack && feedBack.length > 0 ? (
                                     <div className="user-review-card">
-                                        {selectedProduct.ratings
+                                        {feedBack
                                             .filter(rating => rating.role === 1)
                                             .slice(0, 5)
                                             .map((rating, ratingIndex) => (
@@ -824,7 +848,7 @@ function Visit_Shop () {
                                     </div>
                                 )}
                             </div>
-                            <nav aria-label="Page navigation example">
+                            {/* <nav aria-label="Page navigation example">
                                 <ul className="pagination pagination-lg">
                                     <li className="page-item">
                                         <a className="page-link" href="#" aria-label="Previous">
@@ -842,7 +866,7 @@ function Visit_Shop () {
                                     </a>
                                     </li>
                                 </ul>
-                            </nav>
+                            </nav> */}
                         </div>
                     </div>
                 </div>

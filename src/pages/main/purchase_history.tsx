@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import React from 'react';
 import submitRatingEventEmitter from '../../helpers/SubmitRatingEventEmitter';
 import orderEventEmitter from '../../helpers/OrderEmitter';
+import thankYou from '../../assets/images/thankYou.png';
 import { Rating } from '../../components/common/rate';
 import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 
@@ -27,7 +28,7 @@ function Purchase_History () {
         Denied: 'Denied'
     };
 
-    const [recommendationProducts, setRecommendationProducts] = useState([]);
+    const [, setRecommendationProducts] = useState([]);
     const [purchases, setPurchases] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [selectedPurchases, setSelectedPurchases] = useState(null);
@@ -35,9 +36,11 @@ function Purchase_History () {
     const [isLoading, setIsLoading] = useState(true);
     const [ratingProduct, setRatingProduct] = useState(0);
     const [ratingSupplier, setRatingSupplier] = useState(0);
-    const [ratedPurchases, setRatedPurchases] = useState(new Set());
     const [searchTerm, setSearchTerm] = useState('');
     const { userId } = useParams();
+
+     // * For Delay
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
@@ -74,7 +77,8 @@ function Purchase_History () {
                 UserId: userId,
                 ProductId: productId,
                 SupplierId: supplierId,
-                Value: productRating
+                Value: productRating,
+                Comment: comment
             });
     
             // * Submit supplier rating
@@ -82,32 +86,36 @@ function Purchase_History () {
                 UserId: userId,
                 ProductId: productId,
                 SupplierId: supplierId,
-                Value: supplierRating,
-                Comment: comment
+                Value: supplierRating
             });
-
-            // * Add the purchaseId to the ratedPurchases set
-            setRatedPurchases(prevRatedPurchases => {
-                const updatedRatedPurchases = new Set(prevRatedPurchases.add(purchaseId));
-                localStorage.setItem('ratedPurchases', JSON.stringify(Array.from(updatedRatedPurchases)));
-                return updatedRatedPurchases;
-            });
-            
+    
             submitRatingEventEmitter.emit("SubmitRating");
             toast.success("Ratings submitted successfully");
             setRatingProduct(0);
             setRatingSupplier(0);
+            setComment("");
+            setPurchases(prevPurchases => prevPurchases.map(purchase => {
+                if (purchase.id === purchaseId) {
+                    purchase.isRated = true;
+                }
+                return purchase;
+            }));
+
+            await sleep(1000);
+            window.location.reload();
+            
         } catch (error) {
             console.error("Error submitting ratings:", error);
-            toast.error("Error submitting ratings");
+            console.error("Error submitting ratings");
         }
-    };
+    }
 
-    // * Load rated purchases from local storage
-    useEffect(() => {
-        const storedRatedPurchases = JSON.parse(localStorage.getItem('ratedPurchases')) || [];
-        setRatedPurchases(new Set(storedRatedPurchases));
-    }, []);
+    const hasBeenRated = (purchase) => {
+        return purchase?.orderItems?.some(orderItem => 
+            orderItem.product?.ratings?.some(rating => 
+                rating.userId === parseInt(userId) && rating.isRated)
+        ) ?? false;
+    };
 
     // * Get Order By User Id
     useEffect(() => {
@@ -387,24 +395,26 @@ function Purchase_History () {
                                         </tbody>
                                     </table>
                                 </div>
-                                {!ratedPurchases.has(selectedPurchases.id) ? (
-                                    <div className='rating-container'>
-                                       {/* Product Rating */}
-                                        <div className="stars-container">
-                                            <div className="prod-rating">
-                                                <h3 className='order-details-titles'>Product Rating:</h3>
-                                                <Rating 
-                                                    activeColor="#ffd700" 
-                                                    count={5} 
-                                                    size={35} 
-                                                    value={ratingProduct}  
-                                                    onChange={(rating) => setRatingProduct(rating)} 
-                                                />
-                                            </div>
-            
-                                            {/* Supplier Rating */}
-                                            <div className="prod-rating">
-                                                <h3 className='order-details-titles'>Supplier Rating:</h3>
+
+                                {!hasBeenRated(selectedPurchases) ? (
+                                    <React.Fragment>
+                                        <div className='rating-container'>
+                                            {/* Product Rating */}
+                                            <div className="stars-container">
+                                                <div className="prod-rating">
+                                                    <h3 className='order-details-titles'>Product Rating:</h3>
+                                                    <Rating 
+                                                        activeColor="#ffd700" 
+                                                        count={5} 
+                                                        size={35} 
+                                                        value={ratingProduct}  
+                                                        onChange={(rating) => setRatingProduct(rating)} 
+                                                    />
+                                                </div>
+
+                                                {/* Supplier Rating */}
+                                                <div className="prod-rating">
+                                                    <h3 className='order-details-titles'>Supplier Rating:</h3>
                                                     <Rating 
                                                         activeColor="#ffd700" 
                                                         count={5} 
@@ -412,75 +422,31 @@ function Purchase_History () {
                                                         value={ratingSupplier}
                                                         onChange={(rating) => setRatingSupplier(rating)} 
                                                     />
+                                                </div>
+                                            </div>
+                                            <div className="feedback-input-container">
+                                                <textarea onChange={(e) => setComment(e.target.value)} value={comment} placeholder='Please enter your feedback here.' className='cust-feedback-histo' name="customer-feedback" id="feedback" />
                                             </div>
                                         </div>
-                                        <div className="feedback-input-container">
-                                            <textarea onChange={(e) => setComment(e.target.value)} value={comment} placeholder='Please enter your feedback here.' className='cust-feedback-histo' name="customer-feedback" id="feedback" />
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="rating-complete-message">
-                                        <p className="thank-you-message">Thank you for rating!</p>
-                                        <p className="follow-up-message">Based on your previous purchases, we recommend the following products for you. If you wish to buy again, just click the 'buy again' button below of the modal.</p>
-                                        <div className="recommendation-section">
-                                            {recommendationProducts.map((product, index) => (
-                                                <div key={index} className="recommendation-card">
-                                                    <img src={`https://localhost:7017/${product.image}`}className="purchHistory-product-image" />
-                                                    <div className="product-details">
-                                                        <h4 className="product-name">{product.productName}</h4>
-                                                        <p className="product-description">{product.description}</p>
-                                                        <p className="product-price">
-                                                            {product.price ? product.price.toLocaleString('en-US', {
-                                                                style: 'currency',
-                                                                currency: 'PHP',
-                                                                minimumFractionDigits: 2,
-                                                                maximumFractionDigits: 2
-                                                            })
-                                                            : "₱0.00"}
-                                                        </p>
-                                                    </div>
-                                                    <Link to={`/shop/${userId}/visit_shop/${product.supplierId}`}>
-                                                        <button className="go-to-shop-button" onClick={handleCLose}>Go to Shop</button>
-                                                    </Link>
-                                                </div>
-                                            ))}
-                                            <div className="rating-and-feedback-container">
-                                                <div className="prod-starRating-container">
-                                                    <h3 className='order-details-titles'>Product Rating:</h3>
-                                                    <span className='fa fa-star' style={{ fontSize:'15px', marginBottom:'10px', color:'#0b66dd' }}><span className='starRating-num'>9</span>out of 5</span>
-                                                </div>
-                                                <div className="shop-starRating-container">
-                                                    <h3 className='order-details-titles'>Supplier Rating:</h3>
-                                                    <span className='fa fa-star' style={{ fontSize:'15px', marginBottom:'10px', color:'#0b66dd' }}><span className='starRating-num'>5</span>out of 5</span>
-                                                </div>
-                                                <br />
-                                                <h3 className='order-details-titles'>Customer Feedback</h3>
-                                                    <p className='custFeedback-text'>
-                                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                                                        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                                                        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                                                        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                                                            Excepteur sint occaecat cupidatat non proident,
-                                                        sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                                    </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}    
-        
-                                {!ratedPurchases.has(selectedPurchases.id) && (
-                                    <React.Fragment>
+
                                         <div className="feedback-btn-container">
                                             <button 
                                                 className="submit-feedback-btn" 
-                                                onClick={() => HandleSubmitRatings(selectedPurchases.id, selectedPurchases.cart.items[0].product.productId, 
-                                                                            selectedPurchases.cart.items[0].product.supplierId, 
-                                                                            ratingProduct, 
-                                                                            ratingSupplier)}>
+                                                onClick={() => HandleSubmitRatings(selectedPurchases.id, selectedPurchases.orderItems[0].product.productId, 
+                                                                                    selectedPurchases.cart.supplier.id, 
+                                                                                    ratingProduct, 
+                                                                                    ratingSupplier)}>
                                                 Submit
                                             </button>
                                         </div>
                                     </React.Fragment>
+                                ) : (
+                                    <div className="rating-complete-message">
+                                        <p className="thank-you-message">Thank you for rating!</p>
+                                        <p className="follow-up-message">Your feedback has been submitted. If you wish to buy again, just click the 'buy again' button below of the modal.</p>
+                                        <img className='thankYou-img' src={ thankYou } alt="" />
+                                        <div className="recommendation-section"></div>
+                                    </div>
                                 )}
         
                                 </div>
