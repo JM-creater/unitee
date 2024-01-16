@@ -1,11 +1,10 @@
 import './admin_shops.css'
 import { useEffect, useState } from 'react'
-import starIcon from "../../assets/images/icons/starRating.png"
-import prodRating from "../../assets/images/icons/star.png"
 import axios from 'axios'
 import validationEventEmitter from '../../helpers/ValidationEmitter';
 import registerUsersEventEmitter from '../../helpers/RegisterUsersEmitter';
 import addProductEventEmitter from '../../helpers/AddProductEventEmitter'
+import React from 'react'
 
 
 function Admin_Shops () {
@@ -295,8 +294,17 @@ function Admin_Shops () {
                         <h5 className="supplier-card-title">{shopItem.shopName}</h5>
                         <h5 className='shop-rating-card'>{shopItem.address}</h5>
                         <h5 className='shop-rating-card'>
-                            <img className="ratingIcon" src={starIcon} />
-                            {shopItem.averageRating.toFixed(1)}
+                            {shopItem.averageRating > 0 ? (
+                                <React.Fragment>
+                                    <span className="fa fa-star" style={{ color: 'yellow', marginRight: '3px' }}></span>
+                                    {shopItem.averageRating.toFixed(1)}
+                                </React.Fragment>
+                            ) : (
+                                <React.Fragment>
+                                    <span className="fa fa-star" style={{ color: '#ccc', marginRight: '3px' }}></span>
+                                    0.0
+                                </React.Fragment>
+                            )}
                         </h5>
                     </div>
                 </div>
@@ -488,85 +496,90 @@ function Admin_Shops () {
                             </div>
                             {/* END OF FILTER */}
 
-                            {/* PRODUCTS CONTAINER */}
+                                {/* PRODUCTS CONTAINER */}
                                 <div className='adminShop-prods-container'>
-
-                                {/* PRODUCT CARD */}
                                 {filteredProducts.map(product => (
-                                <div key={product.productId} className='prodList-card-admin' style={{ backgroundColor:'#004AAD', padding:'10px', borderRadius:'5px' }}>
-                                    <div style={{ display:'flex', flexFlow:'column' }}>
-                                        <div className='admin-viewProds-card'>
-                                            <img className='admin-viewProd-img' src={ `https://localhost:7017/${product.image}` }/>
-                                            <h4 className='col-md-4 admin-prodName' style={{ display:'flex', flexFlow:'column' }}>{product.productName}
-                                                <span className='admin-prodRating' style={{ color:'white', marginTop:'8px', display:'flex', alignItems:'center' }}>
-
-                                                    <img style={{ marginRight:'5px', width:'100%', maxWidth:'12px' }} src={ prodRating } alt="product rating icon" />
-                                                    {averageRatingProduct && averageRatingProduct[product.productId] ? averageRatingProduct[product.productId].toFixed(1) : "0.0"}
-                                                    
-                                                </span>
-                                            </h4>
-                                            <h4 className='col-md-3 admin-prodStocks'>Total Stocks:
-                                                <span className='totalStocks-adminProd'>{totalStock(product.sizes)}</span>
-                                            </h4>
-                                            <h4 className='col-md-3 admin-prodPrice'>Price:
-                                                <span className='price-adminProd'>
-                                                    {product.price ? product.price.toLocaleString('en-US', {
-                                                        style: 'currency',
-                                                        currency: 'PHP',
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2
-                                                    })
-                                                    : "₱0.00"}
-                                                </span>
-                                            </h4>
+                                    <div key={product.productId} className='prodList-card-admin' style={{ backgroundColor:'#004AAD', padding:'10px', borderRadius:'5px' }}>
+                                        <div style={{ display:'flex', flexFlow:'column' }}>
+                                            <div className='admin-viewProds-card'>
+                                                <img className='admin-viewProd-img' src={ `https://localhost:7017/${product.image}` }/>
+                                                <h4 className='col-md-4 admin-prodName' style={{ display:'flex', flexFlow:'column' }}>{product.productName}
+                                                    <span className='admin-prodRating' style={{ color:'white', marginTop:'8px', display:'flex', alignItems:'center' }}>
+                                                        {averageRatingProduct[product.productId] > 0 ? (
+                                                            <React.Fragment>
+                                                                <span className="fa fa-star" style={{ color: 'yellow', marginRight: '3px' }}></span>
+                                                                {averageRatingProduct[product.productId].toFixed(1)}
+                                                            </React.Fragment>
+                                                        ) : (
+                                                            <React.Fragment>
+                                                                <span className="fa fa-star" style={{ color: '#ccc', marginRight: '3px' }}></span>
+                                                                0.0
+                                                            </React.Fragment>
+                                                        )}
+                                                    </span>
+                                                </h4>
+                                                <h4 className='col-md-3 admin-prodStocks'>Total Stocks:
+                                                    <span className='totalStocks-adminProd'>{totalStock(product.sizes)}</span>
+                                                </h4>
+                                                <h4 className='col-md-3 admin-prodPrice'>Price:
+                                                    <span className='price-adminProd'>
+                                                        {product.price ? product.price.toLocaleString('en-US', {
+                                                            style: 'currency',
+                                                            currency: 'PHP',
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2
+                                                        })
+                                                        : "₱0.00"}
+                                                    </span>
+                                                </h4>
+                                            </div>
+                                            
+                                            <div className='showMore-btn-container'>
+                                                        {/* SHOW MORE BUTTON */}
+                                                <button 
+                                                    className="admin-prodShowDetails-btn" 
+                                                    type="button" 
+                                                    data-bs-toggle="collapse"  
+                                                    data-bs-target={`#prodDetailsCollapse${product.productId}`}  
+                                                    aria-expanded="false" 
+                                                    aria-controls={`prodDetailsCollapse${product.productId}`}
+                                                >
+                                                    Show More
+                                                </button>
+                                            </div>
                                         </div>
-                                        
-                                        <div className='showMore-btn-container'>
-                                                    {/* SHOW MORE BUTTON */}
-                                            <button 
-                                                className="admin-prodShowDetails-btn" 
-                                                type="button" 
-                                                data-bs-toggle="collapse"  
-                                                data-bs-target={`#prodDetailsCollapse${product.productId}`}  
-                                                aria-expanded="false" 
-                                                aria-controls={`prodDetailsCollapse${product.productId}`}
-                                            >
-                                                Show More
-                                            </button>
-                                        </div>
-                                    </div>
 
 
-                                    <div className="collapse" id={`prodDetailsCollapse${product.productId}`} style={{ marginRight:'18px' }}>
-                                        {/* START OF CARD BODY */}
-                                        <div className="card card-body" style={{ display:'flex', justifyContent:'space-between', gap:'10px', backgroundColor: 'transparent' }}>
+                                        <div className="collapse" id={`prodDetailsCollapse${product.productId}`} style={{ marginRight:'18px' }}>
+                                            {/* START OF CARD BODY */}
+                                            <div className="card card-body" style={{ display:'flex', justifyContent:'space-between', gap:'10px', backgroundColor: 'transparent' }}>
 
-                                            {/* DESCRIPTION */}
-                                            <h5 className='admin-prodDetails-labels' style={{ display:'flex', flexWrap:'wrap' }}>Description:
-                                                <span className='col-md-10 admin-prodDetails-text'>{product.description}</span>
-                                            </h5>
-
-                                            {/* DEPARTMENT */}
-                                            <h5 className='admin-prodDetails-labels'>Department:
-                                                <h5 className='admin-prodDetails-text'>{getDepartmentName(product.departmentId)}</h5>
-                                            </h5>
-
-                                            {/* TYPE */}
-                                            <h5 className='admin-prodDetails-labels'>Type:
-                                                <h5 className='admin-prodDetails-text'>{getProductTypeName(product.productTypeId)}</h5>
-                                            </h5>
-
-                                            {/* SIZES AVAILABLE */}
-                                            <h5 className='admin-prodDetails-labels'>Sizes Available:
-                                                <h5 className='admin-prodDetails-text'>
-                                                    {product.sizes.map((sizeObj, index) => (
-                                                        <span style={{ fontSize: '18px', color: 'white' }} key={index}>{sizeObj.size}{index !== product.sizes.length - 1 ? ', ' : ''}</span>
-                                                    ))}
+                                                {/* DESCRIPTION */}
+                                                <h5 className='admin-prodDetails-labels' style={{ display:'flex', flexWrap:'wrap' }}>Description:
+                                                    <span className='col-md-10 admin-prodDetails-text'>{product.description}</span>
                                                 </h5>
-                                            </h5>
+
+                                                {/* DEPARTMENT */}
+                                                <h5 className='admin-prodDetails-labels'>Department:
+                                                    <h5 className='admin-prodDetails-text'>{getDepartmentName(product.departmentId)}</h5>
+                                                </h5>
+
+                                                {/* TYPE */}
+                                                <h5 className='admin-prodDetails-labels'>Type:
+                                                    <h5 className='admin-prodDetails-text'>{getProductTypeName(product.productTypeId)}</h5>
+                                                </h5>
+
+                                                {/* SIZES AVAILABLE */}
+                                                <h5 className='admin-prodDetails-labels'>Sizes Available:
+                                                    <h5 className='admin-prodDetails-text'>
+                                                        {product.sizes.map((sizeObj, index) => (
+                                                            <span style={{ fontSize: '18px', color: 'white' }} key={index}>{sizeObj.size}{index !== product.sizes.length - 1 ? ', ' : ''}</span>
+                                                        ))}
+                                                    </h5>
+                                                </h5>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 ))}
                             </div>
                         </div>

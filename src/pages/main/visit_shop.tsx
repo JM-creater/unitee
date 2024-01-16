@@ -43,6 +43,7 @@ function Visit_Shop () {
     const { userId, id: shopId } = useParams();
     const supplier = suppliers[shopId];
 
+    // * Render stars
     const renderStars = (rating) => {
         const stars = [];
         for (let i = 1; i <= 5; i++) {
@@ -750,9 +751,9 @@ function Visit_Shop () {
     
                                     <h5 className="prodModal-text">
                                         <img className="prodModalRating-icon" src={prodRatingModal} alt="Product Rating Icon" />
-                                        {selectedProduct.averageRating.toFixed(1) }
+                                        {selectedProduct.averageRating.toFixed(1)}
                                     </h5>
-                                    <span className="num-sold-prod"><span className="numberSold-prod"> {getNumberOfSolds(selectedProduct.productId)}</span>sold</span>
+                                    <span className="num-sold-prod"><span className="numberSold-prod">{getNumberOfSolds(selectedProduct.productId)}</span>sold</span>
                                     <h5 className="prodModal-text">
                                         {getDepartmentName(selectedProduct.productDepartments.departmentId)}
                                     </h5>
@@ -844,7 +845,7 @@ function Visit_Shop () {
                                                                 {rating.user.firstName} {rating.user.lastName}
                                                             </span>
                                                             <span className="reviews-rating">
-                                                                <span className="fa fa-star reviewRating">{rating.value}</span> out of 5
+                                                                <span className="reviewRating">{renderStars(rating.value)}</span>
                                                             </span>
                                                         </div>
                                                     </div>
