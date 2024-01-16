@@ -493,6 +493,14 @@
     border-radius: 50%;
 }
 
+.fa-star {
+    color: #ccc; 
+}
+
+.checked {
+    color: yellow; 
+}
+
 @media screen and (max-width: 480px) {
     .shop-main-container {
         flex-flow: row;
