@@ -1,6 +1,5 @@
 import "./search_product.css";
 import cartIcon from "../../assets/images/icons/addToCart.png";
-import prodRatingModal from "../../assets/images/icons/starRating.png";
 import LoadingGif from "../../assets/images/icons/loadingscreen.svg";
 import noimage from "../../assets/images/noimage.jpg"
 import axios from "axios";
@@ -118,13 +117,13 @@ function Search_Product() {
 
     // * Handle Product Type Filter
     const handleProductTypeClick = (e) => {
-            const value = e.target.value;
-            if (selectedProductType === value) {
-                setSelectedProductType("");
-                e.target.checked = false;
-            } else {
-                setSelectedProductType(value);
-            }
+        const value = e.target.value;
+        if (selectedProductType === value) {
+            setSelectedProductType("");
+            e.target.checked = false;
+        } else {
+            setSelectedProductType(value);
+        }
     };
 
     // * Handle Gender Filter
@@ -189,17 +188,17 @@ function Search_Product() {
         });
     };
 
-  // * Update the Product Details Modal
-  // useEffect(() => {
-  //     const modal = document.getElementById('viewProdDetailsModal')
-  //     if (modal) {
-  //         modal.addEventListener('hidden.bs.modal', HandleCloseButton);
+    // * Update the Product Details Modal
+    // useEffect(() => {
+    //     const modal = document.getElementById('viewProdDetailsModal')
+    //     if (modal) {
+    //         modal.addEventListener('hidden.bs.modal', HandleCloseButton);
 
-  //         return () => {
-  //             modal.removeEventListener('hidden.bs.modal', HandleCloseButton);
-  //         };
-  //     }
-  // }, []);
+    //         return () => {
+    //             modal.removeEventListener('hidden.bs.modal', HandleCloseButton);
+    //         };
+    //     }
+    // }, []);
 
     // * Update the Size Guide Modal
     useEffect(() => {
@@ -551,114 +550,92 @@ return (
                                         </div>
                                     </div>
                                 </div>
-                            <div className="col-md-5 prodModal-details-container">
-                            <h2 className="col-md-12 prodModal-Name">
-                                {selectedProduct.productName}
-                            </h2>
-
-                            <h5 className="prodModal-text">
-                                <img
-                                    className="prodModalRating-icon"
-                                    src={prodRatingModal}
-                                />
-                                {selectedProduct.averageRating.toFixed(1)}
-                            </h5>
-                            <span className="num-sold-prod"><span className="numberSold-prod">{getNumberOfSolds(selectedProduct.productId)}</span>sold</span>
-                            <h5 className="prodModal-text">
-                                {getDepartmentName(selectedProduct.productDepartments.departmentId)}
-                            </h5>
-                            <h5 className="prodModal-text">
-                                {selectedProduct.category}
-                            </h5>
-                            <h1 className="prodModal-Price">
-                                {selectedProduct.price ? selectedProduct.price.toLocaleString('en-US', {
-                                    style: 'currency',
-                                    currency: 'PHP',
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                })
-                                : "₱0.00"}
-                            </h1>
-                            <div className="prodModal-SizeGuide">
-                                <h5 className="prodModal-text">
-                                {/* <img className="sizeIcon-container" src={ sizeIcon }/> */}
-                                <button
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#viewSizeGuideModal"
-                                    style={{
-                                        padding: "5px",
-                                        border: "2px solid white",
-                                        backgroundColor: "#004AAD",
-                                        borderRadius: "10px",
-                                        color: "white",
-                                    }}
-                                >
-                                    Size Guide
-                                </button>
-                                </h5>
-                            </div>
-                            <div className="col-md-12 prodModal-Size-Stock-container">
-                                <select
-                                className="col-md-5"
-                                style={{
-                                    padding: "10px",
-                                    border: "2px solid white",
-                                    backgroundColor: "#F0F0F0",
-                                    borderRadius: "10px",
-                                }}
-                                onChange={HandleSelectedSize}
-                                >
-                                <option disabled selected hidden>
-                                    Select Size
-                                </option>
-                                {selectedProduct.sizes &&
-                                    selectedProduct.sizes.map((size, index) => (
-                                    <option
-                                        key={`${size}-${index}`}
-                                        value={size.id}
-                                        disabled={size.quantity === 0}
-                                    >
-                                        {size.size}{" "}
-                                        {size.quantity === 0 ? "(Sold Out)" : ""}
-                                    </option>
-                                    ))}
-                                </select>
-                                {selectedProduct.sizes && (
-                                <h5 className="prodModal-stocks">
-                                    Stocks: {newQuantity}
-                                </h5>
-                                )}
-                            </div>
-                            <div className="prodModal-quantity-container">
-                                <h5 style={{ marginRight: "10px", fontSize: "12px" }}>
-                                Quantity
-                                </h5>
-                                <button className="prodModal-minus-quanti-btn" onClick={HandleMinusQuantity}>
-                                -
-                                </button>
-
-                                <input
-                                    id="quantities"
-                                    className="prodModal-quanti-input"
-                                    type="text"
-                                    value={quantity}
-                                    onChange={(e) =>
-                                        setQuantity(parseInt(e.target.value) || 0)
-                                    }
-                                ></input>
-
-                                <button className="prodModal-plus-quanti-btn" onClick={HandlePlusQuantity}>
-                                +
-                                </button>
-                            </div>
-                            <button
-                                className="prodModal-add-to-cart-btn"
-                                onClick={addToCart}
-                            >
-                                <img className="prodModal-cart-icon" src={cartIcon} />
-                                Add to Cart
-                            </button>
-                            </div>
+                                <div className="prodModal-details-container">
+                                    <h2 className="prodModal-Name">{selectedProduct.productName}</h2>
+    
+                                    <h5 className="prodModal-text">
+                                        {selectedProduct.averageRating > 0 ? (
+                                            <React.Fragment>
+                                                <span className="fa fa-star" style={{ color: 'yellow', marginRight: '3px' }}></span>
+                                                {selectedProduct.averageRating.toFixed(1)}
+                                            </React.Fragment>
+                                        ) : (
+                                            <React.Fragment>
+                                                <span className="fa fa-star" style={{ color: '#ccc', marginRight: '3px' }}></span>
+                                                {selectedProduct.averageRating.toFixed(1)}
+                                            </React.Fragment>
+                                        )}
+                                    </h5>
+                                    <span className="num-sold-prod"><span className="numberSold-prod">{getNumberOfSolds(selectedProduct.productId)}</span>sold</span>
+                                    <h5 className="prodModal-text">
+                                        {getDepartmentName(selectedProduct.productDepartments.departmentId)}
+                                    </h5>
+                                    <h5 className="prodModal-text">
+                                        {selectedProduct.category}
+                                    </h5>
+                                    <h1 className="prodModal-Price">
+                                        {selectedProduct.price ? selectedProduct.price.toLocaleString('en-US', {
+                                            style: 'currency',
+                                            currency: 'PHP',
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        })
+                                        : "₱0.00"}
+                                    </h1>
+                                    <div className="prodModal-Size-Stock-container">
+                                    <button 
+                                                className="sizeGuide-btn"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#viewSizeGuideModal"
+                                                title="view size guide"
+                                            >
+                                                Size Guide
+                                            </button>
+                                        <select 
+                                            className="col-md-2" 
+                                            title="select product size"
+                                            style={{ padding:'10px', border: '2px solid white', borderRadius:'10px' }}
+                                            onChange={HandleSelectedSize}
+                                        >
+                                            <option disabled selected hidden>
+                                                Select Size
+                                            </option>
+                                            {selectedProduct.sizes && selectedProduct.sizes.map((size, index) => (
+                                                <option key={`${size}-${index}`} value={size.id} disabled={size.quantity === 0}>
+                                                    {size.size} {size.quantity === 0 ? '(Sold Out)' : ''}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {selectedProduct.sizes && (
+                                            <h5 className="prodModal-stocks">Stocks: {newQuantity}</h5>
+                                        )}
+                                    </div>
+                                    <div className="prodModal-quantity-container">
+                                            <h5 style={{ marginRight:'10px', fontSize:'12px' }}>Quantity</h5>
+                                        <button className="prodModal-minus-quanti-btn" onClick={HandleMinusQuantity}>
+                                            -
+                                        </button>
+    
+                                        <input 
+                                            id="quantities"
+                                            className="prodModal-quanti-input" 
+                                            type="text" 
+                                            value={quantity}
+                                            onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
+                                        >
+                                        </input>
+    
+                                        <button className="prodModal-plus-quanti-btn" onClick={HandlePlusQuantity}>
+                                            +
+                                        </button>
+                                    </div>
+                                    <div className="addToCart-container">
+                                        <button className="prodModal-add-to-cart-btn" onClick={addToCart} >
+                                            <img className="prodModal-cart-icon" src={ cartIcon }/>
+                                            Add to Cart
+                                        </button>
+                                    </div>
+                                </div>
                         </React.Fragment>
                         )}
 
