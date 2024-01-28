@@ -1,6 +1,5 @@
 import starIcon from "../../assets/images/icons/starRating.png"
 import cartIcon from "../../assets/images/icons/addToCart.png"
-import prodRatingModal from "../../assets/images/icons/starRating.png"
 import noimage from "../../assets/images/noimage.jpg"
 import axios from 'axios'
 import { toast } from 'react-toastify';
@@ -56,7 +55,6 @@ function Visit_Shop () {
         return stars;
     }
     
-
     // * Function to fetch feedback for a specific product
     const handleFeedback = async (productId) => {
         try {
@@ -750,8 +748,17 @@ function Visit_Shop () {
                                     <h2 className="prodModal-Name">{selectedProduct.productName}</h2>
     
                                     <h5 className="prodModal-text">
-                                        <img className="prodModalRating-icon" src={prodRatingModal} alt="Product Rating Icon" />
-                                        {selectedProduct.averageRating.toFixed(1)}
+                                        {selectedProduct.averageRating > 0 ? (
+                                            <React.Fragment>
+                                                <span className="fa fa-star" style={{ color: 'yellow', marginRight: '3px' }}></span>
+                                                {selectedProduct.averageRating.toFixed(1)}
+                                            </React.Fragment>
+                                        ) : (
+                                            <React.Fragment>
+                                                <span className="fa fa-star" style={{ color: '#ccc', marginRight: '3px' }}></span>
+                                                {selectedProduct.averageRating.toFixed(1)}
+                                            </React.Fragment>
+                                        )}
                                     </h5>
                                     <span className="num-sold-prod"><span className="numberSold-prod">{getNumberOfSolds(selectedProduct.productId)}</span>sold</span>
                                     <h5 className="prodModal-text">
