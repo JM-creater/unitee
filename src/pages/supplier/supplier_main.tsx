@@ -33,6 +33,7 @@ function Supplier_Main (){
     const [countForPickUp, setCountForPickUp] = useState(0);
     const [countCompleted, setCountCompleted] = useState(0);
     const [countCanceled, setCountCanceled] = useState(0);
+    const [isCollapse, setIsCollapse] = useState<boolean>(false);
     const { id } = useParams();
     const { setLogout } = useAuth();
     const navigate = useNavigate();
@@ -41,6 +42,11 @@ function Supplier_Main (){
         const savedNotifs = localStorage.getItem('displayedNotifs');
         return savedNotifs ? new Set(JSON.parse(savedNotifs)) : new Set();
     });
+
+    const toggleCollapse = () => {
+        setIsCollapse(!isCollapse);
+        handleNotificationClick();
+    };
 
      // * For Delay
     const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -77,7 +83,7 @@ function Supplier_Main (){
             }
         }
         fetchCountData();
-    }, []);
+    }, [id]);
 
     // * Windows Event Listener Focus
     useEffect(() => {
@@ -283,49 +289,54 @@ function Supplier_Main (){
                 />
                 <header className="supplier-header">
                     <Link to='' className="col-md-12 supplier-home-btn">
-                            <img className="Supplierlogo" src={ logo }/>
+                            <img className="Supplierlogo" src={ logo } alt='logo'/>
                     </Link>
 
 
                     <div className="supplier-nav-bar">
                         <Link to='' className="supplier-nav-link">
-                            <img className="supplier-nav-icon" src={ dashboardSupplierIcon }/>
+                            <img className="supplier-nav-icon" src={ dashboardSupplierIcon } alt='icon' />
                             <span className="supplier-nav-text">Dashboard</span>
                         </Link>
-                        {/* <Link to='supplier_orders' className="supplier-nav-link" onClick={handleNotificationClick}>
-                            <img className="supplier-nav-icon" src={ ordersSupplierIcon }/>
-                            <span className="supplier-nav-text">Orders {notifItem.length > 0 && <span className='notifOrder-count'>{notifItem.length}</span>}</span>
-                        </Link> */}
-                        <div onClick={handleNotificationClick} className="supplier-nav-link" data-bs-toggle="collapse" href="#orderStatusCollapse" role="button" aria-expanded="false" aria-controls="orderStatusCollapse">
-                            <img className="supplier-nav-icon" src={ ordersSupplierIcon }/>
+                        
+                        <button
+                            className="supplier-nav-link"
+                            onClick={toggleCollapse}
+                        >
+                            <img className="supplier-nav-icon" src={ ordersSupplierIcon } alt='icon'/>
                             <span className="order-status-collapse">Orders {notifItem.length > 0 && <span className='notifOrder-count'>{notifItem.length}</span>}</span>
-                        </div>
-                        <div className="collapse" id="orderStatusCollapse">
-                            <div className="orders-collapse-container"
-                            style={{ backgroundColor: "#020654" }}>
-                                <Link className="supplier-collapse-orders-link" to="pending_orders">
-                                    <span className="supplier-nav-text-collapse">Pending {countPending > 0 && <span className='notifPending-count'>{countPending}</span>}</span>
-                                </Link>
-                                <Link className="supplier-collapse-orders-link" to="approved_orders">
-                                    <span className="supplier-nav-text-collapse">Approved {countApproved > 0 && <span className='notifApproved-count'>{countApproved}</span>}</span>
-                                </Link>
-                                <Link className="supplier-collapse-orders-link" to="pickUp_orders">
-                                    <span className="supplier-nav-text-collapse">For Pick Up {countForPickUp > 0 && <span className='notifForPickUp-count'>{countForPickUp}</span>}</span>
-                                </Link>
-                                <Link className="supplier-collapse-orders-link" to="completed_orders">
-                                    <span className="supplier-nav-text-collapse">Completed {countCompleted > 0 && <span className='notifCompleted-count'>{countCompleted}</span>}</span>
-                                </Link>
-                                <Link className="supplier-collapse-orders-link" to="canceled_orders">
-                                    <span className="supplier-nav-text-collapse">Canceled {countCanceled > 0 && <span className='notifCanceled-count'>{countCanceled}</span>}</span>
-                                </Link>
-                            </div>
-                        </div>
+                        </button>
+
+                        {
+                            isCollapse && (
+                                <div className="collapse show">
+                                    <div className="orders-collapse-container"
+                                    style={{ backgroundColor: "#020654" }}>
+                                        <Link className="supplier-collapse-orders-link" to="pending_orders">
+                                            <span className="supplier-nav-text-collapse">Pending {countPending > 0 && <span className='notifPending-count'>{countPending}</span>}</span>
+                                        </Link>
+                                        <Link className="supplier-collapse-orders-link" to="approved_orders">
+                                            <span className="supplier-nav-text-collapse">Approved {countApproved > 0 && <span className='notifApproved-count'>{countApproved}</span>}</span>
+                                        </Link>
+                                        <Link className="supplier-collapse-orders-link" to="pickUp_orders">
+                                            <span className="supplier-nav-text-collapse">For Pick Up {countForPickUp > 0 && <span className='notifForPickUp-count'>{countForPickUp}</span>}</span>
+                                        </Link>
+                                        <Link className="supplier-collapse-orders-link" to="completed_orders">
+                                            <span className="supplier-nav-text-collapse">Completed {countCompleted > 0 && <span className='notifCompleted-count'>{countCompleted}</span>}</span>
+                                        </Link>
+                                        <Link className="supplier-collapse-orders-link" to="canceled_orders">
+                                            <span className="supplier-nav-text-collapse">Canceled {countCanceled > 0 && <span className='notifCanceled-count'>{countCanceled}</span>}</span>
+                                        </Link>
+                                    </div>
+                                </div>
+                            )
+                        }
                         <Link to='manage_shop' className="supplier-nav-link">
-                            <img className="supplier-nav-icon" src={ shopIcon }/>
+                            <img className="supplier-nav-icon" src={ shopIcon } alt='icon'/>
                             <span className="supplier-nav-text">Shop</span>
                         </Link>
                         <Link to='reports' className="supplier-nav-link">
-                            <img className="supplier-nav-icon" src={ supplierReportsIcon }/>
+                            <img className="supplier-nav-icon" src={ supplierReportsIcon } alt='icon'/>
                             <span className="supplier-nav-text">Reports</span>
                         </Link>
                     </div>
@@ -342,6 +353,7 @@ function Supplier_Main (){
                                     src={ `https://localhost:7017/${supplier.image}` } 
                                     data-bs-toggle="dropdown" 
                                     aria-expanded="false"
+                                    alt='profile'
                                 />
                             </React.Fragment>
                         )}
@@ -350,7 +362,7 @@ function Supplier_Main (){
                             <Link to={`supplier_viewProf/${id}`} style={{ textDecoration: 'none' }}>
                                 <li className="drop-list">
                                     <a className="dropdown-item supplier-drop-item" style={{ fontSize:'15px'}}>
-                                        <img className="drop-icon" src={ editprof }/>
+                                        <img className="drop-icon" src={ editprof } alt='icon'/>
                                         View Profile
                                     </a>
                                 </li>
@@ -358,7 +370,7 @@ function Supplier_Main (){
                             
                             <li className="drop-list">
                                 <a className="dropdown-item supplier-drop-item" data-bs-toggle="modal" data-bs-target="#logoutModal" style={{ fontWeight:'600', fontSize:'15px', cursor: 'pointer' }}>
-                                    <img className="drop-icon-logout" src={ logoutIcon }/>
+                                    <img className="drop-icon-logout" src={ logoutIcon } alt='icon'/>
                                     Log Out
                                 </a>
                             </li>  

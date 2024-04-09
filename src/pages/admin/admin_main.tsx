@@ -22,6 +22,7 @@ function Admin_Main() {
   const [overallUserCount, setOverallUserCount] = useState(0);
   const [customerCount, setCustomerCount] = useState(0);
   const [supplierCount, setSupplierCount] = useState(0);
+  const [isCollapse, setIsCollapse] = useState<boolean>(false);
   const { setLogout } = useAuth();
   const navigate = useNavigate();
 
@@ -97,46 +98,55 @@ function Admin_Main() {
           <header className="admin-header">
             <Link to="" className="col-md-12 admin-home-btn">
               <div className="adminLogo-container">
-                <img className="adminIcon" src={adminIcon} />
-                <img className="unitee-logo-admin" src={logo} />
+                <img className="adminIcon" src={adminIcon} alt="admin-icon"/>
+                <img className="unitee-logo-admin" src={logo} alt="unitee-logo-admin"/>
               </div>
             </Link>
 
             <div className="admin-nav-bar">
               <Link to="" className="admin-nav-link">
-                <img className="admin-nav-icon" src={dashboardAdminIcon} />
+                <img className="admin-nav-icon" src={dashboardAdminIcon} alt="admin-nav-con" />
                 <span className="admin-nav-text">Dashboard</span>
               </Link>
 
               <Link className="admin-nav-link" to="admin_shops">
-                <img className="admin-nav-icon" src={shopsIcon} />
+                <img className="admin-nav-icon" src={shopsIcon} alt="admin-shop-icon" />
                 <span className="admin-nav-text">Shops</span>
               </Link>
 
-              <div className="admin-nav-link" data-bs-toggle="collapse" href="#usersTypeCollapse" role="button" aria-expanded="false" aria-controls="usersTypeCollapse">
+              <button 
+                className="admin-nav-link"
+                onClick={() => setIsCollapse(!isCollapse)}
+              >
                 <img className="admin-nav-icon" src={usersIcon} alt="" />
                 <span className="users-type-collapse">Users {overallUserCount > 0 && <span className='notifPending-count'>{overallUserCount}</span>}</span>
-              </div>
+              </button>
 
-              <div className="collapse" id="usersTypeCollapse">
-                <div className="users-collapse-container"
-                  style={{ backgroundColor: "#020654" }}>
-                  <Link className="admin-collapse-users-link" to="view_customers">
-                    <span className="admin-nav-text-collapse">Customers {customerCount > 0 && <span className='notifPending-count'>{customerCount}</span>}</span>
-                  </Link>
-                  <Link className="admin-collapse-users-link" to="suppliers">
-                    <span className="admin-nav-text-collapse">Suppliers {supplierCount > 0 && <span className='notifPending-count'>{supplierCount}</span>}</span>
-                  </Link>
+              {
+                isCollapse && (
+                  <div className="collapse show">
+                  <div 
+                    className="users-collapse-container"
+                    style={{ backgroundColor: "#020654" }}
+                  >
+                    <Link className="admin-collapse-users-link" to="view_customers">
+                      <span className="admin-nav-text-collapse">Customers {customerCount > 0 && <span className='notifPending-count'>{customerCount}</span>}</span>
+                    </Link>
+                    <Link className="admin-collapse-users-link" to="suppliers">
+                      <span className="admin-nav-text-collapse">Suppliers {supplierCount > 0 && <span className='notifPending-count'>{supplierCount}</span>}</span>
+                    </Link>
+                  </div>
                 </div>
-              </div>
+                )
+              }
 
               <Link className="admin-nav-link" to="admin_reports">
-                <img className="admin-nav-icon" src={adminReportsIcon} />
+                <img className="admin-nav-icon" src={adminReportsIcon} alt="admin-report-icon" />
                 <span className="admin-nav-text">Reports</span>
               </Link>
 
               <Link className="admin-nav-link" to={`admin_viewProf/${id}`}>
-                <img className="admin-nav-icon" src={viewProfIcon} />
+                <img className="admin-nav-icon" src={viewProfIcon} alt="admiin-view-prof-icon" />
                 <span className="admin-nav-text">View Profile</span>
               </Link>
             </div>
